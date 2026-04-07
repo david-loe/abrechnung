@@ -1,4 +1,5 @@
 .env
+.codex
 
 # copy from backend/.gitignore
 backend/node_modules

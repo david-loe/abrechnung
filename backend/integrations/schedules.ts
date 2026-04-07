@@ -1,4 +1,5 @@
 import { Schedule } from 'abrechnung-common/types.js'
+import { type RepeatOptions } from 'bullmq'
 
 function isIntInRange(value: unknown, min: number, max: number) {
   return Number.isInteger(value) && Number(value) >= min && Number(value) <= max
@@ -42,4 +43,8 @@ export function scheduleToCronTime(schedule: Schedule) {
     return `${schedule.minute} ${schedule.hour} * * *`
   }
   return `${schedule.minute} ${schedule.hour} * * ${schedule.weekdays.join(',')}`
+}
+
+export function scheduleToRepeatOptions(schedule: Schedule): Omit<RepeatOptions, 'key'> {
+  return { pattern: scheduleToCronTime(schedule) }
 }

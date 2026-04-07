@@ -150,16 +150,19 @@ export interface IntegrationScheduleSettings {
 export interface IntegrationSettings<idType extends _id = _id> {
   integrationKey: string
   schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
+  settings: Record<string, unknown>
   _id: idType
 }
 
-export interface RetentionSettings<idType extends _id = _id> {
-  enabled: boolean
-  schedule: Schedule
-  retentionPolicy: {
-    [key in RetentionType]: number
-  }
-  _id: idType
+export interface RetentionIntegrationSettings<idType extends _id = _id> extends IntegrationSettings<idType> {
+  integrationKey: 'retentionPolicy'
+  schedules: { apply: IntegrationScheduleSettings }
+  settings: { [key in RetentionType]: number }
+}
+export interface LumpSumIntegrationSettings<idType extends _id = _id> extends IntegrationSettings<idType> {
+  integrationKey: 'lumpSums'
+  schedules: { sync: IntegrationScheduleSettings }
+  settings: Record<string, never>
 }
 
 export interface DisplaySettings<idType extends _id = _id> {

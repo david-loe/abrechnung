@@ -1,6 +1,5 @@
 import APP from './app.js'
 import ENV from './env.js'
-import { startIntegrationScheduler } from './integrations/schedulerManager.js'
 import { logger } from './logger.js'
 import { UserDoc } from './models/user.js'
 
@@ -14,7 +13,6 @@ declare global {
 }
 
 const app = await APP()
-await startIntegrationScheduler()
 
 app.listen(8000, () => {
   logger.info(`Backend listening at ${ENV.VITE_BACKEND_URL}`)

@@ -1,39 +1,26 @@
-import { Schedule } from 'abrechnung-common/types.js'
-import { fetchAndUpdateLumpSums } from './lumpSums/trigger.js'
-import { retentionPolicy } from './policies/trigger.js'
+import { type Integration } from './integration.js'
+import { lumpSumsIntegration } from './lumpSums/integration.js'
+import { a1NotificationIntegration } from './notifications/a1.js'
+import { mailNotificationIntegration } from './notifications/email.js'
+import { pushNotificationIntegration } from './notifications/push.js'
+import { statusNotificationIntegration } from './notifications/status.js'
+import { reportDiskIntegration } from './reports/disk.js'
+import { reportMailIntegration } from './reports/email.js'
+import { retentionPolicyIntegration } from './retentionPolicy/integration.js'
+import { webhookIntegration } from './webhooks/integration.js'
 
-export interface IntegrationScheduledActionDefinition {
-  scheduleKey: string
-  defaultSchedule: Schedule
-  enabledByDefault: boolean
-  onTick: () => Promise<void>
-}
-
-export interface IntegrationDefinition {
-  integrationKey: string
-  scheduledActions: IntegrationScheduledActionDefinition[]
-}
-
-export const integrationDefinitions: IntegrationDefinition[] = [
-  {
-    integrationKey: 'lumpSums',
-    scheduledActions: [
-      {
-        scheduleKey: 'sync',
-        defaultSchedule: { type: 'daily', hour: 1, minute: 0 },
-        enabledByDefault: true,
-        onTick: fetchAndUpdateLumpSums
-      }
-    ]
-  },
-  {
-    integrationKey: 'retentionPolicy',
-    scheduledActions: [
-      { scheduleKey: 'apply', defaultSchedule: { type: 'daily', hour: 1, minute: 0 }, enabledByDefault: true, onTick: retentionPolicy }
-    ]
-  }
+export const integrations: Integration[] = [
+  lumpSumsIntegration,
+  retentionPolicyIntegration,
+  webhookIntegration,
+  statusNotificationIntegration,
+  reportMailIntegration,
+  reportDiskIntegration,
+  a1NotificationIntegration,
+  mailNotificationIntegration,
+  pushNotificationIntegration
 ]
 
-export function getIntegrationDefinition(integrationKey: string) {
-  return integrationDefinitions.find((definition) => definition.integrationKey === integrationKey)
+export function getIntegration(integrationKey: string) {
+  return integrations.find((integration) => integration.key === integrationKey)
 }

@@ -1,3 +1,7 @@
-import { startIntegrationWorker } from '../integrations/runtimeWorker.js'
+import { connectDB } from '../db.js'
+import { syncIntegrationSchedules } from '../integrations/scheduler.js'
+import { startIntegrationWorker } from '../integrations/worker.js'
 
-startIntegrationWorker()
+await connectDB(false)
+await syncIntegrationSchedules()
+await startIntegrationWorker()

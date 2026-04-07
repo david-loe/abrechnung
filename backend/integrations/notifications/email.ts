@@ -8,10 +8,9 @@ import { genAuthenticatedLink } from '../../helper.js'
 import i18n, { updateI18n } from '../../i18n.js'
 import { logger } from '../../logger.js'
 import { getMailTemplate } from '../../templates/cache.js'
-import { runOutboundAction } from '../runtime.js'
-import { NotificationEmailPayload } from '../types.js'
+import { Integration } from '../integration.js'
 
-export async function getClient() {
+export async function getMailClient() {
   // NO BACKEND_CACHE bc used in worker
   const connectionSettings = await getConnectionSettings()
   if (connectionSettings.smtp?.host) {
@@ -20,6 +19,32 @@ export async function getClient() {
   throw new Error('SMTP not configured in Connection Settings')
 }
 export type MailRecipient = Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }
+interface NotificationEmailPayload {
+  recipient: MailRecipient
+  subject: string
+  paragraph: string
+  language: Locale
+  button?: { text: string; link: string }
+  lastParagraph?: string | string[]
+}
+
+class MailNotificationIntegration extends Integration {
+  public override readonly operations = {
+    send: {
+      jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } },
+      run: async (payload: unknown) => {
+        const mail = payload as NotificationEmailPayload
+        await sendMail(mail.recipient, mail.subject, mail.paragraph, mail.language, mail.button, mail.lastParagraph)
+      }
+    }
+  }
+
+  public constructor() {
+    super('notifications.email')
+  }
+}
+
+export const mailNotificationIntegration = new MailNotificationIntegration()
 
 export async function enqueueMail(
   recipients: MailRecipient[],
@@ -31,6 +56,7 @@ export async function enqueueMail(
 ) {
   const displaySettings = await getDisplaySettings(false)
   updateI18n(displaySettings.locale)
+
   for (const recipient of recipients) {
     const language = recipient.settings.language
     let recipientButton: { text: string; link: string } | undefined
@@ -43,8 +69,9 @@ export async function enqueueMail(
         })
       }
     }
+
     const payload: NotificationEmailPayload = { recipient, subject, paragraph, language, button: recipientButton, lastParagraph }
-    await runOutboundAction('notifications.email.send', payload)
+    await mailNotificationIntegration.enqueue('send', payload)
   }
 }
 
@@ -56,7 +83,7 @@ export async function sendMail(
   button?: { text: string; link: string },
   lastParagraph?: string | string[]
 ) {
-  const mailClient = await getClient()
+  const mailClient = await getMailClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
@@ -72,7 +99,7 @@ export async function sendMail(
   return mailClient.sendMail({
     from: `"${app.name}" <${mailClient.options.from}>`,
     to: recipient.email,
-    subject: subject,
+    subject,
     text: plainText,
     html: renderedHTML
   })

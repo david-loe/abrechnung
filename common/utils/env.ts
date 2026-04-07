@@ -78,6 +78,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
     default: 120_000,
     desc: 'Delay between webhook retry attempts in milliseconds. BullMQ exponential: 2 ^ (attempts - 1) * delay'
   }),
+  WORKER_CONCURRENCY: int({ default: 5, desc: 'Concurrency of the integration worker' }),
   PROD_INIT_CONNECTION_SETTINGS: json<Partial<Omit<ConnectionSettings, '_id'>>>({
     default: undefined,
     desc: 'Initial connection settings for production environment as JSON object'

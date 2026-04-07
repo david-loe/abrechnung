@@ -10,37 +10,69 @@ import {
 } from 'abrechnung-common/types.js'
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
-import { Types } from 'mongoose'
 import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
 import ENV from '../../env.js'
 import { reportPrinter } from '../../factory.js'
 import { updateI18n } from '../../i18n.js'
 import Webhook from '../../models/webhook.js'
-import { runOutboundAction } from '../runtime.js'
+import { type IntegrationEventHandlerMap } from '../events.js'
+import { Integration } from '../integration.js'
 import { runUserScript } from './runScript.js'
 
+type WebhookJobInput = Travel | ExpenseReport | HealthCareCost | Advance
+
 interface WebhookJobData {
-  input: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-  webhook: IWebhook<Types.ObjectId>
+  input: WebhookJobInput
+  webhookId: string
 }
 
-export async function runWebhooks(
-  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-) {
-  await runOutboundAction('webhooks.deliver', { report })
-}
+class WebhookIntegration extends Integration {
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'report.draft_saved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.submitted': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.review_requested': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.rejected': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.back_to_in_work': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.review_completed': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'travel.directly_approved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'travel.approved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'advance.received': async ({ report }) => await this.enqueueMatchingWebhooks(report)
+  }
 
-export async function executeWebhooks(
-  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-) {
-  const reportType = getReportTypeFromModelName(getModelNameFromReport(report))
-  const hooks = await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
-  for (const hook of hooks) {
-    await processWebhookJob({ input: report, webhook: hook })
+  public override readonly operations = {
+    deliver: {
+      jobOptions: { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } },
+      run: async ({ input, webhookId }: WebhookJobData) => {
+        await processWebhookJob({ input, webhookId })
+      }
+    }
+  }
+
+  public constructor() {
+    super('webhooks')
+  }
+
+  private async enqueueMatchingWebhooks(report: WebhookJobInput) {
+    const webhooks = await findMatchingWebhooks(report)
+    for (const webhook of webhooks) {
+      await this.enqueue('deliver', { input: report, webhookId: webhook._id.toString() })
+    }
   }
 }
 
-export async function processWebhookJob({ webhook, input }: WebhookJobData) {
+export const webhookIntegration = new WebhookIntegration()
+
+async function findMatchingWebhooks(report: WebhookJobInput) {
+  const reportType = getReportTypeFromModelName(getModelNameFromReport(report))
+  return await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
+}
+
+export async function processWebhookJob({ webhookId, input }: WebhookJobData) {
+  const webhook = await Webhook.findOne({ _id: webhookId }).lean<IWebhook | null>()
+  if (!webhook?.isActive) {
+    return
+  }
+
   const request = { ...webhook.request, ...(webhook.script ? await runUserScript(webhook.script, input) : {}) }
 
   if (request.convertBodyToFormData) {

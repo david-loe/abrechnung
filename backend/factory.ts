@@ -1,7 +1,7 @@
 import { ApprovedTravelsPrinter } from 'abrechnung-common/print/approvedTravelsPrinter.js'
 import { ReportPrinter } from 'abrechnung-common/print/reportPrinter.js'
 import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
-import { CountryCode, Country as ICountry, ExchangeRate as IExchangeRate, Locale } from 'abrechnung-common/types.js'
+import { _id, CountryCode, Country as ICountry, ExchangeRate as IExchangeRate, Locale } from 'abrechnung-common/types.js'
 import { CurrencyConverter, ExchangeRateProvider, InforEuroResponse } from 'abrechnung-common/utils/currencyConverter.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
 import axios from 'axios'
@@ -15,7 +15,7 @@ import Organisation from './models/organisation.js'
 
 export const formatter = new Formatter(BACKEND_CACHE.displaySettings.locale.default, BACKEND_CACHE.displaySettings.nameDisplayFormat)
 
-export const reportPrinter = new ReportPrinter<Types.ObjectId>(
+export const reportPrinter = new ReportPrinter<_id>(
   BACKEND_CACHE.printerSettings,
   BACKEND_CACHE.travelSettings,
   formatter,

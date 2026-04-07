@@ -37,7 +37,6 @@ const routes = [
     meta: { requiresAuth: true, requiresVueform: true },
     children: [
       { path: '', redirect: { name: defaultAdminSection.routeName } },
-      { path: 'integrations/retention-policy', redirect: { name: 'admin-retention-policy' } },
       ...adminSections.map((section) => ({
         path: section.path,
         name: section.routeName,

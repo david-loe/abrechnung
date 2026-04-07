@@ -1,119 +1,123 @@
-import { IntegrationSettings, Locale } from 'abrechnung-common/types.js'
+import {
+  IntegrationScheduleSettings,
+  IntegrationSettings,
+  Locale,
+  LumpSumIntegrationSettings,
+  RetentionIntegrationSettings
+} from 'abrechnung-common/types.js'
+import mongoose from 'mongoose'
 import { NotFoundError } from '../controller/error.js'
 import IntegrationSettingsModel from '../models/integrationSettings.js'
-import { getResolvedRetentionSettings, saveRetentionSettings } from '../models/retentionSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
-import { getIntegrationDefinition } from './registry.js'
+import { getIntegration } from './registry.js'
 
-export type IntegrationSettingsPayload = Omit<IntegrationSettings, '_id'>
+interface IntegrationSettingsPayloadByKey {
+  lumpSums: Omit<LumpSumIntegrationSettings, '_id'>
+  retentionPolicy: Omit<RetentionIntegrationSettings, '_id'>
+}
 
-function requireIntegrationDefinition(integrationKey: string) {
-  const definition = getIntegrationDefinition(integrationKey)
-  if (!definition) {
+export type IntegrationSettingsPayload<IntegrationKey extends string = string> =
+  IntegrationKey extends keyof IntegrationSettingsPayloadByKey
+    ? IntegrationSettingsPayloadByKey[IntegrationKey]
+    : Omit<IntegrationSettings, '_id'>
+
+export interface IntegrationSettingsRequestBody {
+  schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
+  settings: { [key: string]: unknown }
+}
+
+function requireIntegration(integrationKey: string) {
+  const integration = getIntegration(integrationKey)
+  if (!integration) {
     throw new NotFoundError(`No integration found for key '${integrationKey}'.`)
   }
 
-  return definition
+  return integration
 }
 
-function requireScheduledActionDefinition(integrationKey: string, scheduleKey: string) {
-  const definition = requireIntegrationDefinition(integrationKey)
-  const action = definition.scheduledActions.find((scheduledAction) => scheduledAction.scheduleKey === scheduleKey)
-  if (!action) {
-    throw new NotFoundError(`No schedule '${scheduleKey}' found for integration '${integrationKey}'.`)
+function requireScheduleOperation(integrationKey: string, operation: string) {
+  const integration = requireIntegration(integrationKey)
+  if (!integration.hasOperation(operation)) {
+    throw new NotFoundError(`No operation '${operation}' found for integration '${integrationKey}'.`)
   }
 
-  return action
+  return integration
 }
 
-export function getIntegrationScheduleSettingsFormSchema(
-  integrationKey: string,
-  scheduleKey: string,
-  language: Locale | readonly Locale[]
-) {
-  requireIntegrationDefinition(integrationKey)
-  requireScheduledActionDefinition(integrationKey, scheduleKey)
-
-  return mongooseSchemaToVueformSchema(
-    { enabled: { type: Boolean, required: true }, schedule: { specialType: 'schedule', required: true, noColumn: true } },
-    language,
-    {},
-    false
-  )
+function integrationScheduleSettingsSchemaDefinition() {
+  return { enabled: { type: Boolean, required: true }, schedule: { specialType: 'schedule', required: true, noColumn: true } }
 }
 
-export function buildDefaultIntegrationSettings(integrationKey: string): IntegrationSettingsPayload {
-  const definition = requireIntegrationDefinition(integrationKey)
+function buildIntegrationScheduleSettingsFormSchema(integrationKey: string, operation: string, language: Locale | readonly Locale[]) {
+  requireScheduleOperation(integrationKey, operation)
 
-  return {
-    integrationKey,
-    schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
-        action.scheduleKey,
-        { enabled: action.enabledByDefault, schedule: action.defaultSchedule }
-      ])
-    )
-  }
-}
-
-export async function getResolvedIntegrationSettings(integrationKey: string): Promise<IntegrationSettingsPayload> {
-  if (integrationKey === 'retentionPolicy') {
-    const retentionSettings = await getResolvedRetentionSettings()
-    return { integrationKey, schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } } }
+  const schema = mongooseSchemaToVueformSchema(integrationScheduleSettingsSchemaDefinition(), language, {}, false)
+  const scheduleElement = schema.schedule as Record<string, unknown> | undefined
+  if (scheduleElement) {
+    scheduleElement.scheduleKey = operation
   }
 
-  const definition = requireIntegrationDefinition(integrationKey)
+  return schema
+}
 
-  const defaults = buildDefaultIntegrationSettings(integrationKey)
-  const stored = (await IntegrationSettingsModel.findOne({ integrationKey }, { __v: 0 }).lean()) as IntegrationSettings | null
+async function findIntegrationSettings(integrationKey: string) {
+  return await mongoose.connection
+    .collection<IntegrationSettingsPayload>('integrationsettings')
+    .findOne({ integrationKey }, { projection: { _id: 0, __v: 0 } })
+}
+
+export async function getIntegrationSettingsFormSchema(integrationKey: string, language: Locale | readonly Locale[]) {
+  const integration = requireIntegration(integrationKey)
+  const settingsSchemaDefinition = integration.getSettingsFormSchema(language)
+  const schema: Record<string, unknown> =
+    Object.keys(settingsSchemaDefinition).length > 0 ? mongooseSchemaToVueformSchema(settingsSchemaDefinition, language, {}, false) : {}
+  const storedSettings = await findIntegrationSettings(integrationKey)
+  const scheduleKeys = storedSettings ? Object.keys(storedSettings.schedules) : []
+
+  if (scheduleKeys.length === 1) {
+    Object.assign(schema, buildIntegrationScheduleSettingsFormSchema(integrationKey, scheduleKeys[0], language))
+  }
+
+  return schema
+}
+
+export async function getIntegrationSettings<IntegrationKey extends keyof IntegrationSettingsPayloadByKey>(
+  integrationKey: IntegrationKey
+): Promise<IntegrationSettingsPayload<IntegrationKey>>
+export async function getIntegrationSettings(integrationKey: string): Promise<IntegrationSettingsPayload>
+export async function getIntegrationSettings(integrationKey: string): Promise<IntegrationSettingsPayload> {
+  requireIntegration(integrationKey)
+  const stored = await findIntegrationSettings(integrationKey)
+
   if (!stored) {
-    return defaults
+    throw new NotFoundError(`No integration settings found for key '${integrationKey}'.`)
   }
 
-  const { _id: _storedId, ...storedWithoutId } = stored
-
-  return {
-    ...defaults,
-    ...storedWithoutId,
-    schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
-        action.scheduleKey,
-        stored.schedules?.[action.scheduleKey] ?? defaults.schedules[action.scheduleKey]
-      ])
-    )
-  }
+  return stored
 }
 
-export async function saveIntegrationSettings(integrationKey: string, settings: IntegrationSettingsPayload) {
-  if (integrationKey === 'retentionPolicy') {
-    const currentSettings = await getResolvedRetentionSettings()
-    const scheduleSettings = settings.schedules?.apply ?? buildDefaultIntegrationSettings(integrationKey).schedules.apply
-    const retentionSettings = await saveRetentionSettings({
-      enabled: scheduleSettings.enabled,
-      schedule: scheduleSettings.schedule,
-      retentionPolicy: currentSettings.retentionPolicy
-    })
+export async function getAllIntegrationSettings() {
+  return await mongoose.connection
+    .collection<IntegrationSettingsPayload>('integrationsettings')
+    .find({}, { projection: { _id: 0, __v: 0 } })
+    .sort({ integrationKey: 1 })
+    .toArray()
+}
 
-    return { integrationKey, schedules: { apply: { enabled: retentionSettings.enabled, schedule: retentionSettings.schedule } } }
-  }
-
-  const definition = requireIntegrationDefinition(integrationKey)
-
-  const defaults = buildDefaultIntegrationSettings(integrationKey)
-  const normalized = {
-    integrationKey,
-    schedules: Object.fromEntries(
-      definition.scheduledActions.map((action) => [
-        action.scheduleKey,
-        settings.schedules?.[action.scheduleKey] ?? defaults.schedules[action.scheduleKey]
-      ])
-    )
-  }
+export async function saveIntegrationSettings<IntegrationKey extends keyof IntegrationSettingsPayloadByKey>(
+  integrationKey: IntegrationKey,
+  body: IntegrationSettingsPayload<IntegrationKey>
+): Promise<IntegrationSettingsPayload<IntegrationKey>>
+export async function saveIntegrationSettings(integrationKey: string, body: IntegrationSettingsPayload): Promise<IntegrationSettingsPayload>
+export async function saveIntegrationSettings(integrationKey: string, body: IntegrationSettingsPayload) {
+  requireIntegration(integrationKey)
 
   const doc = (await IntegrationSettingsModel.findOne({ integrationKey })) ?? new IntegrationSettingsModel({ integrationKey })
-  doc.schedules = normalized.schedules
+  doc.integrationKey = integrationKey
+  doc.schedules = body.schedules
+  doc.settings = body.settings
   await doc.validate()
   await doc.save()
 
-  return getResolvedIntegrationSettings(integrationKey)
+  return getIntegrationSettings(integrationKey)
 }

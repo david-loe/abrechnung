@@ -96,14 +96,14 @@
     <DisplaySettingsForm v-else-if="activeSectionId === 'displaySettings'" />
     <PrinterSettingsForm v-else-if="activeSectionId === 'printerSettings'" />
     <SettingsForm v-else-if="activeSectionId === 'settings'" />
-    <RetentionSettingsForm v-else-if="activeSectionId === 'retentionPolicy'" />
+    <IntegrationSettingsForm v-else-if="activeSectionId === 'retentionPolicy'" integrationKey="retentionPolicy" />
     <Suspense v-else-if="activeSectionId === 'webhooks'">
       <template #default>
         <WebhookList />
       </template>
       <template #fallback>Loading.. </template>
     </Suspense>
-    <IntegrationScheduleForm v-else-if="activeSectionId === 'lumpSumSync'" integrationKey="lumpSums" scheduleKey="sync" />
+    <IntegrationSettingsForm v-else-if="activeSectionId === 'lumpSumSync'" integrationKey="lumpSums" />
     <StatsPage v-else-if="activeSectionId === 'stats'" />
     <AdminTools v-else-if="activeSectionId === 'adminTools'" />
   </div>
@@ -124,11 +124,10 @@ import CountryList from './elements/CountryList.vue'
 import CurrencyList from './elements/CurrencyList.vue'
 import DisplaySettingsForm from './elements/DisplaySettingsForm.vue'
 import HealthInsuranceList from './elements/HealthInsuranceList.vue'
-import IntegrationScheduleForm from './elements/IntegrationScheduleForm.vue'
+import IntegrationSettingsForm from './elements/IntegrationSettingsForm.vue'
 import OrganisationList from './elements/OrganisationList.vue'
 import PrinterSettingsForm from './elements/PrinterSettingsForm.vue'
 import ProjectList from './elements/ProjectList.vue'
-import RetentionSettingsForm from './elements/RetentionSettingsForm.vue'
 import SettingsForm from './elements/SettingsForm.vue'
 import StatsPage from './elements/StatsPage.vue'
 import TravelSettingsForm from './elements/TravelSettingsForm.vue'

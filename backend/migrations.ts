@@ -100,15 +100,18 @@ export async function checkForMigrations() {
         )
     }
     if (semver.lte(migrateFrom, '2.5.3')) {
-      logger.info('Apply migration from v2.5.3: move retention policy to retention settings')
+      logger.info('Apply migration from v2.5.3: move retention policy to integration settings')
 
       const settingsCol = mongoose.connection.collection('settings')
-      const retentionSettingsCol = mongoose.connection.collection('retentionsettings')
+      const integrationSettingsCol = mongoose.connection.collection('integrationsettings')
 
       const currentSettings = await settingsCol.findOne({})
 
       if (currentSettings && 'retentionPolicy' in currentSettings) {
-        await retentionSettingsCol.updateOne({}, { $set: { retentionPolicy: currentSettings.retentionPolicy } }, { upsert: true })
+        await integrationSettingsCol.updateOne(
+          { integrationKey: 'retentionPolicy' },
+          { $set: { settings: currentSettings.retentionPolicy } }
+        )
       }
 
       await settingsCol.updateMany({}, { $unset: { retentionPolicy: '' } })

@@ -1,224 +1,154 @@
 import test, { ExecutionContext } from 'ava'
-import ENV from '../../env.js'
-import {
-  closeIntegrationQueue,
-  getJobOptions,
-  type IntegrationRuntimeDependencies,
-  processIntegrationJob,
-  resetIntegrationRuntimeDependenciesForTests,
-  runInboundSync,
-  runOutboundAction,
-  runPolicyAction,
-  setIntegrationQueueForTests,
-  setIntegrationRuntimeDependenciesForTests
-} from '../../integrations/runtime.js'
-import { type IntegrationJobData, type IntegrationReport } from '../../integrations/types.js'
-
-function createReport(overrides: Record<string, unknown> = {}) {
-  return {
-    _id: 'report-1',
-    state: 1,
-    owner: { name: { givenName: 'Fry' } },
-    comments: [],
-    project: {},
-    ...overrides
-  } as unknown as IntegrationReport
-}
-
-function createMailRecipient() {
-  return { email: 'fry@planetexpress.com', fk: {}, settings: { language: 'de' }, name: { givenName: 'Fry', familyName: 'Fry' } } as const
-}
-
-function createPushUser() {
-  return { _id: 'user-1', email: 'fry@planetexpress.com' } as never
-}
+import { type Queue } from 'bullmq'
+import { Integration } from '../../integrations/integration.js'
+import { processIntegrationJob } from '../../integrations/processor.js'
+import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
 
 function stubQueueAdd(t: ExecutionContext, implementation: (name: string, data: IntegrationJobData, opts?: unknown) => Promise<unknown>) {
-  setIntegrationQueueForTests({ add: implementation as never, close: async () => {}, getJob: async () => undefined })
+  setIntegrationQueueForTests({
+    add: implementation as never,
+    close: async () => {},
+    getJob: async () => undefined,
+    getJobSchedulers: async () => [],
+    removeJobScheduler: async () => true,
+    upsertJobScheduler: async () => ({}) as never
+  } as unknown as Queue<IntegrationJobData>)
   t.teardown(() => {
     setIntegrationQueueForTests(undefined)
   })
 }
 
-test.afterEach.always(() => {
-  resetIntegrationRuntimeDependenciesForTests()
-})
-
 test.after.always(async () => {
   await closeIntegrationQueue()
 })
 
-test('getJobOptions returns integration-specific retry settings', (t) => {
-  t.deepEqual(getJobOptions('webhooks.deliver'), {
-    attempts: ENV.WEBHOOK_ATTEMPTS,
-    backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY }
-  })
-  t.deepEqual(getJobOptions('reports.write_disk'), { attempts: 6, backoff: { type: 'exponential', delay: 3_000 } })
-  t.deepEqual(getJobOptions('notifications.email.send'), { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } })
-  t.deepEqual(getJobOptions('lump_sums.sync_in'), {})
-})
-
-test.serial('runOutboundAction enqueues the expected outbound job payload', async (t) => {
-  const payload = { recipient: createMailRecipient(), subject: 'Subject', paragraph: 'Paragraph', language: 'de' } as const
+test.serial('Integration.enqueue applies integration-specific job options', async (t) => {
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
+
+  class QueueingIntegration extends Integration {
+    public override readonly operations = {
+      send: { jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }, run: async () => {} }
+    }
+
+    public constructor() {
+      super('stub')
+    }
+  }
 
   stubQueueAdd(t, async (name, data, opts) => {
     captured = { name, data, opts }
     return {} as never
   })
 
-  await runOutboundAction('notifications.email.send', payload)
+  await new QueueingIntegration().enqueue('send', { ok: true })
 
   t.deepEqual(captured, {
-    name: 'notifications.email.send',
-    data: { contract: 'outboundAction', action: 'notifications.email.send', payload },
+    name: 'stub.send',
+    data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
     opts: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
   })
 })
 
-test.serial('runInboundSync enqueues the expected inbound job payload', async (t) => {
+test.serial('Integration.enqueue lets explicit job options override integration defaults', async (t) => {
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
 
-  stubQueueAdd(t, async (name, data, opts) => {
-    captured = { name, data, opts }
-    return {} as never
-  })
+  class QueueingIntegration extends Integration {
+    public override readonly operations = { send: { jobOptions: { attempts: 5, removeOnComplete: false }, run: async () => {} } }
 
-  await runInboundSync('lump_sums.sync_in')
-
-  t.deepEqual(captured, {
-    name: 'lump_sums.sync_in',
-    data: { contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} },
-    opts: {}
-  })
-})
-
-test.serial('runInboundSync merges integration-specific options with explicit job overrides', async (t) => {
-  let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
-
-  stubQueueAdd(t, async (name, data, opts) => {
-    captured = { name, data, opts }
-    return {} as never
-  })
-
-  await runInboundSync('lump_sums.sync_in', {}, { jobId: 'schedule:lumpSums:sync', removeOnComplete: true, removeOnFail: true })
-
-  t.deepEqual(captured, {
-    name: 'lump_sums.sync_in',
-    data: { contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} },
-    opts: { jobId: 'schedule:lumpSums:sync', removeOnComplete: true, removeOnFail: true }
-  })
-})
-
-test.serial('runPolicyAction enqueues the expected policy job payload', async (t) => {
-  let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
-
-  stubQueueAdd(t, async (name, data, opts) => {
-    captured = { name, data, opts }
-    return {} as never
-  })
-
-  await runPolicyAction('retention.apply')
-
-  t.deepEqual(captured, { name: 'retention.apply', data: { contract: 'policy', action: 'retention.apply', payload: {} }, opts: {} })
-})
-
-test.serial('processIntegrationJob dispatches outbound actions to the matching handlers', async (t) => {
-  const report = createReport()
-  const recipient = createMailRecipient()
-  const user = createPushUser()
-  const calls = {
-    webhooks: [] as unknown[],
-    mails: [] as unknown[],
-    pushes: [] as unknown[],
-    reportMails: [] as unknown[],
-    disk: [] as unknown[]
+    public constructor() {
+      super('stub')
+    }
   }
 
-  const deps: IntegrationRuntimeDependencies = {
-    isReportDiskEnabled: () => true,
-    executeWebhooks: async (payload) => {
-      calls.webhooks.push(payload)
-    },
-    sendMail: async (payload) => {
-      calls.mails.push(payload)
-    },
-    sendPushNotification: async (payload) => {
-      calls.pushes.push(payload)
-    },
-    sendReportViaMail: async (payload) => {
-      calls.reportMails.push(payload)
-    },
-    saveReportOnDisk: async (payload) => {
-      calls.disk.push(payload)
-    },
-    syncLumpSums: async () => {},
-    applyRetentionPolicy: async () => {}
+  stubQueueAdd(t, async (name, data, opts) => {
+    captured = { name, data, opts }
+    return {} as never
+  })
+
+  await new QueueingIntegration().enqueue('send', { ok: true }, { removeOnComplete: true, jobId: 'job-1' })
+
+  t.deepEqual(captured, {
+    name: 'stub.send',
+    data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
+    opts: { attempts: 5, removeOnComplete: true, jobId: 'job-1' }
+  })
+})
+
+test.serial('processIntegrationJob dispatches to the matching integration instance', async (t) => {
+  const calls: Array<{ operation: string; payload: unknown }> = []
+
+  class StubIntegration extends Integration {
+    public override readonly operations = {
+      run: {
+        run: async (payload: unknown) => {
+          calls.push({ operation: 'run', payload })
+        }
+      }
+    }
+
+    public constructor() {
+      super('stub')
+    }
   }
 
-  setIntegrationRuntimeDependenciesForTests(deps)
+  await processIntegrationJob({ integrationKey: 'stub', operation: 'run', payload: { ok: true } }, [new StubIntegration()])
 
-  await processIntegrationJob({ contract: 'outboundAction', action: 'webhooks.deliver', payload: { report } })
-  await processIntegrationJob({
-    contract: 'outboundAction',
-    action: 'notifications.email.send',
-    payload: { recipient, subject: 'Subject', paragraph: 'Paragraph', language: 'de' }
-  })
-  await processIntegrationJob({
-    contract: 'outboundAction',
-    action: 'notifications.push.send',
-    payload: { title: 'Title', body: 'Body', users: [user], url: '/travel/1' }
-  })
-  await processIntegrationJob({ contract: 'outboundAction', action: 'reports.email.send', payload: { report } })
-  await processIntegrationJob({
-    contract: 'outboundAction',
-    action: 'reports.write_disk',
-    payload: { filePath: '/reports/test.pdf', report }
-  })
-
-  t.deepEqual(calls.webhooks, [{ report }])
-  t.deepEqual(calls.mails, [{ recipient, subject: 'Subject', paragraph: 'Paragraph', language: 'de' }])
-  t.deepEqual(calls.pushes, [{ title: 'Title', body: 'Body', users: [user], url: '/travel/1' }])
-  t.deepEqual(calls.reportMails, [{ report }])
-  t.deepEqual(calls.disk, [{ filePath: '/reports/test.pdf', report }])
+  t.deepEqual(calls, [{ operation: 'run', payload: { ok: true } }])
 })
 
-test.serial('processIntegrationJob skips disk delivery when it is disabled', async (t) => {
-  const report = createReport()
-  let called = false
+test.serial('processIntegrationJob dispatches scheduled jobs to the matching operation', async (t) => {
+  const calls: unknown[] = []
 
-  setIntegrationRuntimeDependenciesForTests({
-    isReportDiskEnabled: () => false,
-    saveReportOnDisk: async () => {
-      called = true
+  class ScheduledIntegration extends Integration {
+    public override readonly operations = {
+      sync: {
+        run: async (payload: unknown) => {
+          calls.push(payload)
+        }
+      }
     }
-  })
 
-  await processIntegrationJob({
-    contract: 'outboundAction',
-    action: 'reports.write_disk',
-    payload: { filePath: '/reports/test.pdf', report }
-  })
+    public constructor() {
+      super('stub')
+    }
+  }
 
-  t.false(called)
+  await processIntegrationJob({ integrationKey: 'stub', operation: 'sync', payload: { ok: true } }, [new ScheduledIntegration()])
+
+  t.deepEqual(calls, [{ ok: true }])
 })
 
-test.serial('processIntegrationJob dispatches inbound sync and policy actions', async (t) => {
-  let lumpSumSyncs = 0
-  let retentionRuns = 0
+test.serial('processIntegrationJob resolves payload via buildPayload when the queued payload is null', async (t) => {
+  const calls: unknown[] = []
 
-  setIntegrationRuntimeDependenciesForTests({
-    syncLumpSums: async () => {
-      lumpSumSyncs += 1
-    },
-    applyRetentionPolicy: async () => {
-      retentionRuns += 1
+  class ScheduledIntegration extends Integration {
+    public override readonly operations = {
+      sync: {
+        buildPayload: async () => ({ ok: true }),
+        run: async (payload: unknown) => {
+          calls.push(payload)
+        }
+      }
     }
+
+    public constructor() {
+      super('stub')
+    }
+  }
+
+  await processIntegrationJob({ integrationKey: 'stub', operation: 'sync', payload: null }, [new ScheduledIntegration()])
+
+  t.deepEqual(calls, [{ ok: true }])
+})
+
+test('processIntegrationJob throws for an unknown integration key', async (t) => {
+  await t.throwsAsync(() => processIntegrationJob({ integrationKey: 'missing', operation: 'run', payload: {} }, []), {
+    message: "No integration found for key 'missing'."
   })
+})
 
-  await processIntegrationJob({ contract: 'inboundSync', action: 'lump_sums.sync_in', payload: {} })
-  await processIntegrationJob({ contract: 'policy', action: 'retention.apply', payload: {} })
-
-  t.is(lumpSumSyncs, 1)
-  t.is(retentionRuns, 1)
+test('processIntegrationJob throws for an unknown operation', async (t) => {
+  await t.throwsAsync(() => processIntegrationJob({ integrationKey: 'stub', operation: 'run', payload: {} }, [new Integration('stub')]), {
+    message: "No operation 'run' found for integration 'stub'."
+  })
 })
