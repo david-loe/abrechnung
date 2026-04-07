@@ -1,11 +1,18 @@
 import test, { ExecutionContext } from 'ava'
+import { type Queue } from 'bullmq'
 import { Integration } from '../../integrations/integration.js'
 import { processIntegrationJob } from '../../integrations/processor.js'
-import { closeIntegrationQueue, setIntegrationQueueForTests } from '../../integrations/queue.js'
-import { type IntegrationJobData } from '../../integrations/types.js'
+import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
 
 function stubQueueAdd(t: ExecutionContext, implementation: (name: string, data: IntegrationJobData, opts?: unknown) => Promise<unknown>) {
-  setIntegrationQueueForTests({ add: implementation as never, close: async () => {}, getJob: async () => undefined })
+  setIntegrationQueueForTests({
+    add: implementation as never,
+    close: async () => {},
+    getJob: async () => undefined,
+    getJobSchedulers: async () => [],
+    removeJobScheduler: async () => true,
+    upsertJobScheduler: async () => ({}) as never
+  } as unknown as Queue<IntegrationJobData>)
   t.teardown(() => {
     setIntegrationQueueForTests(undefined)
   })
@@ -19,16 +26,12 @@ test.serial('Integration.enqueue applies integration-specific job options', asyn
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
 
   class QueueingIntegration extends Integration {
-    public constructor() {
-      super('stub')
+    public override readonly operations = {
+      send: { jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }, run: async () => {} }
     }
 
-    protected override getJobOptions(operation: string) {
-      if (operation === 'send') {
-        return { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
-      }
-
-      return super.getJobOptions(operation)
+    public constructor() {
+      super('stub')
     }
   }
 
@@ -50,12 +53,10 @@ test.serial('Integration.enqueue lets explicit job options override integration 
   let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
 
   class QueueingIntegration extends Integration {
+    public override readonly operations = { send: { jobOptions: { attempts: 5, removeOnComplete: false }, run: async () => {} } }
+
     public constructor() {
       super('stub')
-    }
-
-    protected override getJobOptions() {
-      return { attempts: 5, removeOnComplete: false }
     }
   }
 
@@ -77,12 +78,16 @@ test.serial('processIntegrationJob dispatches to the matching integration instan
   const calls: Array<{ operation: string; payload: unknown }> = []
 
   class StubIntegration extends Integration {
-    public constructor() {
-      super('stub')
+    public override readonly operations = {
+      run: {
+        run: async (payload: unknown) => {
+          calls.push({ operation: 'run', payload })
+        }
+      }
     }
 
-    public override async execute(operation: string, payload: unknown) {
-      calls.push({ operation, payload })
+    public constructor() {
+      super('stub')
     }
   }
 
@@ -91,29 +96,47 @@ test.serial('processIntegrationJob dispatches to the matching integration instan
   t.deepEqual(calls, [{ operation: 'run', payload: { ok: true } }])
 })
 
-test.serial('Integration.execute dispatches scheduled operations through scheduledActions', async (t) => {
+test.serial('processIntegrationJob dispatches scheduled jobs to the matching operation', async (t) => {
   const calls: unknown[] = []
 
   class ScheduledIntegration extends Integration {
-    public override readonly scheduledActions = [
-      {
-        scheduleKey: 'sync',
-        defaultSchedule: { type: 'daily', hour: 1, minute: 0 } as const,
-        enabledByDefault: true,
-        description: 'stub sync',
-        operation: 'sync',
-        execute: async (payload: unknown) => {
+    public override readonly operations = {
+      sync: {
+        run: async (payload: unknown) => {
           calls.push(payload)
         }
       }
-    ]
+    }
 
     public constructor() {
       super('stub')
     }
   }
 
-  await new ScheduledIntegration().execute('sync', { ok: true })
+  await processIntegrationJob({ integrationKey: 'stub', operation: 'sync', payload: { ok: true } }, [new ScheduledIntegration()])
+
+  t.deepEqual(calls, [{ ok: true }])
+})
+
+test.serial('processIntegrationJob resolves payload via buildPayload when the queued payload is null', async (t) => {
+  const calls: unknown[] = []
+
+  class ScheduledIntegration extends Integration {
+    public override readonly operations = {
+      sync: {
+        buildPayload: async () => ({ ok: true }),
+        run: async (payload: unknown) => {
+          calls.push(payload)
+        }
+      }
+    }
+
+    public constructor() {
+      super('stub')
+    }
+  }
+
+  await processIntegrationJob({ integrationKey: 'stub', operation: 'sync', payload: null }, [new ScheduledIntegration()])
 
   t.deepEqual(calls, [{ ok: true }])
 })
@@ -121,5 +144,11 @@ test.serial('Integration.execute dispatches scheduled operations through schedul
 test('processIntegrationJob throws for an unknown integration key', async (t) => {
   await t.throwsAsync(() => processIntegrationJob({ integrationKey: 'missing', operation: 'run', payload: {} }, []), {
     message: "No integration found for key 'missing'."
+  })
+})
+
+test('processIntegrationJob throws for an unknown operation', async (t) => {
+  await t.throwsAsync(() => processIntegrationJob({ integrationKey: 'stub', operation: 'run', payload: {} }, [new Integration('stub')]), {
+    message: "No operation 'run' found for integration 'stub'."
   })
 })

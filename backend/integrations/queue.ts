@@ -1,14 +1,15 @@
 import { Queue } from 'bullmq'
 import ENV from '../env.js'
-import { type IntegrationJobData } from './types.js'
 
 const INTEGRATION_QUEUE_NAME = 'integration'
 
-export type IntegrationQueueJob = { getState: () => Promise<string>; remove: () => Promise<void> }
+export interface IntegrationJobData {
+  integrationKey: string
+  operation: string
+  payload: unknown
+}
 
-type IntegrationQueue = Pick<Queue<IntegrationJobData>, 'add' | 'close' | 'getJob'>
-
-let integrationQueue: IntegrationQueue | undefined
+let integrationQueue: Queue<IntegrationJobData> | undefined
 
 function createIntegrationQueue() {
   return new Queue<IntegrationJobData>(INTEGRATION_QUEUE_NAME, {
@@ -31,7 +32,7 @@ export function getIntegrationQueue() {
   return integrationQueue
 }
 
-export function setIntegrationQueueForTests(queue: IntegrationQueue | undefined) {
+export function setIntegrationQueueForTests(queue: Queue<IntegrationJobData> | undefined) {
   integrationQueue = queue
 }
 

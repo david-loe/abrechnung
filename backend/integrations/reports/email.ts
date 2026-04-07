@@ -13,38 +13,32 @@ import { getConnectionSettings } from '../../db.js'
 import { formatter, reportPrinter } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
-import { type IntegrationEvent } from '../events.js'
+import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { getMailClient } from '../notifications/email.js'
-import { ReportEmailPayload } from '../types.js'
+
+interface ReportEmailPayload {
+  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
+}
 
 class ReportMailIntegration extends Integration {
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'report.review_completed': async ({ report }) => {
+      await this.enqueue('send', { report })
+    }
+  }
+
+  public override readonly operations = {
+    send: {
+      jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } },
+      run: async (payload: unknown) => {
+        await sendReportViaMail((payload as ReportEmailPayload).report)
+      }
+    }
+  }
+
   public constructor() {
     super('reports.email')
-  }
-
-  protected override getJobOptions(operation: string) {
-    if (operation === 'send') {
-      return { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
-    }
-
-    return super.getJobOptions(operation)
-  }
-
-  public override handles(event: IntegrationEvent) {
-    return event.type === 'report.review_completed'
-  }
-
-  public override async runEvent(event: IntegrationEvent) {
-    await this.enqueue('send', { report: event.report as ReportEmailPayload['report'] })
-  }
-
-  public override async execute(operation: string, payload: unknown) {
-    if (operation !== 'send') {
-      return super.execute(operation, payload)
-    }
-
-    await sendReportViaMail((payload as ReportEmailPayload).report)
   }
 }
 

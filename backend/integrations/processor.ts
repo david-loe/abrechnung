@@ -1,5 +1,5 @@
 import { type Integration } from './integration.js'
-import { type IntegrationJobData } from './types.js'
+import { type IntegrationJobData } from './queue.js'
 
 export async function processIntegrationJob(job: IntegrationJobData, availableIntegrations?: Integration[]) {
   const resolvedIntegrations = availableIntegrations ?? (await import('./registry.js')).integrations
@@ -9,5 +9,5 @@ export async function processIntegrationJob(job: IntegrationJobData, availableIn
     throw new Error(`No integration found for key '${job.integrationKey}'.`)
   }
 
-  await integration.execute(job.operation, job.payload)
+  await integration.runOperation(job.operation, job.payload)
 }

@@ -16,7 +16,8 @@ const integrationScheduleSettingsSchema = new Schema(
 
 const schema = new Schema<IntegrationSettings<Types.ObjectId>>({
   integrationKey: { type: String, required: true, unique: true, trim: true, index: true },
-  schedules: { type: Map, of: integrationScheduleSettingsSchema, required: true, default: () => ({}) }
+  schedules: { type: Map, of: integrationScheduleSettingsSchema, required: true, default: () => ({}) },
+  settings: { type: Schema.Types.Mixed, required: true, default: () => ({}) }
 })
 
 export default model<IntegrationSettings<Types.ObjectId>>('IntegrationSettings', schema)

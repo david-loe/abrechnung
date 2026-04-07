@@ -16,15 +16,24 @@ export type IntegrationEvent =
   | { type: 'travel.back_to_approved'; report: TravelEventTarget }
   | { type: 'advance.received'; report: Advance }
 
-export interface EventIntegration {
-  handles(event: IntegrationEvent): boolean
-  runEvent(event: IntegrationEvent): Promise<void>
+export type IntegrationEventByType<TType extends IntegrationEvent['type']> = Extract<IntegrationEvent, { type: TType }>
+
+export type IntegrationEventHandlerMap = {
+  [TType in IntegrationEvent['type']]: (event: IntegrationEventByType<TType>) => Promise<void>
 }
 
-export async function emitIntegrationEvent(event: IntegrationEvent, integrations: EventIntegration[]) {
+export interface EventIntegration {
+  events: Partial<IntegrationEventHandlerMap>
+}
+
+export async function emitIntegrationEvent<TType extends IntegrationEvent['type']>(
+  event: IntegrationEventByType<TType>,
+  integrations: EventIntegration[]
+) {
   for (const integration of integrations) {
-    if (integration.handles(event)) {
-      await integration.runEvent(event)
+    const handler = integration.events[event.type]
+    if (handler) {
+      await handler(event)
     }
   }
 }

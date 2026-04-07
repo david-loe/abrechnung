@@ -12,7 +12,6 @@ import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
 import i18n from './i18n.js'
 import { closeIntegrationQueue } from './integrations/queue.js'
-import { stopIntegrationScheduler } from './integrations/scheduler.js'
 import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
 
@@ -102,7 +101,6 @@ export default async function () {
 }
 
 export async function shutdown() {
-  await stopIntegrationScheduler()
   await closeIntegrationQueue()
   await disconnectDB()
 }

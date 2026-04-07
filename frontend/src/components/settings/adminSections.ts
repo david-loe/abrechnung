@@ -164,9 +164,9 @@ export const adminSections: readonly AdminSection[] = [
   },
   {
     id: 'retentionPolicy',
-    path: 'retention-policy',
+    path: 'integrations/retention-policy',
     routeName: 'admin-retention-policy',
-    group: 'configuration',
+    group: 'integrations',
     labelKey: 'labels.retentionPolicy',
     keywordKey: 'settingsSearch.retentionPolicy'
   },

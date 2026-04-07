@@ -21,17 +21,6 @@ export const integrations: Integration[] = [
   pushNotificationIntegration
 ]
 
-export const scheduledIntegrations = integrations.filter((integration) => integration.scheduledActions.length > 0)
-
 export function getIntegration(integrationKey: string) {
   return integrations.find((integration) => integration.key === integrationKey)
-}
-
-export function getScheduledIntegration(integrationKey: string) {
-  const integration = getIntegration(integrationKey)
-  if (!integration || integration.scheduledActions.length === 0) {
-    return undefined
-  }
-
-  return integration
 }

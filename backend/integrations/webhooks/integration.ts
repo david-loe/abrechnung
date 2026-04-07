@@ -16,7 +16,7 @@ import ENV from '../../env.js'
 import { reportPrinter } from '../../factory.js'
 import { updateI18n } from '../../i18n.js'
 import Webhook from '../../models/webhook.js'
-import { type IntegrationEvent } from '../events.js'
+import { type IntegrationEvent, type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { runUserScript } from './runScript.js'
 
@@ -26,42 +26,29 @@ interface WebhookJobData {
 }
 
 class WebhookIntegration extends Integration {
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'report.draft_saved': async ({ report }) => await this.enqueue('deliver', { report }),
+    'report.submitted': async ({ report }) => await this.enqueue('deliver', { report }),
+    'report.review_requested': async ({ report }) => await this.enqueue('deliver', { report }),
+    'report.rejected': async ({ report }) => await this.enqueue('deliver', { report }),
+    'report.back_to_in_work': async ({ report }) => await this.enqueue('deliver', { report }),
+    'report.review_completed': async ({ report }) => await this.enqueue('deliver', { report }),
+    'travel.directly_approved': async ({ report }) => await this.enqueue('deliver', { report }),
+    'travel.approved': async ({ report }) => await this.enqueue('deliver', { report }),
+    'advance.received': async ({ report }) => await this.enqueue('deliver', { report })
+  }
+
+  public override readonly operations = {
+    deliver: {
+      jobOptions: { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } },
+      run: async (payload: unknown) => {
+        await executeWebhooks((payload as { report: WebhookJobData['input'] }).report)
+      }
+    }
+  }
+
   public constructor() {
     super('webhooks')
-  }
-
-  protected override getJobOptions(operation: string) {
-    if (operation === 'deliver') {
-      return { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } }
-    }
-
-    return super.getJobOptions(operation)
-  }
-
-  public override handles(event: IntegrationEvent) {
-    return (
-      event.type === 'report.draft_saved' ||
-      event.type === 'report.submitted' ||
-      event.type === 'report.review_requested' ||
-      event.type === 'report.rejected' ||
-      event.type === 'report.back_to_in_work' ||
-      event.type === 'report.review_completed' ||
-      event.type === 'travel.directly_approved' ||
-      event.type === 'travel.approved' ||
-      event.type === 'advance.received'
-    )
-  }
-
-  public override async runEvent(event: IntegrationEvent) {
-    await this.enqueue('deliver', { report: event.report as WebhookJobData['input'] })
-  }
-
-  public override async execute(operation: string, payload: unknown) {
-    if (operation !== 'deliver') {
-      return super.execute(operation, payload)
-    }
-
-    await executeWebhooks((payload as { report: WebhookJobData['input'] }).report)
   }
 }
 

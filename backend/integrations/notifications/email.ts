@@ -9,7 +9,6 @@ import i18n, { updateI18n } from '../../i18n.js'
 import { logger } from '../../logger.js'
 import { getMailTemplate } from '../../templates/cache.js'
 import { Integration } from '../integration.js'
-import { NotificationEmailPayload } from '../types.js'
 
 export async function getMailClient() {
   // NO BACKEND_CACHE bc used in worker
@@ -20,27 +19,28 @@ export async function getMailClient() {
   throw new Error('SMTP not configured in Connection Settings')
 }
 export type MailRecipient = Contact & { fk: IUser['fk']; settings: { language: IUser['settings']['language'] } }
+interface NotificationEmailPayload {
+  recipient: MailRecipient
+  subject: string
+  paragraph: string
+  language: Locale
+  button?: { text: string; link: string }
+  lastParagraph?: string | string[]
+}
 
 class MailNotificationIntegration extends Integration {
+  public override readonly operations = {
+    send: {
+      jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } },
+      run: async (payload: unknown) => {
+        const mail = payload as NotificationEmailPayload
+        await sendMail(mail.recipient, mail.subject, mail.paragraph, mail.language, mail.button, mail.lastParagraph)
+      }
+    }
+  }
+
   public constructor() {
     super('notifications.email')
-  }
-
-  protected override getJobOptions(operation: string) {
-    if (operation === 'send') {
-      return { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
-    }
-
-    return super.getJobOptions(operation)
-  }
-
-  public override async execute(operation: string, payload: unknown) {
-    if (operation !== 'send') {
-      return super.execute(operation, payload)
-    }
-
-    const mail = payload as NotificationEmailPayload
-    await sendMail(mail.recipient, mail.subject, mail.paragraph, mail.language, mail.button, mail.lastParagraph)
   }
 }
 

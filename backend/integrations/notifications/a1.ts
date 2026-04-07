@@ -4,24 +4,26 @@ import { BACKEND_CACHE } from '../../db.js'
 import { formatter } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
-import { type IntegrationEvent } from '../events.js'
+import { type IntegrationEvent, type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { enqueueMail } from './email.js'
 
+type ApprovedTravelEvent = Extract<IntegrationEvent, { type: 'travel.directly_approved' | 'travel.approved' }>
+
 class A1NotificationIntegration extends Integration {
-  public constructor() {
-    super('notifications.a1')
-  }
-
-  public override handles(event: IntegrationEvent) {
-    return event.type === 'travel.directly_approved' || event.type === 'travel.approved'
-  }
-
-  public override async runEvent(event: IntegrationEvent) {
-    const report = event.report as TravelSimple
+  private readonly notifyAboutApprovedTravel = async ({ report }: ApprovedTravelEvent) => {
     if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
       await sendA1Notification(report)
     }
+  }
+
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'travel.directly_approved': this.notifyAboutApprovedTravel,
+    'travel.approved': this.notifyAboutApprovedTravel
+  }
+
+  constructor() {
+    super('notifications.a1')
   }
 }
 

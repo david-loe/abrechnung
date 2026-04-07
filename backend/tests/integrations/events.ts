@@ -1,6 +1,7 @@
 import test from 'ava'
-import { type EventIntegration, emitIntegrationEvent } from '../../integrations/events.js'
-import { type IntegrationReport } from '../../integrations/types.js'
+import { type EventIntegration, emitIntegrationEvent, type IntegrationEvent } from '../../integrations/events.js'
+
+type IntegrationReport = Extract<IntegrationEvent, { type: 'report.submitted' }>['report']
 
 function createReport(overrides: Record<string, unknown> = {}) {
   return {
@@ -28,61 +29,88 @@ function createIntegrations() {
 
   const integrations: EventIntegration[] = [
     {
-      handles: (event) =>
-        [
-          'report.draft_saved',
-          'report.submitted',
-          'report.review_requested',
-          'report.rejected',
-          'report.back_to_in_work',
-          'report.review_completed',
-          'travel.directly_approved',
-          'travel.approved',
-          'advance.received'
-        ].includes(event.type),
-      runEvent: async (event) => {
-        calls.webhooks.push(event.report as IntegrationReport)
-      }
-    },
-    {
-      handles: (event) =>
-        [
-          'report.submitted',
-          'report.review_requested',
-          'report.rejected',
-          'report.back_to_in_work',
-          'report.review_completed',
-          'travel.approved',
-          'travel.back_to_approved'
-        ].includes(event.type),
-      runEvent: async (event) => {
-        if (event.type === 'report.back_to_in_work') {
-          calls.notifications.push({ report: event.report, textState: 'BACK_TO_IN_WORK' })
-        } else if (event.type === 'travel.back_to_approved') {
-          calls.notifications.push({ report: event.report, textState: 'BACK_TO_APPROVED' })
-        } else {
-          calls.notifications.push({ report: event.report, textState: undefined })
+      events: {
+        'report.draft_saved': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'report.submitted': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'report.review_requested': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'report.rejected': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'report.back_to_in_work': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'report.review_completed': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'travel.directly_approved': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'travel.approved': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
+        },
+        'advance.received': async (event) => {
+          calls.webhooks.push(event.report as IntegrationReport)
         }
       }
     },
     {
-      handles: (event) => event.type === 'report.review_completed',
-      runEvent: async (event) => {
-        calls.reportMails.push(event.report as IntegrationReport)
+      events: {
+        'report.submitted': async (event) => {
+          calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'report.review_requested': async (event) => {
+          calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'report.rejected': async (event) => {
+          calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'report.back_to_in_work': async (event) => {
+          calls.notifications.push({ report: event.report, textState: 'BACK_TO_IN_WORK' })
+        },
+        'report.review_completed': async (event) => {
+          calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'travel.approved': async (event) => {
+          calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'travel.back_to_approved': async (event) => {
+          calls.notifications.push({ report: event.report, textState: 'BACK_TO_APPROVED' })
+        }
       }
     },
     {
-      handles: (event) => event.type === 'report.review_completed',
-      runEvent: async (event) => {
-        calls.disk.push({ filePath: '/reports/test.pdf', report: event.report as IntegrationReport })
+      events: {
+        'report.review_completed': async (event) => {
+          calls.reportMails.push(event.report as IntegrationReport)
+        }
       }
     },
     {
-      handles: (event) => ['travel.directly_approved', 'travel.approved'].includes(event.type),
-      runEvent: async (event) => {
-        const report = event.report as { isCrossBorder: boolean; destinationPlace: { country: { needsA1Certificate: boolean } } }
-        if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
-          calls.a1.push(event.report as IntegrationReport)
+      events: {
+        'report.review_completed': async (event) => {
+          calls.disk.push({ filePath: '/reports/test.pdf', report: event.report as IntegrationReport })
+        }
+      }
+    },
+    {
+      events: {
+        'travel.directly_approved': async (event) => {
+          const report = event.report as { isCrossBorder: boolean; destinationPlace: { country: { needsA1Certificate: boolean } } }
+          if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
+            calls.a1.push(event.report as IntegrationReport)
+          }
+        },
+        'travel.approved': async (event) => {
+          const report = event.report as { isCrossBorder: boolean; destinationPlace: { country: { needsA1Certificate: boolean } } }
+          if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
+            calls.a1.push(event.report as IntegrationReport)
+          }
         }
       }
     }

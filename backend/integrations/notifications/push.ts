@@ -12,17 +12,17 @@ interface SessionWithSubscription extends SessionData {
 }
 
 class PushNotificationIntegration extends Integration {
-  public constructor() {
-    super('notifications.push')
+  public override readonly operations = {
+    send: {
+      run: async (payload: unknown) => {
+        const notification = payload as { title: string; body: string; users: User<Types.ObjectId>[]; url: string }
+        await sendPushNotification(notification.title, notification.body, notification.users, notification.url)
+      }
+    }
   }
 
-  public override async execute(operation: string, payload: unknown) {
-    if (operation !== 'send') {
-      return super.execute(operation, payload)
-    }
-
-    const notification = payload as { title: string; body: string; users: User<Types.ObjectId>[]; url: string }
-    await sendPushNotification(notification.title, notification.body, notification.users, notification.url)
+  public constructor() {
+    super('notifications.push')
   }
 }
 

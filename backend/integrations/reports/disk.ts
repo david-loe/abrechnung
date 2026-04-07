@@ -6,38 +6,33 @@ import { reportPrinter } from '../../factory.js'
 import { updateI18n } from '../../i18n.js'
 import { logger } from '../../logger.js'
 import { writeToDiskFilePath } from '../../pdf/helper.js'
-import { type IntegrationEvent } from '../events.js'
+import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
-import { ReportWriteDiskPayload } from '../types.js'
+
+interface ReportWriteDiskPayload {
+  filePath: string
+  report: Parameters<typeof reportPrinter.print>[0]
+}
 
 class ReportDiskIntegration extends Integration {
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'report.review_completed': async ({ report }) => {
+      const diskReport = report as ReportWriteDiskPayload['report']
+      await this.enqueue('write', { filePath: await writeToDiskFilePath(diskReport), report: diskReport })
+    }
+  }
+
+  public override readonly operations = {
+    write: {
+      jobOptions: { attempts: 6, backoff: { type: 'exponential', delay: 3_000 } },
+      run: async (payload: unknown) => {
+        await saveReportOnDisk(payload as ReportWriteDiskPayload)
+      }
+    }
+  }
+
   public constructor() {
-    super('reports.writeDisk')
-  }
-
-  protected override getJobOptions(operation: string) {
-    if (operation === 'write') {
-      return { attempts: 6, backoff: { type: 'exponential', delay: 3_000 } }
-    }
-
-    return super.getJobOptions(operation)
-  }
-
-  public override handles(event: IntegrationEvent) {
-    return event.type === 'report.review_completed'
-  }
-
-  public override async runEvent(event: IntegrationEvent) {
-    const report = event.report as ReportWriteDiskPayload['report']
-    await this.enqueue('write', { filePath: await writeToDiskFilePath(report), report })
-  }
-
-  public override async execute(operation: string, payload: unknown) {
-    if (operation !== 'write') {
-      return super.execute(operation, payload)
-    }
-
-    await saveReportOnDisk(payload as ReportWriteDiskPayload)
+    super('reports.disk')
   }
 }
 

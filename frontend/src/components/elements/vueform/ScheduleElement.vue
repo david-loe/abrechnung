@@ -28,7 +28,11 @@
         </div>
 
         <div v-if="normalizedValue.type === 'everyXHour'" class="col-md-4">
-          <component :is="component(detailFields.value)" v-bind="detailFields.value" name="value" />
+          <component
+            :is="component(detailFields.value)"
+            :key="`value-${detailFields.value.default}`"
+            v-bind="detailFields.value"
+            name="value" />
         </div>
 
         <div v-else class="col-md-8">
@@ -63,12 +67,12 @@ const defaultHour = 1
 const defaultMinute = 0
 
 function normalizeLoadedValue(value) {
-  if (value?.schedule && typeof value.schedule === 'object') {
-    return { enabled: value.enabled ?? true, ...value.schedule }
-  }
-
   if (value?.type) {
     return { enabled: value.enabled ?? true, ...value }
+  }
+
+  if (value?.schedule && typeof value.schedule === 'object') {
+    return { enabled: value.enabled ?? true, ...value.schedule }
   }
 
   return { enabled: true }

@@ -22,40 +22,24 @@ import ENV from '../../env.js'
 import { genAuthenticatedLink } from '../../helper.js'
 import i18n from '../../i18n.js'
 import User from '../../models/user.js'
-import { type IntegrationEvent } from '../events.js'
+import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { enqueueMail } from './email.js'
 import { enqueuePushNotification } from './push.js'
 
 class StatusNotificationIntegration extends Integration {
+  override readonly events: Partial<IntegrationEventHandlerMap> = {
+    'report.submitted': async ({ report }) => await sendStatusNotification(report),
+    'report.review_requested': async ({ report }) => await sendStatusNotification(report),
+    'report.rejected': async ({ report }) => await sendStatusNotification(report),
+    'report.back_to_in_work': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_IN_WORK'),
+    'report.review_completed': async ({ report }) => await sendStatusNotification(report),
+    'travel.approved': async ({ report }) => await sendStatusNotification(report),
+    'travel.back_to_approved': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_APPROVED')
+  }
+
   public constructor() {
     super('notifications.status')
-  }
-
-  public override handles(event: IntegrationEvent) {
-    return (
-      event.type === 'report.submitted' ||
-      event.type === 'report.review_requested' ||
-      event.type === 'report.rejected' ||
-      event.type === 'report.back_to_in_work' ||
-      event.type === 'report.review_completed' ||
-      event.type === 'travel.approved' ||
-      event.type === 'travel.back_to_approved'
-    )
-  }
-
-  public override async runEvent(event: IntegrationEvent) {
-    if (event.type === 'report.back_to_in_work') {
-      await sendStatusNotification(event.report as TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance, 'BACK_TO_IN_WORK')
-      return
-    }
-
-    if (event.type === 'travel.back_to_approved') {
-      await sendStatusNotification(event.report as TravelSimple, 'BACK_TO_APPROVED')
-      return
-    }
-
-    await sendStatusNotification(event.report as TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance)
   }
 }
 

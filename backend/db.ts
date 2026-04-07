@@ -8,10 +8,11 @@ import {
   ConnectionSettings as IConnectionSettings,
   DisplaySettings as IDisplaySettings,
   PrinterSettings as IPrinterSettings,
-  RetentionSettings as IRetentionSettings,
   Settings as ISettings,
   TravelSettings as ITravelSettings,
   User as IUser,
+  LumpSumIntegrationSettings,
+  RetentionIntegrationSettings,
   tokenAdminUser
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
@@ -21,7 +22,7 @@ import { CACHE } from './data/cache.js'
 import connectionSettingsDev from './data/connectionSettings.development.js'
 import connectionSettingsProd from './data/connectionSettings.production.js'
 import healthInsurances from './data/healthInsurances.json' with { type: 'json' }
-import retentionSettings from './data/retentionSettings.js'
+import integrationSettings from './data/integrationSettings.js'
 import settings from './data/settings.js'
 import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
@@ -86,10 +87,6 @@ export async function initDB() {
     logger.info('Created Settings from Default')
   }
 
-  if ((await mongoose.connection.collection('retentionsettings').countDocuments()) === 0) {
-    await mongoose.connection.collection('retentionsettings').insertOne(retentionSettings satisfies Omit<IRetentionSettings, '_id'>)
-  }
-
   if ((await mongoose.connection.collection('travelsettings').countDocuments()) === 0) {
     await mongoose.connection.collection('travelsettings').insertOne(travelSettings satisfies Omit<ITravelSettings, '_id'>)
   }
@@ -120,6 +117,18 @@ export async function initDB() {
     } else {
       await mongoose.connection.collection('connectionsettings').insertOne(connectionSettingsDev satisfies Omit<IConnectionSettings, '_id'>)
     }
+  }
+
+  for (const defaultIntegrationSettings of integrationSettings) {
+    if (
+      (await mongoose.connection
+        .collection('integrationsettings')
+        .countDocuments({ integrationKey: defaultIntegrationSettings.integrationKey })) === 0
+    ) {
+    }
+    await mongoose.connection
+      .collection('integrationsettings')
+      .insertOne(defaultIntegrationSettings satisfies Omit<RetentionIntegrationSettings | LumpSumIntegrationSettings, '_id'>)
   }
 
   await initer(Currency, 'currencies', currencies)
@@ -185,15 +194,6 @@ export async function getTravelSettings(init = true): Promise<ITravelSettings> {
     return travelSettings
   }
   throw Error('Travel Settings not found')
-}
-
-export async function getRetentionSettings(init = true): Promise<IRetentionSettings> {
-  await connectDB(init)
-  const retentionSettings = (await mongoose.connection.collection('retentionsettings').findOne()) as IRetentionSettings | null
-  if (retentionSettings) {
-    return retentionSettings
-  }
-  throw Error('Retention Settings not found')
 }
 
 export async function getPrinterSettings(init = true): Promise<IPrinterSettings> {

@@ -1,9 +1,9 @@
 import { locales } from 'abrechnung-common/types.js'
 import { Body, Get, Path, Post, Route, Security, Tags } from 'tsoa'
-import { reloadIntegrationSchedules } from '../integrations/scheduler.js'
+import { syncIntegrationSchedules } from '../integrations/scheduler.js'
 import {
-  getIntegrationScheduleSettingsFormSchema,
-  getResolvedIntegrationSettings,
+  getIntegrationSettings,
+  getIntegrationSettingsFormSchema,
   type IntegrationSettingsPayload,
   saveIntegrationSettings
 } from '../integrations/settings.js'
@@ -16,18 +16,18 @@ import { Controller } from './controller.js'
 export class IntegrationSettingsController extends Controller {
   @Get('{integrationKey}')
   public async get(@Path() integrationKey: string) {
-    return { data: await getResolvedIntegrationSettings(integrationKey) }
+    return { data: await getIntegrationSettings(integrationKey) }
   }
 
-  @Get('{integrationKey}/form/{scheduleKey}')
-  public async getForm(@Path() integrationKey: string, @Path() scheduleKey: string) {
-    return { data: getIntegrationScheduleSettingsFormSchema(integrationKey, scheduleKey, locales) }
+  @Get('{integrationKey}/form')
+  public async getIntegrationForm(@Path() integrationKey: string) {
+    return { data: await getIntegrationSettingsFormSchema(integrationKey, locales) }
   }
 
   @Post('{integrationKey}')
   public async post(@Path() integrationKey: string, @Body() requestBody: IntegrationSettingsPayload) {
     const result = await saveIntegrationSettings(integrationKey, { ...requestBody, integrationKey })
-    await reloadIntegrationSchedules()
+    await syncIntegrationSchedules()
     return { message: 'alerts.successSaving', result }
   }
 }

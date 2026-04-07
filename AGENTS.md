@@ -13,6 +13,7 @@ When generic agent behavior conflicts with this file, follow this file.
 ## Core Engineering Principles
 - Prefer readability over cleverness.
 - Keep code explicit, predictable, and easy to maintain.
+- No fallback or legacy layers; use only current, clean, idiomatic solutions.
 - Make focused changes; avoid unrelated refactors.
 - Preserve existing architecture and conventions unless the task requires architectural changes.
 - Performance matters: prefer solutions that keep runtime fast for end users.

@@ -1,57 +1,50 @@
-import { CronJob } from 'cron'
-import { scheduledIntegrations } from './registry.js'
-import { scheduleToCronTime } from './schedules.js'
-import { getResolvedIntegrationSettings } from './settings.js'
+import { logger } from '../logger.js'
+import { INTEGRATION_SCHEDULE_PREFIX } from './integration.js'
+import { getIntegrationQueue } from './queue.js'
+import { getIntegration } from './registry.js'
+import { scheduleToRepeatOptions } from './schedules.js'
+import { getAllIntegrationSettings } from './settings.js'
 
-const scheduledJobs = new Map<string, CronJob>()
-let schedulerStarted = false
+export async function syncIntegrationSchedules() {
+  const queue = getIntegrationQueue()
+  const activeSchedulerKeys = new Set<string>()
+  const integrationSettings = await getAllIntegrationSettings()
 
-function buildJobKey(integrationKey: string, scheduleKey: string) {
-  return `${integrationKey}:${scheduleKey}`
-}
+  for (const settings of integrationSettings) {
+    const integration = getIntegration(settings.integrationKey)
+    if (!integration) {
+      throw new Error(`No integration found for key '${settings.integrationKey}'.`)
+    }
 
-function stopAllScheduledJobs() {
-  for (const job of scheduledJobs.values()) {
-    job.stop()
-  }
-  scheduledJobs.clear()
-}
+    for (const [operation, scheduleSettings] of Object.entries(settings.schedules)) {
+      if (!integration.hasOperation(operation)) {
+        throw new Error(`No operation '${operation}' found for integration '${integration.key}'.`)
+      }
 
-export async function reloadIntegrationSchedules() {
-  if (!schedulerStarted) {
-    return
-  }
-
-  stopAllScheduledJobs()
-
-  for (const integration of scheduledIntegrations) {
-    const settings = await getResolvedIntegrationSettings(integration.key)
-    for (const scheduledAction of integration.scheduledActions) {
-      const scheduleSettings = settings.schedules[scheduledAction.scheduleKey]
-      if (!scheduleSettings?.enabled) {
+      if (!scheduleSettings.enabled) {
         continue
       }
 
-      const jobKey = buildJobKey(integration.key, scheduledAction.scheduleKey)
-      const job = CronJob.from({
-        cronTime: scheduleToCronTime(scheduleSettings.schedule),
-        onTick: () => integration.runScheduledAction(scheduledAction.scheduleKey),
-        start: true
+      const schedulerKey = integration.buildOperationSchedulerId(operation)
+      const operationDefinition = integration.requireOperation(operation)
+      activeSchedulerKeys.add(schedulerKey)
+
+      await queue.upsertJobScheduler(schedulerKey, scheduleToRepeatOptions(scheduleSettings.schedule), {
+        name: integration.buildJobName(operation),
+        data: { integrationKey: integration.key, operation, payload: null },
+        opts: { removeOnComplete: true, removeOnFail: true, ...operationDefinition.jobOptions }
       })
-      scheduledJobs.set(jobKey, job)
     }
   }
-}
 
-export async function startIntegrationScheduler() {
-  if (schedulerStarted) {
-    return
+  const existingSchedulers = await queue.getJobSchedulers()
+  for (const scheduler of existingSchedulers) {
+    if (!scheduler.key.startsWith(INTEGRATION_SCHEDULE_PREFIX) || activeSchedulerKeys.has(scheduler.key)) {
+      continue
+    }
+
+    await queue.removeJobScheduler(scheduler.key)
   }
-  schedulerStarted = true
-  await reloadIntegrationSchedules()
-}
 
-export async function stopIntegrationScheduler() {
-  schedulerStarted = false
-  stopAllScheduledJobs()
+  logger.info(`Synchronized ${activeSchedulerKeys.size} integration schedules`)
 }

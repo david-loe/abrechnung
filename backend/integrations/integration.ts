@@ -1,79 +1,67 @@
-import { Schedule } from 'abrechnung-common/types.js'
+import { Locale } from 'abrechnung-common/types.js'
 import { JobsOptions } from 'bullmq'
-import { type IntegrationEvent } from './events.js'
+import { type IntegrationEventHandlerMap } from './events.js'
 import { getIntegrationQueue } from './queue.js'
-import { runScheduledIntegrationJob } from './runScheduledIntegrationJob.js'
 
-export interface IntegrationScheduledActionDefinition {
-  scheduleKey: string
-  defaultSchedule: Schedule
-  enabledByDefault: boolean
-  description: string
-  operation: string
-  execute: (payload: unknown) => Promise<void>
+export const INTEGRATION_SCHEDULE_PREFIX = 'schedule:'
+
+export interface IntegrationOperationDefinition {
+  run: (payload: unknown) => Promise<void>
   buildPayload?: () => Promise<unknown> | unknown
   jobOptions?: JobsOptions
 }
 
 export class Integration {
-  public readonly scheduledActions: IntegrationScheduledActionDefinition[] = []
+  public readonly operations: Record<string, IntegrationOperationDefinition> = {}
+  public readonly events: Partial<IntegrationEventHandlerMap> = {}
 
   public constructor(public readonly key: string) {}
 
-  protected getJobOptions(_operation: string): JobsOptions {
-    return {}
-  }
-
-  protected buildJobName(operation: string) {
+  public buildJobName(operation: string) {
     return `${this.key}.${operation}`
   }
 
-  protected buildScheduledJobId(scheduleKey: string) {
-    return `schedule:${this.key}:${scheduleKey}`
+  public buildOperationSchedulerId(operation: string) {
+    return `${INTEGRATION_SCHEDULE_PREFIX}${this.key}:${operation}`
   }
 
-  protected getScheduledAction(scheduleKey: string) {
-    return this.scheduledActions.find((scheduledAction) => scheduledAction.scheduleKey === scheduleKey)
+  public getSettingsFormSchema(_language: Locale | readonly Locale[]) {
+    return {}
   }
 
-  protected getScheduledActionForOperation(operation: string) {
-    return this.scheduledActions.find((scheduledAction) => scheduledAction.operation === operation)
+  public getDefaultSettings() {
+    return {}
+  }
+
+  public hasOperation(operation: string) {
+    return operation in this.operations
+  }
+
+  public getOperationKeys() {
+    return Object.keys(this.operations)
+  }
+
+  public requireOperation(operation: string) {
+    const definition = this.operations[operation]
+    if (!definition) {
+      throw new Error(`No operation '${operation}' found for integration '${this.key}'.`)
+    }
+
+    return definition
   }
 
   public async enqueue(operation: string, payload: unknown, jobOptions: JobsOptions = {}) {
+    const definition = this.requireOperation(operation)
     await getIntegrationQueue().add(
       this.buildJobName(operation),
       { integrationKey: this.key, operation, payload },
-      { ...this.getJobOptions(operation), ...jobOptions }
+      { ...definition.jobOptions, ...jobOptions }
     )
   }
 
-  public async runScheduledAction(scheduleKey: string) {
-    const action = this.getScheduledAction(scheduleKey)
-    if (!action) {
-      throw new Error(`No schedule '${scheduleKey}' found for integration '${this.key}'.`)
-    }
-
-    const jobId = this.buildScheduledJobId(scheduleKey)
-    await runScheduledIntegrationJob(jobId, action.description, async () => {
-      const payload = action.buildPayload ? await action.buildPayload() : {}
-      await this.enqueue(action.operation, payload, { jobId, removeOnComplete: true, removeOnFail: true, ...action.jobOptions })
-    })
-  }
-
-  public handles(_event: IntegrationEvent) {
-    return false
-  }
-
-  public async runEvent(_event: IntegrationEvent) {}
-
-  public async execute(operation: string, payload: unknown) {
-    const scheduledAction = this.getScheduledActionForOperation(operation)
-    if (scheduledAction) {
-      await scheduledAction.execute(payload)
-      return
-    }
-
-    throw new Error(`Integration '${this.key}' does not support operation '${operation}'.`)
+  public async runOperation(operation: string, payload: unknown) {
+    const definition = this.requireOperation(operation)
+    const resolvedPayload = payload ?? (await definition.buildPayload?.())
+    await definition.run(resolvedPayload)
   }
 }
