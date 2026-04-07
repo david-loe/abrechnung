@@ -20,11 +20,11 @@ import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { runUserScript } from './runScript.js'
 
-type WebhookJobInput = Travel<_id> | ExpenseReport<_id> | HealthCareCost<_id> | Advance<_id>
+type WebhookJobInput = Travel | ExpenseReport | HealthCareCost | Advance
 
 interface WebhookJobData {
   input: WebhookJobInput
-  webhook: IWebhook<_id>
+  webhook: IWebhook
 }
 
 class WebhookIntegration extends Integration {

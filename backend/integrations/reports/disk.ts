@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { Advance, ExpenseReport, HealthCareCost, Travel } from 'abrechnung-common/types.js'
 import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
 import ENV from '../../env.js'
 import { reportPrinter } from '../../factory.js'
@@ -11,7 +12,7 @@ import { Integration } from '../integration.js'
 
 interface ReportWriteDiskPayload {
   filePath: string
-  report: Parameters<typeof reportPrinter.print>[0]
+  report: Travel | ExpenseReport | HealthCareCost | Advance
 }
 
 class ReportDiskIntegration extends Integration {
