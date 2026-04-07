@@ -2,6 +2,7 @@ import {
   Advance,
   ExpenseReport,
   HealthCareCost,
+  idDocumentToId,
   Locale,
   reportIsAdvance,
   reportIsHealthCareCost,
@@ -14,9 +15,7 @@ import { formatter } from '../factory.js'
 import i18n from '../i18n.js'
 import Organisation from '../models/organisation.js'
 
-export async function writeToDiskFilePath(
-  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-): Promise<string> {
+export async function writeToDiskFilePath(report: Travel | ExpenseReport | HealthCareCost | Advance): Promise<string> {
   let path = '/reports/'
   let totalSum = ''
   formatter.setLocale(i18n.language as Locale)
@@ -33,7 +32,7 @@ export async function writeToDiskFilePath(
       path += 'expenseReport/'
     }
   }
-  const org = await Organisation.findOne({ _id: report.project.organisation._id })
+  const org = await Organisation.findOne({ _id: idDocumentToId(report.project.organisation) })
   const subfolder = org ? org.subfolderPath : ''
   const filename = sanitizeFilename(
     `${report.project.identifier} ${formatter.name(report.owner.name, 'shortWithoutPoint')} - ${report.name} ${totalSum}.pdf`

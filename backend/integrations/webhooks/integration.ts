@@ -1,4 +1,5 @@
 import {
+  _id,
   Advance,
   ExpenseReport,
   getModelNameFromReport,
@@ -10,39 +11,40 @@ import {
 } from 'abrechnung-common/types.js'
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
-import { Types } from 'mongoose'
 import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
 import ENV from '../../env.js'
 import { reportPrinter } from '../../factory.js'
 import { updateI18n } from '../../i18n.js'
 import Webhook from '../../models/webhook.js'
-import { type IntegrationEvent, type IntegrationEventHandlerMap } from '../events.js'
+import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { runUserScript } from './runScript.js'
 
+type WebhookJobInput = Travel<_id> | ExpenseReport<_id> | HealthCareCost<_id> | Advance<_id>
+
 interface WebhookJobData {
-  input: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-  webhook: IWebhook<Types.ObjectId>
+  input: WebhookJobInput
+  webhook: IWebhook<_id>
 }
 
 class WebhookIntegration extends Integration {
   override readonly events: Partial<IntegrationEventHandlerMap> = {
-    'report.draft_saved': async ({ report }) => await this.enqueue('deliver', { report }),
-    'report.submitted': async ({ report }) => await this.enqueue('deliver', { report }),
-    'report.review_requested': async ({ report }) => await this.enqueue('deliver', { report }),
-    'report.rejected': async ({ report }) => await this.enqueue('deliver', { report }),
-    'report.back_to_in_work': async ({ report }) => await this.enqueue('deliver', { report }),
-    'report.review_completed': async ({ report }) => await this.enqueue('deliver', { report }),
-    'travel.directly_approved': async ({ report }) => await this.enqueue('deliver', { report }),
-    'travel.approved': async ({ report }) => await this.enqueue('deliver', { report }),
-    'advance.received': async ({ report }) => await this.enqueue('deliver', { report })
+    'report.draft_saved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.submitted': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.review_requested': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.rejected': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.back_to_in_work': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'report.review_completed': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'travel.directly_approved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'travel.approved': async ({ report }) => await this.enqueueMatchingWebhooks(report),
+    'advance.received': async ({ report }) => await this.enqueueMatchingWebhooks(report)
   }
 
   public override readonly operations = {
     deliver: {
       jobOptions: { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } },
-      run: async (payload: unknown) => {
-        await executeWebhooks((payload as { report: WebhookJobData['input'] }).report)
+      run: async ({ input, webhook }: WebhookJobData) => {
+        await processWebhookJob({ input, webhook })
       }
     }
   }
@@ -50,18 +52,20 @@ class WebhookIntegration extends Integration {
   public constructor() {
     super('webhooks')
   }
+
+  private async enqueueMatchingWebhooks(report: WebhookJobInput) {
+    const webhooks = await findMatchingWebhooks(report)
+    for (const webhook of webhooks) {
+      await this.enqueue('deliver', { input: report, webhook })
+    }
+  }
 }
 
 export const webhookIntegration = new WebhookIntegration()
 
-export async function executeWebhooks(
-  report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
-) {
+async function findMatchingWebhooks(report: WebhookJobInput) {
   const reportType = getReportTypeFromModelName(getModelNameFromReport(report))
-  const hooks = await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
-  for (const hook of hooks) {
-    await processWebhookJob({ input: report, webhook: hook })
-  }
+  return await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
 }
 
 export async function processWebhookJob({ webhook, input }: WebhookJobData) {

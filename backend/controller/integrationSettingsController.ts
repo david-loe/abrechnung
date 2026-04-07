@@ -5,6 +5,7 @@ import {
   getIntegrationSettings,
   getIntegrationSettingsFormSchema,
   type IntegrationSettingsPayload,
+  type IntegrationSettingsRequestBody,
   saveIntegrationSettings
 } from '../integrations/settings.js'
 import { Controller } from './controller.js'
@@ -25,8 +26,8 @@ export class IntegrationSettingsController extends Controller {
   }
 
   @Post('{integrationKey}')
-  public async post(@Path() integrationKey: string, @Body() requestBody: IntegrationSettingsPayload) {
-    const result = await saveIntegrationSettings(integrationKey, { ...requestBody, integrationKey })
+  public async post(@Path() integrationKey: string, @Body() requestBody: IntegrationSettingsRequestBody) {
+    const result = await saveIntegrationSettings(integrationKey, { ...requestBody, integrationKey } as IntegrationSettingsPayload)
     await syncIntegrationSchedules()
     return { message: 'alerts.successSaving', result }
   }

@@ -1,4 +1,10 @@
-import { IntegrationSettings, Locale, LumpSumIntegrationSettings, RetentionIntegrationSettings } from 'abrechnung-common/types.js'
+import {
+  IntegrationScheduleSettings,
+  IntegrationSettings,
+  Locale,
+  LumpSumIntegrationSettings,
+  RetentionIntegrationSettings
+} from 'abrechnung-common/types.js'
 import mongoose from 'mongoose'
 import { NotFoundError } from '../controller/error.js'
 import IntegrationSettingsModel from '../models/integrationSettings.js'
@@ -14,6 +20,11 @@ export type IntegrationSettingsPayload<IntegrationKey extends string = string> =
   IntegrationKey extends keyof IntegrationSettingsPayloadByKey
     ? IntegrationSettingsPayloadByKey[IntegrationKey]
     : Omit<IntegrationSettings, '_id'>
+
+export interface IntegrationSettingsRequestBody {
+  schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
+  settings: { [key: string]: unknown }
+}
 
 function requireIntegration(integrationKey: string) {
   const integration = getIntegration(integrationKey)
@@ -52,7 +63,7 @@ function buildIntegrationScheduleSettingsFormSchema(integrationKey: string, oper
 async function findIntegrationSettings(integrationKey: string) {
   return await mongoose.connection
     .collection<IntegrationSettingsPayload>('integrationsettings')
-    .findOne({ integrationKey }, { projection: { _id: 0 } })
+    .findOne({ integrationKey }, { projection: { _id: 0, __v: 0 } })
 }
 
 export async function getIntegrationSettingsFormSchema(integrationKey: string, language: Locale | readonly Locale[]) {
@@ -88,7 +99,7 @@ export async function getIntegrationSettings(integrationKey: string): Promise<In
 export async function getAllIntegrationSettings() {
   return await mongoose.connection
     .collection<IntegrationSettingsPayload>('integrationsettings')
-    .find({}, { projection: { _id: 0 } })
+    .find({}, { projection: { _id: 0, __v: 0 } })
     .toArray()
 }
 

@@ -125,10 +125,10 @@ export async function initDB() {
         .collection('integrationsettings')
         .countDocuments({ integrationKey: defaultIntegrationSettings.integrationKey })) === 0
     ) {
+      await mongoose.connection
+        .collection('integrationsettings')
+        .insertOne(defaultIntegrationSettings satisfies Omit<RetentionIntegrationSettings | LumpSumIntegrationSettings, '_id'>)
     }
-    await mongoose.connection
-      .collection('integrationsettings')
-      .insertOne(defaultIntegrationSettings satisfies Omit<RetentionIntegrationSettings | LumpSumIntegrationSettings, '_id'>)
   }
 
   await initer(Currency, 'currencies', currencies)

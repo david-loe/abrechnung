@@ -150,7 +150,7 @@ export interface IntegrationScheduleSettings {
 export interface IntegrationSettings<idType extends _id = _id> {
   integrationKey: string
   schedules: { [scheduleKey: string]: IntegrationScheduleSettings }
-  settings: unknown
+  settings: Record<string, unknown>
   _id: idType
 }
 

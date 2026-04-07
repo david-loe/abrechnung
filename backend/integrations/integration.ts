@@ -6,7 +6,8 @@ import { getIntegrationQueue } from './queue.js'
 export const INTEGRATION_SCHEDULE_PREFIX = 'schedule:'
 
 export interface IntegrationOperationDefinition {
-  run: (payload: unknown) => Promise<void>
+  // biome-ignore lint/suspicious/noExplicitAny: typing is too complex for now, can be improved in the future
+  run: (payload: any) => Promise<void>
   buildPayload?: () => Promise<unknown> | unknown
   jobOptions?: JobsOptions
 }
