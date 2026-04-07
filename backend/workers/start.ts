@@ -4,4 +4,4 @@ import { startIntegrationWorker } from '../integrations/worker.js'
 
 await connectDB(false)
 await syncIntegrationSchedules()
-startIntegrationWorker()
+await startIntegrationWorker()

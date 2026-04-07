@@ -1,3 +1,4 @@
+import { applyRetentionPolicy } from '../../retentionpolicy.js'
 import { Integration } from '../integration.js'
 import { retentionPolicySchemaDefinition } from './settings.js'
 
@@ -5,7 +6,6 @@ class RetentionPolicyIntegration extends Integration {
   public override readonly operations = {
     apply: {
       run: async () => {
-        const { applyRetentionPolicy } = await import('../../retentionpolicy.js')
         await applyRetentionPolicy()
       }
     }

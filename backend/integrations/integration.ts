@@ -60,9 +60,13 @@ export class Integration {
     )
   }
 
+  /**
+   * Operations without an explicit payload or buildPayload receive an empty object
+   * so queue workers never pass undefined into run handlers.
+   */
   public async runOperation(operation: string, payload: unknown) {
     const definition = this.requireOperation(operation)
-    const resolvedPayload = payload ?? (await definition.buildPayload?.())
+    const resolvedPayload = payload ?? (await definition.buildPayload?.()) ?? {}
     await definition.run(resolvedPayload)
   }
 }

@@ -10,12 +10,12 @@ function describeJob(data: IntegrationJobData) {
   return `${data.integrationKey}:${data.operation}`
 }
 
-export function startIntegrationWorker() {
+export async function startIntegrationWorker() {
   if (workerInstance) {
     return workerInstance
   }
 
-  workerInstance = new Worker<IntegrationJobData>(
+  const worker = new Worker<IntegrationJobData>(
     INTEGRATION_QUEUE_NAME,
     async (job) => {
       logger.debug(`Processing integration job ${job.id} (${describeJob(job.data)})`)
@@ -24,18 +24,20 @@ export function startIntegrationWorker() {
     { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency: ENV.WORKER_CONCURRENCY }
   )
 
-  workerInstance.on('completed', (job) => {
+  worker.on('completed', (job) => {
     logger.debug(`Integration job ${job.id} completed`)
   })
 
-  workerInstance.on('failed', (job, error) => {
+  worker.on('failed', (job, error) => {
     logger.error(`Integration job ${job?.id} failed (${job ? describeJob(job.data) : 'unknown'})`, error)
   })
 
-  workerInstance.on('error', (error) => {
+  worker.on('error', (error) => {
     logger.error('Integration worker encountered an error', error)
   })
 
+  await worker.waitUntilReady()
+  workerInstance = worker
   logger.info('Integration worker started')
   return workerInstance
 }

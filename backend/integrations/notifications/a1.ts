@@ -1,5 +1,6 @@
 import { TravelSimple } from 'abrechnung-common/types.js'
 import { getDiffInDays, PlaceToString } from 'abrechnung-common/utils/scripts.js'
+import escapeHtml from 'escape-html'
 import { BACKEND_CACHE } from '../../db.js'
 import { formatter } from '../../factory.js'
 import i18n from '../../i18n.js'
@@ -29,6 +30,10 @@ class A1NotificationIntegration extends Integration {
 
 export const a1NotificationIntegration = new A1NotificationIntegration()
 
+function escapeNotificationValue(value: string | null | undefined) {
+  return escapeHtml(value ?? '')
+}
+
 export async function sendA1Notification(report: TravelSimple) {
   const org = await Organisation.findOne({ _id: report.project.organisation })
   if (!org?.a1CertificateEmail) {
@@ -41,18 +46,24 @@ export async function sendA1Notification(report: TravelSimple) {
   const subject = t('mail.travel.a1.subject')
   const paragraph = t('mail.travel.a1.paragraph')
   const lastParagraph = [
-    `${t('labels.traveler')}: ${formatter.name(report.owner.name)}`,
-    `${t('labels.reason')}: ${report.reason}`,
-    `${t('labels.startDate')}: ${formatter.date(report.startDate, language)}`,
-    `${t('labels.endDate')}: ${formatter.date(report.endDate, language)} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
-    `${t('labels.destinationPlace')}: ${PlaceToString(report.destinationPlace, language)}`,
-    `${t('labels.approvedBy')}: ${formatter.name(report.editor.name)}`,
-    `${t('labels.destinationName')}: ${report.a1Certificate?.destinationName}`,
-    `${t('labels.exactAddress')}: ${report.a1Certificate?.exactAddress}`
+    `${t('labels.traveler')}: ${escapeNotificationValue(formatter.name(report.owner.name))}`,
+    `${t('labels.reason')}: ${escapeNotificationValue(report.reason)}`,
+    `${t('labels.startDate')}: ${escapeNotificationValue(formatter.date(report.startDate))}`,
+    `${t('labels.endDate')}: ${escapeNotificationValue(formatter.date(report.endDate))} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
+    `${t('labels.destinationPlace')}: ${escapeNotificationValue(PlaceToString(report.destinationPlace, language))}`,
+    `${t('labels.approvedBy')}: ${escapeNotificationValue(formatter.name(report.editor.name))}`
   ]
 
   if (report.fellowTravelersNames) {
-    lastParagraph.splice(1, 0, `\n${t('labels.fellowTravelersNames')}: ${report.fellowTravelersNames}`)
+    lastParagraph.splice(1, 0, `\n${t('labels.fellowTravelersNames')}: ${escapeNotificationValue(report.fellowTravelersNames)}`)
+  }
+
+  if (report.a1Certificate?.destinationName) {
+    lastParagraph.push(`${t('labels.destinationName')}: ${escapeNotificationValue(report.a1Certificate.destinationName)}`)
+  }
+
+  if (report.a1Certificate?.exactAddress) {
+    lastParagraph.push(`${t('labels.exactAddress')}: ${escapeNotificationValue(report.a1Certificate.exactAddress)}`)
   }
 
   await enqueueMail(

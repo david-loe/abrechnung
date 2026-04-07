@@ -23,7 +23,7 @@ type WebhookJobInput = Travel | ExpenseReport | HealthCareCost | Advance
 
 interface WebhookJobData {
   input: WebhookJobInput
-  webhook: IWebhook
+  webhookId: string
 }
 
 class WebhookIntegration extends Integration {
@@ -42,8 +42,8 @@ class WebhookIntegration extends Integration {
   public override readonly operations = {
     deliver: {
       jobOptions: { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } },
-      run: async ({ input, webhook }: WebhookJobData) => {
-        await processWebhookJob({ input, webhook })
+      run: async ({ input, webhookId }: WebhookJobData) => {
+        await processWebhookJob({ input, webhookId })
       }
     }
   }
@@ -55,7 +55,7 @@ class WebhookIntegration extends Integration {
   private async enqueueMatchingWebhooks(report: WebhookJobInput) {
     const webhooks = await findMatchingWebhooks(report)
     for (const webhook of webhooks) {
-      await this.enqueue('deliver', { input: report, webhook })
+      await this.enqueue('deliver', { input: report, webhookId: webhook._id.toString() })
     }
   }
 }
@@ -67,7 +67,12 @@ async function findMatchingWebhooks(report: WebhookJobInput) {
   return await Webhook.find({ reportType, onState: report.state, isActive: true }).sort({ executionOrder: 1 }).lean()
 }
 
-export async function processWebhookJob({ webhook, input }: WebhookJobData) {
+export async function processWebhookJob({ webhookId, input }: WebhookJobData) {
+  const webhook = await Webhook.findOne({ _id: webhookId }).lean<IWebhook | null>()
+  if (!webhook?.isActive) {
+    return
+  }
+
   const request = { ...webhook.request, ...(webhook.script ? await runUserScript(webhook.script, input) : {}) }
 
   if (request.convertBodyToFormData) {

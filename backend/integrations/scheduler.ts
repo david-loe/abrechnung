@@ -13,12 +13,14 @@ export async function syncIntegrationSchedules() {
   for (const settings of integrationSettings) {
     const integration = getIntegration(settings.integrationKey)
     if (!integration) {
-      throw new Error(`No integration found for key '${settings.integrationKey}'.`)
+      logger.error(`No integration found for key '${settings.integrationKey}'.`)
+      continue
     }
 
     for (const [operation, scheduleSettings] of Object.entries(settings.schedules)) {
       if (!integration.hasOperation(operation)) {
-        throw new Error(`No operation '${operation}' found for integration '${integration.key}'.`)
+        logger.error(`No operation '${operation}' found for integration '${integration.key}'.`)
+        continue
       }
 
       if (!scheduleSettings.enabled) {

@@ -2,6 +2,7 @@ import test from 'ava'
 import { type EventIntegration, emitIntegrationEvent, type IntegrationEvent } from '../../integrations/events.js'
 
 type IntegrationReport = Extract<IntegrationEvent, { type: 'report.submitted' }>['report']
+type IntegrationTravelReport = Extract<IntegrationEvent, { type: 'travel.directly_approved' }>['report']
 
 function createReport(overrides: Record<string, unknown> = {}) {
   return {
@@ -15,7 +16,11 @@ function createReport(overrides: Record<string, unknown> = {}) {
 }
 
 function createTravelReport(overrides: Record<string, unknown> = {}) {
-  return createReport({ isCrossBorder: false, destinationPlace: { country: { needsA1Certificate: false } }, ...overrides })
+  return createReport({
+    isCrossBorder: false,
+    destinationPlace: { country: { needsA1Certificate: false } },
+    ...overrides
+  }) as IntegrationTravelReport
 }
 
 function createIntegrations() {
@@ -147,7 +152,7 @@ test('travel.back_to_approved only triggers notification with custom state label
   const report = createTravelReport()
   const { calls, integrations } = createIntegrations()
 
-  await emitIntegrationEvent({ type: 'travel.back_to_approved', report: report as never }, integrations)
+  await emitIntegrationEvent({ type: 'travel.back_to_approved', report }, integrations)
 
   t.deepEqual(calls.webhooks, [])
   t.deepEqual(calls.notifications, [{ report, textState: 'BACK_TO_APPROVED' }])
@@ -160,7 +165,7 @@ test('travel.directly_approved triggers A1 notification when conditions are met'
   const report = createTravelReport({ isCrossBorder: true, destinationPlace: { country: { needsA1Certificate: true } } })
   const { calls, integrations } = createIntegrations()
 
-  await emitIntegrationEvent({ type: 'travel.directly_approved', report: report as never }, integrations)
+  await emitIntegrationEvent({ type: 'travel.directly_approved', report }, integrations)
 
   t.deepEqual(calls.webhooks, [report])
   t.deepEqual(calls.notifications, [])
@@ -171,7 +176,7 @@ test('travel.directly_approved skips A1 notification when conditions are not met
   const report = createTravelReport()
   const { calls, integrations } = createIntegrations()
 
-  await emitIntegrationEvent({ type: 'travel.directly_approved', report: report as never }, integrations)
+  await emitIntegrationEvent({ type: 'travel.directly_approved', report }, integrations)
 
   t.deepEqual(calls.webhooks, [report])
   t.deepEqual(calls.a1, [])

@@ -78,7 +78,7 @@ test.serial('syncIntegrationSchedules upserts repeatable jobs for enabled integr
       jobTemplate: {
         name: 'lumpSums.sync',
         data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true }
+        opts: { removeOnComplete: true, removeOnFail: true, attempts: 3, backoff: { type: 'exponential', delay: 5_000 } }
       }
     },
     {
@@ -132,7 +132,7 @@ test.serial('syncIntegrationSchedules removes disabled and obsolete repeatable j
       jobTemplate: {
         name: 'lumpSums.sync',
         data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true }
+        opts: { removeOnComplete: true, removeOnFail: true, attempts: 3, backoff: { type: 'exponential', delay: 5_000 } }
       }
     }
   ])

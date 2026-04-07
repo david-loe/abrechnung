@@ -27,7 +27,8 @@ export class IntegrationSettingsController extends Controller {
 
   @Post('{integrationKey}')
   public async post(@Path() integrationKey: string, @Body() requestBody: IntegrationSettingsRequestBody) {
-    const result = await saveIntegrationSettings(integrationKey, { ...requestBody, integrationKey } as IntegrationSettingsPayload)
+    const payload: IntegrationSettingsPayload = { ...requestBody, integrationKey }
+    const result = await saveIntegrationSettings(integrationKey, payload)
     await syncIntegrationSchedules()
     return { message: 'alerts.successSaving', result }
   }

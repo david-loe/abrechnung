@@ -62,7 +62,7 @@ test.serial('webhook events enqueue all matching hooks as separate jobs', async 
   stubMatchingWebhooks(t, hooks)
   stubQueueAdd(t, async (name, data, opts) => {
     queued.push({ name, data, opts })
-    return {} as never
+    return undefined
   })
 
   await webhookIntegration.events['report.submitted']?.({ type: 'report.submitted', report } as never)
@@ -70,12 +70,12 @@ test.serial('webhook events enqueue all matching hooks as separate jobs', async 
   t.deepEqual(queued, [
     {
       name: 'webhooks.deliver',
-      data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhook: hooks[0] } },
+      data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhookId: hooks[0]._id } },
       opts: deliverJobOptions
     },
     {
       name: 'webhooks.deliver',
-      data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhook: hooks[1] } },
+      data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhookId: hooks[1]._id } },
       opts: deliverJobOptions
     }
   ])
@@ -88,7 +88,7 @@ test.serial('webhook delivery processes a single queued hook without enqueueing 
 
   stubQueueAdd(t, async (_name, _data, _opts) => {
     queued = true
-    return {} as never
+    return undefined
   })
 
   axios.request = (async () =>
@@ -103,7 +103,16 @@ test.serial('webhook delivery processes a single queued hook without enqueueing 
     axios.request = originalRequest
   })
 
-  await webhookIntegration.operations.deliver.run({ input: report as never, webhook: createWebhook('first') })
+  const webhook = createWebhook('first')
+  const originalFindOne = Webhook.findOne
+
+  ;(Webhook as { findOne: typeof Webhook.findOne }).findOne = (() => ({ lean: async () => webhook })) as typeof Webhook.findOne
+
+  t.teardown(() => {
+    ;(Webhook as { findOne: typeof Webhook.findOne }).findOne = originalFindOne
+  })
+
+  await webhookIntegration.operations.deliver.run({ input: report as never, webhookId: webhook._id })
 
   t.false(queued)
 })
