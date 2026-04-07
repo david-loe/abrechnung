@@ -7093,184 +7093,6 @@
 					"HealthCareCost"
 				]
 			},
-			"Schedule": {
-				"anyOf": [
-					{
-						"properties": {
-							"value": {
-								"type": "number",
-								"format": "double"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"everyXHour"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"value",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"minute": {
-								"type": "number",
-								"format": "double"
-							},
-							"hour": {
-								"type": "number",
-								"format": "double"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"daily"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"minute",
-							"hour",
-							"type"
-						],
-						"type": "object"
-					},
-					{
-						"properties": {
-							"minute": {
-								"type": "number",
-								"format": "double"
-							},
-							"hour": {
-								"type": "number",
-								"format": "double"
-							},
-							"weekdays": {
-								"items": {
-									"type": "number",
-									"format": "double"
-								},
-								"type": "array"
-							},
-							"type": {
-								"type": "string",
-								"enum": [
-									"weekly"
-								],
-								"nullable": false
-							}
-						},
-						"required": [
-							"minute",
-							"hour",
-							"weekdays",
-							"type"
-						],
-						"type": "object"
-					}
-				]
-			},
-			"RetentionSettings__id_": {
-				"properties": {
-					"enabled": {
-						"type": "boolean"
-					},
-					"schedule": {
-						"$ref": "#/components/schemas/Schedule"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteBookedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteBookedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"enabled",
-					"schedule",
-					"retentionPolicy",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"IRetentionSettings_string_": {
-				"properties": {
-					"enabled": {
-						"type": "boolean"
-					},
-					"schedule": {
-						"$ref": "#/components/schemas/Schedule"
-					},
-					"retentionPolicy": {
-						"properties": {
-							"deleteBookedAfterXDays": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteApprovedTravelAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"deleteInWorkReportsAfterXDaysUnused": {
-								"type": "number",
-								"format": "double"
-							},
-							"mailXDaysBeforeDeletion": {
-								"type": "number",
-								"format": "double"
-							}
-						},
-						"required": [
-							"deleteBookedAfterXDays",
-							"deleteApprovedTravelAfterXDaysUnused",
-							"deleteInWorkReportsAfterXDaysUnused",
-							"mailXDaysBeforeDeletion"
-						],
-						"type": "object"
-					},
-					"_id": {
-						"type": "string"
-					}
-				},
-				"required": [
-					"enabled",
-					"schedule",
-					"retentionPolicy",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"ProjectSimpleWithName__id_": {
 				"properties": {
 					"identifier": {
@@ -8469,6 +8291,102 @@
 			"SetterBody_Omit_IOrganisation_mongoose.Types.ObjectId_.logo__": {
 				"$ref": "#/components/schemas/SetterPartial_Omit_IOrganisation_mongoose.Types.ObjectId_.logo_.NoPost_"
 			},
+			"Pick_IntegrationSettings__id_.Exclude_keyofIntegrationSettings__id_._id__": {
+				"properties": {},
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"Omit_IntegrationSettings__id_._id_": {
+				"$ref": "#/components/schemas/Pick_IntegrationSettings__id_.Exclude_keyofIntegrationSettings__id_._id__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"Record_string.unknown_": {
+				"properties": {},
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"Schedule": {
+				"anyOf": [
+					{
+						"properties": {
+							"value": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"everyXHour"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"value",
+							"type"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"minute": {
+								"type": "number",
+								"format": "double"
+							},
+							"hour": {
+								"type": "number",
+								"format": "double"
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"daily"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"minute",
+							"hour",
+							"type"
+						],
+						"type": "object"
+					},
+					{
+						"properties": {
+							"minute": {
+								"type": "number",
+								"format": "double"
+							},
+							"hour": {
+								"type": "number",
+								"format": "double"
+							},
+							"weekdays": {
+								"items": {
+									"type": "number",
+									"format": "double"
+								},
+								"type": "array"
+							},
+							"type": {
+								"type": "string",
+								"enum": [
+									"weekly"
+								],
+								"nullable": false
+							}
+						},
+						"required": [
+							"minute",
+							"hour",
+							"weekdays",
+							"type"
+						],
+						"type": "object"
+					}
+				]
+			},
 			"IntegrationScheduleSettings": {
 				"properties": {
 					"enabled": {
@@ -8485,32 +8403,27 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Pick_IntegrationSettings.Exclude_keyofIntegrationSettings._id__": {
+			"IntegrationSettingsRequestBody": {
 				"properties": {
-					"integrationKey": {
-						"type": "string"
-					},
 					"schedules": {
 						"properties": {},
 						"additionalProperties": {
 							"$ref": "#/components/schemas/IntegrationScheduleSettings"
 						},
 						"type": "object"
+					},
+					"settings": {
+						"properties": {},
+						"additionalProperties": {},
+						"type": "object"
 					}
 				},
 				"required": [
-					"integrationKey",
-					"schedules"
+					"schedules",
+					"settings"
 				],
 				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_IntegrationSettings._id_": {
-				"$ref": "#/components/schemas/Pick_IntegrationSettings.Exclude_keyofIntegrationSettings._id__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"IntegrationSettingsPayload": {
-				"$ref": "#/components/schemas/Omit_IntegrationSettings._id_"
+				"additionalProperties": false
 			},
 			"GETResponse_HealthInsurance__id_-or-HealthInsurance__id_-Array_": {
 				"properties": {
@@ -17626,139 +17539,6 @@
 				]
 			}
 		},
-		"/admin/retentionSettings": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"data": {
-											"$ref": "#/components/schemas/RetentionSettings__id_"
-										}
-									},
-									"required": [
-										"data"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Retention Settings"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"admin"
-						]
-					},
-					{
-						"httpBearer": [
-							"admin"
-						]
-					}
-				],
-				"parameters": []
-			},
-			"post": {
-				"operationId": "Post",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"result": {
-											"$ref": "#/components/schemas/RetentionSettings__id_"
-										},
-										"message": {
-											"type": "string"
-										}
-									},
-									"required": [
-										"result",
-										"message"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Retention Settings"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"admin"
-						]
-					},
-					{
-						"httpBearer": [
-							"admin"
-						]
-					}
-				],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/IRetentionSettings_string_"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/admin/retentionSettings/form": {
-			"get": {
-				"operationId": "GetForm",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"properties": {
-										"data": {}
-									},
-									"required": [
-										"data"
-									],
-									"type": "object"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"Retention Settings"
-				],
-				"security": [
-					{
-						"cookieAuth": [
-							"admin"
-						]
-					},
-					{
-						"httpBearer": [
-							"admin"
-						]
-					}
-				],
-				"parameters": []
-			}
-		},
 		"/project": {
 			"get": {
 				"operationId": "Get",
@@ -18733,7 +18513,7 @@
 								"schema": {
 									"properties": {
 										"data": {
-											"$ref": "#/components/schemas/IntegrationSettingsPayload"
+											"$ref": "#/components/schemas/Omit_IntegrationSettings__id_._id_"
 										}
 									},
 									"required": [
@@ -18781,7 +18561,7 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/IntegrationSettingsPayload"
+											"$ref": "#/components/schemas/Omit_IntegrationSettings__id_._id_"
 										},
 										"message": {
 											"type": "string"
@@ -18827,16 +18607,16 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/IntegrationSettingsPayload"
+								"$ref": "#/components/schemas/IntegrationSettingsRequestBody"
 							}
 						}
 					}
 				}
 			}
 		},
-		"/admin/integrationSettings/{integrationKey}/form/{scheduleKey}": {
+		"/admin/integrationSettings/{integrationKey}/form": {
 			"get": {
-				"operationId": "GetForm",
+				"operationId": "GetIntegrationForm",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -18844,7 +18624,9 @@
 							"application/json": {
 								"schema": {
 									"properties": {
-										"data": {}
+										"data": {
+											"$ref": "#/components/schemas/Record_string.unknown_"
+										}
 									},
 									"required": [
 										"data"
@@ -18874,14 +18656,6 @@
 					{
 						"in": "path",
 						"name": "integrationKey",
-						"required": true,
-						"schema": {
-							"type": "string"
-						}
-					},
-					{
-						"in": "path",
-						"name": "scheduleKey",
 						"required": true,
 						"schema": {
 							"type": "string"
