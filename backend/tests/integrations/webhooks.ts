@@ -86,7 +86,7 @@ test.serial('webhook delivery processes a single queued hook without enqueueing 
   const report = createReport()
   const originalRequest = axios.request
 
-  stubQueueAdd(t, async (name, data, opts) => {
+  stubQueueAdd(t, async (_name, _data, _opts) => {
     queued = true
     return {} as never
   })

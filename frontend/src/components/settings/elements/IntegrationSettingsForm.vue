@@ -95,12 +95,8 @@ async function save(requestData: Record<string, unknown>) {
     return
   }
 
-  const nextSettings = { ...requestData } as Record<string, unknown>
-  const scheduleSettings = scheduleKey.value ? getScheduleSettings(nextSettings) : undefined
-
-  delete nextSettings.scheduler
-  delete nextSettings.enabled
-  delete nextSettings.schedule
+  const scheduleSettings = scheduleKey.value ? getScheduleSettings(requestData) : undefined
+  const { scheduler: _scheduler, enabled: _enabled, schedule: _schedule, ...nextSettings } = requestData
 
   const result = await API.setter<IntegrationSettingsPayload>(`admin/integrationSettings/${props.integrationKey}`, {
     ...integrationSettings.value,
