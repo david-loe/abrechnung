@@ -28,19 +28,11 @@
         </div>
 
         <div v-if="normalizedValue.type === 'everyXHour'" class="col-md-4">
-          <component
-            :is="component(detailFields.value)"
-            :key="`value-${detailFields.value.default}`"
-            v-bind="detailFields.value"
-            name="value" />
+          <component :is="component(detailFields.value)" v-bind="detailFields.value" name="value" />
         </div>
 
         <div v-else class="col-md-8">
-          <component
-            :is="component(detailFields.time)"
-            :key="`time-${normalizedValue.type}-${detailFields.time.default}`"
-            v-bind="detailFields.time"
-            name="time" />
+          <component :is="component(detailFields.time)" v-bind="detailFields.time" name="time" />
         </div>
 
         <div v-if="normalizedValue.type === 'weekly'" class="col-12">

@@ -9,10 +9,11 @@ import {
 } from 'abrechnung-common/types.js'
 import { getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
-import { getConnectionSettings } from '../../db.js'
-import { formatter, reportPrinter } from '../../factory.js'
+import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
+import { createFormatter } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
+import { renderReportPdf } from '../../pdf/report.js'
 import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { getMailClient } from '../notifications/email.js'
@@ -53,9 +54,12 @@ export async function sendReportViaMail(
     if (org?.reportEmail) {
       const mailClient = await getMailClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
-      formatter.setLocale(lng)
+      const displaySettings = await getDisplaySettings(false)
+      const printerSettings = await getPrinterSettings(false)
+      const travelSettings = await getTravelSettings(false)
+      const formatter = createFormatter(lng, displaySettings.nameDisplayFormat)
       let subject = '🧾 '
-      const pdf = await reportPrinter.print(report, lng)
+      const pdf = await renderReportPdf(report, lng, { displaySettings, printerSettings, travelSettings })
       let totalSum = ''
       if (reportIsAdvance(report)) {
         subject = subject + i18n.t('labels.advance', { lng })

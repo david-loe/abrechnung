@@ -1,7 +1,16 @@
 import { ApprovedTravelsPrinter } from 'abrechnung-common/print/approvedTravelsPrinter.js'
 import { ReportPrinter } from 'abrechnung-common/print/reportPrinter.js'
 import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
-import { _id, CountryCode, Country as ICountry, ExchangeRate as IExchangeRate, Locale } from 'abrechnung-common/types.js'
+import {
+  _id,
+  CountryCode,
+  Country as ICountry,
+  ExchangeRate as IExchangeRate,
+  Locale,
+  NameDisplayFormat,
+  PrinterSettings,
+  TravelSettings
+} from 'abrechnung-common/types.js'
 import { CurrencyConverter, ExchangeRateProvider, InforEuroResponse } from 'abrechnung-common/utils/currencyConverter.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
 import axios from 'axios'
@@ -13,55 +22,70 @@ import DocumentFile from './models/documentFile.js'
 import ExchangeRate from './models/exchangeRate.js'
 import Organisation from './models/organisation.js'
 
-export const formatter = new Formatter(BACKEND_CACHE.displaySettings.locale.default, BACKEND_CACHE.displaySettings.nameDisplayFormat)
+function translateText(textIdentifier: string, language: Locale, interpolation?: Record<string, string>) {
+  return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
+}
 
-export const reportPrinter = new ReportPrinter<_id>(
-  BACKEND_CACHE.printerSettings,
-  BACKEND_CACHE.travelSettings,
-  formatter,
-  (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
-    return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
-  },
-  async (id) => {
-    const doc = await DocumentFile.findOne({ _id: id }).lean()
-    if (doc) {
-      // inconsistent type in mongoose for Buffer, so need assertion here https://github.com/Automattic/mongoose/pull/15518
-      return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
-    }
-    return null
-  },
-  async (id) => {
-    const orga = await Organisation.findOne({ _id: id }).lean()
-    if (orga?.logo?._id) {
-      return { logoId: orga.logo._id, website: orga.website }
-    }
-    return null
+async function getDocumentFileBuffer(id: _id) {
+  const doc = await DocumentFile.findOne({ _id: id }).lean()
+  if (doc) {
+    // inconsistent type in mongoose for Buffer, so need assertion here https://github.com/Automattic/mongoose/pull/15518
+    return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
   }
-)
+  return null
+}
 
-export const approvedTravelsPrinter = new ApprovedTravelsPrinter<Types.ObjectId>(
-  BACKEND_CACHE.printerSettings,
-  formatter,
-  (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => {
-    return i18n.t(textIdentifier, { lng: language, ...interpolation }) as string
-  },
-  async (id) => {
-    const doc = await DocumentFile.findOne({ _id: id }).lean()
-    if (doc) {
-      // inconsistent type in mongoose for Buffer, so need assertion here https://github.com/Automattic/mongoose/pull/15518
-      return { buffer: doc.data.buffer as unknown as ArrayBuffer, type: doc.type }
-    }
-    return null
-  },
-  async (id) => {
-    const orga = await Organisation.findOne({ _id: id }).lean()
-    if (orga?.logo?._id) {
-      return { logoId: orga.logo._id, website: orga.website }
-    }
-    return null
+async function getOrganisationLogo(id: _id) {
+  const orga = await Organisation.findOne({ _id: id }).lean()
+  if (orga?.logo?._id) {
+    return { logoId: orga.logo._id, website: orga.website }
   }
-)
-approvedTravelsPrinter.setAllowSpouseRefund(BACKEND_CACHE.travelSettings.allowSpouseRefund)
+  return null
+}
+
+export function createFormatter(
+  locale = BACKEND_CACHE.displaySettings.locale.default,
+  nameDisplayFormat = BACKEND_CACHE.displaySettings.nameDisplayFormat
+) {
+  return new Formatter(locale, nameDisplayFormat)
+}
+
+export function createReportPrinter(
+  settings: PrinterSettings = BACKEND_CACHE.printerSettings,
+  travelSettings: TravelSettings = BACKEND_CACHE.travelSettings,
+  nameDisplayFormat: NameDisplayFormat = BACKEND_CACHE.displaySettings.nameDisplayFormat
+) {
+  return new ReportPrinter<_id>(
+    settings,
+    travelSettings,
+    createFormatter(undefined, nameDisplayFormat),
+    translateText,
+    getDocumentFileBuffer,
+    getOrganisationLogo
+  )
+}
+
+export function createApprovedTravelsPrinter(
+  settings: PrinterSettings = BACKEND_CACHE.printerSettings,
+  nameDisplayFormat: NameDisplayFormat = BACKEND_CACHE.displaySettings.nameDisplayFormat,
+  allowSpouseRefund = BACKEND_CACHE.travelSettings.allowSpouseRefund
+) {
+  const printer = new ApprovedTravelsPrinter<Types.ObjectId>(
+    settings,
+    createFormatter(undefined, nameDisplayFormat),
+    translateText,
+    getDocumentFileBuffer,
+    getOrganisationLogo
+  )
+  printer.setAllowSpouseRefund(allowSpouseRefund)
+  return printer
+}
+
+export const formatter = createFormatter()
+
+export const reportPrinter = createReportPrinter()
+
+export const approvedTravelsPrinter = createApprovedTravelsPrinter()
 
 export const travelCalculator = new TravelCalculator(
   (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
