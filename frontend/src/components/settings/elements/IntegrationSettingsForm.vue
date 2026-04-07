@@ -25,11 +25,14 @@ const scheduleKey = ref<string | undefined>(undefined)
 const formRef = useTemplateRef('form')
 
 function getScheduleSettings(requestData: Record<string, unknown>) {
-  if (requestData.scheduler && typeof requestData.scheduler === 'object') {
-    return requestData.scheduler as IntegrationScheduleSettings
+  if (typeof requestData.enabled !== 'boolean' || !requestData.schedule || typeof requestData.schedule !== 'object') {
+    return undefined
   }
 
-  return undefined
+  return {
+    enabled: requestData.enabled,
+    schedule: requestData.schedule as IntegrationScheduleSettings['schedule']
+  } satisfies IntegrationScheduleSettings
 }
 
 function buildSchedulerSchema(
@@ -96,7 +99,7 @@ async function save(requestData: Record<string, unknown>) {
   }
 
   const scheduleSettings = scheduleKey.value ? getScheduleSettings(requestData) : undefined
-  const { scheduler: _scheduler, enabled: _enabled, schedule: _schedule, ...nextSettings } = requestData
+  const { enabled: _enabled, schedule: _schedule, ...nextSettings } = requestData
 
   const result = await API.setter<IntegrationSettingsPayload>(`admin/integrationSettings/${props.integrationKey}`, {
     ...integrationSettings.value,
