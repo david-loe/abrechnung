@@ -3,6 +3,7 @@ import ENV from '../env.js'
 import { logger } from '../logger.js'
 import { processIntegrationJob } from './processor.js'
 import { INTEGRATION_QUEUE_NAME, type IntegrationJobData } from './queue.js'
+import { integrations } from './registry.js'
 
 let workerInstance: Worker<IntegrationJobData> | undefined
 
@@ -19,7 +20,7 @@ export async function startIntegrationWorker() {
     INTEGRATION_QUEUE_NAME,
     async (job) => {
       logger.debug(`Processing integration job ${job.id} (${describeJob(job.data)})`)
-      await processIntegrationJob(job.data)
+      await processIntegrationJob(job.data, integrations)
     },
     { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency: ENV.WORKER_CONCURRENCY }
   )
