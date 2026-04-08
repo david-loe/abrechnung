@@ -13,29 +13,19 @@ function getBounds(startDate: Date | string, endDate: Date | string, toleranceIn
   return { start, end }
 }
 
-export function getStagesOutOfBounds(
-  stages: TravelStage[],
-  startDate: Date | string,
-  endDate: Date | string,
-  toleranceInDays: number
-): TravelStage[] {
+export function getStagesOutOfBounds(stages: TravelStage[], startDate: Date | string, endDate: Date | string, toleranceInDays: number) {
   const { start, end } = getBounds(startDate, endDate, toleranceInDays)
 
   return stages.filter((stage) => !isStageInBounds(stage, start, end))
 }
 
-export function getStagesInBounds(
-  stages: TravelStage[],
-  startDate: Date | string,
-  endDate: Date | string,
-  toleranceInDays: number
-): TravelStage[] {
+export function getStagesInBounds(stages: TravelStage[], startDate: Date | string, endDate: Date | string, toleranceInDays: number) {
   const { start, end } = getBounds(startDate, endDate, toleranceInDays)
 
   return stages.filter((stage) => isStageInBounds(stage, start, end))
 }
 
-function isStageInBounds(stage: TravelStage, start: Date, end: Date): boolean {
+function isStageInBounds(stage: TravelStage, start: Date, end: Date) {
   const departure = new Date(stage.departure)
   const arrival = new Date(stage.arrival)
 

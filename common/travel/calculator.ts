@@ -533,14 +533,15 @@ export class TravelValidator {
 
   checkStagesInBounds(travel: Travel<_id, binary>): Warning[] {
     const warnings: Warning[] = []
-    getStagesOutOfBounds(
+    const outOfBoundsStages = getStagesOutOfBounds(
       travel.stages,
       travel.startDate,
       travel.endDate,
       this.travelSettings.toleranceStageDatesToApprovedTravelDates
-    ).forEach((stage) => {
+    )
+    for (const stage of outOfBoundsStages) {
       warnings.push({ name: 'stageOutOfBounds', val: stage })
-    })
+    }
     return warnings
   }
 }
