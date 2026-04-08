@@ -18,6 +18,7 @@ import {
   TravelSettings
 } from '../types.js'
 import { datetimeToDate, getDayList, getDiffInDays } from '../utils/scripts.js'
+import { getStagesOutOfBounds } from './utils.js'
 
 interface InputTravelDay extends Omit<TravelDay<_id>, 'country' | 'special' | 'lumpSums' | '_id'> {}
 
@@ -452,14 +453,14 @@ export class TravelValidator {
   }
 
   validate(travel: InputTravel): Invalid[] {
-    return this.validateDates(travel).concat(this.validateCountries(travel))
+    return [...this.validateDates(travel), ...this.validateCountries(travel)]
   }
 
   /**
    * checks a travel for warnings
    */
   check(travel: Travel<_id, binary>): Warning[] {
-    return this.checkProfessionalShare(travel).concat(this.checkTravelLength(travel))
+    return [...this.checkProfessionalShare(travel), ...this.checkTravelLength(travel), ...this.checkStagesInBounds(travel)]
   }
 
   validateDates(travel: InputTravel): Invalid[] {
@@ -527,6 +528,19 @@ export class TravelValidator {
     if (travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare) {
       warnings.push({ name: 'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare })
     }
+    return warnings
+  }
+
+  checkStagesInBounds(travel: Travel<_id, binary>): Warning[] {
+    const warnings: Warning[] = []
+    getStagesOutOfBounds(
+      travel.stages,
+      travel.startDate,
+      travel.endDate,
+      this.travelSettings.toleranceStageDatesToApprovedTravelDates
+    ).forEach((stage) => {
+      warnings.push({ name: 'stageOutOfBounds', val: stage })
+    })
     return warnings
   }
 }
