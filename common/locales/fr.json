@@ -54,6 +54,7 @@
     "rateLimitExceeded": "Limite de taux de requêtes dépassée !",
     "reloadRequired": "Rafraîchissement requis",
     "saveAfterRotate": "L'image a été pivotée. Veuillez enregistrer pour conserver cette modification.",
+    "stagesOutOfNewBoundsX": "⚠️ Les étapes suivantes sont en dehors des nouvelles dates de voyage:\n\n{X}",
     "stagesOverlapping": "Les étapes se chevauchent dans le temps",
     "successDeleting": "Supprimé",
     "successSaving": "Enregistré",

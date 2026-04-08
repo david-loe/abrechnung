@@ -28,7 +28,7 @@ import {
   mailToLink,
   msTeamsToLink,
   objectsToCSV,
-  PlaceToString
+  placeToString
 } from './scripts.js'
 
 type Id = string
@@ -37,9 +37,9 @@ const DE: CountrySimple = { _id: 'DE', name: { de: 'Deutschland', en: 'Germany',
 
 const place: Place = { place: 'Berlin', country: DE }
 
-test('PlaceToString formats place', (t) => {
-  t.is(PlaceToString(place), 'Berlin, DE 🇩🇪')
-  t.is(PlaceToString(place, 'en'), 'Berlin, Germany 🇩🇪')
+test('placeToString formats place', (t) => {
+  t.is(placeToString(place), 'Berlin, DE 🇩🇪')
+  t.is(placeToString(place, 'en'), 'Berlin, Germany 🇩🇪')
 })
 
 test('getById finds items or null', (t) => {

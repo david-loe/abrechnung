@@ -1,5 +1,5 @@
 import { TravelSimple } from 'abrechnung-common/types.js'
-import { getDiffInDays, PlaceToString } from 'abrechnung-common/utils/scripts.js'
+import { getDiffInDays, placeToString } from 'abrechnung-common/utils/scripts.js'
 import escapeHtml from 'escape-html'
 import { BACKEND_CACHE } from '../../db.js'
 import { formatter } from '../../factory.js'
@@ -50,7 +50,7 @@ export async function sendA1Notification(report: TravelSimple) {
     `${t('labels.reason')}: ${escapeNotificationValue(report.reason)}`,
     `${t('labels.startDate')}: ${escapeNotificationValue(formatter.date(report.startDate))}`,
     `${t('labels.endDate')}: ${escapeNotificationValue(formatter.date(report.endDate))} (${dif} ${t(`labels.${dif === 1 ? 'day' : 'days'}`)})`,
-    `${t('labels.destinationPlace')}: ${escapeNotificationValue(PlaceToString(report.destinationPlace, language))}`,
+    `${t('labels.destinationPlace')}: ${escapeNotificationValue(placeToString(report.destinationPlace, language))}`,
     `${t('labels.approvedBy')}: ${escapeNotificationValue(formatter.name(report.editor.name))}`
   ]
 

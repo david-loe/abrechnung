@@ -54,6 +54,7 @@
     "rateLimitExceeded": "Превышено лимит запросов!",
     "reloadRequired": "Требуется перезагрузка",
     "saveAfterRotate": "Изображение повернуто. Сохраните, чтобы не потерять изменение.",
+    "stagesOutOfNewBoundsX": "⚠️ Следующие этапы находятся за пределами новых дат поездки:\n\n{X}",
     "stagesOverlapping": "Этапы пересекаются по времени",
     "successDeleting": "Удалено",
     "successSaving": "Сохранено",

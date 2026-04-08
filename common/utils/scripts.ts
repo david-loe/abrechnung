@@ -23,8 +23,12 @@ import {
 import { Base32 } from './encoding.js'
 import Formatter from './formatter.js'
 
-export function PlaceToString(place: Place, language?: Locale) {
+export function placeToString(place: Place, language?: Locale) {
   return `${place.place}, ${language ? place.country.name[language] : place.country._id}${place.country.flag ? ` ${place.country.flag}` : ''}`
+}
+
+export function placeToSimpleString(place: Place) {
+  return `${place.place}${place.country.flag ? ` ${place.country.flag}` : ''}`
 }
 
 export function getById<T extends { _id: string }>(id: string, array: readonly T[]): T | null {
