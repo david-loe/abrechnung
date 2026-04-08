@@ -456,10 +456,14 @@ export function csvToObjects(
       const obj: Record<string, ValueType> = {}
       const currentline = lines[i]
       for (let j = 0; j < headers.length; j++) {
+        const header = headers[j]?.trim()
+        if (!header) {
+          continue
+        }
         let object = obj
         const valStr = currentline[j] !== '' ? currentline[j] : undefined
         let val: ValueType = valStr
-        const pathParts = headers[j].split(pathSeparator)
+        const pathParts = header.split(pathSeparator)
         for (let k = 0; k < pathParts.length - 1; k++) {
           if (!isObject(object[pathParts[k]])) {
             object[pathParts[k]] = {}
@@ -468,15 +472,15 @@ export function csvToObjects(
         }
         const key = pathParts[pathParts.length - 1]
         // search for [] to identify arrays
-        const match = currentline[j].match(/^\[(.*)\]$/)
+        const match = currentline[j]?.match(/^\[(.*)\]$/) || null
         if (match === null) {
-          if (transformer[headers[j]]) {
-            val = transformer[headers[j]](valStr)
+          if (transformer[header]) {
+            val = transformer[header](valStr)
           }
         } else {
           const split = match[1].split(arraySeparator)
-          if (transformer[headers[j]]) {
-            val = split.map(transformer[headers[j]])
+          if (transformer[header]) {
+            val = split.map(transformer[header])
           }
         }
         object[key] = val
