@@ -15,6 +15,7 @@ import {
 import {
   addUp,
   convertGermanDateToHTMLDate,
+  csvToObjects,
   datetimeToDateString,
   datetimeToDatetimeString,
   detectSeparator,
@@ -76,6 +77,61 @@ test('detectSeparator', (t) => {
 test('convertGermanDateToHTMLDate', (t) => {
   t.is(convertGermanDateToHTMLDate('1.2.2023'), '2023-02-01')
   t.is(convertGermanDateToHTMLDate('2023-02-01'), '2023-02-01')
+})
+
+test('csvToObjects ignores empty headers', (t) => {
+  const csv = 'cost.date;description;cost.amount;cost.currency;note;;;;\n01.01.2023;#001;400000;UGX;My Note;;1;;\n'
+
+  t.deepEqual(csvToObjects(csv, {}, ';'), [
+    { cost: { date: '01.01.2023', amount: '400000', currency: 'UGX' }, description: '#001', note: 'My Note' }
+  ])
+})
+
+test('csvToObjects covers nested paths, transformers, arrays and empty values', (t) => {
+  const csv = [
+    'meta/date;meta/title;stats/count;tags;flags;notes;  ;list/numbers;plainArray;list/empty;transform/empty',
+    '"2023-02-01";"Hello;World";7;[alpha | beta];[];;ignored;[1 | 2 | 3];[x | y];[];',
+    '2023-02-02;Second;;[];[active];note 2;;[4];[z];[left | right];value'
+  ].join('\n')
+
+  const result = csvToObjects(
+    csv,
+    {
+      'meta/date': (val) => (val ? `date:${val}` : val),
+      'stats/count': (val) => (val ? Number.parseInt(val, 10) : null),
+      tags: (val) => val?.toUpperCase(),
+      flags: (val) => val?.toUpperCase(),
+      'list/numbers': (val) => (val ? Number.parseInt(val, 10) : null),
+      plainArray: (val) => val?.toUpperCase(),
+      'transform/empty': (val) => val ?? 'EMPTY'
+    },
+    ';',
+    ' | ',
+    '/'
+  )
+
+  t.deepEqual(result, [
+    {
+      meta: { date: 'date:2023-02-01', title: 'Hello;World' },
+      stats: { count: 7 },
+      tags: ['ALPHA', 'BETA'],
+      flags: [''],
+      notes: undefined,
+      list: { numbers: [1, 2, 3], empty: '[]' },
+      plainArray: ['X', 'Y'],
+      transform: { empty: 'EMPTY' }
+    },
+    {
+      meta: { date: 'date:2023-02-02', title: 'Second' },
+      stats: { count: null },
+      tags: [''],
+      flags: ['ACTIVE'],
+      notes: 'note 2',
+      list: { numbers: [4], empty: '[left | right]' },
+      plainArray: ['Z'],
+      transform: { empty: 'value' }
+    }
+  ])
 })
 
 test('objectsToCSV converts arrays', (t) => {
