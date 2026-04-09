@@ -54,6 +54,7 @@
     "rateLimitExceeded": "¡Límite de solicitudes superado!",
     "reloadRequired": "Se requiere recargar",
     "saveAfterRotate": "La imagen se giró. Guarda para conservar este cambio.",
+    "stagesOutOfNewBoundsX": "⚠️ Las etapas siguientes están fuera de las nuevas fechas de viaje:\n\n{X}",
     "stagesOverlapping": "Las etapas se superponen temporalmente",
     "successDeleting": "Eliminado",
     "successSaving": "Guardado",

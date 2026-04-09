@@ -6,7 +6,7 @@
     <!-- day -->
     <div v-if="row.type === 'day'" class="row align-items-center mt-3">
       <div class="col-auto">
-        <h5 class="m-0">
+        <h5 class="m-0 tnum">
           <small
             v-if="(row.data as TravelDay).purpose === 'private'"
             :title="t('labels.private')"
@@ -53,9 +53,7 @@
       v-else-if="row.type === 'stage'"
       class="row align-items-center clickable ps-lg-4 mb-1"
       @click="emit('showModal', 'edit', 'stage', row.data as Stage)">
-      <div class="col-auto fs-3 d-none d-md-block">
-        <i :class="getStageIcon(row.data as Stage)"></i>
-      </div>
+      <div class="col-auto fs-3 d-none d-md-block"><i :class="getStageIcon(row.data as Stage)"></i></div>
       <div class="col-auto text-truncate">
         <PlaceElement :place="(row.data as Stage).startLocation" />
         <i :class="getStageIcon(row.data as Stage) + ' d-md-none me-1'"></i>
@@ -76,9 +74,7 @@
       v-else-if="row.type === 'expense'"
       class="row align-items-center clickable ps-lg-4 mb-1"
       @click="emit('showModal', 'edit', 'expense', row.data as TravelExpense)">
-      <div class="col-auto fs-3 d-none d-md-block">
-        <i class="bi bi-coin"></i>
-      </div>
+      <div class="col-auto fs-3 d-none d-md-block"><i class="bi bi-coin"></i></div>
       <div class="col-auto">
         <i class="bi bi-coin d-md-none me-1"></i>
         {{ (row.data as TravelExpense).description }}

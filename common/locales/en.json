@@ -54,6 +54,7 @@
     "rateLimitExceeded": "Rate Limit Exceeded!",
     "reloadRequired": "Reload required",
     "saveAfterRotate": "Image was rotated. Please save to keep this change.",
+    "stagesOutOfNewBoundsX": "⚠️ The following stages are outside the new travel dates:\n\n{X}",
     "stagesOverlapping": "Stages are overlapping",
     "successDeleting": "Deleted successfully",
     "successSaving": "Saved successfully",

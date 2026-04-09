@@ -54,6 +54,7 @@
     "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "reloadRequired": "Neuladen erforderlich",
     "saveAfterRotate": "Bild wurde gedreht. Bitte speichern, damit die Änderung erhalten bleibt.",
+    "stagesOutOfNewBoundsX": "⚠️ Die folgenden Etappen liegen außerhalb der neuen Reisedaten:\n\n{X}",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
     "successDeleting": "Gelöscht",
     "successSaving": "Gespeichert",

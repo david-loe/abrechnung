@@ -60,7 +60,7 @@
           :update-user-org="endpointPrefix !== 'examine/'"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"
-          @edit="editTravelDetails" />
+          @edit="(t) =>editTravelDetails(t as TravelSimple<string>)" />
         <LumpSumEditor
           v-else-if="modalObjectType === 'lumpSums'"
           :travel="travel"
@@ -294,7 +294,7 @@ import {
   User,
   UserSimple
 } from 'abrechnung-common/types.js'
-import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
+import { placeToSimpleString, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -318,6 +318,7 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -399,7 +400,22 @@ async function postLumpSums(days: TravelDay[], lastPlaceOfWork: Travel['lastPlac
   }
 }
 
-async function editTravelDetails(updatedTravel: Partial<TravelSimple>) {
+async function editTravelDetails(updatedTravel: TravelSimple) {
+  const stagesOutOfNewBounds = getStagesOutOfBounds(
+    travel.value.stages,
+    updatedTravel.startDate,
+    updatedTravel.endDate,
+    APP_DATA.value?.travelSettings.toleranceStageDatesToApprovedTravelDates || 0
+  )
+  if (stagesOutOfNewBounds.length > 0) {
+    const stageList = stagesOutOfNewBounds
+      .map((s) => `(${formatter.simpleDate(s.departure)}) ${placeToSimpleString(s.startLocation)} → ${placeToSimpleString(s.endLocation)}`)
+      .join('\n')
+
+    if (!confirm(t('alerts.stagesOutOfNewBoundsX', { X: stageList }))) {
+      return
+    }
+  }
   if (props.endpointPrefix === 'examine/' || APP_DATA.value?.user.access['approved:travel']) {
     modalFormIsLoading.value = true
     const path = props.endpointPrefix === 'examine/' ? 'examine/travel' : 'travel/approved'
@@ -412,16 +428,14 @@ async function editTravelDetails(updatedTravel: Partial<TravelSimple>) {
       await getTravel()
     }
   } else {
-    if (confirm(t('alerts.warningReapply'))) {
-      modalFormIsLoading.value = true
-      const result = await API.setter<Travel>('travel/appliedFor', updatedTravel)
-      modalFormIsLoading.value = false
-      if (result.ok) {
-        resetAndHide()
-        router.push({ path: '/' })
-      } else {
-        await getTravel()
-      }
+    modalFormIsLoading.value = true
+    const result = await API.setter<Travel>('travel/appliedFor', updatedTravel)
+    modalFormIsLoading.value = false
+    if (result.ok) {
+      resetAndHide()
+      router.push({ path: '/' })
+    } else {
+      await getTravel()
     }
   }
 }
