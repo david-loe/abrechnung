@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "abrechnung-common": "file:../common",
-    "axios": "^1.13.6",
+    "axios": "^1.15.0",
     "body-parser": "^2.2.2",
     "bullmq": "^5.70.4",
     "connect-mongo": "^6.0.0",
