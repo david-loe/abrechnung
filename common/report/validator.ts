@@ -53,7 +53,7 @@ export class Validator<TReport extends ReportLike = ReportLike, TSettings extend
     this.settings = { requireReceipts: true, ...settings } as Required<TSettings>
   }
 
-  protected getReportExpenseValidationResults(report: TReport, settings: Required<TSettings>): ValidationResult[] {
+  protected getReportExpenseValidationResults(report: TReport, _settings: Required<TSettings>): ValidationResult[] {
     const results: ValidationResult[] = []
 
     for (const [index, expense] of report.expenses.entries()) {
