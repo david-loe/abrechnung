@@ -234,7 +234,7 @@
                         <span class="ms-1">{{ t('labels.toExamination') }}</span>
                       </button>
                     </TooltipElement>
-                    <button v-else @click="toExamination()" class="btn btn-primary">
+                    <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
@@ -524,7 +524,7 @@ async function deleteTravel() {
 }
 
 async function toExamination() {
-  if (travelErrorCount.value > 0) {
+  if (isReadOnly.value || travelErrorCount.value > 0) {
     return
   }
   modalFormIsLoading.value = true

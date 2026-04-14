@@ -1,4 +1,14 @@
-import { Currency, CurrencyCode, DocumentFileType, IdDocument, Money, Travel, TravelDay, TravelSimple } from 'abrechnung-common/types.js'
+import {
+  Currency,
+  CurrencyCode,
+  DocumentFileType,
+  Expense,
+  IdDocument,
+  Money,
+  Travel,
+  TravelDay,
+  TravelSimple
+} from 'abrechnung-common/types.js'
 import { Request as ExRequest } from 'express'
 import { Types } from 'mongoose'
 import { SetterBody } from './controller.js'
@@ -26,6 +36,15 @@ export interface MoneyPost extends Omit<Money, 'currency'> {
 export interface MoneyPlusPost extends MoneyPost {
   receipts?: File[]
   date?: Date
+}
+
+export interface ExpenseBulkImportCostPost extends Omit<MoneyPlusPost, 'exchangeRate' | 'receipts'> {
+  exchangeRate?: Money['exchangeRate']
+  date: Date
+}
+
+export interface ExpenseBulkImportPost extends Omit<SetterBody<Expense<Types.ObjectId>>, 'cost'> {
+  cost: ExpenseBulkImportCostPost
 }
 
 export interface TravelApplication
