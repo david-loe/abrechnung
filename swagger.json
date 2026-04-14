@@ -9961,6 +9961,171 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ExpenseSetterBody": {
+				"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
+			},
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"Pick_MoneyPlusPost.Exclude_keyofMoneyPlusPost.exchangeRate-or-receipts__": {
+				"properties": {
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"currency": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_string_"
+							}
+						]
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"currency",
+					"amount"
+				],
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"ExpenseBulkImportCostPost": {
+				"properties": {
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"currency": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_string_"
+							}
+						]
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"exchangeRate": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							},
+							"rate": {
+								"type": "number",
+								"format": "double"
+							},
+							"date": {
+								"anyOf": [
+									{
+										"type": "string",
+										"format": "date-time"
+									},
+									{
+										"type": "string"
+									}
+								]
+							}
+						},
+						"required": [
+							"amount",
+							"rate",
+							"date"
+						],
+						"type": "object",
+						"nullable": true
+					}
+				},
+				"required": [
+					"currency",
+					"amount",
+					"date"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Pick_SetterBody_Expense_mongoose.Types.ObjectId__.Exclude_keyofSetterBody_Expense_mongoose.Types.ObjectId__.cost__": {
+				"properties": {
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					},
+					"description": {
+						"type": "string"
+					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
+					"note": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
+			},
+			"ExpenseBulkImportPost": {
+				"properties": {
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					},
+					"description": {
+						"type": "string"
+					},
+					"project": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+							},
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						]
+					},
+					"note": {
+						"type": "string"
+					},
+					"cost": {
+						"$ref": "#/components/schemas/ExpenseBulkImportCostPost"
+					}
+				},
+				"required": [
+					"cost"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ExpenseReport_mongoose.Types.ObjectId.binary_": {
 				"properties": {
 					"name": {
@@ -20671,7 +20836,7 @@
 					"content": {
 						"multipart/form-data": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
+								"$ref": "#/components/schemas/ExpenseSetterBody"
 							}
 						}
 					}
@@ -20736,6 +20901,92 @@
 						}
 					}
 				]
+			}
+		},
+		"/expenseReport/expense/bulk": {
+			"post": {
+				"operationId": "PostExpensesToOwn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/ExpenseBulkImportPost"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/expenseReport/inWork": {
@@ -21254,7 +21505,7 @@
 					"content": {
 						"multipart/form-data": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
+								"$ref": "#/components/schemas/ExpenseSetterBody"
 							}
 						}
 					}
@@ -21319,6 +21570,92 @@
 						}
 					}
 				]
+			}
+		},
+		"/examine/expenseReport/expense/bulk": {
+			"post": {
+				"operationId": "PostExpensesToAny",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "parentId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/ExpenseBulkImportPost"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/examine/expenseReport/inWork": {
