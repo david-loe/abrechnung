@@ -383,7 +383,7 @@ async function deleteHealthCareCost() {
 }
 
 async function toExamination() {
-  if (!canEnterReview.value) {
+  if (isReadOnly.value || !canEnterReview.value) {
     return
   }
   const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/underExamination`, {

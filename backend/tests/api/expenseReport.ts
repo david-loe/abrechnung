@@ -157,113 +157,143 @@ test.serial('POST /expenseReport/expense/bulk is atomic', async (t) => {
 })
 
 test.serial('POST /expenseReport/expense/bulk strips foreign receipt references', async (t) => {
-  await loginUser(agent, 'admin')
-  const foreignUserResponse = await agent
-    .get('/admin/user')
-    .query({ filterJSON: Buffer.from(JSON.stringify({ 'fk.ldapauth': 'leela' })).toString('base64') })
-  t.is(foreignUserResponse.status, 200)
+  let foreignUser: { _id: string; access: Record<string, boolean> } | undefined
+  let originalForeignUserAccess: Record<string, boolean> | undefined
+  let foreignReport: ExpenseReportSimple | undefined
+  let targetReport: ExpenseReportSimple | undefined
 
-  const foreignUser = foreignUserResponse.body.data[0]
-  const foreignUserUpdateResponse = await agent
-    .post('/admin/user')
-    .send({ _id: foreignUser._id, access: { ...foreignUser.access, 'inWork:expenseReport': true } })
-  t.is(foreignUserUpdateResponse.status, 200)
+  try {
+    await loginUser(agent, 'admin')
+    const foreignUserResponse = await agent
+      .get('/admin/user')
+      .query({ filterJSON: Buffer.from(JSON.stringify({ 'fk.ldapauth': 'leela' })).toString('base64') })
+    t.is(foreignUserResponse.status, 200)
 
-  await loginUser(agent, 'expenseReport')
-  const foreignReportResponse = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Foreign Receipt Source', project: expenseReport.project, category: expenseReport.category })
-  t.is(foreignReportResponse.status, 200)
-
-  const foreignReport = foreignReportResponse.body.result as ExpenseReportSimple
-  const foreignExpense = {
-    description: 'Foreign Receipt Expense',
-    cost: {
-      amount: 12,
-      currency: { _id: 'EUR' },
-      receipts: [{ name: 'Foreign Receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-      date: new Date('2023-09-12T00:00:00.000Z')
+    foreignUser = foreignUserResponse.body.data[0]
+    t.truthy(foreignUser, 'Expected to find the foreign user for bulk receipt test setup')
+    if (!foreignUser) {
+      return
     }
-  }
+    originalForeignUserAccess = { ...foreignUser.access }
+    const foreignUserUpdateResponse = await agent
+      .post('/admin/user')
+      .send({ _id: foreignUser._id, access: { ...foreignUser.access, 'inWork:expenseReport': true } })
+    t.is(foreignUserUpdateResponse.status, 200)
 
-  const foreignExpenseResponse = await postMultipartExpense('/expenseReport/expense', foreignReport._id.toString(), foreignExpense)
-  t.is(foreignExpenseResponse.status, 200)
+    await loginUser(agent, 'expenseReport')
+    const foreignReportResponse = await agent
+      .post('/expenseReport/inWork')
+      .send({ name: 'Foreign Receipt Source', project: expenseReport.project, category: expenseReport.category })
+    t.is(foreignReportResponse.status, 200)
 
-  const foreignReceiptId = (foreignExpenseResponse.body.result as ExpenseReport).expenses[0].cost.receipts[0]._id
-
-  await loginUser(agent, 'user')
-  const targetReportResponse = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Bulk Receipt Target', project: expenseReport.project, category: expenseReport.category })
-  t.is(targetReportResponse.status, 200)
-
-  const targetReport = targetReportResponse.body.result as ExpenseReportSimple
-  const bulkResponse = await agent
-    .post('/expenseReport/expense/bulk')
-    .query({ parentId: targetReport._id.toString() })
-    .send([
-      {
-        description: 'Imported Expense',
-        cost: { amount: 42, currency: { _id: 'EUR' }, receipts: [{ _id: foreignReceiptId }], date: new Date('2023-09-13T00:00:00.000Z') }
+    foreignReport = foreignReportResponse.body.result as ExpenseReportSimple
+    const foreignExpense = {
+      description: 'Foreign Receipt Expense',
+      cost: {
+        amount: 12,
+        currency: { _id: 'EUR' },
+        receipts: [{ name: 'Foreign Receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
+        date: new Date('2023-09-12T00:00:00.000Z')
       }
-    ])
-  t.is(bulkResponse.status, 200)
-  t.is((bulkResponse.body.result as ExpenseReport).expenses[0].cost.receipts.length, 0)
+    }
 
-  const targetDeleteResponse = await agent.delete('/expenseReport').query({ _id: targetReport._id.toString() })
-  t.is(targetDeleteResponse.status, 200)
+    const foreignExpenseResponse = await postMultipartExpense('/expenseReport/expense', foreignReport._id.toString(), foreignExpense)
+    t.is(foreignExpenseResponse.status, 200)
 
-  await loginUser(agent, 'expenseReport')
-  const foreignDeleteResponse = await agent.delete('/expenseReport').query({ _id: foreignReport._id.toString() })
-  t.is(foreignDeleteResponse.status, 200)
+    const foreignReceiptId = (foreignExpenseResponse.body.result as ExpenseReport).expenses[0].cost.receipts[0]._id
 
-  await loginUser(agent, 'user')
+    await loginUser(agent, 'user')
+    const targetReportResponse = await agent
+      .post('/expenseReport/inWork')
+      .send({ name: 'Bulk Receipt Target', project: expenseReport.project, category: expenseReport.category })
+    t.is(targetReportResponse.status, 200)
+
+    targetReport = targetReportResponse.body.result as ExpenseReportSimple
+    const bulkResponse = await agent
+      .post('/expenseReport/expense/bulk')
+      .query({ parentId: targetReport._id.toString() })
+      .send([
+        {
+          description: 'Imported Expense',
+          cost: { amount: 42, currency: { _id: 'EUR' }, receipts: [{ _id: foreignReceiptId }], date: new Date('2023-09-13T00:00:00.000Z') }
+        }
+      ])
+    t.is(bulkResponse.status, 200)
+    t.is((bulkResponse.body.result as ExpenseReport).expenses[0].cost.receipts.length, 0)
+  } finally {
+    if (targetReport?._id) {
+      await loginUser(agent, 'user')
+      const targetDeleteResponse = await agent.delete('/expenseReport').query({ _id: targetReport._id.toString() })
+      t.is(targetDeleteResponse.status, 200)
+    }
+
+    if (foreignReport?._id) {
+      await loginUser(agent, 'expenseReport')
+      const foreignDeleteResponse = await agent.delete('/expenseReport').query({ _id: foreignReport._id.toString() })
+      t.is(foreignDeleteResponse.status, 200)
+    }
+
+    if (foreignUser?._id && originalForeignUserAccess) {
+      await loginUser(agent, 'admin')
+      const restoreForeignUserResponse = await agent.post('/admin/user').send({ _id: foreignUser._id, access: originalForeignUserAccess })
+      t.is(restoreForeignUserResponse.status, 200)
+    }
+
+    await loginUser(agent, 'user')
+  }
 })
 
 test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
-  await loginUser(agent, 'user')
-  const tempReportResponse = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Examine Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
-  t.is(tempReportResponse.status, 200)
+  let tempExpenseReport: ExpenseReportSimple | undefined
 
-  const tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
-  const initialExpense = {
-    description: 'Initial Expense',
-    cost: {
-      amount: 82,
-      currency: { _id: 'GBP' },
-      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-      date: new Date('2023-09-14T00:00:00.000Z')
+  try {
+    await loginUser(agent, 'user')
+    const tempReportResponse = await agent
+      .post('/expenseReport/inWork')
+      .send({ name: 'Examine Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
+    t.is(tempReportResponse.status, 200)
+
+    tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
+    const initialExpense = {
+      description: 'Initial Expense',
+      cost: {
+        amount: 82,
+        currency: { _id: 'GBP' },
+        receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
+        date: new Date('2023-09-14T00:00:00.000Z')
+      }
     }
+
+    const expenseResponse = await postMultipartExpense('/expenseReport/expense', tempExpenseReport._id.toString(), initialExpense)
+    t.is(expenseResponse.status, 200)
+
+    const underExaminationResponse = await agent.post('/expenseReport/underExamination').send({ _id: tempExpenseReport._id.toString() })
+    t.is(underExaminationResponse.status, 200)
+
+    await loginUser(agent, 'expenseReport')
+    const bulkResponse = await agent
+      .post('/examine/expenseReport/expense/bulk')
+      .query({ parentId: tempExpenseReport._id.toString() })
+      .send([
+        { description: 'Imported Hotel', cost: { amount: 100, currency: { _id: 'EUR' }, date: new Date('2023-09-15T00:00:00.000Z') } },
+        { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-16T00:00:00.000Z') } }
+      ])
+    t.is(bulkResponse.status, 422)
+
+    const reportResponse = await agent
+      .get('/examine/expenseReport')
+      .query({ _id: tempExpenseReport._id.toString(), additionalFields: ['expenses'] })
+    t.is(reportResponse.status, 200)
+    t.is((reportResponse.body.data as ExpenseReport).expenses.length, 1)
+  } finally {
+    if (tempExpenseReport?._id) {
+      await loginUser(agent, 'expenseReport')
+      const deleteResponse = await agent.delete('/examine/expenseReport').query({ _id: tempExpenseReport._id.toString() })
+      t.is(deleteResponse.status, 200)
+    }
+
+    await loginUser(agent, 'user')
   }
-
-  const expenseResponse = await postMultipartExpense('/expenseReport/expense', tempExpenseReport._id.toString(), initialExpense)
-  t.is(expenseResponse.status, 200)
-
-  const underExaminationResponse = await agent.post('/expenseReport/underExamination').send({ _id: tempExpenseReport._id.toString() })
-  t.is(underExaminationResponse.status, 200)
-
-  await loginUser(agent, 'expenseReport')
-  const bulkResponse = await agent
-    .post('/examine/expenseReport/expense/bulk')
-    .query({ parentId: tempExpenseReport._id.toString() })
-    .send([
-      { description: 'Imported Hotel', cost: { amount: 100, currency: { _id: 'EUR' }, date: new Date('2023-09-15T00:00:00.000Z') } },
-      { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-16T00:00:00.000Z') } }
-    ])
-  t.is(bulkResponse.status, 422)
-
-  const reportResponse = await agent
-    .get('/examine/expenseReport')
-    .query({ _id: tempExpenseReport._id.toString(), additionalFields: ['expenses'] })
-  t.is(reportResponse.status, 200)
-  t.is((reportResponse.body.data as ExpenseReport).expenses.length, 1)
-
-  const deleteResponse = await agent.delete('/examine/expenseReport').query({ _id: tempExpenseReport._id.toString() })
-  t.is(deleteResponse.status, 200)
-
-  await loginUser(agent, 'user')
 })
 
 // FILL OUT

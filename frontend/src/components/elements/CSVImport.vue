@@ -2,12 +2,12 @@
   <div class="d-inline-flex flex-column align-items-center">
     <input ref="fileInput" class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" style="display: none" >
 
-    <button :class="`btn btn-${buttonStyle}`" @click="triggerFileDialog" :disabled="loading">
+    <button type="button" :class="`btn btn-${buttonStyle}`" @click="triggerFileDialog" :disabled="loading">
       <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
       {{ t('labels.csvImport') }}
     </button>
 
-    <button class="btn btn-sm btn-link" @click="downloadTemplate" :disabled="loading">{{ t('labels.csvTemplate') }}</button>
+    <button type="button" class="btn btn-sm btn-link" @click="downloadTemplate" :disabled="loading">{{ t('labels.csvTemplate') }}</button>
   </div>
 </template>
 

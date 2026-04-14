@@ -393,7 +393,7 @@ async function deleteExpenseReport() {
 }
 
 async function toExamination() {
-  if (!canEnterReview.value) {
+  if (isReadOnly.value || !canEnterReview.value) {
     return
   }
   const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
