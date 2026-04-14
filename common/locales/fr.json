@@ -58,6 +58,7 @@
     "reviewBlockedByValidationErrorsX": "Corrigez toutes les erreurs de validation avant de soumettre.",
     "reviewRequirementsNotMet": "Le rapport ne peut pas encore être soumis pour examen.",
     "saveAfterRotate": "L'image a été pivotée. Veuillez enregistrer pour conserver cette modification.",
+    "savedExpensesXOfY": "Dépenses enregistrées : {X}/{Y}.",
     "stageOutOfBounds": "Au moins une étape est en dehors de la période de voyage approuvée.",
     "stagesOutOfNewBoundsX": "⚠️ Les étapes suivantes sont en dehors des nouvelles dates de voyage:\n\n{X}",
     "stagesOverlapping": "Les étapes se chevauchent dans le temps",

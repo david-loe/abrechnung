@@ -58,6 +58,7 @@
     "reviewBlockedByValidationErrorsX": "Жіберу үшін барлық валидация қателерін түзетіңіз.",
     "reviewRequirementsNotMet": "Есепті әзірге тексеруге жіберу мүмкін емес.",
     "saveAfterRotate": "Сурет бұрылды. Өзгерісті сақтау үшін сақтаңыз.",
+    "savedExpensesXOfY": "Сақталған шығындар: {X}/{Y}.",
     "stageOutOfBounds": "Кемінде бір кезең бекітілген сапар аралығынан тыс жатыр.",
     "stagesOutOfNewBoundsX": "⚠️ Кезеңдер жаңа сапар күндерінің сыртында:\n\n{X}",
     "stagesOverlapping": "Кезеңдер уақытымен қиылысады",

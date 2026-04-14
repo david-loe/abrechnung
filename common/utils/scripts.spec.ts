@@ -87,6 +87,15 @@ test('csvToObjects ignores empty headers', (t) => {
   ])
 })
 
+test('csvToObjects ignores empty rows', (t) => {
+  const csv = ['cost.date;description;cost.amount', '2024-01-01;Test 1;12', ';;', '2024-01-02;Test 2;13', ''].join('\n')
+
+  t.deepEqual(csvToObjects(csv, {}, ';'), [
+    { cost: { date: '2024-01-01', amount: '12' }, description: 'Test 1' },
+    { cost: { date: '2024-01-02', amount: '13' }, description: 'Test 2' }
+  ])
+})
+
 test('csvToObjects covers nested paths, transformers, arrays and empty values', (t) => {
   const csv = [
     'meta/date;meta/title;stats/count;tags;flags;notes;  ;list/numbers;plainArray;list/empty;transform/empty',

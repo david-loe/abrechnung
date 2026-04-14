@@ -196,6 +196,56 @@ test('combineTravelValidationResults combines overlapping stage paths into one c
   t.deepEqual(overlapConflicts[0].reference?.index, [0, 1])
 })
 
+test('combineTravelValidationResults keeps distinct overlap pairs when one stage overlaps multiple others', (t) => {
+  const { tc, stages, travel } = createSetup()
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [
+      { ...stages[0], arrival: new Date('2023-01-01T20:00:00Z') },
+      { ...stages[0], _id: 's3', departure: new Date('2023-01-01T09:00:00Z'), arrival: new Date('2023-01-01T11:00:00Z') },
+      { ...stages[0], _id: 's4', departure: new Date('2023-01-01T12:00:00Z'), arrival: new Date('2023-01-01T14:00:00Z') }
+    ]
+  })
+
+  const combined = combineTravelValidationResults(results)
+  const overlapConflicts = combined.filter((conflict) => conflict.code === 'stagesOverlapping')
+
+  t.is(overlapConflicts.length, 2)
+  t.deepEqual(
+    overlapConflicts.map((conflict) => conflict.reference?.index),
+    [
+      [0, 1],
+      [0, 2]
+    ]
+  )
+})
+
+test('combineTravelValidationResults does not collapse multi-overlap markers into same-stage conflicts', (t) => {
+  const { tc, stages, travel } = createSetup()
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [
+      { ...stages[0], arrival: new Date('2023-01-01T18:00:00Z') },
+      { ...stages[0], _id: 's3', departure: new Date('2023-01-01T09:00:00Z'), arrival: new Date('2023-01-01T17:00:00Z') },
+      { ...stages[0], _id: 's4', departure: new Date('2023-01-01T10:00:00Z'), arrival: new Date('2023-01-01T16:00:00Z') }
+    ]
+  })
+
+  const combined = combineTravelValidationResults(results)
+  const overlapConflicts = combined.filter((conflict) => conflict.code === 'stagesOverlapping')
+
+  t.is(overlapConflicts.length, 3)
+  t.true(overlapConflicts.every((conflict) => (conflict.reference?.index.length || 0) === 2))
+  t.deepEqual(
+    overlapConflicts.map((conflict) => conflict.reference?.index),
+    [
+      [0, 1],
+      [0, 2],
+      [1, 2]
+    ]
+  )
+})
+
 test('combineTravelValidationResults combines country-change paths into one conflict', (t) => {
   const { tc, stages, travel } = createSetup()
   const results = tc.validator.getValidationResults({

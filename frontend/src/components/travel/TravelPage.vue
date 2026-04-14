@@ -174,7 +174,6 @@
             </div>
           </div>
 
-          <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">{{ t('alerts.noData.stage') }}</div>
           <TravelTable :travel="travel" :highlighted-stage-indexes="highlightedStageIndexes" ref="table" @showModal="showModal" />
         </div>
 
@@ -229,12 +228,7 @@
                 </div>
                 <template v-if="travel.state < State.BOOKABLE">
                   <div v-if="travel.state === TravelState.APPROVED">
-                    <TooltipElement v-if="reviewDisabledReasons.length > 0">
-                      <template #content>
-                        <div class="text-start">
-                          <div v-for="(reason, index) of reviewDisabledReasons" :key="reason + index">{{ reason }}</div>
-                        </div>
-                      </template>
+                    <TooltipElement v-if="travelErrorCount > 0" :text="reviewDisabledTooltip">
                       <button class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
                         <span class="ms-1">{{ t('labels.toExamination') }}</span>
@@ -395,6 +389,7 @@ const combinedTravelValidationResults = computed(() => combineTravelValidationRe
 const travelErrorCount = computed(
   () => combinedTravelValidationResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length
 )
+const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX'))
 
 const hasTravelCalculationBlockingErrors = computed(() => {
   if (!travel.value._id || !APP_DATA.value?.travelCalculator || !Array.isArray(travel.value.stages)) {
@@ -411,21 +406,6 @@ const summaryAddUp = computed(() => {
     ...entry,
     lumpSums: { ...((entry as AddUp<string, Travel<string>>).lumpSums || { amount: 0 }), amount: Number.NaN }
   }))
-})
-
-const reviewDisabledReasons = computed(() => {
-  const reasons: string[] = []
-  const validationErrorCount = travelErrorCount.value
-  if (isReadOnly.value) {
-    reasons.push(t('labels.readOnly'))
-  }
-  if (!Array.isArray(travel.value.stages) || travel.value.stages.length < 1) {
-    reasons.push(t('alerts.noData.stage'))
-  }
-  if (validationErrorCount > 0) {
-    reasons.push(t('alerts.reviewBlockedByValidationErrorsX'))
-  }
-  return reasons
 })
 
 function highlightStages(stageIndexes: number[]) {
@@ -544,7 +524,7 @@ async function deleteTravel() {
 }
 
 async function toExamination() {
-  if (reviewDisabledReasons.value.length > 0) {
+  if (travelErrorCount.value > 0) {
     return
   }
   modalFormIsLoading.value = true

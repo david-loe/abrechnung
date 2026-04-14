@@ -15,13 +15,9 @@
             <div v-if="issue.actionPayload" class="mb-1">
               <button type="button" class="btn btn-link btn-sm p-0 text-start fw-semibold" @click="emit('action', issue.actionPayload)">
                 <span>{{ issue.subject }}</span>
-                <span v-for="(flag, flagIndex) of issue.subjectFlags" :key="flag + flagIndex" class="ms-1">{{ flag }}</span>
               </button>
             </div>
-            <div v-else class="mb-1 fw-semibold">
-              <span>{{ issue.subject }}</span>
-              <span v-for="(flag, flagIndex) of issue.subjectFlags" :key="flag + flagIndex" class="ms-1">{{ flag }}</span>
-            </div>
+            <div v-else class="mb-1 fw-semibold"><span>{{ issue.subject }}</span></div>
             <div class="d-flex align-items-baseline gap-1">
               <small class="d-block text-body-secondary lh-sm">{{ issue.message }}</small>
               <span v-if="te(`info.${issue.code}`)" class="small lh-1">
@@ -54,7 +50,6 @@ type ValidationIssuesAlertItem = {
   code: string
   type: 'error' | 'warning'
   subject: string
-  subjectFlags?: string[]
   message: string
   actionPayload?: ValidationIssueActionPayload
 }
@@ -99,8 +94,14 @@ function formatValidationPath(path: string) {
     .join(' ➜ ')
 }
 
-function formatIssueMessage(result: ValidationResult) {
+function formatIssueMessage(result: ValidationResult, stageIndexes: number[] = []) {
   if (!result.path) {
+    if (result.code === 'countryChangeBetweenStages') {
+      const flags = getCountryChangeFlags(result, stageIndexes)
+      if (flags && flags.length > 1) {
+        return `${flags.join(' → ')} ${t(`alerts.${result.code}`)}`
+      }
+    }
     return t(`alerts.${result.code}`)
   }
 
@@ -154,11 +155,7 @@ function getStageSubject(stageIndexes: number[]) {
 function getIssueDisplay(result: ValidationResult) {
   const stageIndexes = getStageIndexes(result)
   if (stageIndexes.length > 1) {
-    return {
-      subject: getStageSubject(stageIndexes),
-      subjectFlags: getCountryChangeFlags(result, stageIndexes),
-      actionPayload: { type: 'multi-stage', stageIndexes } as ValidationIssueActionPayload
-    }
+    return { subject: getStageSubject(stageIndexes), actionPayload: { type: 'multi-stage', stageIndexes } as ValidationIssueActionPayload }
   }
 
   if (stageIndexes.length === 1) {
@@ -189,15 +186,15 @@ function getIssueDisplay(result: ValidationResult) {
 }
 
 function toIssueItem(result: ValidationResult, index: number): ValidationIssuesAlertItem {
-  const { subject, subjectFlags, actionPayload } = getIssueDisplay(result)
+  const stageIndexes = getStageIndexes(result)
+  const { subject, actionPayload } = getIssueDisplay(result)
   const referenceKey = result.reference ? `${result.reference.collection}:${result.reference.index.join('-')}` : ''
   return {
     key: `${result.code}:${result.path || referenceKey || index}`,
     code: result.code,
     type: result.severity === 'error' ? 'error' : 'warning',
     subject,
-    subjectFlags,
-    message: formatIssueMessage(result),
+    message: formatIssueMessage(result, stageIndexes),
     actionPayload
   }
 }

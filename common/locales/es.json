@@ -58,6 +58,7 @@
     "reviewBlockedByValidationErrorsX": "Resuelve todos los errores de validación para enviar.",
     "reviewRequirementsNotMet": "El reporte todavía no se puede enviar a revisión.",
     "saveAfterRotate": "La imagen se giró. Guarda para conservar este cambio.",
+    "savedExpensesXOfY": "Gastos guardados: {X}/{Y}.",
     "stageOutOfBounds": "Al menos una etapa está fuera del periodo de viaje aprobado.",
     "stagesOutOfNewBoundsX": "⚠️ Las etapas siguientes están fuera de las nuevas fechas de viaje:\n\n{X}",
     "stagesOverlapping": "Las etapas se superponen temporalmente",

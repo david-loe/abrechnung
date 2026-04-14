@@ -93,6 +93,23 @@ export class ExpenseReportController extends Controller {
     })
   }
 
+  @Post('expense/bulk')
+  public async postExpensesToOwn(
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>[],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    if (requestBody.length < 1) {
+      throw new ValidationClientError(i18n.t('alerts.noData.expense', { lng: request.user.settings.language }))
+    }
+
+    let result = await this.postExpenseToOwn(parentId, requestBody[0], request)
+    for (const expense of requestBody.slice(1)) {
+      result = await this.postExpenseToOwn(parentId, expense, request)
+    }
+    return result
+  }
+
   @Delete('expense')
   public async deleteExpenseFromOwn(@Query() _id: string, @Query() parentId: string, @Request() request: AuthenticatedExpressRequest) {
     return await this.deleterForArrayElement(ExpenseReport, {
@@ -268,6 +285,23 @@ export class ExpenseReportExamineController extends Controller {
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
     })
+  }
+
+  @Post('expense/bulk')
+  public async postExpensesToAny(
+    @Query('parentId') parentId: string,
+    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>[],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    if (requestBody.length < 1) {
+      throw new ValidationClientError(i18n.t('alerts.noData.expense', { lng: request.user.settings.language }))
+    }
+
+    let result = await this.postExpenseToAny(parentId, requestBody[0], request)
+    for (const expense of requestBody.slice(1)) {
+      result = await this.postExpenseToAny(parentId, expense, request)
+    }
+    return result
   }
 
   @Delete('expense')

@@ -134,6 +134,7 @@
             </div>
             <div v-if="!isReadOnly" class="col-auto ms-auto">
               <CSVImport
+                :endpoint="`${endpointPrefix}expenseReport/expense/bulk?parentId=${expenseReport._id}`"
                 button-style="outline-secondary btn-sm"
                 :template-fields="['cost.date', 'description', 'cost.amount', 'cost.currency', 'note']"
                 :transformers="[
@@ -141,7 +142,7 @@
                   { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
                   { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
                 ]"
-                @submitted="(d) => (isReadOnly ? null : importExpenses(d as Partial<Expense<string>>[]))" />
+                @submitted="() => (isReadOnly ? null : getExpenseReport())" />
             </div>
           </div>
           <div>
@@ -451,16 +452,6 @@ async function postExpense(expense: Partial<Expense>, closeModal = true, showAle
     return true
   }
   return false
-}
-
-async function importExpenses(expenses: Partial<Expense<string>>[]) {
-  for (const expense of expenses) {
-    const result = await postExpense(expense, false, false)
-    if (!result) {
-      return
-    }
-  }
-  API.addAlert({ title: t('alerts.successSaving'), type: 'success' })
 }
 
 async function deleteExpense(_id?: string) {

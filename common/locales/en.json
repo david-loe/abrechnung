@@ -58,6 +58,7 @@
     "reviewBlockedByValidationErrorsX": "Resolve all validation errors to submit.",
     "reviewRequirementsNotMet": "The report cannot be submitted for review yet.",
     "saveAfterRotate": "Image was rotated. Please save to keep this change.",
+    "savedExpensesXOfY": "Saved expenses: {X}/{Y}.",
     "stageOutOfBounds": "At least one stage is outside the approved travel range.",
     "stagesOutOfNewBoundsX": "⚠️ The following stages are outside the new travel dates:\n\n{X}",
     "stagesOverlapping": "Stages are overlapping",

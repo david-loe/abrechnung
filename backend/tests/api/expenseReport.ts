@@ -56,6 +56,56 @@ test.serial('GET /expenseReport', async (t) => {
   }
 })
 
+test.serial('POST /expenseReport/expense/bulk', async (t) => {
+  const tempReportResponse = await agent
+    .post('/expenseReport/inWork')
+    .send({ name: 'Bulk Import Test', project: expenseReport.project, category: expenseReport.category })
+  t.is(tempReportResponse.status, 200)
+
+  const tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
+  const bulkExpenses: Partial<Expense>[] = [
+    {
+      description: 'Imported Taxi',
+      cost: {
+        amount: 28.4,
+        currency: { _id: 'EUR', name: { de: 'Euro', en: 'Euro', fr: 'Euro', ru: 'Euro', es: 'Euro', kk: 'Euro' } },
+        receipts: [],
+        date: new Date('2023-09-10T00:00:00.000Z')
+      }
+    },
+    {
+      description: 'Imported Meal',
+      cost: {
+        amount: 16.9,
+        currency: {
+          _id: 'USD',
+          name: {
+            de: 'US-Dollar',
+            en: 'US Dollar',
+            fr: 'Dollar americain',
+            ru: 'Доллар США',
+            es: 'Dolar estadounidense',
+            kk: 'АКШ доллары'
+          }
+        },
+        receipts: [],
+        date: new Date('2023-09-11T00:00:00.000Z')
+      },
+      note: 'Imported from CSV'
+    }
+  ]
+
+  const bulkResponse = await agent
+    .post('/expenseReport/expense/bulk')
+    .query({ parentId: tempExpenseReport._id.toString() })
+    .send(bulkExpenses)
+  t.is(bulkResponse.status, 200)
+  t.is((bulkResponse.body.result as ExpenseReport).expenses.length, bulkExpenses.length)
+
+  const deleteResponse = await agent.delete('/expenseReport').query({ _id: tempExpenseReport._id.toString() })
+  t.is(deleteResponse.status, 200)
+})
+
 // FILL OUT
 
 const expenses: Expense[] = [

@@ -466,8 +466,12 @@ export function csvToObjects(
   if (lines.length > 1) {
     const headers = lines[0]
     for (let i = 1; i < lines.length; i++) {
-      const obj: Record<string, ValueType> = {}
       const currentline = lines[i]
+      if (currentline.every((entry) => entry.trim() === '')) {
+        continue
+      }
+
+      const obj: Record<string, ValueType> = {}
       for (let j = 0; j < headers.length; j++) {
         const header = headers[j]?.trim()
         if (!header) {

@@ -58,6 +58,7 @@
     "reviewBlockedByValidationErrorsX": "Behebe alle Validierungsfehler, um einzureichen.",
     "reviewRequirementsNotMet": "Der Report kann noch nicht zur Prüfung eingereicht werden.",
     "saveAfterRotate": "Bild wurde gedreht. Bitte speichern, damit die Änderung erhalten bleibt.",
+    "savedExpensesXOfY": "Auslagen gespeichert: {X}/{Y}.",
     "stageOutOfBounds": "Mindestens eine Etappe liegt außerhalb des genehmigten Reisezeitraums.",
     "stagesOutOfNewBoundsX": "⚠️ Die folgenden Etappen liegen außerhalb der neuen Reisedaten:\n\n{X}",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",

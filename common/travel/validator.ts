@@ -14,40 +14,27 @@ function isConflictCode(code: string): code is TravelConflictCode {
 
 export function combineTravelValidationResults(results: ValidationResult[]) {
   const combined: ValidationResult[] = []
-  const groupedIndexes = new Set<number>()
+  const groupedConflictKeys = new Set<string>()
 
-  for (let i = 0; i < results.length; i++) {
-    if (groupedIndexes.has(i)) {
-      continue
-    }
-
-    const current = results[i]
-    const next = results[i + 1]
-
+  for (const result of results) {
     if (
-      !isConflictCode(current.code) ||
-      !current.path ||
-      !current.reference ||
-      !next ||
-      next.code !== current.code ||
-      next.severity !== current.severity ||
-      !next.path ||
-      !next.reference
+      !isConflictCode(result.code) ||
+      !result.reference ||
+      result.reference.collection !== 'stages' ||
+      result.reference.index.length < 2
     ) {
-      combined.push(current)
+      combined.push(result)
       continue
     }
 
-    if (current.reference.collection !== 'stages' || next.reference.collection !== 'stages') {
-      combined.push(current)
+    const stageIndexes = Array.from(new Set(result.reference.index)).sort((a, b) => a - b)
+    const conflictKey = `${result.code}:${result.severity}:${stageIndexes.join('-')}`
+    if (groupedConflictKeys.has(conflictKey)) {
       continue
     }
 
-    const stageIndexes = [...current.reference.index, ...next.reference.index].sort((a, b) => a - b)
-    combined.push({ code: current.code, severity: current.severity, reference: { collection: 'stages', index: stageIndexes } })
-    groupedIndexes.add(i)
-    groupedIndexes.add(i + 1)
-    i++
+    combined.push({ code: result.code, severity: result.severity, reference: { collection: 'stages', index: stageIndexes } })
+    groupedConflictKeys.add(conflictKey)
   }
 
   return combined
@@ -108,41 +95,36 @@ export class TravelValidator extends Validator<ValidatableTravel, TravelValidato
   }
 
   protected getStageDateResults(travel: ValidatableTravel): ValidationResult[] {
-    const conflicts = new Map<string, ValidationResult>()
+    const conflicts: ValidationResult[] = []
 
     for (let i = 0; i < travel.stages.length; i++) {
-      for (let j = 0; j < travel.stages.length; j++) {
-        if (i === j) {
+      for (let j = i + 1; j < travel.stages.length; j++) {
+        const stageA = travel.stages[i]
+        const stageB = travel.stages[j]
+        const firstIndex = stageA.departure.valueOf() <= stageB.departure.valueOf() ? i : j
+        const secondIndex = firstIndex === i ? j : i
+        const firstStage = travel.stages[firstIndex]
+        const secondStage = travel.stages[secondIndex]
+
+        if (firstStage.arrival.valueOf() <= secondStage.departure.valueOf()) {
           continue
         }
 
-        if (travel.stages[i].departure.valueOf() < travel.stages[j].departure.valueOf()) {
-          if (travel.stages[i].arrival.valueOf() <= travel.stages[j].departure.valueOf()) {
-            continue
-          }
-          if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
-            conflicts.set(`stages.${i}.arrival.stagesOverlapping`, this.createStageResult(i, 'arrival', 'stagesOverlapping', 'error'))
-            conflicts.set(`stages.${j}.departure.stagesOverlapping`, this.createStageResult(j, 'departure', 'stagesOverlapping', 'error'))
-          } else {
-            conflicts.set(`stages.${j}.arrival.stagesOverlapping`, this.createStageResult(j, 'arrival', 'stagesOverlapping', 'error'))
-            conflicts.set(`stages.${j}.departure.stagesOverlapping`, this.createStageResult(j, 'departure', 'stagesOverlapping', 'error'))
-          }
+        if (firstStage.arrival.valueOf() <= secondStage.arrival.valueOf()) {
+          conflicts.push(...this.createStageConflictResults(firstIndex, 'arrival', secondIndex, 'departure', 'stagesOverlapping', 'error'))
           continue
         }
 
-        if (travel.stages[i].departure.valueOf() < travel.stages[j].arrival.valueOf()) {
-          if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
-            conflicts.set(`stages.${i}.arrival.stagesOverlapping`, this.createStageResult(i, 'arrival', 'stagesOverlapping', 'error'))
-            conflicts.set(`stages.${i}.departure.stagesOverlapping`, this.createStageResult(i, 'departure', 'stagesOverlapping', 'error'))
-          } else {
-            conflicts.set(`stages.${j}.arrival.stagesOverlapping`, this.createStageResult(j, 'arrival', 'stagesOverlapping', 'error'))
-            conflicts.set(`stages.${i}.departure.stagesOverlapping`, this.createStageResult(i, 'departure', 'stagesOverlapping', 'error'))
-          }
-        }
+        conflicts.push(
+          ...this.createStageConflictResults(secondIndex, 'departure', secondIndex, 'arrival', 'stagesOverlapping', 'error', [
+            firstIndex,
+            secondIndex
+          ])
+        )
       }
     }
 
-    return Array.from(conflicts.values())
+    return conflicts
   }
 
   protected getStageCountryResults(travel: ValidatableTravel): ValidationResult[] {
@@ -150,8 +132,16 @@ export class TravelValidator extends Validator<ValidatableTravel, TravelValidato
 
     for (let i = 1; i < travel.stages.length; i++) {
       if (travel.stages[i - 1].endLocation.country._id !== travel.stages[i].startLocation.country._id) {
-        results.push(this.createStageResult(i - 1, 'endLocation.country', 'countryChangeBetweenStages', 'error'))
-        results.push(this.createStageResult(i, 'startLocation.country', 'countryChangeBetweenStages', 'error'))
+        results.push(
+          ...this.createStageConflictResults(
+            i - 1,
+            'endLocation.country',
+            i,
+            'startLocation.country',
+            'countryChangeBetweenStages',
+            'error'
+          )
+        )
       }
     }
 
@@ -162,10 +152,26 @@ export class TravelValidator extends Validator<ValidatableTravel, TravelValidato
     index: number,
     fieldPath: string | undefined,
     code: string,
-    severity: ValidationResult['severity']
+    severity: ValidationResult['severity'],
+    referenceIndexes = [index]
   ): ValidationResult {
-    const reference: ValidationReference = { collection: 'stages', index: [index] }
+    const reference: ValidationReference = { collection: 'stages', index: referenceIndexes }
     return { code, severity, path: fieldPath ? `stages.${index}.${fieldPath}` : undefined, reference }
+  }
+
+  private createStageConflictResults(
+    firstIndex: number,
+    firstFieldPath: string,
+    secondIndex: number,
+    secondFieldPath: string,
+    code: string,
+    severity: ValidationResult['severity'],
+    referenceIndexes = [firstIndex, secondIndex]
+  ) {
+    return [
+      this.createStageResult(firstIndex, firstFieldPath, code, severity, referenceIndexes),
+      this.createStageResult(secondIndex, secondFieldPath, code, severity, referenceIndexes)
+    ]
   }
 
   getCalculationBlockingResults(travel: Pick<Travel<_id, binary>, 'stages'>) {
