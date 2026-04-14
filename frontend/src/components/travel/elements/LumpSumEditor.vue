@@ -124,8 +124,14 @@ const localLastPlaceOfWork = ref(props.travel.lastPlaceOfWork)
 const lumpSumsSum = ref(getLumpSumsSum(props.travel.days))
 const isCalculatingLumpSumsSum = ref(false)
 const localDays = ref<TravelDay<string>[]>([])
+const hasTravelValidationErrors = computed(() => props.travelCalculator.validator.getCalculationBlockingResults(props.travel).length > 0)
 
 setup(props.travel)
+if (hasTravelValidationErrors.value) {
+  setLumpSumsSumToNaN()
+} else {
+  void updateLumpSumsSum(localDays.value)
+}
 
 function setup(travel: Travel<string>) {
   setLocalDays(travel.days)
@@ -136,12 +142,35 @@ function setup(travel: Travel<string>) {
     )
   }
 }
+function setLumpSumsSumToNaN() {
+  lumpSumsSum.value = { amount: Number.NaN }
+}
 function setLocalDays(days: TravelDay<string>[]) {
   const newDays: TravelDay<string>[] = []
   for (const day of days) {
     newDays.push(mergeDeep({}, day))
   }
   localDays.value = newDays
+}
+async function updateLumpSumsSum(days: TravelDay<string>[]) {
+  if (hasTravelValidationErrors.value) {
+    setLumpSumsSumToNaN()
+    return
+  }
+  isCalculatingLumpSumsSum.value = true
+  try {
+    const newCalculatedDays = await props.travelCalculator.calculateDays(
+      props.travel.stages,
+      localLastPlaceOfWork.value,
+      props.travel.destinationPlace,
+      days
+    )
+    await props.travelCalculator.addCateringRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
+    await props.travelCalculator.addOvernightRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
+    lumpSumsSum.value = getLumpSumsSum(newCalculatedDays)
+  } finally {
+    isCalculatingLumpSumsSum.value = false
+  }
 }
 function getLastPaceOfWorkList(travelObj: Travel) {
   const list: Omit<Place, 'place'>[] = []
@@ -191,6 +220,10 @@ watch(
 )
 
 watch(localLastPlaceOfWork, async (newLastPlace) => {
+  if (hasTravelValidationErrors.value) {
+    setLumpSumsSumToNaN()
+    return
+  }
   setLocalDays(
     await props.travelCalculator.calculateDays(props.travel.stages, newLastPlace, props.travel.destinationPlace, localDays.value)
   )
@@ -199,23 +232,25 @@ watch(localLastPlaceOfWork, async (newLastPlace) => {
 watch(
   localDays,
   async (newLocalDays) => {
-    isCalculatingLumpSumsSum.value = true
-    try {
-      const newCalculatedDays = await props.travelCalculator.calculateDays(
-        props.travel.stages,
-        localLastPlaceOfWork.value,
-        props.travel.destinationPlace,
-        newLocalDays
-      )
-      await props.travelCalculator.addCateringRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
-      await props.travelCalculator.addOvernightRefunds(newCalculatedDays, props.travel.stages, Boolean(props.travel.claimSpouseRefund))
-      lumpSumsSum.value = getLumpSumsSum(newCalculatedDays)
-    } finally {
-      isCalculatingLumpSumsSum.value = false
-    }
+    await updateLumpSumsSum(newLocalDays)
   },
   { deep: true }
 )
+
+watch(hasTravelValidationErrors, async (hasErrors) => {
+  if (hasErrors) {
+    setLumpSumsSumToNaN()
+    return
+  }
+  setLocalDays(
+    await props.travelCalculator.calculateDays(
+      props.travel.stages,
+      localLastPlaceOfWork.value,
+      props.travel.destinationPlace,
+      localDays.value
+    )
+  )
+})
 </script>
 
 <style scoped>

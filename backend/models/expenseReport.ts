@@ -28,7 +28,7 @@ const expenseReportSchema = () =>
       expenses: [
         {
           description: { type: String, required: true },
-          cost: costObject(true, true, true, undefined),
+          cost: costObject({ exchangeRate: true, receipts: true, required: true, receiptsRequired: false }),
           project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }

@@ -175,7 +175,7 @@
           </div>
 
           <div v-if="travel.stages.length == 0" class="alert alert-light" role="alert">{{ t('alerts.noData.stage') }}</div>
-          <TravelTable :travel="travel" ref="table" @showModal="showModal" />
+          <TravelTable :travel="travel" :highlighted-stage-indexes="highlightedStageIndexes" ref="table" @showModal="showModal" />
         </div>
 
         <div class="col-lg-4 col">
@@ -189,13 +189,19 @@
               <a class="clickable" role="button" @click="goToSettings(travel)">{{ t('labels.goToSettings') }}</a>
             </div>
           </div>
+          <ValidationIssuesAlert
+            :results="combinedTravelValidationResults"
+            :expenses="travel.expenses"
+            :stages="travel.stages"
+            fallback-subject-label-key="labels.travel"
+            @action="handleTravelIssueAction" />
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
               <div>
                 <AddUpTable
                   class="mb-4"
-                  :add-up="travel.addUp"
+                  :add-up="summaryAddUp"
                   :claim-spouse-refund="travel.claimSpouseRefund"
                   :progress="travel.progress"
                   :project="travel.project"
@@ -223,13 +229,18 @@
                 </div>
                 <template v-if="travel.state < State.BOOKABLE">
                   <div v-if="travel.state === TravelState.APPROVED">
-                    <TooltipElement v-if="travel.stages.length < 1" :text="t('alerts.noData.stage')">
+                    <TooltipElement v-if="reviewDisabledReasons.length > 0">
+                      <template #content>
+                        <div class="text-start">
+                          <div v-for="(reason, index) of reviewDisabledReasons" :key="reason + index">{{ reason }}</div>
+                        </div>
+                      </template>
                       <button class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
                         <span class="ms-1">{{ t('labels.toExamination') }}</span>
                       </button>
                     </TooltipElement>
-                    <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                    <button v-else @click="toExamination()" class="btn btn-primary">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
@@ -281,6 +292,7 @@
 
 <script lang="ts" setup>
 import {
+  type AddUp,
   DocumentFile,
   Stage,
   State,
@@ -294,6 +306,8 @@ import {
   User,
   UserSimple
 } from 'abrechnung-common/types.js'
+import type { ValidationResult } from 'abrechnung-common/report/validator.js'
+import { combineTravelValidationResults } from 'abrechnung-common/travel/validator.js'
 import { placeToSimpleString, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -308,6 +322,7 @@ import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
+import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
 import LumpSumEditor from '@/components/travel/elements/LumpSumEditor.vue'
 import TravelTable from '@/components/travel/elements/TravelTable.vue'
@@ -318,6 +333,7 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
@@ -343,6 +359,7 @@ const isReadOnlySwitchOn = ref(true)
 const modalFormIsLoading = ref(false)
 
 const hasUnusedAdvances = ref(false)
+const highlightedStageIndexes = ref<number[]>([])
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -360,6 +377,83 @@ const isReadOnly = computed(() => {
     isReadOnlySwitchOn.value
   )
 })
+
+const travelValidationResults = computed(() => {
+  if (
+    !travel.value._id ||
+    !APP_DATA.value?.travelCalculator ||
+    !Array.isArray(travel.value.stages) ||
+    !Array.isArray(travel.value.expenses)
+  ) {
+    return [] as ValidationResult[]
+  }
+  return APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value).results
+})
+
+const combinedTravelValidationResults = computed(() => combineTravelValidationResults(travelValidationResults.value))
+
+const travelErrorCount = computed(
+  () => combinedTravelValidationResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length
+)
+
+const hasTravelCalculationBlockingErrors = computed(() => {
+  if (!travel.value._id || !APP_DATA.value?.travelCalculator || !Array.isArray(travel.value.stages)) {
+    return false
+  }
+  return APP_DATA.value.travelCalculator.validator.getCalculationBlockingResults(travel.value).length > 0
+})
+
+const summaryAddUp = computed(() => {
+  if (!hasTravelCalculationBlockingErrors.value) {
+    return travel.value.addUp
+  }
+  return travel.value.addUp.map((entry) => ({
+    ...entry,
+    lumpSums: { ...((entry as AddUp<string, Travel<string>>).lumpSums || { amount: 0 }), amount: Number.NaN }
+  }))
+})
+
+const reviewDisabledReasons = computed(() => {
+  const reasons: string[] = []
+  const validationErrorCount = travelErrorCount.value
+  if (isReadOnly.value) {
+    reasons.push(t('labels.readOnly'))
+  }
+  if (!Array.isArray(travel.value.stages) || travel.value.stages.length < 1) {
+    reasons.push(t('alerts.noData.stage'))
+  }
+  if (validationErrorCount > 0) {
+    reasons.push(t('alerts.reviewBlockedByValidationErrorsX'))
+  }
+  return reasons
+})
+
+function highlightStages(stageIndexes: number[]) {
+  highlightedStageIndexes.value = [...stageIndexes]
+  tableRef.value?.scrollToStage(stageIndexes[0])
+}
+
+function handleTravelIssueAction(payload: ValidationIssueActionPayload) {
+  if (payload.type === 'single-stage') {
+    const stage = travel.value.stages[payload.stageIndex]
+    if (stage) {
+      showModal('edit', 'stage', stage)
+    }
+    return
+  }
+
+  if (payload.type === 'single-expense') {
+    const expense = travel.value.expenses[payload.expenseIndex]
+    if (expense) {
+      showModal('edit', 'expense', expense)
+    }
+    return
+  }
+
+  if (payload.type === 'multi-stage' && payload.stageIndexes.length > 0) {
+    highlightStages(payload.stageIndexes)
+  }
+}
 
 function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
   if (object) {
@@ -450,6 +544,9 @@ async function deleteTravel() {
 }
 
 async function toExamination() {
+  if (reviewDisabledReasons.value.length > 0) {
+    return
+  }
   modalFormIsLoading.value = true
   const result = await API.setter<Travel>(`${props.endpointPrefix}travel/underExamination`, {
     _id: travel.value._id,
@@ -580,6 +677,7 @@ async function getTravel() {
 
 async function setTravel(newTravel: Travel<string>) {
   travel.value = newTravel
+  highlightedStageIndexes.value = []
   logger.info(`${t('labels.travel')}:`)
   logger.info(travel.value)
   if (props.endpointPrefix === 'examine/') {

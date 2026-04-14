@@ -46,7 +46,6 @@
         id="expenseFormFile"
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
-        :required="true"
         :endpointPrefix="endpointPrefix"
         :ownerId="ownerId"
         :showUploadFromPhone="props.showUploadFromPhone" />

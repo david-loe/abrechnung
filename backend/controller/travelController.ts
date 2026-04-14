@@ -13,15 +13,25 @@ import {
 import { mongo, QueryFilter, Types } from 'mongoose'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import { reportPrinter } from '../factory.js'
+import { reportPrinter, travelCalculator } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
+
+function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
+  const reviewSummary = travelCalculator.validator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
 
 @Tags('Travel')
 @Route('travel')
@@ -239,6 +249,7 @@ export class TravelController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
+          assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -515,6 +526,7 @@ export class TravelExamineController extends Controller {
           oldObject.state === TravelState.IN_REVIEW &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
+          assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -554,6 +566,7 @@ export class TravelExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPROVED && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

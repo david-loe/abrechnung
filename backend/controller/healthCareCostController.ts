@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import { Validator } from 'abrechnung-common/report/validator.js'
 import {
   Expense,
   HealthCareCostState,
@@ -21,8 +22,20 @@ import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
+
+const healthCareCostValidator = new Validator({ requireReceipts: true })
+
+function assertHealthCareCostCanEnterReview(report: Pick<IHealthCareCost, 'expenses'>, language: string) {
+  const reviewSummary = healthCareCostValidator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
 
 @Tags('Health Care Cost')
 @Route('healthCareCost')
@@ -156,6 +169,7 @@ export class HealthCareCostController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
+          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -356,6 +370,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -377,6 +392,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

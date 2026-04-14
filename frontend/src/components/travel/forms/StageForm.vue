@@ -103,14 +103,12 @@
           :disabled="disabled"
           required>
           <option v-for="distanceRefundType of distanceRefundTypes" :value="distanceRefundType" :key="distanceRefundType">
-            {{
-              t('distanceRefundTypes.' + distanceRefundType) +
+            {{ t('distanceRefundTypes.' + distanceRefundType) +
               ' (' +
               props.travelSettings.distanceRefunds[distanceRefundType as DistanceRefundType] +
               ' ' +
               baseCurrency.symbol +
-              '/km)'
-            }}
+              '/km)' }}
           </option>
         </select>
       </div>
@@ -191,7 +189,6 @@
           id="stageFormFile"
           v-model="formStage.cost.receipts"
           :disabled="disabled"
-          :required="Boolean(formStage.cost.amount)"
           :endpointPrefix="endpointPrefix"
           :ownerId="ownerId"
           :showUploadFromPhone="props.showUploadFromPhone" />

@@ -182,6 +182,7 @@ test.serial('POST /travel/stage', async (t) => {
     }
     const res = await req
     if (res.status === 200) {
+      travel = res.body.result
       t.pass()
     } else {
       console.log(res.body)
@@ -216,6 +217,7 @@ test.serial('POST /travel/expense', async (t) => {
     }
     const res = await req
     if (res.status === 200) {
+      travel = res.body.result
       t.pass()
     } else {
       console.log(res.body)
@@ -245,6 +247,7 @@ test.serial('POST /travel/approved AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/travel/approved').send({ _id: travel._id })
   if (res.status === 200) {
+    travel = res.body.result
     t.pass()
   } else {
     console.log(res.body)
@@ -254,10 +257,72 @@ test.serial('POST /travel/approved AGAIN', async (t) => {
   t.is((res.body.result as Travel).history.length, 3)
 })
 
+test.serial('POST /travel/stage keeps invalid travel saveable in approved state', async (t) => {
+  t.plan(4)
+  const overlappingStage: Stage = {
+    ...(travel as Travel).stages[1],
+    departure: new Date('2023-08-24T18:00:00.000Z'),
+    arrival: new Date('2023-08-24T22:00:00.000Z')
+  }
+
+  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
+  for (const entry of objectToFormFields(overlappingStage)) {
+    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+      req = req.attach(entry.field, entry.val)
+    } else {
+      req = req.field(entry.field, entry.val)
+    }
+  }
+  const res = await req
+  if (res.status === 200) {
+    travel = res.body.result
+    t.pass()
+  } else {
+    console.log(res.body)
+    t.fail()
+  }
+  t.is((res.body.result as Travel).addUp[0].lumpSums.amount, 0)
+  t.false(Number.isNaN((res.body.result as Travel).addUp[0].total.amount))
+  t.is((res.body.result as Travel).state, TravelState.APPROVED)
+})
+
+test.serial('POST /travel/underExamination rejects invalid travel', async (t) => {
+  const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
+  t.is(res.status, 422)
+})
+
+test.serial('POST /travel/stage fixes invalid travel again', async (t) => {
+  t.plan(2)
+  const fixedStage: Stage = {
+    ...(travel as Travel).stages[1],
+    departure: new Date('2023-08-29T11:30:00.000Z'),
+    arrival: new Date('2023-08-29T14:05:00.000Z')
+  }
+
+  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
+  for (const entry of objectToFormFields(fixedStage)) {
+    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+      req = req.attach(entry.field, entry.val)
+    } else {
+      req = req.field(entry.field, entry.val)
+    }
+  }
+  const res = await req
+  if (res.status === 200) {
+    travel = res.body.result
+    t.pass()
+  } else {
+    console.log(res.body)
+    t.fail()
+  }
+  t.false(Number.isNaN((res.body.result as Travel).addUp[0].lumpSums.amount))
+})
+
 test.serial('POST /travel/underExamination AGAIN', async (t) => {
   t.plan(3)
   const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
   if (res.status === 200) {
+    travel = res.body.result
     t.pass()
   } else {
     console.log(res.body)

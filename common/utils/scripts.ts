@@ -159,8 +159,15 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
 export function getLumpSumsSum(days: TravelDay<_id>[]) {
   let sum = 0
   for (const day of days) {
-    sum += day.lumpSums.overnight.refund.amount
-    sum += day.lumpSums.catering.refund.amount
+    const overnightAmount = day.lumpSums?.overnight?.refund?.amount
+    const cateringAmount = day.lumpSums?.catering?.refund?.amount
+
+    if (typeof overnightAmount !== 'number' || typeof cateringAmount !== 'number') {
+      return { amount: Number.NaN }
+    }
+
+    sum += overnightAmount
+    sum += cateringAmount
   }
   return { amount: sum }
 }
@@ -203,7 +210,8 @@ export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], wi
       summary[j++].push(formatter.baseCurrency(addUps[i].expenses.amount))
     }
     if (withLumpSums) {
-      summary[j++].push(formatter.baseCurrency((addUps[i] as AddUp<_id, Travel<_id, binary>>).lumpSums.amount))
+      const lumpSumsAmount = (addUps[i] as AddUp<_id, Travel<_id, binary>>).lumpSums.amount
+      summary[j++].push(Number.isNaN(lumpSumsAmount) ? 'NaN' : formatter.baseCurrency(lumpSumsAmount))
     }
     if (hasAdvance) {
       summary[j++].push(
@@ -313,7 +321,8 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
     addToAddUps(addUps, approvedAdvance.balance.amount, 'advance', approvedAdvance.project, isTravel)
   }
   for (const addUp of addUps) {
-    let totalAmount = addUp.expenses.amount + ((addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount || 0)
+    const lumpSumsAmount = (addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount
+    let totalAmount = addUp.expenses.amount + (typeof lumpSumsAmount === 'number' && !Number.isNaN(lumpSumsAmount) ? lumpSumsAmount : 0)
     if (totalAmount < 0) {
       addUp.negativeTotal = true
       totalAmount = 0

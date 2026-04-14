@@ -64,7 +64,7 @@ const expenses: Expense[] = [
     cost: {
       amount: 82, //@ts-ignore
       currency: { _id: 'GBP' }, //@ts-ignore
-      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
+      receipts: [],
       date: new Date('2023-09-14T00:00:00.000Z')
     }
   },
@@ -96,11 +96,47 @@ test.serial('POST /expenseReport/expense', async (t) => {
     }
     const res = await req
     if (res.status === 200) {
+      expenseReport = res.body.result
       t.pass()
     } else {
       console.log(res.body)
     }
   }
+})
+
+test.serial('POST /expenseReport/underExamination rejects incomplete expense', async (t) => {
+  const res = await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id })
+  t.is(res.status, 422)
+})
+
+test.serial('POST /expenseReport/expense adds missing receipt', async (t) => {
+  t.plan(2)
+  const expenseWithoutReceipt = (expenseReport as ExpenseReport).expenses.find((expense) => expense.cost.receipts.length === 0)
+  const updatedExpense = {
+    ...expenseWithoutReceipt,
+    cost: {
+      ...expenseWithoutReceipt?.cost,
+      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
+    }
+  }
+
+  let req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
+  for (const entry of objectToFormFields(updatedExpense)) {
+    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+      req = req.attach(entry.field, entry.val)
+    } else {
+      req = req.field(entry.field, entry.val)
+    }
+  }
+  const res = await req
+  if (res.status === 200) {
+    expenseReport = res.body.result
+    t.pass()
+  } else {
+    console.log(res.body)
+    t.fail()
+  }
+  t.true((res.body.result as ExpenseReport).expenses.every((expense) => expense.cost.receipts.length > 0))
 })
 
 test.serial('POST /expenseReport/underExamination', async (t) => {

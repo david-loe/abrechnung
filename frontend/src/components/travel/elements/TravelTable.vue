@@ -51,7 +51,11 @@
     <!-- Stage -->
     <div
       v-else-if="row.type === 'stage'"
-      class="row align-items-center clickable ps-lg-4 mb-1"
+      :id="`travel-stage-${row.stageIndex}`"
+      :class="[
+        'row align-items-center clickable ps-lg-4 mb-1 rounded-2',
+        isHighlightedStage(row.stageIndex) ? 'bg-danger-subtle border border-danger px-2 py-1' : ''
+      ]"
       @click="emit('showModal', 'edit', 'stage', row.data as Stage)">
       <div class="col-auto fs-3 d-none d-md-block"><i :class="getStageIcon(row.data as Stage)"></i></div>
       <div class="col-auto text-truncate">
@@ -105,13 +109,16 @@ const { t } = useI18n()
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 
 type Table = (
-  | { type: 'stage'; data: Stage }
+  | { type: 'stage'; data: Stage; stageIndex: number }
   | { type: 'expense'; data: TravelExpense }
   | { type: 'day'; data: TravelDay }
   | { type: 'gap'; data: Gap }
 )[]
 
-const props = defineProps({ travel: { type: Object as PropType<Travel<string>>, required: true } })
+const props = defineProps({
+  travel: { type: Object as PropType<Travel<string>>, required: true },
+  highlightedStageIndexes: { type: Array as PropType<number[]>, default: () => [] }
+})
 const emit = defineEmits<{
   (e: 'showModal', m: 'add', t: 'stage', d: Gap): void
   (e: 'showModal', m: 'edit', t: 'stage', d: Stage): void
@@ -149,8 +156,8 @@ function renderTable() {
         table.value.push({ type: 'expense', data: expense })
       }
     }
-    for (const stage of props.travel.stages.slice(stagesStart, stagesEnd)) {
-      table.value.push({ type: 'stage', data: stage })
+    for (const [offset, stage] of props.travel.stages.slice(stagesStart, stagesEnd).entries()) {
+      table.value.push({ type: 'stage', data: stage, stageIndex: stagesStart + offset })
     }
   }
   // Füge eine "Gap" ein, falls vorhanden:
@@ -182,6 +189,10 @@ function getStageIcon(stage: Stage) {
   return icon
 }
 
+function isHighlightedStage(stageIndex: number) {
+  return props.highlightedStageIndexes.includes(stageIndex)
+}
+
 function getNext(record: TravelRecord, type: TravelRecordType) {
   const index = table.value.findIndex((e) => e.type === type && e.data._id === record._id)
   if (index === -1) {
@@ -206,7 +217,11 @@ function getPrev(record: TravelRecord, type: TravelRecordType) {
   }
 }
 
-defineExpose({ getNext, getPrev })
+function scrollToStage(stageIndex: number) {
+  document.getElementById(`travel-stage-${stageIndex}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+}
+
+defineExpose({ getNext, getPrev, scrollToStage })
 
 watch(() => props.travel, renderTable)
 watch(() => props.travel.expenses, renderTable)

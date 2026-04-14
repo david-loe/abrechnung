@@ -2,6 +2,7 @@ import test from 'ava'
 import { baseCurrency, Country, CountryCode, Stage, TravelState } from '../types.js'
 import { TravelCalculator } from './calculator.js'
 import travelSettings from './travelSettings.js'
+import { combineTravelValidationResults } from './validator.js'
 
 function createSetup() {
   const countryDE: Country = {
@@ -149,6 +150,62 @@ test('calc reports conflicts for overlapping stages', async (t) => {
     { ...stages[0], _id: 's3', departure: new Date('2023-01-01T10:00:00Z'), arrival: new Date('2023-01-01T19:00:00Z') }
   ]
   const badTravel = { ...travel, stages: badStages }
-  const { conflicts } = await tc.calc(badTravel)
+  const { result, conflicts } = await tc.calc(badTravel)
   t.true(conflicts.length > 0)
+  t.truthy(result)
+  t.true((result?.progress ?? 0) > 0)
+  t.is(result?.days[0].lumpSums.catering.refund.amount, 0)
+  t.is(result?.days[0].lumpSums.overnight.refund.amount, 0)
+})
+
+test('validator returns warnings independently from validation errors', (t) => {
+  const { tc, travel } = createSetup()
+  const results = tc.validator.getValidationResults({ ...travel, endDate: new Date('2022-12-20') })
+  t.true(results.some((result) => result.code === 'stageOutOfBounds' && result.severity === 'warning'))
+})
+
+test('validator requires receipts for travel stages with a cost amount', (t) => {
+  const { tc, stages, travel } = createSetup()
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+  })
+
+  t.true(
+    results.some(
+      (result) =>
+        result.code === 'requiredForReview' &&
+        result.path === 'stages.0.cost.receipts' &&
+        result.reference?.collection === 'stages' &&
+        result.reference.index[0] === 0
+    )
+  )
+})
+
+test('combineTravelValidationResults combines overlapping stage paths into one conflict', (t) => {
+  const { tc, stages, travel } = createSetup()
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [stages[0], { ...stages[0], _id: 's3', departure: new Date('2023-01-01T10:00:00Z'), arrival: new Date('2023-01-01T19:00:00Z') }]
+  })
+
+  const combined = combineTravelValidationResults(results)
+  const overlapConflicts = combined.filter((conflict) => conflict.code === 'stagesOverlapping')
+
+  t.is(overlapConflicts.length, 1)
+  t.deepEqual(overlapConflicts[0].reference?.index, [0, 1])
+})
+
+test('combineTravelValidationResults combines country-change paths into one conflict', (t) => {
+  const { tc, stages, travel } = createSetup()
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [stages[0], { ...stages[1], startLocation: { place: 'Berlin', country: stages[0].startLocation.country } }]
+  })
+
+  const combined = combineTravelValidationResults(results)
+  const countryChangeConflicts = combined.filter((result) => result.code === 'countryChangeBetweenStages')
+
+  t.is(countryChangeConflicts.length, 1)
+  t.deepEqual(countryChangeConflicts[0].reference?.index, [0, 1])
 })

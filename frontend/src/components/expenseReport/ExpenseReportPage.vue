@@ -141,41 +141,33 @@
                   { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
                   { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
                 ]"
-                @submitted="(d) => (isReadOnly ? null : addDrafts(d as ExpenseDraft[]))" />
+                @submitted="(d) => (isReadOnly ? null : importExpenses(d as Partial<Expense<string>>[]))" />
             </div>
           </div>
-          <TableElement
-            :rows-items="[12, 50, 100]"
-            :rows-per-page="50"
-            db-key="expenseTableExpenseReport"
-            :empty-message="t('alerts.noData.expense')"
-            :headers="[
-              { text: '', value: 'warning', width: 25 },
-              { text: 'labels.date', value: 'cost.date', sortable: true },
-              { text: 'labels.description', value: 'description', sortable: true },
-              { text: 'labels.amount', value: 'cost' }
-            ]"
-            :items="allExpenses"
-            :body-row-class-name="(expense, rowNum) => (expense as Expense)._id ? 'clickable' : 'table-warning clickable'"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)"
-            @update-sort="updateExpenseSorting">
-            <template #item-cost.date="{ cost }: Expense">
-              {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                  ? formatter.simpleDate(cost.date)
-                  : formatter.date(cost.date) }}
-            </template>
-            <template #item-cost="{ cost }: Expense">
-              <div class="text-end tnum">{{ formatter.money(cost) }}</div>
-            </template>
-            <template #item-warning="expense: Expense">
-              <span v-if="!(expense as Expense)._id" class="text-warning" :title="t('labels.draft')">
-                <i class="bi bi-exclamation-triangle"></i>
-              </span>
-            </template>
-          </TableElement>
-          <div v-if="expenseReport.drafts && expenseReport.drafts.length > 0" class="row g-2 text-danger mt-1">
-            <div class="col-auto"><i class="bi bi-exclamation-triangle"></i></div>
-            <div class="col"><span> {{ t('alerts.draftsWillBeLost') }}</span></div>
+          <div>
+            <TableElement
+              :rows-items="[12, 50, 100]"
+              :rows-per-page="50"
+              db-key="expenseTableExpenseReport"
+              :empty-message="t('alerts.noData.expense')"
+              :headers="[
+                { text: 'labels.date', value: 'cost.date', sortable: true },
+                { text: 'labels.description', value: 'description', sortable: true },
+                { text: 'labels.amount', value: 'cost' }
+              ]"
+              :items="expenseReport.expenses"
+              body-row-class-name="clickable"
+              @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)"
+              @update-sort="updateExpenseSorting">
+              <template #item-cost.date="{ cost }: Expense">
+                {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+                    ? formatter.simpleDate(cost.date)
+                    : formatter.date(cost.date) }}
+              </template>
+              <template #item-cost="{ cost }: Expense">
+                <div class="text-end tnum">{{ formatter.money(cost) }}</div>
+              </template>
+            </TableElement>
           </div>
         </div>
         <div class="col-lg-4 col-auto">
@@ -189,6 +181,11 @@
               <a class="clickable" role="button" @click="goToSettings(expenseReport)">{{ t('labels.goToSettings') }}</a>
             </div>
           </div>
+          <ValidationIssuesAlert
+            :results="reviewResults"
+            :expenses="expenseReport.expenses"
+            fallback-subject-label-key="labels.expenseReport"
+            @action="handleReviewIssueAction" />
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
@@ -219,7 +216,7 @@
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && expenseReport.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="expenseReport.state === State.EDITABLE_BY_OWNER">
-                  <TooltipElement v-if="expenseReport.expenses.length < 1" :text="t('alerts.noData.expense')">
+                  <TooltipElement v-if="!canEnterReview" :text="reviewDisabledTooltip">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
@@ -275,20 +272,12 @@
 </template>
 
 <script lang="ts" setup>
-import {
-  Currency,
-  DocumentFile,
-  Expense,
-  ExpenseReport,
-  ExpenseReportSimple,
-  ExpenseReportState,
-  State,
-  UserSimple
-} from 'abrechnung-common/types.js'
+import { type ValidationResult, Validator } from 'abrechnung-common/report/validator.js'
+import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState, State, UserSimple } from 'abrechnung-common/types.js'
 import { convertGermanDateToHTMLDate, getById, refNumberToString } from 'abrechnung-common/utils/scripts.js'
-import { computed, onBeforeUnmount, onMounted, PropType, ref, useTemplateRef } from 'vue'
+import { computed, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { onBeforeRouteLeave, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import Badge from '@/components/elements/Badge.vue'
@@ -300,6 +289,7 @@ import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
+import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
@@ -309,10 +299,12 @@ import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import { sortByPath } from 'abrechnung-common/utils/sort.js'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 
 type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
 type ModalMode = 'add' | 'edit'
+const expenseReportValidator = new Validator({ requireReceipts: true })
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -323,17 +315,7 @@ const props = defineProps({
 const router = useRouter()
 const { t } = useI18n()
 
-type ExpenseDraft = {
-  cost: { date: string; amount: number; currency: Currency; receipts: DocumentFile[] }
-  description: string
-  note?: string
-  id: number
-}
-interface ExpenseReportWithDrafts extends ExpenseReport<string> {
-  drafts?: ExpenseDraft[]
-}
-
-const expenseReport = ref<ExpenseReportWithDrafts>({} as ExpenseReport<string>)
+const expenseReport = ref<ExpenseReport<string>>({} as ExpenseReport<string>)
 const modalObject = ref<ModalObject>({})
 const modalMode = ref<ModalMode>('add')
 const modalObjectType = ref<ModalObjectType>('expense')
@@ -354,7 +336,9 @@ const isReadOnly = computed(() => {
   )
 })
 
-const allExpenses = computed(() => [...expenseReport.value.expenses, ...(expenseReport.value.drafts ?? [])])
+const reviewResults = ref<ValidationResult[]>([])
+const canEnterReview = computed(() => !reviewResults.value.some((issue: ValidationResult) => issue.severity === 'error'))
+const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX'))
 
 const modalCompRef = useTemplateRef('modalComp')
 
@@ -388,6 +372,17 @@ function resetAndHide() {
   hideModal()
 }
 
+function handleReviewIssueAction(payload: ValidationIssueActionPayload) {
+  if (payload.type !== 'single-expense') {
+    return
+  }
+  const expense = expenseReport.value.expenses[payload.expenseIndex]
+  if (!expense) {
+    return
+  }
+  showModal('edit', 'expense', expense)
+}
+
 async function deleteExpenseReport() {
   const result = await API.deleter(`${props.endpointPrefix}expenseReport`, { _id: props._id })
   if (result) {
@@ -396,14 +391,15 @@ async function deleteExpenseReport() {
 }
 
 async function toExamination() {
-  if (shouldContinue()) {
-    const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
-      _id: expenseReport.value._id,
-      comment: expenseReport.value.comment
-    })
-    if (result.ok) {
-      router.push({ path: '/', hash: '#skip' })
-    }
+  if (!canEnterReview.value) {
+    return
+  }
+  const result = await API.setter<ExpenseReport>(`${props.endpointPrefix}expenseReport/underExamination`, {
+    _id: expenseReport.value._id,
+    comment: expenseReport.value.comment
+  })
+  if (result.ok) {
+    router.push({ path: '/', hash: '#skip' })
   }
 }
 
@@ -434,26 +430,37 @@ async function completeReview() {
   }
 }
 
-async function postExpense(expense: Partial<Expense>) {
+async function postExpense(expense: Partial<Expense>, closeModal = true, showAlert = true) {
   let headers: Record<string, string> = {}
-  if (expense.cost?.receipts) {
+  if (expense.cost?.receipts && expense.cost.receipts.length > 0) {
     headers = { 'Content-Type': 'multipart/form-data' }
   }
   modalFormIsLoading.value = true
-  const result = await API.setter<ExpenseReport<string>>(`${props.endpointPrefix}expenseReport/expense`, expense, {
-    headers,
-    params: { parentId: expenseReport.value._id }
-  })
+  const result = await API.setter<ExpenseReport<string>>(
+    `${props.endpointPrefix}expenseReport/expense`,
+    expense,
+    { headers, params: { parentId: expenseReport.value._id } },
+    showAlert
+  )
   modalFormIsLoading.value = false
   if (result.ok) {
-    const draftIndex = expenseReport.value.drafts?.findIndex((d) => d.id === (expense as unknown as ExpenseDraft).id)
-    if (draftIndex !== undefined && draftIndex !== -1) {
-      expenseReport.value.drafts?.splice(draftIndex, 1)
-    }
     setExpenseReport(result.ok)
-    resetAndHide()
-  } else {
+    if (closeModal) {
+      resetAndHide()
+    }
+    return true
   }
+  return false
+}
+
+async function importExpenses(expenses: Partial<Expense<string>>[]) {
+  for (const expense of expenses) {
+    const result = await postExpense(expense, false, false)
+    if (!result) {
+      return
+    }
+  }
+  API.addAlert({ title: t('alerts.successSaving'), type: 'success' })
 }
 
 async function deleteExpense(_id?: string) {
@@ -493,9 +500,10 @@ async function getExpenseReport() {
 }
 
 async function setExpenseReport(er: ExpenseReport<string>) {
-  const drafts = expenseReport.value.drafts || []
   expenseReport.value = er
-  expenseReport.value.drafts = drafts
+  reviewResults.value = expenseReportValidator
+    .getValidationSummary(er)
+    .results.filter((issue: ValidationResult) => issue.severity === 'warning' || issue.severity === 'error')
   sortedExpenseIds = er.expenses.map((e) => e._id)
   logger.info(`${t('labels.expenseReport')}:`)
   logger.info(expenseReport.value)
@@ -541,48 +549,8 @@ function getPrev(expense: Expense<string>): Expense<string> | undefined {
   return prev || undefined
 }
 
-function addDrafts(draftExpenses: ExpenseDraft[]) {
-  for (const draft of draftExpenses) {
-    draft.cost.receipts = []
-    draft.id = Math.random()
-  }
-
-  if (!expenseReport.value.drafts) {
-    expenseReport.value.drafts = []
-  }
-  expenseReport.value.drafts.push(...draftExpenses)
-}
-
 function goToSettings(expenseReport: ExpenseReport<string>) {
   showModal('edit', 'expenseReport', expenseReport)
-}
-
-function handleBeforeUnload(e: BeforeUnloadEvent) {
-  if (expenseReport.value.drafts && expenseReport.value.drafts.length > 0) {
-    e.preventDefault()
-  }
-}
-onMounted(() => {
-  window.addEventListener('beforeunload', handleBeforeUnload)
-})
-onBeforeUnmount(() => {
-  window.removeEventListener('beforeunload', handleBeforeUnload)
-})
-
-onBeforeRouteLeave((to, _from, next) => {
-  if (to.hash === '#skip') {
-    to.hash = ''
-    next()
-    return
-  }
-  next(shouldContinue())
-})
-
-function shouldContinue(): boolean {
-  if (expenseReport.value.drafts && expenseReport.value.drafts.length > 0) {
-    return confirm(t('alerts.unsavedChanges'))
-  }
-  return true
 }
 
 try {
@@ -592,4 +560,3 @@ try {
 }
 const examinerMails = await getExaminerMails()
 </script>
-<style></style>

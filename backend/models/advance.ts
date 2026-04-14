@@ -32,8 +32,8 @@ const advanceSchema = () =>
   new Schema<Advance<Types.ObjectId>, Model<Advance<Types.ObjectId>>, Methods>(
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
-      budget: costObject(true, false, true, 0, baseCurrency._id),
-      balance: Object.assign({ description: 'in EUR' }, costObject(false, false, true, 0)),
+      budget: costObject({ exchangeRate: true, receipts: false, required: true, min: 0, defaultCurrency: baseCurrency._id }),
+      balance: Object.assign({ description: 'in EUR' }, costObject({ exchangeRate: false, receipts: false, required: true, min: 0 })),
       offsetAgainst: {
         type: [
           {

@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import { Validator } from 'abrechnung-common/report/validator.js'
 import {
   Expense,
   ExpenseReportState,
@@ -19,8 +20,20 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
+
+const expenseReportValidator = new Validator({ requireReceipts: true })
+
+function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expenses'>, language: string) {
+  const reviewSummary = expenseReportValidator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
 
 @Tags('Expense Report')
 @Route('expenseReport')
@@ -152,6 +165,7 @@ export class ExpenseReportController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -328,6 +342,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -372,6 +387,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

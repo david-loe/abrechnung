@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "exports": {
+    "./report/validator.js": "./dist/report/validator.js",
     "./*": "./dist/*",
     "./fonts/*": "./fonts/*",
     "./data/*": "./data/*",

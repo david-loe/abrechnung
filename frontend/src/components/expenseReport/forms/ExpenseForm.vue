@@ -46,7 +46,7 @@
         id="expenseFormFile"
         v-model="formExpense.cost.receipts"
         :disabled="disabled"
-        :required="true"
+        :required="false"
         :endpointPrefix="endpointPrefix"
         :ownerId="ownerId" />
     </div>
