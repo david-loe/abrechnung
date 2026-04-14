@@ -87,6 +87,15 @@ test('csvToObjects ignores empty headers', (t) => {
   ])
 })
 
+test('csvToObjects ignores empty rows', (t) => {
+  const csv = ['cost.date;description;cost.amount', '2024-01-01;Test 1;12', ';;', '2024-01-02;Test 2;13', ''].join('\n')
+
+  t.deepEqual(csvToObjects(csv, {}, ';'), [
+    { cost: { date: '2024-01-01', amount: '12' }, description: 'Test 1' },
+    { cost: { date: '2024-01-02', amount: '13' }, description: 'Test 2' }
+  ])
+})
+
 test('csvToObjects covers nested paths, transformers, arrays and empty values', (t) => {
   const csv = [
     'meta/date;meta/title;stats/count;tags;flags;notes;  ;list/numbers;plainArray;list/empty;transform/empty',
@@ -310,4 +319,52 @@ test('addUp sums travel lump sums, applies professional share, and splits by pro
   t.is(thirdProjectAddUp.advance.amount, 0)
   t.is(thirdProjectAddUp.balance.amount, 25)
   t.false(thirdProjectAddUp.advanceOverflow)
+})
+
+test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
+  const projectA = createProject('A')
+  const invalidDay = createTravelDay('day-1', 20, 30)
+  ;(invalidDay.lumpSums.catering.refund as { amount?: number }).amount = undefined
+
+  const travel: AddUpTravel = {
+    project: projectA,
+    startDate: new Date('2024-01-01').toISOString(),
+    stages: [
+      {
+        _id: 'stage-1',
+        departure: new Date('2024-01-01T08:00:00.000Z').toISOString(),
+        arrival: new Date('2024-01-01T12:00:00.000Z').toISOString(),
+        startLocation: place,
+        endLocation: place,
+        transport: { type: 'airplane' },
+        cost: createCost(100),
+        purpose: 'professional',
+        project: null,
+        note: null
+      },
+      {
+        _id: 'stage-2',
+        departure: new Date('2024-01-01T10:00:00.000Z').toISOString(),
+        arrival: new Date('2024-01-01T14:00:00.000Z').toISOString(),
+        startLocation: place,
+        endLocation: place,
+        transport: { type: 'airplane' },
+        cost: createCost(20),
+        purpose: 'professional',
+        project: null,
+        note: null
+      }
+    ],
+    expenses: [],
+    days: [invalidDay],
+    professionalShare: 1,
+    advances: [createAdvance('adv-main', projectA, 30)]
+  }
+
+  const result = addUp<Id, AddUpTravel>(travel)
+
+  t.is(result.length, 1)
+  t.true(Number.isNaN((result[0] as FlatAddUp<Id, AddUpTravel>).lumpSums?.amount))
+  t.is(result[0].total.amount, 120)
+  t.is(result[0].balance.amount, 90)
 })

@@ -2,15 +2,18 @@
   <div class="d-inline-flex flex-column align-items-center">
     <input ref="fileInput" class="form-control" type="file" accept=".csv,.tsv,.tab" @change="readFile" style="display: none" >
 
-    <button :class="`btn btn-${buttonStyle}`" @click="triggerFileDialog">{{ t('labels.csvImport') }}</button>
+    <button type="button" :class="`btn btn-${buttonStyle}`" @click="triggerFileDialog" :disabled="loading">
+      <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+      {{ t('labels.csvImport') }}
+    </button>
 
-    <button class="btn btn-sm btn-link" @click="downloadTemplate">{{ t('labels.csvTemplate') }}</button>
+    <button type="button" class="btn btn-sm btn-link" @click="downloadTemplate" :disabled="loading">{{ t('labels.csvTemplate') }}</button>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { csvToObjects, detectSeparator, download } from 'abrechnung-common/utils/scripts.js'
-import { PropType, useTemplateRef } from 'vue'
+import { PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
 
@@ -37,6 +40,7 @@ const props = defineProps({
 })
 
 const fileInputRef = useTemplateRef('fileInput')
+const loading = ref(false)
 
 function readFile(event: Event) {
   const target = event.target as HTMLInputElement
@@ -78,13 +82,21 @@ function convert(csv: string) {
   return csvToObjects(csvWithoutComment, transformer, separator)
 }
 async function submit(data: Record<string, unknown>[]) {
-  if (props.endpoint) {
-    const result = await API.setter<unknown[]>(props.endpoint, data)
-    if (result.ok) {
+  if (loading.value) {
+    return
+  }
+  loading.value = true
+  try {
+    if (props.endpoint) {
+      const result = await API.setter<unknown[]>(props.endpoint, data)
+      if (result.ok) {
+        emit('submitted', data)
+      }
+    } else {
       emit('submitted', data)
     }
-  } else {
-    emit('submitted', data)
+  } finally {
+    loading.value = false
   }
 }
 function downloadTemplate() {

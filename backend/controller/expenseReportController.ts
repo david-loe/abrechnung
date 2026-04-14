@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import { Validator } from 'abrechnung-common/report/validator.js'
 import {
   Expense,
   ExpenseReportState,
@@ -19,8 +20,72 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest } from './types.js'
+import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
+import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
+
+const expenseReportValidator = new Validator({ requireReceipts: true })
+type ExpenseSetterBody = SetterBody<Expense<Types.ObjectId, mongo.Binary>>
+
+function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expenses'>, language: string) {
+  const reviewSummary = expenseReportValidator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
+
+function normalizeExpenseProject(requestBody: ExpenseSetterBody) {
+  // multipart/form-data does not send null values
+  // so we need to set it to null if the value is an empty string
+  if (requestBody.project?.toString() === '') {
+    requestBody.project = null
+  }
+}
+
+function upsertExpense(expenses: Expense[], requestBody: ExpenseSetterBody) {
+  if (requestBody._id && requestBody._id !== '') {
+    const existingExpense = expenses.find((expense) => (expense._id as Types.ObjectId).equals(requestBody._id as string))
+    if (!existingExpense) {
+      throw new NotFoundError(`No ExpenseReport - expenses for _id: '${requestBody._id}' found.`)
+    }
+    Object.assign(existingExpense, requestBody)
+    return
+  }
+
+  expenses.push(requestBody as Expense)
+}
+
+async function postExpensesBulk(
+  parentId: string,
+  requestBody: ExpenseSetterBody[],
+  language: string,
+  checkOldObject: (oldObject: ExpenseReportDoc) => Promise<boolean>
+) {
+  if (requestBody.length < 1) {
+    throw new ValidationClientError(i18n.t('alerts.noData.expense', { lng: language }))
+  }
+
+  const parentObject = await ExpenseReport.findOne({ _id: parentId })
+  if (!parentObject) {
+    throw new NotFoundError(`No ExpenseReport for _id: '${parentId}' found.`)
+  }
+  if (!(await checkOldObject(parentObject))) {
+    throw new NotAllowedError('Not allowed to modify this ExpenseReport - expenses')
+  }
+
+  const expenses = parentObject.expenses as Expense[]
+  for (const expense of requestBody) {
+    normalizeExpenseProject(expense)
+    upsertExpense(expenses, expense)
+  }
+
+  expenses.sort((a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf())
+  parentObject.markModified('expenses')
+
+  return { message: 'alerts.successSaving', result: (await parentObject.save()).toObject() }
+}
 
 @Tags('Expense Report')
 @Route('expenseReport')
@@ -54,14 +119,10 @@ export class ExpenseReportController extends Controller {
   @Consumes('multipart/form-data')
   public async postExpenseToOwn(
     @Query('parentId') parentId: string,
-    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
+    @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
+    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -77,6 +138,22 @@ export class ExpenseReportController extends Controller {
         return false
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+    })
+  }
+
+  @Post('expense/bulk')
+  public async postExpensesToOwn(
+    @Query('parentId') parentId: string,
+    @Body() requestBody: ExpenseBulkImportPost[],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return await postExpensesBulk(parentId, requestBody, request.user.settings.language, async (oldObject) => {
+      if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
+        // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
+        oldObject.editor = request.user._id as any
+        return true
+      }
+      return false
     })
   }
 
@@ -152,6 +229,7 @@ export class ExpenseReportController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -226,14 +304,10 @@ export class ExpenseReportExamineController extends Controller {
   @Consumes('multipart/form-data')
   public async postExpenseToAny(
     @Query('parentId') parentId: string,
-    @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
+    @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
+    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -253,6 +327,26 @@ export class ExpenseReportExamineController extends Controller {
         return false
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+    })
+  }
+
+  @Post('expense/bulk')
+  public async postExpensesToAny(
+    @Query('parentId') parentId: string,
+    @Body() requestBody: ExpenseBulkImportPost[],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return await postExpensesBulk(parentId, requestBody, request.user.settings.language, async (oldObject) => {
+      if (
+        !oldObject.historic &&
+        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+      ) {
+        // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
+        oldObject.editor = request.user._id as any
+        return true
+      }
+      return false
     })
   }
 
@@ -372,6 +466,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

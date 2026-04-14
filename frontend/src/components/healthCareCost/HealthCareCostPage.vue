@@ -123,29 +123,31 @@
               </button>
             </div>
           </div>
-          <TableElement
-            :rows-items="[12, 50, 100]"
-            :rows-per-page="50"
-            db-key="expenseTableHealthCareCost"
-            :empty-message="t('alerts.noData.healthCareCost')"
-            :headers="[
-              { text: 'labels.date', value: 'cost.date', sortable: true },
-              { text: 'labels.description', value: 'description', sortable: true },
-              { text: 'labels.amount', value: 'cost' }
-            ]"
-            :items="healthCareCost.expenses"
-            body-row-class-name="clickable"
-            @click-row="(expense) => showModal('edit', 'expense', expense as Expense)"
-            @update-sort="updateExpenseSorting">
-            <template #item-cost.date="{ cost }: Expense">
-              {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                  ? formatter.simpleDate(cost.date)
-                  : formatter.date(cost.date) }}
-            </template>
-            <template #item-cost="{ cost }: Expense">
-              <div class="text-end tnum">{{ formatter.money(cost) }}</div>
-            </template>
-          </TableElement>
+          <div>
+            <TableElement
+              :rows-items="[12, 50, 100]"
+              :rows-per-page="50"
+              db-key="expenseTableHealthCareCost"
+              :empty-message="t('alerts.noData.healthCareCost')"
+              :headers="[
+                { text: 'labels.date', value: 'cost.date', sortable: true },
+                { text: 'labels.description', value: 'description', sortable: true },
+                { text: 'labels.amount', value: 'cost' }
+              ]"
+              :items="healthCareCost.expenses"
+              body-row-class-name="clickable"
+              @click-row="(expense) => showModal('edit', 'expense', expense as Expense)"
+              @update-sort="updateExpenseSorting">
+              <template #item-cost.date="{ cost }: Expense">
+                {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
+                    ? formatter.simpleDate(cost.date)
+                    : formatter.date(cost.date) }}
+              </template>
+              <template #item-cost="{ cost }: Expense">
+                <div class="text-end tnum">{{ formatter.money(cost) }}</div>
+              </template>
+            </TableElement>
+          </div>
         </div>
         <div class="col-lg-4 col-auto">
           <div
@@ -158,6 +160,11 @@
               <a class="clickable" role="button" @click="goToSettings(healthCareCost)">{{ t('labels.goToSettings') }}</a>
             </div>
           </div>
+          <ValidationIssuesAlert
+            :results="reviewResults"
+            :expenses="healthCareCost.expenses"
+            fallback-subject-label-key="labels.healthCareCost"
+            @action="handleReviewIssueAction" />
           <div class="card">
             <div class="card-body">
               <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
@@ -188,7 +195,7 @@
                     :disabled="isReadOnly && !(endpointPrefix === 'examine/' && healthCareCost.state === State.IN_REVIEW)" />
                 </div>
                 <div v-if="healthCareCost.state === State.EDITABLE_BY_OWNER">
-                  <TooltipElement v-if="healthCareCost.expenses.length < 1" :text="t('alerts.noData.expense')">
+                  <TooltipElement v-if="!canEnterReview" :text="reviewDisabledTooltip">
                     <button class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
@@ -252,6 +259,7 @@
 </template>
 
 <script lang="ts" setup>
+import { type ValidationResult, Validator } from 'abrechnung-common/report/validator.js'
 import {
   Expense,
   HealthCareCost,
@@ -275,6 +283,7 @@ import StatePipeline from '@/components/elements/StatePipeline.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
+import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
@@ -284,10 +293,13 @@ import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import { sortByPath } from 'abrechnung-common/utils/sort.js'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 
 type ModalObject = Partial<Expense> | HealthCareCostSimple
 type ModalObjectType = 'expense' | 'healthCareCost'
 type ModalMode = 'add' | 'edit'
+
+const healthCareCostValidator = new Validator({ requireReceipts: true })
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -318,7 +330,23 @@ const isReadOnly = computed(() => {
   )
 })
 
+const reviewResults = ref<ValidationResult[]>([])
+const canEnterReview = computed(() => !reviewResults.value.some((issue: ValidationResult) => issue.severity === 'error'))
+const reviewErrorCount = computed(() => reviewResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length)
+const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX', { X: reviewErrorCount.value }))
+
 const modalCompRef = useTemplateRef('modalComp')
+
+function handleReviewIssueAction(payload: ValidationIssueActionPayload) {
+  if (payload.type !== 'single-expense') {
+    return
+  }
+  const expense = healthCareCost.value.expenses[payload.expenseIndex]
+  if (!expense) {
+    return
+  }
+  showModal('edit', 'expense', expense)
+}
 
 function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject) {
   if (object) {
@@ -355,6 +383,9 @@ async function deleteHealthCareCost() {
 }
 
 async function toExamination() {
+  if (isReadOnly.value || !canEnterReview.value) {
+    return
+  }
   const result = await API.setter<HealthCareCost>(`${props.endpointPrefix}healthCareCost/underExamination`, {
     _id: healthCareCost.value._id,
     comment: healthCareCost.value.comment
@@ -445,6 +476,9 @@ async function getHealthCareCost() {
 
 async function setHealthCareCost(newHealthCareCost: HealthCareCost<string>) {
   healthCareCost.value = newHealthCareCost
+  reviewResults.value = healthCareCostValidator
+    .getValidationSummary(newHealthCareCost)
+    .results.filter((issue: ValidationResult) => issue.severity === 'warning' || issue.severity === 'error')
   sortedExpenseIds = newHealthCareCost.expenses.map((e) => e._id)
   logger.info(`${t('labels.healthCareCost')}:`)
   logger.info(healthCareCost.value)
@@ -521,5 +555,3 @@ if (props.endpointPrefix === 'examine/') {
 
 const examinerMails = await getExaminerMails()
 </script>
-
-<style></style>

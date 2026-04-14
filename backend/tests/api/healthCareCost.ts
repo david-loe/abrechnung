@@ -56,6 +56,11 @@ test.serial('GET /healthCareCost', async (t) => {
   }
 })
 
+test.serial('POST /healthCareCost/underExamination rejects incomplete health care cost', async (t) => {
+  const res = await agent.post('/healthCareCost/underExamination').send({ _id: healthCareCost._id })
+  t.is(res.status, 422)
+})
+
 // FILL OUT
 
 const expenses: Expense[] = [

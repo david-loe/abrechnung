@@ -7,7 +7,7 @@ import createAgent, { loginUser } from '../_agent.js'
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
-test('POST /auth/ldapauth', async (t) => {
+test.serial('POST /auth/ldapauth', async (t) => {
   const res = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
   if (res.status === 204) {
     t.pass()
@@ -16,7 +16,7 @@ test('POST /auth/ldapauth', async (t) => {
   }
 })
 
-test('GET /user', async (t) => {
+test.serial('GET /user', async (t) => {
   const res = await agent.get('/user')
   if (res.status === 200) {
     t.pass()
@@ -25,7 +25,7 @@ test('GET /user', async (t) => {
   }
 })
 
-test('GET /user/token', async (t) => {
+test.serial('GET /user/token', async (t) => {
   const res = await agent.get('/user/token')
   if (res.status === 200) {
     t.pass()
@@ -34,7 +34,7 @@ test('GET /user/token', async (t) => {
   }
 })
 
-test('POST /user/token', async (t) => {
+test.serial('POST /user/token', async (t) => {
   t.plan(3)
   const res = await agent.post('/user/token')
   if (res.status === 200) {
@@ -46,7 +46,7 @@ test('POST /user/token', async (t) => {
   t.deepEqual(res.body.result.files, [])
 })
 
-test('DELETE /user/token', async (t) => {
+test.serial('DELETE /user/token', async (t) => {
   const res = await agent.delete('/user/token')
   if (res.status === 204) {
     t.pass()
@@ -55,7 +55,7 @@ test('DELETE /user/token', async (t) => {
   }
 })
 
-test('POST /user/settings', async (t) => {
+test.serial('POST /user/settings', async (t) => {
   t.plan(3)
   const settings = { language: 'en', lastCurrencies: [{ _id: 'EUR' }], lastCountries: [{ _id: 'DE' }] }
   const res = await agent.post('/user/settings').send(settings)
@@ -71,7 +71,7 @@ test('POST /user/settings', async (t) => {
 
 const vehicleRegistration = { vehicleRegistration: [{ name: 'dummy.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }] }
 
-test('POST /user/vehicleRegistration', async (t) => {
+test.serial('POST /user/vehicleRegistration', async (t) => {
   t.plan(2)
   let req = agent.post('/user/vehicleRegistration')
   for (const entry of objectToFormFields(vehicleRegistration)) {

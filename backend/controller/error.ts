@@ -27,6 +27,17 @@ export class ConflictError extends ClientError {
   name = 'alerts.conflict'
 }
 
+export class ValidationClientError extends ClientError {
+  status = 422
+  name = 'alerts.ValidationError'
+  errors: { path?: string; message: string }[]
+
+  constructor(message: string, errors: { path?: string; message: string }[] = []) {
+    super(message)
+    this.errors = errors
+  }
+}
+
 export class RateLimitExceededError extends ClientError {
   status = 429
   name = 'alerts.rateLimitExceeded'

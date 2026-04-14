@@ -16,29 +16,40 @@ import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, T
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 
-export function costObject(
-  exchangeRate: boolean,
-  receipts: boolean,
-  required: boolean,
-  min: number | undefined,
-  defaultCurrency: string | null = null,
-  defaultAmount: number | null = null
-) {
+export function costObject(options: {
+  exchangeRate: boolean
+  receipts: boolean
+  required: boolean
+  receiptsRequired?: boolean
+  min?: number
+  defaultCurrency?: string | null
+  defaultAmount?: number | null
+}) {
+  // receiptsRequired defaults to required
+  const opts = { defaultCurrency: null, defaultAmount: null, receiptsRequired: options.required, ...options }
   // biome-ignore lint/suspicious/noExplicitAny: typing to complex
-  const type: any = { amount: { type: Number, min, required: required, default: required && defaultAmount === null ? 0 : defaultAmount } }
-  if (exchangeRate) {
-    type.exchangeRate = { type: { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min } } }
-    type.currency = { type: String, ref: 'Currency', required: required, default: defaultCurrency }
+  const type: any = {
+    amount: {
+      type: Number,
+      min: opts.min,
+      required: opts.required,
+      default: opts.required && opts.defaultAmount === null ? 0 : opts.defaultAmount,
+      set: (value: number | null | undefined) => (typeof value === 'number' && Number.isNaN(value) ? null : value)
+    }
   }
-  if (receipts) {
-    type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: required }] }
+  if (opts.exchangeRate) {
+    type.exchangeRate = { type: { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min: opts.min } } }
+    type.currency = { type: String, ref: 'Currency', required: opts.required, default: opts.defaultCurrency }
+  }
+  if (opts.receipts) {
+    type.receipts = { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: opts.receiptsRequired }] }
     type.date = {
       type: Date,
       validate: { validator: (v: Date | string | number) => Date.now() >= new Date(v).valueOf(), message: 'futureNotAllowed' },
-      required: required
+      required: opts.required
     }
   }
-  return { type, required, default: () => ({}) }
+  return { type, required: opts.required, default: () => ({}) }
 }
 
 export function logObject<T extends AnyState>(states: readonly T[]) {
@@ -103,13 +114,13 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 
   const addUp = {
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
-    balance: costObject(false, false, true, 0),
-    total: costObject(false, false, true, 0),
-    expenses: costObject(false, false, true, undefined),
-    advance: costObject(false, false, true, 0),
+    balance: costObject({ exchangeRate: false, receipts: false, required: true, min: 0 }),
+    total: costObject({ exchangeRate: false, receipts: false, required: true, min: 0 }),
+    expenses: costObject({ exchangeRate: false, receipts: false, required: true }),
+    advance: costObject({ exchangeRate: false, receipts: false, required: true, min: 0 }),
     advanceOverflow: { type: Boolean, required: true, default: false },
     negativeTotal: { type: Boolean, required: true, default: false },
-    ...(addUpLumpSums ? { lumpSums: costObject(false, false, true, 0) } : {})
+    ...(addUpLumpSums ? { lumpSums: costObject({ exchangeRate: false, receipts: false, required: false, defaultAmount: 0 }) } : {})
   }
 
   const schemaWithAdvances = Object.assign(

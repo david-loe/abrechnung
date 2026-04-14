@@ -18,7 +18,7 @@ import {
   TravelSettings
 } from '../types.js'
 import { datetimeToDate, getDayList, getDiffInDays } from '../utils/scripts.js'
-import { getStagesOutOfBounds } from './utils.js'
+import { TravelValidator } from './validator.js'
 
 interface InputTravelDay extends Omit<TravelDay<_id>, 'country' | 'special' | 'lumpSums' | '_id'> {}
 
@@ -73,19 +73,18 @@ export class TravelCalculator {
 
   async calc<T extends InputTravel = InputTravel>(travel: T) {
     this.sort(travel)
-    const conflicts = this.validator.validate(travel)
-    if (conflicts.length === 0) {
-      travel.progress = this.getProgress(travel)
-      travel.days = await this.calculateDays(travel.stages, travel.lastPlaceOfWork, travel.destinationPlace, travel.days)
-      travel.professionalShare = this.getProfessionalShare(travel.days)
+    const conflicts = this.validator.getCalculationBlockingResults(travel)
+    travel.progress = this.getProgress(travel)
+    travel.days = await this.calculateDays(travel.stages, travel.lastPlaceOfWork, travel.destinationPlace, travel.days)
+    travel.professionalShare = this.getProfessionalShare(travel.days)
 
-      const outTravel = travel as T & CalcedTravel
-      this.addRefundsForOwnCar(outTravel.stages)
+    const outTravel = travel as T & CalcedTravel
+    this.addRefundsForOwnCar(outTravel.stages)
+    if (conflicts.length === 0) {
       await this.addCateringRefunds(outTravel.days, travel.stages, Boolean(travel.claimSpouseRefund))
       await this.addOvernightRefunds(outTravel.days, travel.stages, Boolean(travel.claimSpouseRefund))
-      return { result: outTravel, conflicts }
     }
-    return { conflicts }
+    return { result: outTravel, conflicts }
   }
 
   updateSettings(travelSettings: TravelSettings<_id>) {
@@ -436,113 +435,6 @@ export class TravelCalculator {
         }
       }
     }
-  }
-}
-
-type Invalid = { path: string; err: string | Error; val?: unknown }
-type Warning = { name: string; val?: unknown; limit?: unknown }
-export class TravelValidator {
-  travelSettings!: TravelSettings<_id>
-
-  constructor(travelSettings: TravelSettings<_id>) {
-    this.updateSettings(travelSettings)
-  }
-
-  updateSettings(travelSettings: TravelSettings<_id>) {
-    this.travelSettings = travelSettings
-  }
-
-  validate(travel: InputTravel): Invalid[] {
-    return [...this.validateDates(travel), ...this.validateCountries(travel)]
-  }
-
-  /**
-   * checks a travel for warnings
-   */
-  check(travel: Travel<_id, binary>): Warning[] {
-    return [...this.checkProfessionalShare(travel), ...this.checkTravelLength(travel), ...this.checkStagesInBounds(travel)]
-  }
-
-  validateDates(travel: InputTravel): Invalid[] {
-    const conflicts = new Set<Invalid>()
-    for (let i = 0; i < travel.stages.length; i++) {
-      for (let j = 0; j < travel.stages.length; j++) {
-        if (i !== j) {
-          if (travel.stages[i].departure.valueOf() < travel.stages[j].departure.valueOf()) {
-            if (travel.stages[i].arrival.valueOf() <= travel.stages[j].departure.valueOf()) {
-            } else {
-              if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
-                // end of [i] inside of [j]
-                conflicts.add({ path: `stages.${i}.arrival`, err: 'stagesOverlapping' })
-                conflicts.add({ path: `stages.${j}.departure`, err: 'stagesOverlapping' })
-              } else {
-                // [j] inside of [i]
-                conflicts.add({ path: `stages.${j}.arrival`, err: 'stagesOverlapping' })
-                conflicts.add({ path: `stages.${j}.departure`, err: 'stagesOverlapping' })
-              }
-            }
-          } else if (travel.stages[i].departure.valueOf() < travel.stages[j].arrival.valueOf()) {
-            if (travel.stages[i].arrival.valueOf() <= travel.stages[j].arrival.valueOf()) {
-              // [i] inside of [j]
-              conflicts.add({ path: `stages.${i}.arrival`, err: 'stagesOverlapping' })
-              conflicts.add({ path: `stages.${i}.departure`, err: 'stagesOverlapping' })
-            } else {
-              // end of [j] inside of [i]
-              conflicts.add({ path: `stages.${j}.arrival`, err: 'stagesOverlapping' })
-              conflicts.add({ path: `stages.${i}.departure`, err: 'stagesOverlapping' })
-            }
-          } else {
-          }
-        }
-      }
-    }
-    return Array.from(conflicts)
-  }
-
-  validateCountries(travel: InputTravel): Invalid[] {
-    const conflicts: Invalid[] = []
-    for (let i = 1; i < travel.stages.length; i++) {
-      if (travel.stages[i - 1].endLocation.country._id !== travel.stages[i].startLocation.country._id) {
-        conflicts.push({ path: `stages.${i - 1}.endLocation.country`, err: 'countryChangeBetweenStages' })
-        conflicts.push({ path: `stages.${i}.startLocation.country`, err: 'countryChangeBetweenStages' })
-      }
-    }
-    return conflicts
-  }
-
-  checkTravelLength(travel: Travel<_id, binary>): Warning[] {
-    const warnings: Warning[] = []
-    const cs = travel.stages.length
-    if (cs > 0) {
-      const travelLength = new Date(travel.stages[cs - 1].arrival).valueOf() - new Date(travel.stages[0].departure).valueOf()
-      const limit = this.travelSettings.minHoursOfTravel * 3_600_000
-      if (travelLength < limit) {
-        warnings.push({ name: 'travelLengthToShort', val: travelLength, limit: limit })
-      }
-    }
-    return warnings
-  }
-
-  checkProfessionalShare(travel: Travel<_id, binary>): Warning[] {
-    const warnings: Warning[] = []
-    if (travel.professionalShare !== null && travel.professionalShare < this.travelSettings.minProfessionalShare) {
-      warnings.push({ name: 'professionalShareToSmall', val: travel.professionalShare, limit: this.travelSettings.minProfessionalShare })
-    }
-    return warnings
-  }
-
-  checkStagesInBounds(travel: Travel<_id, binary>): Warning[] {
-    const warnings: Warning[] = []
-    const outOfBoundsStages = getStagesOutOfBounds(
-      travel.stages,
-      travel.startDate,
-      travel.endDate,
-      this.travelSettings.toleranceStageDatesToApprovedTravelDates
-    )
-    for (const stage of outOfBoundsStages) {
-      warnings.push({ name: 'stageOutOfBounds', val: stage })
-    }
-    return warnings
   }
 }
 
