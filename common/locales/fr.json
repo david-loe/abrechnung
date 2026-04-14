@@ -55,7 +55,7 @@
     "rateLimitExceeded": "Limite de taux de requêtes dépassée !",
     "reloadRequired": "Rafraîchissement requis",
     "reviewBlockedByConflictsX": "Conflits bloquants : {X}.",
-    "reviewBlockedByValidationErrorsX": "Corrigez toutes les erreurs de validation avant de soumettre.",
+    "reviewBlockedByValidationErrorsX": "Corrigez les {X} erreurs de validation avant de soumettre.",
     "reviewRequirementsNotMet": "Le rapport ne peut pas encore être soumis pour examen.",
     "saveAfterRotate": "L'image a été pivotée. Veuillez enregistrer pour conserver cette modification.",
     "savedExpensesXOfY": "Dépenses enregistrées : {X}/{Y}.",

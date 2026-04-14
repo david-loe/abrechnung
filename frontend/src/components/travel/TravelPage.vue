@@ -389,7 +389,7 @@ const combinedTravelValidationResults = computed(() => combineTravelValidationRe
 const travelErrorCount = computed(
   () => combinedTravelValidationResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length
 )
-const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX'))
+const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX', { X: travelErrorCount.value }))
 
 const hasTravelCalculationBlockingErrors = computed(() => {
   if (!travel.value._id || !APP_DATA.value?.travelCalculator || !Array.isArray(travel.value.stages)) {

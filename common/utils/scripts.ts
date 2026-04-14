@@ -211,7 +211,7 @@ export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], wi
     }
     if (withLumpSums) {
       const lumpSumsAmount = (addUps[i] as AddUp<_id, Travel<_id, binary>>).lumpSums.amount
-      summary[j++].push(Number.isNaN(lumpSumsAmount) ? 'NaN' : formatter.baseCurrency(lumpSumsAmount))
+      summary[j++].push(Number.isNaN(lumpSumsAmount) ? '' : formatter.baseCurrency(lumpSumsAmount))
     }
     if (hasAdvance) {
       summary[j++].push(

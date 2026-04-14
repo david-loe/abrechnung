@@ -69,77 +69,91 @@ test.serial('GET /expenseReport', async (t) => {
 })
 
 test.serial('POST /expenseReport/expense/bulk', async (t) => {
-  const tempReportResponse = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Bulk Import Test', project: expenseReport.project, category: expenseReport.category })
-  t.is(tempReportResponse.status, 200)
+  let tempExpenseReport: ExpenseReportSimple | undefined
 
-  const tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
-  const bulkExpenses: Partial<Expense>[] = [
-    {
-      description: 'Imported Taxi',
-      cost: {
-        amount: 28.4,
-        currency: { _id: 'EUR', name: { de: 'Euro', en: 'Euro', fr: 'Euro', ru: 'Euro', es: 'Euro', kk: 'Euro' } },
-        receipts: [],
-        date: new Date('2023-09-10T00:00:00.000Z')
-      }
-    },
-    {
-      description: 'Imported Meal',
-      cost: {
-        amount: 16.9,
-        currency: {
-          _id: 'USD',
-          name: {
-            de: 'US-Dollar',
-            en: 'US Dollar',
-            fr: 'Dollar americain',
-            ru: 'Доллар США',
-            es: 'Dolar estadounidense',
-            kk: 'АКШ доллары'
-          }
-        },
-        receipts: [],
-        date: new Date('2023-09-11T00:00:00.000Z')
+  try {
+    const tempReportResponse = await agent
+      .post('/expenseReport/inWork')
+      .send({ name: 'Bulk Import Test', project: expenseReport.project, category: expenseReport.category })
+    t.is(tempReportResponse.status, 200)
+
+    tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
+    const bulkExpenses: Partial<Expense>[] = [
+      {
+        description: 'Imported Taxi',
+        cost: {
+          amount: 28.4,
+          currency: { _id: 'EUR', name: { de: 'Euro', en: 'Euro', fr: 'Euro', ru: 'Euro', es: 'Euro', kk: 'Euro' } },
+          receipts: [],
+          date: new Date('2023-09-10T00:00:00.000Z')
+        }
       },
-      note: 'Imported from CSV'
+      {
+        description: 'Imported Meal',
+        cost: {
+          amount: 16.9,
+          currency: {
+            _id: 'USD',
+            name: {
+              de: 'US-Dollar',
+              en: 'US Dollar',
+              fr: 'Dollar americain',
+              ru: 'Доллар США',
+              es: 'Dolar estadounidense',
+              kk: 'АКШ доллары'
+            }
+          },
+          receipts: [],
+          date: new Date('2023-09-11T00:00:00.000Z')
+        },
+        note: 'Imported from CSV'
+      }
+    ]
+
+    const bulkResponse = await agent
+      .post('/expenseReport/expense/bulk')
+      .query({ parentId: tempExpenseReport._id.toString() })
+      .send(bulkExpenses)
+    t.is(bulkResponse.status, 200)
+    t.is((bulkResponse.body.result as ExpenseReport).expenses.length, bulkExpenses.length)
+  } finally {
+    if (tempExpenseReport?._id) {
+      const deleteResponse = await agent.delete('/expenseReport').query({ _id: tempExpenseReport._id.toString() })
+      t.is(deleteResponse.status, 200)
     }
-  ]
-
-  const bulkResponse = await agent
-    .post('/expenseReport/expense/bulk')
-    .query({ parentId: tempExpenseReport._id.toString() })
-    .send(bulkExpenses)
-  t.is(bulkResponse.status, 200)
-  t.is((bulkResponse.body.result as ExpenseReport).expenses.length, bulkExpenses.length)
-
-  const deleteResponse = await agent.delete('/expenseReport').query({ _id: tempExpenseReport._id.toString() })
-  t.is(deleteResponse.status, 200)
+  }
 })
 
 test.serial('POST /expenseReport/expense/bulk is atomic', async (t) => {
-  const tempReportResponse = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
-  t.is(tempReportResponse.status, 200)
+  let tempExpenseReport: ExpenseReportSimple | undefined
 
-  const tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
-  const bulkResponse = await agent
-    .post('/expenseReport/expense/bulk')
-    .query({ parentId: tempExpenseReport._id.toString() })
-    .send([
-      { description: 'Imported Taxi', cost: { amount: 28.4, currency: { _id: 'EUR' }, date: new Date('2023-09-10T00:00:00.000Z') } },
-      { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-11T00:00:00.000Z') }, note: 'Imported from CSV' }
-    ])
-  t.is(bulkResponse.status, 422)
+  try {
+    const tempReportResponse = await agent
+      .post('/expenseReport/inWork')
+      .send({ name: 'Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
+    t.is(tempReportResponse.status, 200)
 
-  const reportResponse = await agent.get('/expenseReport').query({ _id: tempExpenseReport._id.toString(), additionalFields: ['expenses'] })
-  t.is(reportResponse.status, 200)
-  t.is((reportResponse.body.data as ExpenseReport).expenses.length, 0)
+    tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
+    const bulkResponse = await agent
+      .post('/expenseReport/expense/bulk')
+      .query({ parentId: tempExpenseReport._id.toString() })
+      .send([
+        { description: 'Imported Taxi', cost: { amount: 28.4, currency: { _id: 'EUR' }, date: new Date('2023-09-10T00:00:00.000Z') } },
+        { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-11T00:00:00.000Z') }, note: 'Imported from CSV' }
+      ])
+    t.is(bulkResponse.status, 422)
 
-  const deleteResponse = await agent.delete('/expenseReport').query({ _id: tempExpenseReport._id.toString() })
-  t.is(deleteResponse.status, 200)
+    const reportResponse = await agent
+      .get('/expenseReport')
+      .query({ _id: tempExpenseReport._id.toString(), additionalFields: ['expenses'] })
+    t.is(reportResponse.status, 200)
+    t.is((reportResponse.body.data as ExpenseReport).expenses.length, 0)
+  } finally {
+    if (tempExpenseReport?._id) {
+      const deleteResponse = await agent.delete('/expenseReport').query({ _id: tempExpenseReport._id.toString() })
+      t.is(deleteResponse.status, 200)
+    }
+  }
 })
 
 test.serial('POST /expenseReport/expense/bulk strips foreign receipt references', async (t) => {
@@ -298,12 +312,17 @@ test.serial('POST /expenseReport/underExamination rejects incomplete expense', a
 })
 
 test.serial('POST /expenseReport/expense adds missing receipt', async (t) => {
-  t.plan(2)
+  t.plan(3)
   const expenseWithoutReceipt = (expenseReport as ExpenseReport).expenses.find((expense) => expense.cost.receipts.length === 0)
+  t.truthy(expenseWithoutReceipt, 'Expected an expense without a receipt in the seeded expense report')
+  if (!expenseWithoutReceipt) {
+    return
+  }
+
   const updatedExpense = {
     ...expenseWithoutReceipt,
     cost: {
-      ...expenseWithoutReceipt?.cost,
+      ...expenseWithoutReceipt.cost,
       receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
     }
   }

@@ -55,7 +55,7 @@
     "rateLimitExceeded": "¡Límite de solicitudes superado!",
     "reloadRequired": "Se requiere recargar",
     "reviewBlockedByConflictsX": "Conflictos bloqueantes: {X}.",
-    "reviewBlockedByValidationErrorsX": "Resuelve todos los errores de validación para enviar.",
+    "reviewBlockedByValidationErrorsX": "Resuelve los {X} errores de validación para enviar.",
     "reviewRequirementsNotMet": "El reporte todavía no se puede enviar a revisión.",
     "saveAfterRotate": "La imagen se giró. Guarda para conservar este cambio.",
     "savedExpensesXOfY": "Gastos guardados: {X}/{Y}.",

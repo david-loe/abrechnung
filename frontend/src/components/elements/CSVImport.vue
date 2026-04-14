@@ -82,6 +82,9 @@ function convert(csv: string) {
   return csvToObjects(csvWithoutComment, transformer, separator)
 }
 async function submit(data: Record<string, unknown>[]) {
+  if (loading.value) {
+    return
+  }
   loading.value = true
   try {
     if (props.endpoint) {

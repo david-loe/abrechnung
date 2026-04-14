@@ -70,7 +70,15 @@ const { t, te } = useI18n()
 const maxVisibleIssues = 3
 const expanded = ref(false)
 
+function translateLabel(key: string) {
+  return te(`labels.${key}`) ? t(`labels.${key}`) : key
+}
+
 function getFieldLabel(path?: string) {
+  if (!path) {
+    return ''
+  }
+
   switch (path) {
     case 'description':
       return t('labels.description')
@@ -82,15 +90,21 @@ function getFieldLabel(path?: string) {
       return t('labels.date')
     case 'cost.receipts':
       return t('labels.receipts')
+    case 'stages':
+      return t('labels.stages')
+    case 'startLocation':
+      return t('labels.startLocation')
+    case 'endLocation':
+      return t('labels.endLocation')
     default:
-      return path || ''
+      return path.includes('.') ? formatValidationPath(path) : translateLabel(path)
   }
 }
 
 function formatValidationPath(path: string) {
   return path
     .split('.')
-    .map((part) => (/^\d+$/.test(part) ? `#${Number(part) + 1}` : t(`labels.${part}`)))
+    .map((part) => (/^\d+$/.test(part) ? `#${Number(part) + 1}` : translateLabel(part)))
     .join(' ➜ ')
 }
 

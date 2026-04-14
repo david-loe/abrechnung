@@ -339,7 +339,8 @@ const isReadOnly = computed(() => {
 
 const reviewResults = ref<ValidationResult[]>([])
 const canEnterReview = computed(() => !reviewResults.value.some((issue: ValidationResult) => issue.severity === 'error'))
-const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX'))
+const reviewErrorCount = computed(() => reviewResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length)
+const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX', { X: reviewErrorCount.value }))
 
 const modalCompRef = useTemplateRef('modalComp')
 

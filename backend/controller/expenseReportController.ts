@@ -422,7 +422,6 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

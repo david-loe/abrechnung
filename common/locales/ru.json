@@ -55,7 +55,7 @@
     "rateLimitExceeded": "Превышено лимит запросов!",
     "reloadRequired": "Требуется перезагрузка",
     "reviewBlockedByConflictsX": "Блокирующие конфликты: {X}.",
-    "reviewBlockedByValidationErrorsX": "Исправьте все ошибки валидации перед отправкой.",
+    "reviewBlockedByValidationErrorsX": "Исправьте все {X} ошибок валидации перед отправкой.",
     "reviewRequirementsNotMet": "Отчет пока нельзя отправить на проверку.",
     "saveAfterRotate": "Изображение повернуто. Сохраните, чтобы не потерять изменение.",
     "savedExpensesXOfY": "Сохранено расходов: {X}/{Y}.",

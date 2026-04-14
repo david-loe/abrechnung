@@ -55,7 +55,7 @@
     "rateLimitExceeded": "Rate Limit Exceeded!",
     "reloadRequired": "Reload required",
     "reviewBlockedByConflictsX": "Blocking conflicts: {X}.",
-    "reviewBlockedByValidationErrorsX": "Resolve all validation errors to submit.",
+    "reviewBlockedByValidationErrorsX": "Resolve all {X} validation errors to submit.",
     "reviewRequirementsNotMet": "The report cannot be submitted for review yet.",
     "saveAfterRotate": "Image was rotated. Please save to keep this change.",
     "savedExpensesXOfY": "Saved expenses: {X}/{Y}.",

@@ -55,7 +55,7 @@
     "rateLimitExceeded": "Anfrageratenlimit überschritten!",
     "reloadRequired": "Neuladen erforderlich",
     "reviewBlockedByConflictsX": "Blockierende Konflikte: {X}.",
-    "reviewBlockedByValidationErrorsX": "Behebe alle Validierungsfehler, um einzureichen.",
+    "reviewBlockedByValidationErrorsX": "Behebe alle {X} Validierungsfehler, um einzureichen.",
     "reviewRequirementsNotMet": "Der Report kann noch nicht zur Prüfung eingereicht werden.",
     "saveAfterRotate": "Bild wurde gedreht. Bitte speichern, damit die Änderung erhalten bleibt.",
     "savedExpensesXOfY": "Auslagen gespeichert: {X}/{Y}.",

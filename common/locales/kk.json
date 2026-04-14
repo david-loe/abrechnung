@@ -55,7 +55,7 @@
     "rateLimitExceeded": "Сұраңыз шектен асты!",
     "reloadRequired": "Қайта жүктеу қажет",
     "reviewBlockedByConflictsX": "Бұғаттайтын қайшылықтар: {X}.",
-    "reviewBlockedByValidationErrorsX": "Жіберу үшін барлық валидация қателерін түзетіңіз.",
+    "reviewBlockedByValidationErrorsX": "Жіберу үшін барлық {X} валидация қателерін түзетіңіз.",
     "reviewRequirementsNotMet": "Есепті әзірге тексеруге жіберу мүмкін емес.",
     "saveAfterRotate": "Сурет бұрылды. Өзгерісті сақтау үшін сақтаңыз.",
     "savedExpensesXOfY": "Сақталған шығындар: {X}/{Y}.",
