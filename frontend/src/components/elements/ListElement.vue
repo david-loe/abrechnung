@@ -25,7 +25,7 @@ import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { PropType, ref, watch } from 'vue'
 import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import API from '@/api.js'
-import 'vue3-easy-data-table/dist/style.css'
+import '@/vendor/vue3-easy-data-table.css'
 import { useI18n } from 'vue-i18n'
 import TableElement from '@/components/elements/TableElement.vue'
 

@@ -8,7 +8,6 @@
     "module": "ESNext",
     "target": "ES2022",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "paths": {

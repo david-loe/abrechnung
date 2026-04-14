@@ -205,7 +205,7 @@ export class AdvanceApproveController extends Controller {
     @Request() request: AuthenticatedExpressRequest
   ) {
     const advance = await Advance.findOne({
-      _id: requestBody.advanceId,
+      _id: idDocumentToId(requestBody.advanceId),
       historic: false,
       state: { $gte: AdvanceState.APPROVED },
       settledOn: null
@@ -215,7 +215,7 @@ export class AdvanceApproveController extends Controller {
     }
     await advance.offset(requestBody.amount, 'offsetEntry', null, requestBody.subject)
     const result: IAdvance | null = await Advance.findOne(
-      { _id: requestBody.advanceId, historic: false },
+      { _id: idDocumentToId(requestBody.advanceId), historic: false },
       { historic: 0, history: 0 }
     ).lean()
     if (result) {

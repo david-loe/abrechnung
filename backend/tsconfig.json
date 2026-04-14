@@ -6,7 +6,7 @@
     "strict": true,
     "module": "NodeNext",
     "target": "ES2022",
-    "allowSyntheticDefaultImports": true,
+    "types": ["node"],
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "experimentalDecorators": true,

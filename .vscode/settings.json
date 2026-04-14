@@ -25,5 +25,6 @@
     "darwin-x64": "./backend/node_modules/@biomejs/cli-darwin-x64/biome",
     "win32-x64": "./backend/node_modules/@biomejs/cli-win32-x64/biome.exe",
     "win32-arm64": "./backend/node_modules/@biomejs/cli-win32-arm64/biome.exe"
-  }
+  },
+  "js/ts.tsdk.path": "./backend/node_modules/typescript/lib"
 }

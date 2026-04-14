@@ -47,7 +47,7 @@
 import { PropType, ref } from 'vue'
 import type { ClickRowArgument, FilterOption, Header, Item, ServerOptions, SortType, UpdateSortArgument } from 'vue3-easy-data-table'
 import Vue3EasyDataTable from 'vue3-easy-data-table'
-import 'vue3-easy-data-table/dist/style.css'
+import '@/vendor/vue3-easy-data-table.css'
 import { useI18n } from 'vue-i18n'
 import ArrowSortableList from '@/components/elements/ArrowSortableList.vue'
 import { deleteFromDB, readFromDB, storeToDB } from '@/indexedDB'
