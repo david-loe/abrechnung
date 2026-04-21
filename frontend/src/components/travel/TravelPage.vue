@@ -381,9 +381,24 @@ const travelValidationResults = computed(() => {
   ) {
     return [] as ValidationResult[]
   }
-  return APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value, {
+  const results = APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value, {
     vehicleRegistration: props.endpointPrefix !== 'examine/' ? APP_DATA.value.user.vehicleRegistration : null
   }).results
+
+  if (props.endpointPrefix !== 'examine/') {
+    return results
+  }
+
+  return results.filter((result) => {
+    // In examine mode we do not know the owner's vehicle registration locally.
+    // Hide this own-car-only hint here and let the backend remain the source of truth.
+    if (result.code !== 'requiredForReview' || result.reference?.collection !== 'stages' || result.path === undefined) {
+      return true
+    }
+
+    const stageIndex = result.reference.index[0]
+    return result.path !== `stages.${stageIndex}.cost.receipts` || travel.value.stages[stageIndex]?.transport.type !== 'ownCar'
+  })
 })
 
 const combinedTravelValidationResults = computed(() => combineTravelValidationResults(travelValidationResults.value))

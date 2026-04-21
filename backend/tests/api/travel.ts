@@ -345,6 +345,7 @@ test.serial('POST /travel/underExamination AGAIN', async (t) => {
 test.serial('POST /travel/underExamination rejects ownCar without owner vehicle registration when required', async (t) => {
   await setVehicleRegistrationRequirement('required')
   await loginUser(agent, 'user')
+  await agent.post('/user/vehicleRegistration').field('noop', '1')
 
   const ownCarTravel: TravelSimple = {
     name: 'Own Car May 2024',
@@ -545,6 +546,9 @@ test.serial('POST /book/travel/booked', async (t) => {
 //   }
 // })
 
-test.serial.after.always('Drop DB Connection', async () => {
+test.serial.after.always('Restore travel settings and drop DB connection', async () => {
+  if (originalVehicleRegistrationSetting) {
+    await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
+  }
   await shutdown()
 })
