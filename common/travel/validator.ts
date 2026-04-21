@@ -5,8 +5,15 @@ import { getStagesOutOfBounds } from './utils.js'
 type ValidatableTravel = Pick<Travel<_id, binary>, 'stages' | 'expenses' | 'startDate' | 'endDate' | 'professionalShare'>
 type TravelValidatorSettings = ValidatorSettings & { travelSettings: TravelSettings<_id> }
 type TravelConflictCode = 'stagesOverlapping' | 'countryChangeBetweenStages'
+export interface TravelValidationContext {
+  vehicleRegistration?: Travel<_id, binary>['stages'][number]['cost']['receipts'] | null
+}
 
-type TravelValidatorFn = (travel: ValidatableTravel, settings: Required<TravelValidatorSettings>) => ValidationResult[]
+type TravelValidatorFn = (
+  travel: ValidatableTravel,
+  settings: Required<TravelValidatorSettings>,
+  context?: TravelValidationContext
+) => ValidationResult[]
 
 function isConflictCode(code: string): code is TravelConflictCode {
   return code === 'stagesOverlapping' || code === 'countryChangeBetweenStages'
@@ -40,16 +47,16 @@ export function combineTravelValidationResults(results: ValidationResult[]) {
   return combined
 }
 
-export class TravelValidator extends Validator<ValidatableTravel, TravelValidatorSettings> {
+export class TravelValidator extends Validator<ValidatableTravel, TravelValidatorSettings, TravelValidationContext> {
   protected validators: TravelValidatorFn[] = [
     (travel, settings) => this.getReportExpenseValidationResults(travel, settings),
-    (travel, settings) => {
+    (travel, settings, context) => {
       if (!settings.requireReceipts) {
         return []
       }
 
       return travel.stages.flatMap((stage, index) =>
-        Boolean(stage.cost?.amount) && (!stage.cost?.receipts || stage.cost.receipts.length < 1)
+        this.isStageReceiptMissingForReview(stage, settings, context)
           ? [this.createStageResult(index, 'cost.receipts', 'requiredForReview', 'error')]
           : []
       )
@@ -92,6 +99,30 @@ export class TravelValidator extends Validator<ValidatableTravel, TravelValidato
 
   updateSettings(travelSettings: TravelSettings<_id>) {
     this.settings = { ...this.settings, travelSettings }
+  }
+
+  private isStageReceiptMissingForReview(
+    stage: ValidatableTravel['stages'][number],
+    settings: Required<TravelValidatorSettings>,
+    context?: TravelValidationContext
+  ) {
+    if (!stage.cost?.amount) {
+      return false
+    }
+
+    if (stage.cost.receipts && stage.cost.receipts.length > 0) {
+      return false
+    }
+
+    if (stage.transport.type !== 'ownCar') {
+      return true
+    }
+
+    if (settings.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'required') {
+      return false
+    }
+
+    return !context?.vehicleRegistration || context.vehicleRegistration.length < 1
   }
 
   protected getStageDateResults(travel: ValidatableTravel): ValidationResult[] {

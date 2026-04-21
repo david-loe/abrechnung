@@ -4,6 +4,7 @@
 This file defines repository-specific operating rules for coding agents in `abrechnung`.
 It applies to the full monorepo (`backend`, `frontend`, `common`) unless a task explicitly says otherwise.
 When generic agent behavior conflicts with this file, follow this file.
+Treat this file as a living document: when code, tooling, workflows, commands, or architecture change in a way that makes this file outdated, update `AGENTS.md` as part of the same work when it is in scope.
 
 ## Repo Map
 - `backend`: Node.js + TypeScript, Express 5, tsoa-generated routes/spec, MongoDB, Redis, worker process.
@@ -48,8 +49,11 @@ docker compose run backend npm run test
 Use the same validation intent as CI production build:
 ```bash
 docker compose build frontend
-docker run abrechnung-frontend "npm run build"
+docker compose run frontend npm run build
 ```
+
+Note:
+- The development frontend image expects the repository to be mounted via Docker Compose. Do not rely on a plain `docker run abrechnung-frontend ...` invocation for validation in this repo layout.
 
 ## Coding Style & TypeScript
 - Follow repository formatter/linter settings (Biome + existing frontend ESLint usage where applicable).
@@ -88,4 +92,5 @@ A task is done when all of the following are true:
 - Requested behavior is implemented correctly.
 - Relevant checks/tests for changed scope were run and results are reported.
 - Documentation/comments are updated when behavior or developer workflows changed.
+- `AGENTS.md` is updated too when repository-specific instructions in it would otherwise become outdated because of the change.
 - No unrelated files or behavior were modified.

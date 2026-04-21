@@ -91,6 +91,15 @@ test.serial('POST /user/vehicleRegistration', async (t) => {
   t.is(res2.status, 200, 'GET /documentFile')
 })
 
+test.serial('POST /user/vehicleRegistration allows clearing all files', async (t) => {
+  t.plan(2)
+  const res = await agent.post('/user/vehicleRegistration').field('noop', '1')
+  t.is(res.status, 200)
+
+  const res2 = await agent.get('/user')
+  t.is((res2.body.data as User).vehicleRegistration?.length ?? 0, 0)
+})
+
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })

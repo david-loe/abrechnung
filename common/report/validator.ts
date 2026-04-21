@@ -25,13 +25,18 @@ export type ValidatorSettings = { requireReceipts?: boolean }
 type ExpenseValidatorRuntimeSettings = Required<ValidatorSettings> & { pathPrefix?: string; reference?: ValidationReference }
 
 type ReportLike = Pick<ExpenseReport | HealthCareCost, 'expenses'>
-type ReportValidatorFn<TReport extends ReportLike, TSettings extends ValidatorSettings> = (
+type ReportValidatorFn<TReport extends ReportLike, TSettings extends ValidatorSettings, TContext> = (
   report: TReport,
-  settings: Required<TSettings>
+  settings: Required<TSettings>,
+  context?: TContext
 ) => ValidationResult[]
 type ExpenseValidatorFn = (expense: Partial<Expense>, settings: ExpenseValidatorRuntimeSettings) => ValidationResult[]
 
-export class Validator<TReport extends ReportLike = ReportLike, TSettings extends ValidatorSettings = ValidatorSettings> {
+export class Validator<
+  TReport extends ReportLike = ReportLike,
+  TSettings extends ValidatorSettings = ValidatorSettings,
+  TContext = undefined
+> {
   protected settings: Required<TSettings>
   protected expenseValidators: ExpenseValidatorFn[] = [
     (expense, settings) => {
@@ -44,7 +49,7 @@ export class Validator<TReport extends ReportLike = ReportLike, TSettings extend
     }
   ]
 
-  protected validators: ReportValidatorFn<TReport, TSettings>[] = [
+  protected validators: ReportValidatorFn<TReport, TSettings, TContext>[] = [
     (report) => (report.expenses.length < 1 ? [{ code: 'noData.expense', severity: 'error' }] : []),
     (report, settings) => this.getReportExpenseValidationResults(report, settings)
   ]
@@ -68,12 +73,12 @@ export class Validator<TReport extends ReportLike = ReportLike, TSettings extend
     return this.expenseValidators.flatMap((validator) => validator(expense, settings))
   }
 
-  getValidationResults(report: TReport): ValidationResult[] {
-    return this.validators.flatMap((validator) => validator(report, this.settings))
+  getValidationResults(report: TReport, context?: TContext): ValidationResult[] {
+    return this.validators.flatMap((validator) => validator(report, this.settings, context))
   }
 
-  getValidationSummary(report: TReport): ValidationSummary {
-    const results = this.getValidationResults(report)
+  getValidationSummary(report: TReport, context?: TContext): ValidationSummary {
+    const results = this.getValidationResults(report, context)
     const hasErrors = results.some((result) => result.severity === 'error')
 
     return { results, isComplete: !hasErrors, canEnterReview: !hasErrors }

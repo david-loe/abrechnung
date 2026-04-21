@@ -381,7 +381,9 @@ const travelValidationResults = computed(() => {
   ) {
     return [] as ValidationResult[]
   }
-  return APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value).results
+  return APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value, {
+    vehicleRegistration: props.endpointPrefix !== 'examine/' ? APP_DATA.value.user.vehicleRegistration : null
+  }).results
 })
 
 const combinedTravelValidationResults = computed(() => combineTravelValidationResults(travelValidationResults.value))
