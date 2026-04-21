@@ -156,6 +156,14 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
 }
 
+export function roundBaseCurrencyAmount(amount: number) {
+  if (!Number.isFinite(amount)) {
+    return amount
+  }
+  const rounded = (Math.sign(amount) * Math.round((Math.abs(amount) + Number.EPSILON) * 100)) / 100
+  return Object.is(rounded, -0) ? 0 : rounded
+}
+
 export function getLumpSumsSum(days: TravelDay<_id>[]) {
   let sum = 0
   for (const day of days) {
@@ -169,19 +177,19 @@ export function getLumpSumsSum(days: TravelDay<_id>[]) {
     sum += overnightAmount
     sum += cateringAmount
   }
-  return { amount: sum }
+  return { amount: roundBaseCurrencyAmount(sum) }
 }
 
 export function getTotalBalance(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.balance.amount, 0)
+  return roundBaseCurrencyAmount(addUps.reduce((sum, a) => sum + a.balance.amount, 0))
 }
 
 export function getTotalTotal(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.total.amount, 0)
+  return roundBaseCurrencyAmount(addUps.reduce((sum, a) => sum + a.total.amount, 0))
 }
 
 export function getTotalAdvance(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.advance.amount, 0)
+  return roundBaseCurrencyAmount(addUps.reduce((sum, a) => sum + a.advance.amount, 0))
 }
 
 export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], withLumpSums = false) {
@@ -322,14 +330,16 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
   }
   for (const addUp of addUps) {
     const lumpSumsAmount = (addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount
-    let totalAmount = addUp.expenses.amount + (typeof lumpSumsAmount === 'number' && !Number.isNaN(lumpSumsAmount) ? lumpSumsAmount : 0)
+    let totalAmount = roundBaseCurrencyAmount(
+      addUp.expenses.amount + (typeof lumpSumsAmount === 'number' && !Number.isNaN(lumpSumsAmount) ? lumpSumsAmount : 0)
+    )
     if (totalAmount < 0) {
       addUp.negativeTotal = true
       totalAmount = 0
     }
     addUp.total.amount = totalAmount
 
-    let balanceAmount = addUp.total.amount - addUp.advance.amount
+    let balanceAmount = roundBaseCurrencyAmount(addUp.total.amount - addUp.advance.amount)
     if (balanceAmount < 0) {
       addUp.advanceOverflow = true
       balanceAmount = 0

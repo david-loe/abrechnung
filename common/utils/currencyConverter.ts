@@ -1,4 +1,5 @@
 import { baseCurrency, idDocumentToId, Money } from '../types.js'
+import { roundBaseCurrencyAmount } from './scripts.js'
 
 const exchangeRateSources = ['InforEuro'] as const
 type _ExchangeRateSource = (typeof exchangeRateSources)[number]
@@ -58,7 +59,7 @@ export class CurrencyConverter {
       return null
     }
 
-    const resultAmount = Math.round(amount * rate * 100) / 100
+    const resultAmount = roundBaseCurrencyAmount(amount * rate)
 
     return { date: conversionDate, rate, amount: resultAmount }
   }

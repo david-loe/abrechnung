@@ -28,7 +28,8 @@ import {
   mailToLink,
   msTeamsToLink,
   objectsToCSV,
-  placeToString
+  placeToString,
+  roundBaseCurrencyAmount
 } from './scripts.js'
 
 type Id = string
@@ -160,6 +161,12 @@ test('hexToRGB', (t) => {
   t.deepEqual(hexToRGB('#ffaa00'), [255, 170, 0])
   t.deepEqual(hexToRGB('#0f0'), [0, 255, 0])
   t.throws(() => hexToRGB('#abcd'))
+})
+
+test('roundBaseCurrencyAmount rounds to cents and normalizes negative zero', (t) => {
+  t.is(roundBaseCurrencyAmount(-0.0001), 0)
+  t.is(roundBaseCurrencyAmount(-0.005), -0.01)
+  t.is(roundBaseCurrencyAmount(1.005), 1.01)
 })
 
 const resolveProjectId = (entry: FlatAddUp<Id>['project']) => (typeof entry === 'string' ? entry : entry._id)
@@ -367,4 +374,45 @@ test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
   t.true(Number.isNaN((result[0] as FlatAddUp<Id, AddUpTravel>).lumpSums?.amount))
   t.is(result[0].total.amount, 120)
   t.is(result[0].balance.amount, 90)
+})
+
+test('addUp ignores tiny negative float remainders after cent rounding', (t) => {
+  const projectA = createProject('A')
+
+  const expenseReport: AddUpReport = {
+    project: projectA,
+    expenses: [
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.1001), note: null, project: null }
+    ],
+    advances: []
+  }
+
+  const result = addUp<Id, AddUpReport>(expenseReport)
+
+  t.is(result.length, 1)
+  t.is(result[0].total.amount, 0)
+  t.is(result[0].balance.amount, 0)
+  t.false(result[0].negativeTotal)
+  t.false(result[0].advanceOverflow)
+})
+
+test('addUp still flags totals that are negative after cent rounding', (t) => {
+  const projectA = createProject('A')
+
+  const expenseReport: AddUpReport = {
+    project: projectA,
+    expenses: [
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.105), note: null, project: null }
+    ],
+    advances: []
+  }
+
+  const result = addUp<Id, AddUpReport>(expenseReport)
+
+  t.is(result.length, 1)
+  t.is(result[0].total.amount, 0)
+  t.is(result[0].balance.amount, 0)
+  t.true(result[0].negativeTotal)
 })
