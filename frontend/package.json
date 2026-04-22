@@ -39,7 +39,7 @@
     "@types/qs": "^6.15.0",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^6.0.6",
-    "eslint": "^9.39.4",
+    "eslint": "^10.2.1",
     "eslint-plugin-vue": "^10.8.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.8",
