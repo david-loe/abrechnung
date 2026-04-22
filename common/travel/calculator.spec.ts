@@ -143,6 +143,30 @@ test('calc computes refunds and costs', async (t) => {
   t.is(result?.progress, 100)
 })
 
+test('calc rounds overnight refunds with decimal multiplication', async (t) => {
+  const { tc, travel } = createSetup()
+  tc.travelSettings.factorOvernightLumpSum = 0.5
+  travel.destinationPlace.country.lumpSums[0].overnight = 2.01
+
+  const { result, conflicts } = await tc.calc(travel)
+
+  t.is(conflicts.length, 0)
+  t.is(result?.days[0].lumpSums.overnight.refund.amount, 1.01)
+})
+
+test('calc rounds catering refunds after decimal subtraction before factor application', async (t) => {
+  const { tc, travel } = createSetup()
+  tc.travelSettings.factorCateringLumpSum = 0.5
+  travel.days[0].cateringRefund = { breakfast: false, lunch: true, dinner: true }
+  travel.destinationPlace.country.lumpSums[0].catering8 = 2.01
+  travel.destinationPlace.country.lumpSums[0].catering24 = 5
+
+  const { result, conflicts } = await tc.calc(travel)
+
+  t.is(conflicts.length, 0)
+  t.is(result?.days[0].lumpSums.catering.refund.amount, 0.51)
+})
+
 test('calc reports conflicts for overlapping stages', async (t) => {
   const { tc, stages, travel } = createSetup()
   const badStages: Stage<string>[] = [

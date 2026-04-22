@@ -17,7 +17,15 @@ import {
   TravelExpense,
   TravelSettings
 } from '../types.js'
-import { datetimeToDate, getDayList, getDiffInDays } from '../utils/scripts.js'
+import {
+  datetimeToDate,
+  getDayList,
+  getDiffInDays,
+  multiplyAmount,
+  multiplyAmountAndRound,
+  subtractAmounts,
+  sumAmounts
+} from '../utils/scripts.js'
 import { TravelValidator } from './validator.js'
 
 interface InputTravelDay extends Omit<TravelDay<_id>, 'country' | 'special' | 'lumpSums' | '_id'> {}
@@ -282,22 +290,20 @@ export class TravelCalculator {
     const lumpSum = await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)
     const amount = lumpSum[result.type]
     let cut = 0
-    if (!day.cateringRefund.breakfast) cut += this.travelSettings.lumpSumCut.breakfast
-    if (!day.cateringRefund.lunch) cut += this.travelSettings.lumpSumCut.lunch
-    if (!day.cateringRefund.dinner) cut += this.travelSettings.lumpSumCut.dinner
+    if (!day.cateringRefund.breakfast) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.breakfast)
+    if (!day.cateringRefund.lunch) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.lunch)
+    if (!day.cateringRefund.dinner) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.dinner)
 
-    const afterCut = Math.max(0, amount - Math.round(lumpSum.catering24 * cut * 100) / 100)
-    result.refund.amount =
-      Math.round(
-        afterCut *
-          ((this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) === -1
-            ? this.travelSettings.factorCateringLumpSum
-            : 1) *
-          100
-      ) / 100
+    const afterCut = Math.max(0, subtractAmounts(amount, multiplyAmountAndRound(lumpSum.catering24, cut)))
+    result.refund.amount = multiplyAmountAndRound(
+      afterCut,
+      (this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) === -1
+        ? this.travelSettings.factorCateringLumpSum
+        : 1
+    )
 
     if (this.travelSettings.allowSpouseRefund && claimSpouseRefund) {
-      result.refund.amount *= 2
+      result.refund.amount = multiplyAmount(result.refund.amount, 2)
     }
     return result
   }
@@ -387,17 +393,15 @@ export class TravelCalculator {
         }
         const refund = { amount: 0 }
         const amount = (await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)).overnight
-        refund.amount =
-          Math.round(
-            amount *
-              (this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
-                ? this.travelSettings.factorOvernightLumpSum
-                : 1) *
-              100
-          ) / 100
+        refund.amount = multiplyAmountAndRound(
+          amount,
+          this.travelSettings.factorOvernightLumpSumExceptions.indexOf(day.country._id) === -1
+            ? this.travelSettings.factorOvernightLumpSum
+            : 1
+        )
 
         if (this.travelSettings.allowSpouseRefund && claimSpouseRefund) {
-          refund.amount *= 2
+          refund.amount = multiplyAmount(refund.amount, 2)
         }
         day.lumpSums.overnight = { refund }
       }
@@ -428,8 +432,10 @@ export class TravelCalculator {
       if (stage.transport.type === 'ownCar') {
         if (stage.transport.distance && stage.transport.distanceRefundType) {
           stage.cost = Object.assign(stage.cost, {
-            amount:
-              Math.round(stage.transport.distance * this.travelSettings.distanceRefunds[stage.transport.distanceRefundType] * 100) / 100,
+            amount: multiplyAmountAndRound(
+              stage.transport.distance,
+              this.travelSettings.distanceRefunds[stage.transport.distanceRefundType]
+            ),
             currency: baseCurrency
           })
         }

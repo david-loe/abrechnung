@@ -20,12 +20,12 @@
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
               <br >
-              {{ `(${formatter.baseCurrency(addUp[index - 1].advance.amount - addUp[index - 1].total.amount)} ${t('labels.left')})` }}
+              {{ `(${formatter.baseCurrency(getAdvanceOverflowAmount(addUp[index - 1]))} ${t('labels.left')})` }}
             </small>
             <template v-if="row[0] === 'labels.balance' && addUp[index - 1].negativeTotal">
               <TooltipElement :text="t('alerts.negativeTotal')"><small class="fw-light">
                 <br >
-                {{ `(⚠️ ${formatter.baseCurrency(addUp[index - 1].expenses.amount + ((addUp[index - 1] as FlatAddUp<string, Travel<string>>).lumpSums?.amount || 0))})` }}
+                {{ `(⚠️ ${formatter.baseCurrency(getNegativeTotalWarningAmount(addUp[index - 1]))})` }}
               </small></TooltipElement>
             </template>
           </td>
@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { AddUp, FlatAddUp, Project, Travel } from 'abrechnung-common/types.js'
-import { getAddUpTableData, getTotalBalance } from 'abrechnung-common/utils/scripts.js'
+import { getAddUpTableData, getTotalBalance, subtractAmounts, sumAmounts } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../formatter.js'
@@ -67,4 +67,12 @@ const props = defineProps({
 })
 
 const addUpTableData = computed(() => getAddUpTableData(formatter, props.addUp, props.withLumpSums))
+
+function getAdvanceOverflowAmount(addUp: AddUp<string>) {
+  return subtractAmounts(addUp.advance.amount, addUp.total.amount)
+}
+
+function getNegativeTotalWarningAmount(addUp: AddUp<string>) {
+  return sumAmounts(addUp.expenses.amount, (addUp as FlatAddUp<string, Travel<string>>).lumpSums?.amount || 0)
+}
 </script>

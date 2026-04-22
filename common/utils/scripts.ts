@@ -1,3 +1,4 @@
+import Big from 'big.js'
 import {
   _id,
   AddUp,
@@ -156,6 +157,46 @@ export function baseCurrencyMoneyToMoney(basic: BaseCurrencyMoney): Money {
   return Object.assign({ currency: baseCurrency }, basic)
 }
 
+function normalizeRoundedAmount(amount: Big.BigSource) {
+  const rounded = new Big(amount).round(2, Big.roundHalfUp).toNumber()
+  return Object.is(rounded, -0) ? 0 : rounded
+}
+
+export function roundAmount(amount: number) {
+  if (!Number.isFinite(amount)) {
+    return amount
+  }
+  return normalizeRoundedAmount(amount)
+}
+
+export function multiplyAmount(left: number, right: number) {
+  if (!Number.isFinite(left) || !Number.isFinite(right)) {
+    return left * right
+  }
+  return new Big(left).times(right).toNumber()
+}
+
+export function multiplyAmountAndRound(left: number, right: number) {
+  if (!Number.isFinite(left) || !Number.isFinite(right)) {
+    return left * right
+  }
+  return normalizeRoundedAmount(new Big(left).times(right))
+}
+
+export function sumAmounts(...amounts: number[]) {
+  if (amounts.some((amount) => !Number.isFinite(amount))) {
+    return amounts.reduce((sum, amount) => sum + amount, 0)
+  }
+  return amounts.reduce((sum, amount) => sum.plus(amount), new Big(0)).toNumber()
+}
+
+export function subtractAmounts(left: number, right: number) {
+  if (!Number.isFinite(left) || !Number.isFinite(right)) {
+    return left - right
+  }
+  return new Big(left).minus(right).toNumber()
+}
+
 export function getLumpSumsSum(days: TravelDay<_id>[]) {
   let sum = 0
   for (const day of days) {
@@ -166,22 +207,21 @@ export function getLumpSumsSum(days: TravelDay<_id>[]) {
       return { amount: Number.NaN }
     }
 
-    sum += overnightAmount
-    sum += cateringAmount
+    sum = sumAmounts(sum, overnightAmount, cateringAmount)
   }
-  return { amount: sum }
+  return { amount: roundAmount(sum) }
 }
 
 export function getTotalBalance(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.balance.amount, 0)
+  return roundAmount(addUps.reduce((sum, a) => sumAmounts(sum, a.balance.amount), 0))
 }
 
 export function getTotalTotal(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.total.amount, 0)
+  return roundAmount(addUps.reduce((sum, a) => sumAmounts(sum, a.total.amount), 0))
 }
 
 export function getTotalAdvance(addUps: FlatAddUp<_id>[]) {
-  return addUps.reduce((sum, a) => sum + a.advance.amount, 0)
+  return roundAmount(addUps.reduce((sum, a) => sumAmounts(sum, a.advance.amount), 0))
 }
 
 export function getAddUpTableData(formatter: Formatter, addUps: AddUp<_id>[], withLumpSums = false) {
@@ -269,18 +309,27 @@ function addToAddUps<idType extends _id>(
     const addUp = addUps.find((addUp) => idDocumentToId<idType>(addUp.project).toString() === projectId.toString())
     if (addUp) {
       if (key in addUp) {
-        ;(addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
+        ;(addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount = sumAmounts(
+          (addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount,
+          add
+        )
       }
     } else {
       const newAddUp = defaultAddUp(projectId, isTravel)
       if (key in newAddUp) {
-        ;(newAddUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
+        ;(newAddUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount = sumAmounts(
+          (newAddUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount,
+          add
+        )
       }
       addUps.push(newAddUp)
     }
   } else {
     if (key in addUps[0]) {
-      ;(addUps[0] as FlatAddUp<idType, Travel<_id, binary>>)[key].amount += add
+      ;(addUps[0] as FlatAddUp<idType, Travel<_id, binary>>)[key].amount = sumAmounts(
+        (addUps[0] as FlatAddUp<idType, Travel<_id, binary>>)[key].amount,
+        add
+      )
     }
   }
 }
@@ -290,7 +339,7 @@ function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: F
     if (stage.cost && stage.cost.amount !== null) {
       let add = getBaseCurrencyAmount(stage.cost)
       if (stage.purpose === 'mixed' && travel.professionalShare) {
-        add = add * travel.professionalShare
+        add = multiplyAmount(add, travel.professionalShare)
       }
       addToAddUps(addUps, add, 'expenses', stage.project, true)
     }
@@ -299,7 +348,7 @@ function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: F
     if (expense.cost && expense.cost.amount !== null) {
       let add = getBaseCurrencyAmount(expense.cost)
       if (expense.purpose === 'mixed' && travel.professionalShare) {
-        add = add * travel.professionalShare
+        add = multiplyAmount(add, travel.professionalShare)
       }
       addToAddUps(addUps, add, 'expenses', expense.project, true)
     }
@@ -322,14 +371,16 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
   }
   for (const addUp of addUps) {
     const lumpSumsAmount = (addUp as FlatAddUp<idType, Travel<_id, binary>>).lumpSums?.amount
-    let totalAmount = addUp.expenses.amount + (typeof lumpSumsAmount === 'number' && !Number.isNaN(lumpSumsAmount) ? lumpSumsAmount : 0)
+    let totalAmount = roundAmount(
+      sumAmounts(addUp.expenses.amount, typeof lumpSumsAmount === 'number' && !Number.isNaN(lumpSumsAmount) ? lumpSumsAmount : 0)
+    )
     if (totalAmount < 0) {
       addUp.negativeTotal = true
       totalAmount = 0
     }
     addUp.total.amount = totalAmount
 
-    let balanceAmount = addUp.total.amount - addUp.advance.amount
+    let balanceAmount = roundAmount(subtractAmounts(addUp.total.amount, addUp.advance.amount))
     if (balanceAmount < 0) {
       addUp.advanceOverflow = true
       balanceAmount = 0

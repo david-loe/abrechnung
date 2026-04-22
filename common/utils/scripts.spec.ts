@@ -27,8 +27,10 @@ import {
   isValidDate,
   mailToLink,
   msTeamsToLink,
+  multiplyAmountAndRound,
   objectsToCSV,
-  placeToString
+  placeToString,
+  roundAmount
 } from './scripts.js'
 
 type Id = string
@@ -160,6 +162,19 @@ test('hexToRGB', (t) => {
   t.deepEqual(hexToRGB('#ffaa00'), [255, 170, 0])
   t.deepEqual(hexToRGB('#0f0'), [0, 255, 0])
   t.throws(() => hexToRGB('#abcd'))
+})
+
+test('roundAmount rounds to cents and normalizes negative zero', (t) => {
+  t.is(roundAmount(-0.0001), 0)
+  t.is(roundAmount(-0.005), -0.01)
+  t.is(roundAmount(1.005), 1.01)
+  t.is(roundAmount(1.0049999999999997), 1)
+  t.is(roundAmount(-1.0049999999999997), -1)
+})
+
+test('multiplyAmountAndRound multiplies in decimal space before cent rounding', (t) => {
+  t.is(multiplyAmountAndRound(2.01, 0.5), 1.01)
+  t.is(multiplyAmountAndRound(1, 1.0049999999999997), 1)
 })
 
 const resolveProjectId = (entry: FlatAddUp<Id>['project']) => (typeof entry === 'string' ? entry : entry._id)
@@ -321,6 +336,28 @@ test('addUp sums travel lump sums, applies professional share, and splits by pro
   t.false(thirdProjectAddUp.advanceOverflow)
 })
 
+test('addUp rounds mixed professional share totals with decimal multiplication', (t) => {
+  const projectA = createProject('A')
+
+  const travel: AddUpTravel = {
+    project: projectA,
+    startDate: new Date('2024-01-01').toISOString(),
+    stages: [],
+    expenses: [{ _id: 'texp-1', description: 'Mixed expense', cost: createCost(2.01), note: null, project: null, purpose: 'mixed' }],
+    days: [],
+    professionalShare: 0.5,
+    advances: []
+  }
+
+  const result = addUp<Id, AddUpTravel>(travel)
+
+  t.is(result.length, 1)
+  t.is(result[0].expenses.amount, 1.005)
+  t.is(result[0].total.amount, 1.01)
+  t.is(result[0].balance.amount, 1.01)
+  t.false(result[0].negativeTotal)
+})
+
 test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
   const projectA = createProject('A')
   const invalidDay = createTravelDay('day-1', 20, 30)
@@ -367,4 +404,45 @@ test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
   t.true(Number.isNaN((result[0] as FlatAddUp<Id, AddUpTravel>).lumpSums?.amount))
   t.is(result[0].total.amount, 120)
   t.is(result[0].balance.amount, 90)
+})
+
+test('addUp ignores tiny negative float remainders after cent rounding', (t) => {
+  const projectA = createProject('A')
+
+  const expenseReport: AddUpReport = {
+    project: projectA,
+    expenses: [
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.1001), note: null, project: null }
+    ],
+    advances: []
+  }
+
+  const result = addUp<Id, AddUpReport>(expenseReport)
+
+  t.is(result.length, 1)
+  t.is(result[0].total.amount, 0)
+  t.is(result[0].balance.amount, 0)
+  t.false(result[0].negativeTotal)
+  t.false(result[0].advanceOverflow)
+})
+
+test('addUp still flags totals that are negative after cent rounding', (t) => {
+  const projectA = createProject('A')
+
+  const expenseReport: AddUpReport = {
+    project: projectA,
+    expenses: [
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.105), note: null, project: null }
+    ],
+    advances: []
+  }
+
+  const result = addUp<Id, AddUpReport>(expenseReport)
+
+  t.is(result.length, 1)
+  t.is(result[0].total.amount, 0)
+  t.is(result[0].balance.amount, 0)
+  t.true(result[0].negativeTotal)
 })
