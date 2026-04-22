@@ -11,6 +11,7 @@
     "./data/*.js": "./dist/data/*.js"
   },
   "dependencies": {
+    "big.js": "^7.0.1",
     "envalid": "^8.1.1",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1"
@@ -21,6 +22,7 @@
     "build": "tsc"
   },
   "devDependencies": {
+    "@types/big.js": "^6.2.2",
     "@types/node": "^24.12.2",
     "ava": "^7.0.0",
     "mongoose": "^9.4.1",
