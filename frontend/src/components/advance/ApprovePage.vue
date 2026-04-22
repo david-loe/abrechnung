@@ -178,7 +178,7 @@ function resetAndHide() {
 }
 
 function canDeleteAdvance(advance: AdvanceSimple<string>) {
-  return advance.state === AdvanceState.APPROVED && advance.offsetAgainst.length === 0
+  return advance.state === AdvanceState.APPROVED && !advance.receivedOn && advance.offsetAgainst.length === 0
 }
 
 async function approveAdvance(

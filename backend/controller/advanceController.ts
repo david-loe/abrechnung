@@ -175,6 +175,7 @@ export class AdvanceApproveController extends Controller {
       checkOldObject: async (oldObject: AdvanceDoc) =>
         !oldObject.historic &&
         oldObject.state === AdvanceState.APPROVED &&
+        !oldObject.receivedOn &&
         oldObject.offsetAgainst.length === 0 &&
         checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })

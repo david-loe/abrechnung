@@ -61,6 +61,11 @@ async function deleteApprovedAdvance(_id: string) {
   return await agent.delete('/approve/advance').query({ _id })
 }
 
+async function confirmAdvanceReceipt(_id: string, receivedOn = new Date('2024-05-05T00:00:00.000Z')) {
+  await loginUser(agent, 'user')
+  return await agent.post('/advance/received').send({ _id, receivedOn })
+}
+
 test.serial('load shared fixtures', async (t) => {
   await loginUser(agent, 'user')
   const [projectResponse, categoryResponse, insuranceResponse] = await Promise.all([
@@ -106,6 +111,21 @@ test.serial('DELETE /approve/advance deletes approver-created advance and dedupl
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.is(deleteResponse.status, 200)
   t.is(deleteResponse.body.deletedCount, 1)
+})
+
+test.serial('DELETE /approve/advance rejects deletion after receipt was confirmed', async (t) => {
+  const createdResponse = await createAppliedAdvance('Received advance')
+  t.is(createdResponse.status, 200)
+  const advance = createdResponse.body.result as { _id: string }
+
+  const approvedResponse = await approveAdvance(advance._id)
+  t.is(approvedResponse.status, 200)
+
+  const receivedResponse = await confirmAdvanceReceipt(advance._id)
+  t.is(receivedResponse.status, 200)
+
+  const deleteResponse = await deleteApprovedAdvance(advance._id)
+  t.not(deleteResponse.status, 200)
 })
 
 test.serial('DELETE /approve/advance rejects deletion when linked from expense report', async (t) => {
