@@ -1,5 +1,5 @@
 import test from 'ava'
-import { baseCurrency, Country, CountryCode, Stage, TravelState } from '../types.js'
+import { baseCurrency, Country, CountryCode, DocumentFile, Stage, TravelState } from '../types.js'
 import { TravelCalculator } from './calculator.js'
 import travelSettings from './travelSettings.js'
 import { combineTravelValidationResults } from './validator.js'
@@ -164,11 +164,11 @@ test('validator returns warnings independently from validation errors', (t) => {
   t.true(results.some((result) => result.code === 'stageOutOfBounds' && result.severity === 'warning'))
 })
 
-test('validator requires receipts for travel stages with a cost amount', (t) => {
+test('validator requires receipts for non-own-car travel stages with a cost amount', (t) => {
   const { tc, stages, travel } = createSetup()
   const results = tc.validator.getValidationResults({
     ...travel,
-    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+    stages: [{ ...stages[0], transport: { type: 'airplane' }, cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
   })
 
   t.true(
@@ -180,6 +180,57 @@ test('validator requires receipts for travel stages with a cost amount', (t) => 
         result.reference.index[0] === 0
     )
   )
+})
+
+test('validator requires own car proof when vehicle registration is required and missing', (t) => {
+  const { tc, stages, travel } = createSetup()
+  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
+
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+  })
+
+  t.true(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
+})
+
+test('validator accepts vehicle registration context for own car when required', (t) => {
+  const { tc, stages, travel } = createSetup()
+  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
+  const vehicleRegistration: DocumentFile<string>[] = [
+    { _id: 'vr1', owner: 'u1', name: 'registration.pdf', type: 'application/pdf', data: new Blob([]) }
+  ]
+
+  const results = tc.validator.getValidationResults(
+    { ...travel, stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]] },
+    { vehicleRegistration }
+  )
+
+  t.false(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
+})
+
+test('validator does not require own car receipts when vehicle registration is optional', (t) => {
+  const { tc, stages, travel } = createSetup()
+  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'optional' })
+
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+  })
+
+  t.false(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
+})
+
+test('validator does not require own car receipts when vehicle registration is disabled', (t) => {
+  const { tc, stages, travel } = createSetup()
+  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'none' })
+
+  const results = tc.validator.getValidationResults({
+    ...travel,
+    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+  })
+
+  t.false(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
 })
 
 test('combineTravelValidationResults combines overlapping stage paths into one conflict', (t) => {

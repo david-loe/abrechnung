@@ -23,8 +23,9 @@ import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
 
-function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
-  const reviewSummary = travelCalculator.validator.getValidationSummary(report)
+async function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
+  const owner = await User.findOne({ _id: report.owner._id }, { vehicleRegistration: 1 }).lean()
+  const reviewSummary = travelCalculator.validator.getValidationSummary(report, { vehicleRegistration: owner?.vehicleRegistration })
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
@@ -249,7 +250,7 @@ export class TravelController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
-          assertTravelCanEnterReview(oldObject, request.user.settings.language)
+          await assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -526,7 +527,7 @@ export class TravelExamineController extends Controller {
           oldObject.state === TravelState.IN_REVIEW &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
-          assertTravelCanEnterReview(oldObject, request.user.settings.language)
+          await assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -566,7 +567,7 @@ export class TravelExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPROVED && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertTravelCanEnterReview(oldObject, request.user.settings.language)
+          await assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

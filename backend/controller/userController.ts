@@ -68,11 +68,11 @@ export class UserController extends Controller {
   @Middlewares(fileHandler.any())
   @Consumes('multipart/form-data')
   public async postVehicleRegistration(
-    @Body() requestBody: { vehicleRegistration: File[] },
+    @Body() requestBody: { vehicleRegistration?: File[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     await documentFileHandler(['vehicleRegistration'])(request)
-    request.user.vehicleRegistration = requestBody.vehicleRegistration as unknown as DocumentFile<Types.ObjectId, mongo.Binary>[]
+    request.user.vehicleRegistration = (requestBody.vehicleRegistration ?? []) as unknown as DocumentFile<Types.ObjectId, mongo.Binary>[]
     request.user.markModified('vehicleRegistration')
     const result = await request.user.save()
     return { message: 'alerts.successSaving', result: result }
