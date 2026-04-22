@@ -7,7 +7,11 @@ import { reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
+import { sendAdvanceDeletionNotification } from '../integrations/notifications/status.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
+import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
+import Travel from '../models/travel.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -152,6 +156,29 @@ export class AdvanceApproveController extends Controller {
       filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0 }, sort: { updatedAt: -1 } })
+  }
+
+  @Delete()
+  public async deleteApproved(@Query() _id: string, @Request() request: AuthenticatedExpressRequest) {
+    const result = await this.deleter(Advance, {
+      _id,
+      referenceChecks: [
+        { model: Travel, paths: ['advances'], conditions: { historic: false } },
+        { model: ExpenseReport, paths: ['advances'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['advances'], conditions: { historic: false } }
+      ],
+      cb: async (deleteResult) => {
+        if (deleteResult.deletedCount === 1) {
+          await sendAdvanceDeletionNotification(deleteResult.deletedObject, request.user)
+        }
+      },
+      checkOldObject: async (oldObject: AdvanceDoc) =>
+        !oldObject.historic &&
+        oldObject.state === AdvanceState.APPROVED &&
+        oldObject.offsetAgainst.length === 0 &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+    })
+    return result
   }
 
   @Post('approved')

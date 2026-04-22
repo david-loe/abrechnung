@@ -165,7 +165,7 @@ export interface DeleterOptions<ModelType, ModelMethods = any> extends DeleterQu
   // biome-ignore lint/suspicious/noExplicitAny: to complex typing
   referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
   minDocumentCount?: number
-  cb?: (data: DeleteResult) => unknown
+  cb?: (data: DeleteResult & { deletedObject: ModelType }) => unknown
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
 }
 
@@ -354,12 +354,12 @@ export class Controller extends TsoaController {
         }
       }
     }
-
-    const result = await doc.deleteOne()
+    const deletedObject = doc.toObject()
+    const deleteResult = await doc.deleteOne()
     if (options.cb) {
-      options.cb(result)
+      await options.cb({ ...deleteResult, deletedObject })
     }
-    return result
+    return deleteResult
   }
 
   async deleterForArrayElement<ModelType, ArrayElementType extends { _id: Types.ObjectId }>(
@@ -391,7 +391,7 @@ export class Controller extends TsoaController {
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()
     if (options.cb) {
-      options.cb({ acknowledged: true, deletedCount: 1 })
+      await options.cb({ acknowledged: true, deletedCount: 1, deletedObject: result })
     }
     return { message: 'alerts.successDeleting', result: result }
   }

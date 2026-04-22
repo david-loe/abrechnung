@@ -595,6 +595,10 @@
         "paragraph": "Сіздің аванс сұранысыңыз мақұлданды.",
         "subject": "✅ Аванс мақұлданды"
       },
+      "DELETED": {
+        "paragraph": "{project} жобасындағы {owner} үшін '{reportName}' авансы {deletedBy} тарапынан жойылды.",
+        "subject": "🗑️ Аванс жойылды"
+      },
       "REJECTED": {
         "lastParagraph": "{commentator} жазды: '{comment}'",
         "paragraph": "Сіздің аванс сұранысыңыз қабылданбаған.",

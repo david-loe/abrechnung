@@ -595,6 +595,10 @@
         "paragraph": "Your advance request has been approved.",
         "subject": "✅ Advance approved"
       },
+      "DELETED": {
+        "paragraph": "The advance '{reportName}' for {owner} in project {project} was deleted by {deletedBy}.",
+        "subject": "🗑️ Advance deleted"
+      },
       "REJECTED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "Your advance request was rejected.",

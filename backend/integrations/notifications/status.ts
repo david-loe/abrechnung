@@ -7,6 +7,7 @@ import {
   HealthCareCostState,
   User as IUser,
   Locale,
+  ProjectSimpleWithName,
   ReportType,
   reportIsAdvance,
   reportIsHealthCareCost,
@@ -24,7 +25,7 @@ import i18n from '../../i18n.js'
 import User from '../../models/user.js'
 import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
-import { enqueueMail } from './email.js'
+import { enqueueMail, type MailRecipient } from './email.js'
 import { enqueuePushNotification } from './push.js'
 
 class StatusNotificationIntegration extends Integration {
@@ -44,6 +45,58 @@ class StatusNotificationIntegration extends Integration {
 }
 
 export const statusNotificationIntegration = new StatusNotificationIntegration()
+
+function dedupeRecipients(recipients: MailRecipient[]) {
+  const uniqueRecipients = new Map<string, MailRecipient>()
+  for (const recipient of recipients) {
+    uniqueRecipients.set(recipient.email, recipient)
+  }
+  return [...uniqueRecipients.values()]
+}
+
+export async function getAdvanceDeletionMailRecipients(advance: Pick<Advance<Types.ObjectId>, 'owner' | 'project'>) {
+  const supervisedProjectsFilter = { $or: [{ 'projects.supervised': [] }, { 'projects.supervised': advance.project._id }] }
+  const [owner, bookers] = await Promise.all([
+    User.findOne({ _id: advance.owner._id }).lean(),
+    User.find({ 'access.book/advance': true, ...supervisedProjectsFilter }).lean()
+  ])
+
+  return dedupeRecipients([...(owner ? [owner] : []), ...bookers])
+}
+
+export async function sendAdvanceDeletionNotification(
+  advance: Pick<Advance<Types.ObjectId>, '_id' | 'name' | 'owner' | 'project'>,
+  deletedBy: Pick<IUser<Types.ObjectId, mongo.Binary>, 'name'>
+) {
+  const recipients = await getAdvanceDeletionMailRecipients(advance)
+  if (recipients.length === 0) {
+    return
+  }
+
+  const recipientsByLanguage = new Map<Locale, MailRecipient[]>()
+  for (const recipient of recipients) {
+    const usersForLanguage = recipientsByLanguage.get(recipient.settings.language) ?? []
+    usersForLanguage.push(recipient)
+    recipientsByLanguage.set(recipient.settings.language, usersForLanguage)
+  }
+
+  const project = advance.project as ProjectSimpleWithName<Types.ObjectId>
+  for (const [language, localizedRecipients] of recipientsByLanguage) {
+    const interpolation = {
+      deletedBy: deletedBy.name.givenName,
+      lng: language,
+      owner: advance.owner.name.givenName,
+      project: `${project.identifier}${project.name ? ` ${project.name}` : ''}`,
+      reportName: advance.name
+    }
+
+    await enqueueMail(
+      localizedRecipients,
+      i18n.t('mail.advance.DELETED.subject', interpolation),
+      i18n.t('mail.advance.DELETED.paragraph', interpolation)
+    )
+  }
+}
 
 export async function sendStatusNotification(
   report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance,

@@ -595,6 +595,10 @@
         "paragraph": "Dein Vorschussantrag wurde genehmigt.",
         "subject": "✅ Vorschuss genehmigt"
       },
+      "DELETED": {
+        "paragraph": "Der Vorschuss '{reportName}' für {owner} im Projekt {project} wurde von {deletedBy} gelöscht.",
+        "subject": "🗑️ Vorschuss gelöscht"
+      },
       "REJECTED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Dein Vorschussantrag wurde abgelehnt.",

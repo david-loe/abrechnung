@@ -595,6 +595,10 @@
         "paragraph": "Tu solicitud de anticipo ha sido aprobada.",
         "subject": "✅ Anticipo aprobado"
       },
+      "DELETED": {
+        "paragraph": "El anticipo '{reportName}' para {owner} en el proyecto {project} fue eliminado por {deletedBy}.",
+        "subject": "🗑️ Anticipo eliminado"
+      },
       "REJECTED": {
         "lastParagraph": "{commentator} escribió: '{comment}'",
         "paragraph": "Tu solicitud de anticipo ha sido rechazada.",
