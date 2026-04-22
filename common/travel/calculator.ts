@@ -17,7 +17,15 @@ import {
   TravelExpense,
   TravelSettings
 } from '../types.js'
-import { datetimeToDate, getDayList, getDiffInDays, multiplyAmount, multiplyAmountAndRound } from '../utils/scripts.js'
+import {
+  datetimeToDate,
+  getDayList,
+  getDiffInDays,
+  multiplyAmount,
+  multiplyAmountAndRound,
+  subtractAmounts,
+  sumAmounts
+} from '../utils/scripts.js'
 import { TravelValidator } from './validator.js'
 
 interface InputTravelDay extends Omit<TravelDay<_id>, 'country' | 'special' | 'lumpSums' | '_id'> {}
@@ -282,11 +290,11 @@ export class TravelCalculator {
     const lumpSum = await this.lumpSumCalculator.getLumpSum(day.country, new Date(day.date), day.special)
     const amount = lumpSum[result.type]
     let cut = 0
-    if (!day.cateringRefund.breakfast) cut += this.travelSettings.lumpSumCut.breakfast
-    if (!day.cateringRefund.lunch) cut += this.travelSettings.lumpSumCut.lunch
-    if (!day.cateringRefund.dinner) cut += this.travelSettings.lumpSumCut.dinner
+    if (!day.cateringRefund.breakfast) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.breakfast)
+    if (!day.cateringRefund.lunch) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.lunch)
+    if (!day.cateringRefund.dinner) cut = sumAmounts(cut, this.travelSettings.lumpSumCut.dinner)
 
-    const afterCut = Math.max(0, amount - multiplyAmountAndRound(lumpSum.catering24, cut))
+    const afterCut = Math.max(0, subtractAmounts(amount, multiplyAmountAndRound(lumpSum.catering24, cut)))
     result.refund.amount = multiplyAmountAndRound(
       afterCut,
       (this.travelSettings.factorCateringLumpSumExceptions as string[]).indexOf(day.country._id) === -1

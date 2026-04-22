@@ -9,6 +9,7 @@ import {
   reportModelNamesWithoutAdvance,
   State
 } from 'abrechnung-common/types.js'
+import { subtractAmounts } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { currencyConverter } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
@@ -133,13 +134,13 @@ schema.methods.offset = async function (
     throw new Error('This report has already been used to offset this advance')
   }
   let amount = reportTotal
-  let difference = reportTotal - doc.balance.amount
+  let difference = subtractAmounts(reportTotal, doc.balance.amount)
   if (difference >= 0) {
     amount = doc.balance.amount
     doc.balance.amount = 0
     doc.settledOn = new Date()
   } else {
-    doc.balance.amount = -difference
+    doc.balance.amount = subtractAmounts(0, difference)
     difference = 0
   }
   doc.offsetAgainst.push({ type: reportModelName, reportId, subject, amount })
