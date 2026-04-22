@@ -14029,9 +14029,6 @@
 										"type": "array"
 									}
 								},
-								"required": [
-									"vehicleRegistration"
-								],
 								"type": "object"
 							}
 						}
