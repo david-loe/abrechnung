@@ -24629,6 +24629,46 @@
 						}
 					}
 				]
+			},
+			"delete": {
+				"operationId": "DeleteApproved",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/approve/advance/approved": {
