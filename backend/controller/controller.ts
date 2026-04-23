@@ -175,7 +175,6 @@ export interface DeleterForArrayElemetQuery extends DeleterQuery {
 
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing
 export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType, ModelMethods = any> extends DeleterForArrayElemetQuery {
-  // biome-ignore lint/suspicious/noExplicitAny: to complex typing
   cb?: (data: ArrayElementType) => unknown
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
   arrayElementKey: keyof ModelType
