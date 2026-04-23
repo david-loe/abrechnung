@@ -173,7 +173,13 @@ export interface DeleterForArrayElemetQuery extends DeleterQuery {
   parentId: string
 }
 
-export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType> extends DeleterOptions<ModelType>, DeleterForArrayElemetQuery {
+// biome-ignore lint/suspicious/noExplicitAny: to complex typing
+export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType, ModelMethods = any> extends DeleterForArrayElemetQuery {
+  // biome-ignore lint/suspicious/noExplicitAny: to complex typing
+  referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
+  minDocumentCount?: number
+  cb?: (data: DeleteResult & { deletedElement: ArrayElementType }) => unknown
+  checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
   arrayElementKey: keyof ModelType
   beforeDelete?(element: ArrayElementType): Promise<unknown>
 }
@@ -373,25 +379,25 @@ export class Controller extends TsoaController {
     if (options.checkOldObject && !(await options.checkOldObject(parentObject))) {
       throw new NotAllowedError(`Not allowed to modify this ${model.modelName} - ${String(options.arrayElementKey)}`)
     }
-    let found = false
+    let deletedElement: ArrayElementType | undefined
     const arr = parentObject[options.arrayElementKey] as Array<ArrayElementType>
     for (let i = 0; i < arr.length; i++) {
       if (arr[i]._id.equals(options._id)) {
-        found = true
         if (options.beforeDelete) {
           await options.beforeDelete(arr[i])
         }
+        deletedElement = arr[i]
         arr.splice(i, 1)
         break
       }
     }
-    if (!found) {
+    if (!deletedElement) {
       throw new NotFoundError(`No ${model.modelName} - ${String(options.arrayElementKey)} for _id: '${options._id}' found.`)
     }
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()
     if (options.cb) {
-      await options.cb({ acknowledged: true, deletedCount: 1, deletedObject: result })
+      await options.cb({ acknowledged: true, deletedCount: 1, deletedElement })
     }
     return { message: 'alerts.successDeleting', result: result }
   }
