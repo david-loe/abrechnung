@@ -5,7 +5,7 @@
       ref="modalComp"
       @afterClose="modalMode === 'view' ? resetModal() : null">
       <template #header="{header}">
-        <h5 class="modal-title">{{header}}</h5>
+        <h5 class="modal-title">{{ header }}</h5>
         <RefStringBadge v-if="modalAdvance.reference" class="ms-2" :number="modalAdvance.reference" type="Advance" />
       </template>
       <div v-if="modalAdvance">
@@ -26,6 +26,13 @@
                     class="btn btn-secondary"
                     @click="isOffsetFormVisible = true">
                     {{ t('labels.addX', {X: t('labels.offsetEntry')}) }}
+                  </button>
+                  <button
+                    v-if="canDeleteAdvance(modalAdvance as AdvanceSimple<string>)"
+                    type="button"
+                    class="btn btn-danger ms-2"
+                    @click="deleteAdvance((modalAdvance as AdvanceSimple<string>)._id)">
+                    {{ t('labels.delete') }}
                   </button>
                 </template>
               </Advance>
@@ -170,6 +177,10 @@ function resetAndHide() {
   hideModal()
 }
 
+function canDeleteAdvance(advance: AdvanceSimple<string>) {
+  return advance.state === AdvanceState.APPROVED && !advance.receivedOn && advance.offsetAgainst.length === 0
+}
+
 async function approveAdvance(
   advance: AdvanceSimple,
   decision: 'approved' | 'rejected',
@@ -204,6 +215,17 @@ async function offsetAdvance(advanceId: string, amount: number) {
       offsetAmount.value = 0
       isOffsetFormVisible.value = false
     }
+  }
+}
+
+async function deleteAdvance(_id: string) {
+  modalFormIsLoading.value = true
+  const result = await API.deleter('approve/advance', { _id })
+  modalFormIsLoading.value = false
+  if (result) {
+    advanceList.value?.loadFromServer()
+    approvedAdvanceList.value?.loadFromServer()
+    resetAndHide()
   }
 }
 

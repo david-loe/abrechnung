@@ -595,6 +595,10 @@
         "paragraph": "Votre demande d'avance a été approuvée.",
         "subject": "✅ Avance approuvée"
       },
+      "DELETED": {
+        "paragraph": "L'avance '{reportName}' pour {owner} dans le projet {project} a été supprimée par {deletedBy}.",
+        "subject": "🗑️ Avance supprimée"
+      },
       "REJECTED": {
         "lastParagraph": "{commentator} a écrit : '{comment}'",
         "paragraph": "Votre demande d'avance a été refusée.",
