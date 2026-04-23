@@ -176,9 +176,7 @@ export interface DeleterForArrayElemetQuery extends DeleterQuery {
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing
 export interface DeleterForArrayElemetOptions<ModelType, ArrayElementType, ModelMethods = any> extends DeleterForArrayElemetQuery {
   // biome-ignore lint/suspicious/noExplicitAny: to complex typing
-  referenceChecks?: { paths: string[]; model: Model<any>; conditions?: { [key: string]: any } }[]
-  minDocumentCount?: number
-  cb?: (data: DeleteResult & { deletedElement: ArrayElementType }) => unknown
+  cb?: (data: ArrayElementType) => unknown
   checkOldObject?: (oldObject: HydratedDocument<ModelType> & ModelMethods) => Promise<boolean>
   arrayElementKey: keyof ModelType
   beforeDelete?(element: ArrayElementType): Promise<unknown>
@@ -363,7 +361,7 @@ export class Controller extends TsoaController {
     const deletedObject = doc.toObject()
     const deleteResult = await doc.deleteOne()
     if (options.cb) {
-      await options.cb({ ...deleteResult, deletedObject })
+      options.cb({ ...deleteResult, deletedObject })
     }
     return deleteResult
   }
@@ -397,7 +395,7 @@ export class Controller extends TsoaController {
     parentObject.markModified(options.arrayElementKey)
     const result: ModelType = (await parentObject.save()).toObject()
     if (options.cb) {
-      await options.cb({ acknowledged: true, deletedCount: 1, deletedElement })
+      options.cb(deletedElement)
     }
     return { message: 'alerts.successDeleting', result: result }
   }
