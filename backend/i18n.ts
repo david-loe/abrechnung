@@ -16,8 +16,7 @@ const i18n = i18next.createInstance({
   fallbackLng: 'de',
   resources: await loadLocaleMessages(),
   nsSeparator: false,
-  interpolation: { prefix: '{', suffix: '}', nestingPrefix: "@:{'", nestingSuffix: "'}" },
-  showSupportNotice: false
+  interpolation: { prefix: '{', suffix: '}', nestingPrefix: "@:{'", nestingSuffix: "'}" }
 })
 
 await i18n.init()
