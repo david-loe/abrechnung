@@ -24,7 +24,7 @@
   "devDependencies": {
     "@types/big.js": "^6.2.2",
     "@types/node": "^24.12.2",
-    "ava": "^7.0.0",
+    "ava": "^8.0.0",
     "mongoose": "^9.5.0",
     "nodemon": "^3.1.14",
     "typescript": "^6.0.3"
