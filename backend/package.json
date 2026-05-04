@@ -5,7 +5,7 @@
   "type": "module",
   "dependencies": {
     "abrechnung-common": "file:../common",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "bullmq": "^5.76.1",
     "connect-mongo": "^6.0.0",
     "cors": "^2.8.6",
@@ -16,7 +16,7 @@
     "express-session": "^1.19.0",
     "i18next": "^26.0.7",
     "isolated-vm": "^6.1.2",
-    "mongodb": "~7.1",
+    "mongodb": "~7.2",
     "mongoose": "^9.5.0",
     "multer": "^2.1.1",
     "nodemailer": "^8.0.5",
