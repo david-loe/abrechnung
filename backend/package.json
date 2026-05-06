@@ -6,7 +6,7 @@
   "dependencies": {
     "abrechnung-common": "file:../common",
     "axios": "^1.15.2",
-    "bullmq": "^5.76.1",
+    "bullmq": "^5.76.5",
     "connect-mongo": "^6.0.0",
     "cors": "^2.8.6",
     "ejs": "^5.0.2",
