@@ -11,8 +11,10 @@ export type binary = mongo.Binary | Blob
 
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
-export function idDocumentToId<idType>(doc: IdDocument<idType>): idType {
-  return doc ? (doc as { _id: idType })._id || (doc as idType) : doc
+type IdOf<T> = T extends { _id: infer I } ? I : T
+
+export function idDocumentToId<T>(doc: T): IdOf<T> {
+  return doc && typeof doc === 'object' && '_id' in doc ? (doc as { _id: IdOf<T> })._id : (doc as IdOf<T>)
 }
 
 /**

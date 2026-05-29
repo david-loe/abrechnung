@@ -1,4 +1,4 @@
-import { baseCurrency, idDocumentToId, Money } from '../types.js'
+import { baseCurrency, CurrencyCode, IdDocument, idDocumentToId } from '../types.js'
 import { multiplyAmountAndRound } from './scripts.js'
 
 const exchangeRateSources = ['InforEuro'] as const
@@ -64,7 +64,13 @@ export class CurrencyConverter {
     return { date: conversionDate, rate, amount: resultAmount }
   }
 
-  async addExchangeRate(costObject: Money, date: string | number | Date) {
+  async addExchangeRate<
+    M extends {
+      amount: number | null
+      currency: IdDocument<CurrencyCode>
+      exchangeRate?: { date: Date | string; rate: number; amount: number } | null | undefined
+    }
+  >(costObject: M, date: string | number | Date) {
     let exchangeRate = null
 
     if (costObject.amount !== null && costObject.amount !== 0) {

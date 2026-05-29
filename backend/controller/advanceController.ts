@@ -3,7 +3,7 @@ import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } 
 import { QueryFilter, Types } from 'mongoose'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import { reportPrinter } from '../factory.js'
+import { currencyConverter, reportPrinter } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
@@ -20,7 +20,7 @@ interface AdvanceApplication {
   project?: IdDocument<Types.ObjectId>
   _id?: Types.ObjectId
   name?: string
-  budget: MoneyPost | undefined
+  budget: MoneyPost
   reason: string
   comment?: string
 }
@@ -191,6 +191,7 @@ export class AdvanceApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
+      await currencyConverter.addExchangeRate((extendedBody as AdvanceApplication).budget, new Date())
       setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
