@@ -11,6 +11,7 @@ import {
   FlatAddUp,
   HealthCareCost,
   HexColor,
+  IdDocument,
   idDocumentToId,
   Locale,
   Money,
@@ -183,6 +184,13 @@ export function multiplyAmountAndRound(left: number, right: number) {
   return normalizeRoundedAmount(new Big(left).times(right))
 }
 
+export function divideAmountAndRound(left: number, right: number) {
+  if (!Number.isFinite(left) || !Number.isFinite(right)) {
+    return left / right
+  }
+  return normalizeRoundedAmount(new Big(left).div(right))
+}
+
 export function sumAmounts(...amounts: number[]) {
   if (amounts.some((amount) => !Number.isFinite(amount))) {
     return amounts.reduce((sum, amount) => sum + amount, 0)
@@ -305,8 +313,8 @@ function addToAddUps<idType extends _id>(
   isTravel = false
 ): void {
   if (project) {
-    const projectId = idDocumentToId(project)
-    const addUp = addUps.find((addUp) => idDocumentToId<idType>(addUp.project).toString() === projectId.toString())
+    const projectId = project._id
+    const addUp = addUps.find((addUp) => idDocumentToId(addUp.project as IdDocument<idType>).toString() === projectId.toString())
     if (addUp) {
       if (key in addUp) {
         ;(addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount = sumAmounts(

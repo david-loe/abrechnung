@@ -134,7 +134,7 @@ class Formatter {
     }
     let str = this.currency(money.amount, idDocumentToId(money.currency))
     if (money.exchangeRate?.rate) {
-      str = `${str} * ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
+      str = `${str} / ${this.float(money.exchangeRate.rate)} = ${this.baseCurrency(money.exchangeRate.amount)}`
     }
     return str
   }

@@ -113,6 +113,6 @@ export const currencyConverter = new CurrencyConverter('InforEuro', [
     if (!data?.value) {
       return null
     }
-    return 1 / data.value
+    return data.value
   })
 ])
