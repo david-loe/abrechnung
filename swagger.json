@@ -13461,6 +13461,7 @@
 					}
 				},
 				"required": [
+					"budget",
 					"reason"
 				],
 				"type": "object",
