@@ -306,7 +306,7 @@ function addToAddUps<idType extends _id>(
 ): void {
   if (project) {
     const projectId = idDocumentToId(project)
-    const addUp = addUps.find((addUp) => idDocumentToId<idType>(addUp.project).toString() === projectId.toString())
+    const addUp = addUps.find((addUp) => idDocumentToId(addUp.project).toString() === projectId.toString())
     if (addUp) {
       if (key in addUp) {
         ;(addUp as FlatAddUp<idType, Travel<_id, binary>>)[key].amount = sumAmounts(
