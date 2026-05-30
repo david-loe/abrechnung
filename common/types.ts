@@ -399,7 +399,6 @@ export interface BaseCurrencyMoney {
 
 export interface Money extends BaseCurrencyMoney {
   currency: Currency
-  /** Foreign currency units per EUR. */
   exchangeRate?: { date: Date | string; rate: number; amount: number } | null
 }
 export interface MoneyNotNull extends Money {
