@@ -121,6 +121,13 @@
                     <hr class="dropdown-divider" >
                   </li>
                 </template>
+                <li><a class="dropdown-item clickable" @click="downloadCSV">
+                  <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
+                  <span>{{ t('csv.download') }}</span>
+                </a></li>
+                <li>
+                  <hr class="dropdown-divider" >
+                </li>
                 <li><a :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')" @click="showModal('edit', 'travel', travel)">
                   <span class="me-1"><i class="bi bi-pencil"></i></span>
                   <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
@@ -327,6 +334,7 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import { downloadReportCSV } from '@/reportExport.js'
 import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
 
@@ -467,6 +475,10 @@ function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject)
 
 function hideModal() {
   modalCompRef.value?.hideModal()
+}
+
+function downloadCSV() {
+  downloadReportCSV(travel.value, formatter.locale, t)
 }
 
 function resetModal() {

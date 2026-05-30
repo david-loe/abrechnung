@@ -72,6 +72,38 @@
     "wrongPassword": "Falsches Passwort",
     "XHasUnusedAdvance": "{X} hat noch einen Vorschuss der aktuell nicht verrechnet wird."
   },
+  "csv": {
+    "cateringAmount": "Berechnete Verpflegungspauschale",
+    "destinationCountry": "Reiseziel - Land",
+    "destinationPlace": "Reiseziel - Ort",
+    "destinationSpecial": "Reiseziel - Besonderheit",
+    "differentProject": "Abweichendes Projekt",
+    "download": "CSV herunterladen",
+    "endCountry": "Zielland",
+    "endPlace": "Zielort",
+    "endSpecial": "Zielort - Besonderheit",
+    "euroAmount": "Umgerechneter EUR-Betrag",
+    "exchangeRate": "Wechselkurs",
+    "exchangeRateDate": "Wechselkursdatum",
+    "lastPlaceOfWorkCountry": "Letzter Tätigkeitsort - Land",
+    "lastPlaceOfWorkSpecial": "Letzter Tätigkeitsort - Besonderheit",
+    "no": "Nein",
+    "originalAmount": "Originalbetrag",
+    "overnightAmount": "Berechnete Übernachtungspauschale",
+    "projectIdentifier": "Projektkennung",
+    "projectName": "Projektname",
+    "reference": "Referenz",
+    "sections": {
+      "details": "Details",
+      "expenses": "Auslagen",
+      "lumpSums": "Pauschalen",
+      "stages": "Etappen"
+    },
+    "startCountry": "Startland",
+    "startPlace": "Startort",
+    "startSpecial": "Startort - Besonderheit",
+    "yes": "Ja"
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "deleteBookedAfterXDays": "Um keine automatische Löschung durchzuführen 0 eingeben",

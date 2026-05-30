@@ -90,6 +90,13 @@
                     <hr class="dropdown-divider" >
                   </li>
                 </template>
+                <li><a class="dropdown-item clickable" @click="downloadCSV">
+                  <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
+                  <span>{{ t('csv.download') }}</span>
+                </a></li>
+                <li>
+                  <hr class="dropdown-divider" >
+                </li>
                 <li>
                   <a
                     :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
@@ -298,6 +305,7 @@ import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
+import { downloadReportCSV } from '@/reportExport.js'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import { sortByPath } from 'abrechnung-common/utils/sort.js'
 import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
@@ -365,6 +373,11 @@ function hideModal() {
     modalCompRef.value.hideModal()
   }
 }
+
+function downloadCSV() {
+  downloadReportCSV(expenseReport.value, formatter.locale, t)
+}
+
 function resetModal() {
   modalMode.value = 'add'
   modalObject.value = {}

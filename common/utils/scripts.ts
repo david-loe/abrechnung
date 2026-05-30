@@ -628,6 +628,18 @@ export function objectsToCSV(objects: Record<string, unknown>[], separator = '\t
   return str
 }
 
+export function rowsToCSV(rows: readonly (readonly (string | number | null | undefined)[])[]) {
+  const serializeCell = (cell: string | number | null | undefined) => {
+    if (cell === null || cell === undefined) {
+      return ''
+    }
+    const value = String(cell)
+    return /[;"\r\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value
+  }
+
+  return `\uFEFF${rows.map((row) => row.map(serializeCell).join(';')).join('\r\n')}\r\n`
+}
+
 export function download(file: File) {
   const link = document.createElement('a')
   const url = URL.createObjectURL(file)

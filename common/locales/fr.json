@@ -72,6 +72,38 @@
     "wrongPassword": "Mot de passe incorrect",
     "XHasUnusedAdvance": "{X} a encore une avance qui n’est actuellement pas imputée."
   },
+  "csv": {
+    "cateringAmount": "Indemnité de repas calculée",
+    "destinationCountry": "Destination - pays",
+    "destinationPlace": "Destination - lieu",
+    "destinationSpecial": "Destination - lieu spécial",
+    "differentProject": "Projet différent",
+    "download": "Télécharger le CSV",
+    "endCountry": "Pays de destination",
+    "endPlace": "Lieu de destination",
+    "endSpecial": "Destination - lieu spécial",
+    "euroAmount": "Montant converti en EUR",
+    "exchangeRate": "Taux de change",
+    "exchangeRateDate": "Date du taux de change",
+    "lastPlaceOfWorkCountry": "Dernier lieu d'activité - pays",
+    "lastPlaceOfWorkSpecial": "Dernier lieu d'activité - lieu spécial",
+    "no": "Non",
+    "originalAmount": "Montant original",
+    "overnightAmount": "Indemnité d'hébergement calculée",
+    "projectIdentifier": "Identifiant du projet",
+    "projectName": "Nom du projet",
+    "reference": "Référence",
+    "sections": {
+      "details": "Détails",
+      "expenses": "Dépenses",
+      "lumpSums": "Forfaits",
+      "stages": "Étapes"
+    },
+    "startCountry": "Pays de départ",
+    "startPlace": "Lieu de départ",
+    "startSpecial": "Départ - lieu spécial",
+    "yes": "Oui"
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Entrez 0 pour ne pas effectuer de suppression automatique",
     "deleteBookedAfterXDays": "Entrez 0 pour ne pas effectuer de suppression automatique",
