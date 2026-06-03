@@ -14,7 +14,14 @@ import {
   type Travel,
   type TravelDay
 } from 'abrechnung-common/types.js'
-import { datetimeToDateString, datetimeToDatetimeString, download, refNumberToString, rowsToCSV } from 'abrechnung-common/utils/scripts.js'
+import {
+  datetimeToDateString,
+  datetimeToDatetimeString,
+  download,
+  refNumberToString,
+  rowsToCSV,
+  sanitizeFilename
+} from 'abrechnung-common/utils/scripts.js'
 import { formatter } from '@/formatter.js'
 
 type CsvCell = string | number | null | undefined
@@ -248,5 +255,5 @@ export function downloadReportCSV(report: ExportReport, locale: Locale, t: Trans
   const reportName =
     report.name.trim() ||
     `${t(`labels.${modelName === 'Travel' ? 'travel' : modelName === 'HealthCareCost' ? 'healthCareCost' : 'expenseReport'}`)}-${refNumberToString(report.reference, modelName)}`
-  download(new File([reportToCSV(report, locale, t)], `${reportName}.csv`, { type: 'text/csv;charset=utf-8' }))
+  download(new File([reportToCSV(report, locale, t)], `${sanitizeFilename(reportName)}.csv`, { type: 'text/csv;charset=utf-8' }))
 }
