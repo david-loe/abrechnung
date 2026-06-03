@@ -95,11 +95,23 @@ export const currencyConverter = new CurrencyConverter('InforEuro', [
   new ExchangeRateProviderWithLocalStorage(
     'InforEuro',
     sources.InforEuro,
-    async (date, TO, rates) => {
-      await ExchangeRate.insertMany(rates.map((r) => ({ ...r, provider: 'InforEuro', date: date.setUTCDate(1) })))
+    async (date, _TO, rates) => {
+      if (rates.length === 0) {
+        return
+      }
+      const cacheDate = new Date(date.setUTCDate(1))
+      await ExchangeRate.bulkWrite(
+        rates.map((rate) => ({
+          updateOne: {
+            filter: { provider: 'InforEuro', currency: rate.currency, date: cacheDate },
+            update: { $setOnInsert: { ...rate, provider: 'InforEuro', date: cacheDate } },
+            upsert: true
+          }
+        }))
+      )
     },
-    async (date, FROM, TO) => {
-      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: date.setUTCDate(1) }).lean()
+    async (date, FROM, _TO) => {
+      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: new Date(date.setUTCDate(1)) }).lean()
       if (rateDoc?.rate) {
         return 1 / rateDoc.rate
       }
@@ -113,7 +125,18 @@ export const currencyConverter = new CurrencyConverter('InforEuro', [
       if (TO !== 'EUR') {
         return
       }
-      await ExchangeRate.insertMany(rates.map((r) => ({ ...r, provider: 'Frankfurter', date: date })))
+      if (rates.length === 0) {
+        return
+      }
+      await ExchangeRate.bulkWrite(
+        rates.map((rate) => ({
+          updateOne: {
+            filter: { provider: 'Frankfurter', currency: rate.currency, date },
+            update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date } },
+            upsert: true
+          }
+        }))
+      )
     },
     async (date, FROM, TO) => {
       if (TO !== 'EUR') {

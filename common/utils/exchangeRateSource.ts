@@ -17,7 +17,7 @@ type FrankfurterResponse = Array<{ date: string; base: string; quote: string; ra
 export const sources: Record<ExchangeRateProviderName, GetRateFn> = {
   InforEuro: async (date: Date, FROM: CurrencyCode, TO: CurrencyCode) => {
     const result: { rate: number | null; rates: Rates | null } = { rate: null, rates: null }
-    if (TO !== 'EUR') {
+    if (TO !== 'EUR' || date.valueOf() < Date.UTC(2000, 0, 1)) {
       return result
     }
     const month = date.getUTCMonth() + 1
@@ -37,6 +37,9 @@ export const sources: Record<ExchangeRateProviderName, GetRateFn> = {
   },
   Frankfurter: async (date: Date, FROM: CurrencyCode, TO: CurrencyCode) => {
     const result: { rate: number | null; rates: Rates | null } = { rate: null, rates: null }
+    if (date.valueOf() < Date.UTC(2000, 0, 1)) {
+      return result
+    }
     const res = await axios.get<FrankfurterResponse>(`https://api.frankfurter.dev/v2/rates?date=${datetimeToDateString(date)}&base=${TO}`)
     if (res.status === 200) {
       result.rates = res.data.map((r) => ({ currency: r.quote, rate: r.rate }))
