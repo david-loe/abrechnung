@@ -51,6 +51,7 @@ export interface Settings<idType extends _id = _id> {
   defaultAccess: { [key in Access]: boolean }
   disableReportType: { [key in ReportType]: boolean }
   uploadTokenExpireAfterSeconds: number
+  exchangeRateProvider: ExchangeRateProviderName
   isReadOnly: boolean
   version: string
   /**

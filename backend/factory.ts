@@ -91,7 +91,7 @@ export const travelCalculator = new TravelCalculator(
   BACKEND_CACHE.travelSettings
 )
 
-export const currencyConverter = new CurrencyConverter('InforEuro', [
+export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.exchangeRateProvider, [
   new ExchangeRateProviderWithLocalStorage(
     'InforEuro',
     sources.InforEuro,

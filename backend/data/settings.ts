@@ -19,6 +19,7 @@ export default {
   },
   disableReportType: { advance: false, expenseReport: false, healthCareCost: true, travel: false },
   uploadTokenExpireAfterSeconds: 600,
+  exchangeRateProvider: 'Frankfurter',
   userCanSeeAllProjects: true,
   onlyShowProjectNamesOnAssigned: false,
   autoSelectAvailableAdvances: true,

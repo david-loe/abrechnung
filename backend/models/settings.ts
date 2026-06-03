@@ -1,6 +1,7 @@
-import { Access, accesses, ReportType, reportTypes, Settings } from 'abrechnung-common/types.js'
+import { Access, accesses, exchangeRateProviderNames, ReportType, reportTypes, Settings } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
+import { currencyConverter } from '../factory.js'
 
 export const settingsSchema = () => {
   const defaultAccess: { [key in Access]?: { type: BooleanConstructor; required: true; label: string } } = {}
@@ -21,6 +22,7 @@ export const settingsSchema = () => {
     defaultAccess: { type: defaultAccess, required: true },
     disableReportType: { type: disableReportType, required: true },
     uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
+    exchangeRateProvider: { type: String, enum: exchangeRateProviderNames, required: true, translationPrefix: '' },
     isReadOnly: { type: Boolean, required: true, hide: true },
     version: { type: String, required: true, hide: true },
     migrateFrom: { type: String, hide: true }
@@ -32,6 +34,7 @@ const schema = settingsSchema()
 schema.post('save', function () {
   const settings = this.toObject()
   BACKEND_CACHE.setSettings(settings)
+  currencyConverter.setProvider(settings.exchangeRateProvider)
 })
 
 export default model('Settings', schema)
