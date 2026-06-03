@@ -6674,6 +6674,13 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ExchangeRateProviderName": {
+				"type": "string",
+				"enum": [
+					"InforEuro",
+					"Frankfurter"
+				]
+			},
 			"Settings_mongoose.Types.ObjectId_": {
 				"properties": {
 					"userCanSeeAllProjects": {
@@ -6786,6 +6793,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"exchangeRateProvider": {
+						"$ref": "#/components/schemas/ExchangeRateProviderName"
+					},
 					"isReadOnly": {
 						"type": "boolean"
 					},
@@ -6808,6 +6818,7 @@
 					"defaultAccess",
 					"disableReportType",
 					"uploadTokenExpireAfterSeconds",
+					"exchangeRateProvider",
 					"isReadOnly",
 					"version",
 					"_id"
@@ -6927,6 +6938,9 @@
 						"type": "number",
 						"format": "double"
 					},
+					"exchangeRateProvider": {
+						"$ref": "#/components/schemas/ExchangeRateProviderName"
+					},
 					"isReadOnly": {
 						"type": "boolean"
 					},
@@ -6949,6 +6963,7 @@
 					"defaultAccess",
 					"disableReportType",
 					"uploadTokenExpireAfterSeconds",
+					"exchangeRateProvider",
 					"isReadOnly",
 					"version",
 					"_id"
@@ -6958,6 +6973,13 @@
 			},
 			"SetterPartial_Omit_ISettings_mongoose.Types.ObjectId_.version-or-migrateFrom-or-isReadOnly_.NoPost_": {
 				"properties": {
+					"exchangeRateProvider": {
+						"type": "string",
+						"enum": [
+							"InforEuro",
+							"Frankfurter"
+						]
+					},
 					"uploadTokenExpireAfterSeconds": {
 						"type": "number",
 						"format": "double"
