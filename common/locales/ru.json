@@ -72,6 +72,38 @@
     "wrongPassword": "Неверный пароль",
     "XHasUnusedAdvance": "У {X} всё ещё есть аванс, который в настоящее время не зачтён."
   },
+  "csv": {
+    "cateringAmount": "Рассчитанная выплата на питание",
+    "destinationCountry": "Место назначения - страна",
+    "destinationPlace": "Место назначения - место",
+    "destinationSpecial": "Место назначения - особое место",
+    "differentProject": "Другой проект",
+    "download": "Скачать CSV",
+    "endCountry": "Страна назначения",
+    "endPlace": "Место назначения",
+    "endSpecial": "Место назначения - особое место",
+    "euroAmount": "Сумма в EUR после конвертации",
+    "exchangeRate": "Обменный курс",
+    "exchangeRateDate": "Дата обменного курса",
+    "lastPlaceOfWorkCountry": "Последнее место работы - страна",
+    "lastPlaceOfWorkSpecial": "Последнее место работы - особое место",
+    "no": "Нет",
+    "originalAmount": "Исходная сумма",
+    "overnightAmount": "Рассчитанная выплата за ночлег",
+    "projectIdentifier": "Идентификатор проекта",
+    "projectName": "Название проекта",
+    "reference": "Ссылка",
+    "sections": {
+      "details": "Подробности",
+      "expenses": "Расходы",
+      "lumpSums": "Выплаты",
+      "stages": "Этапы"
+    },
+    "startCountry": "Страна отправления",
+    "startPlace": "Место отправления",
+    "startSpecial": "Место отправления - особое место",
+    "yes": "Да"
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Введите 0, чтобы избежать автоматического удаления.",
     "deleteBookedAfterXDays": "Введите 0, чтобы избежать автоматического удаления.",

@@ -30,7 +30,8 @@ import {
   multiplyAmountAndRound,
   objectsToCSV,
   placeToString,
-  roundAmount
+  roundAmount,
+  rowsToCSV
 } from './scripts.js'
 
 type Id = string
@@ -151,6 +152,21 @@ test('objectsToCSV converts arrays', (t) => {
     { a: 2, b: [3] }
   ])
   t.is(csv, 'a\tb\n1\t[1, 2]\n2\t[3]\n')
+})
+
+test('rowsToCSV creates Excel-compatible semicolon-separated CSV', (t) => {
+  const csv = rowsToCSV([
+    ['Name', 'Amount', 'Note'],
+    ['plain', 12.5, null],
+    ['semicolon;value', undefined, 'quote "value"'],
+    ['multiline', 0, 'first line\nsecond line']
+  ])
+
+  t.is(csv, '\uFEFFName;Amount;Note\r\nplain;12.5;\r\n"semicolon;value";;"quote ""value"""\r\nmultiline;0;"first line\nsecond line"\r\n')
+})
+
+test('rowsToCSV preserves empty rows', (t) => {
+  t.is(rowsToCSV([['section'], [], ['value']]), '\uFEFFsection\r\n\r\nvalue\r\n')
 })
 
 test('escapeRegExp', (t) => {

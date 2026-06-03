@@ -72,6 +72,38 @@
     "wrongPassword": "Қате құпия сөз",
     "XHasUnusedAdvance": "{X}-те қазіргі уақытта есепке алынбай тұрған аванс бар."
   },
+  "csv": {
+    "cateringAmount": "Есептелген тамақтану төлемі",
+    "destinationCountry": "Межелі орын - ел",
+    "destinationPlace": "Межелі орын - орын",
+    "destinationSpecial": "Межелі орын - арнайы орын",
+    "differentProject": "Басқа жоба",
+    "download": "CSV жүктеп алу",
+    "endCountry": "Межелі ел",
+    "endPlace": "Межелі орын",
+    "endSpecial": "Межелі орын - арнайы орын",
+    "euroAmount": "EUR-ға айналдырылған сома",
+    "exchangeRate": "Айырбас бағамы",
+    "exchangeRateDate": "Айырбас бағамының күні",
+    "lastPlaceOfWorkCountry": "Соңғы жұмыс орны - ел",
+    "lastPlaceOfWorkSpecial": "Соңғы жұмыс орны - арнайы орын",
+    "no": "Жоқ",
+    "originalAmount": "Бастапқы сома",
+    "overnightAmount": "Есептелген түнгі төлем",
+    "projectIdentifier": "Жоба идентификаторы",
+    "projectName": "Жоба атауы",
+    "reference": "Анықтама",
+    "sections": {
+      "details": "Мәліметтер",
+      "expenses": "Шығындар",
+      "lumpSums": "Төлемдер",
+      "stages": "Кезеңдер"
+    },
+    "startCountry": "Бастапқы ел",
+    "startPlace": "Бастапқы орын",
+    "startSpecial": "Бастапқы арнайы орын",
+    "yes": "Иә"
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Автоматты түрде жою үшін 0 енгізіңіз",
     "deleteBookedAfterXDays": "Автоматты түрде жою үшін 0 енгізіңіз",
