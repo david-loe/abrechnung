@@ -251,10 +251,10 @@ export interface Country extends CountrySimple {
 }
 
 export interface ExchangeRate {
+  provider: ExchangeRateProviderName
   currency: string
-  value: number
-  year: number
-  month: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  rate: number
+  date: Date
 }
 
 /**
@@ -743,6 +743,9 @@ export type Meal = (typeof meals)[number]
 
 export const fontNames = ['NotoSans', 'Inter'] as const
 export type FontName = (typeof fontNames)[number]
+
+export const exchangeRateProviderNames = ['InforEuro', 'Frankfurter'] as const
+export type ExchangeRateProviderName = (typeof exchangeRateProviderNames)[number]
 
 export type PageOrientation = 'portrait' | 'landscape'
 

@@ -11,6 +11,7 @@
     "./data/*.js": "./dist/data/*.js"
   },
   "dependencies": {
+    "axios": "^1.17.0",
     "big.js": "^7.0.1",
     "envalid": "^8.1.1",
     "pdf-fontkit": "^1.8.9",

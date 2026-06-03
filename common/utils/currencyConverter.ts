@@ -1,38 +1,62 @@
-import { baseCurrency, CurrencyCode, IdDocument, idDocumentToId } from '../types.js'
+import { baseCurrency, CurrencyCode, ExchangeRateProviderName, IdDocument, idDocumentToId } from '../types.js'
 import { multiplyAmountAndRound } from './scripts.js'
 
-const exchangeRateSources = ['InforEuro'] as const
-type _ExchangeRateSource = (typeof exchangeRateSources)[number]
-
-export type InforEuroResponse = Array<{
-  country: string
-  currency: string
-  isoA3Code: string
-  isoA2Code: string
-  value: number
-  comment: null | string
-}>
+export type Rates = { currency: CurrencyCode; rate: number }[]
+export type GetRateFn = (date: Date, FROM: string, TO: string) => Promise<{ rate: number | null; rates: Rates | null }>
 
 export class ExchangeRateProvider {
-  name: string
-  getRate: (date: Date, FROM: string, TO: string) => Promise<number | null>
+  name: ExchangeRateProviderName
+  #getRate: GetRateFn
 
-  constructor(name: string, getRate: ExchangeRateProvider['getRate']) {
+  constructor(name: ExchangeRateProviderName, getRate: GetRateFn) {
     this.name = name
-    this.getRate = getRate
+    this.#getRate = getRate
+  }
+
+  async getRate(date: Date, FROM: string, TO: string) {
+    return this.#getRate(date, FROM, TO)
+  }
+}
+
+export class ExchangeRateProviderWithLocalStorage extends ExchangeRateProvider {
+  storeRates: (date: Date, TO: string, rates: Rates) => Promise<void>
+  getStoredRate: (date: Date, FROM: string, TO: string) => Promise<number | null>
+
+  constructor(
+    name: ExchangeRateProviderName,
+    getRate: GetRateFn,
+    storeRates: ExchangeRateProviderWithLocalStorage['storeRates'],
+    getStoredRate: ExchangeRateProviderWithLocalStorage['getStoredRate']
+  ) {
+    super(name, getRate)
+    this.storeRates = storeRates
+    this.getStoredRate = getStoredRate
+  }
+
+  async getRate(date: Date, FROM: string, TO: string) {
+    const storedRate = await this.getStoredRate(date, FROM, TO)
+    if (storedRate) {
+      return { rate: storedRate, rates: null }
+    } else {
+      const result = await super.getRate(date, FROM, TO)
+      if (result.rates) {
+        await this.storeRates(date, TO, result.rates)
+      }
+      return result
+    }
   }
 }
 
 export class CurrencyConverter {
-  source: string
-  sources: Record<string, ExchangeRateProvider>
+  #provider!: ExchangeRateProviderName
+  #providers: Partial<Record<ExchangeRateProviderName, ExchangeRateProvider>>
 
-  constructor(source: string, sources: ExchangeRateProvider[]) {
-    this.source = source
-    this.sources = {} as Record<string, ExchangeRateProvider>
-    for (const s of sources) {
-      this.sources[s.name] = s
+  constructor(provider: ExchangeRateProviderName, providers: ExchangeRateProvider[]) {
+    this.#providers = {}
+    for (const s of providers) {
+      this.#providers[s.name] = s
     }
+    this.setProvider(provider)
   }
 
   async convert(
@@ -46,15 +70,12 @@ export class CurrencyConverter {
     if (FROM === TO) {
       return null
     }
-    const provider = this.sources[this.source]
-    if (!provider) {
-      throw new Error(`No exchange rate provider found for source ${this.source}`)
-    }
+    const provider = this.#getProvider(this.#provider)
     let conversionDate = new Date(date)
     if (conversionDate.valueOf() - Date.now() > 0) {
       conversionDate = new Date()
     }
-    const rate = await provider.getRate(conversionDate, FROM, TO)
+    const rate = (await provider.getRate(conversionDate, FROM, TO)).rate
     if (rate === null) {
       return null
     }
@@ -78,5 +99,19 @@ export class CurrencyConverter {
     }
     costObject.exchangeRate = exchangeRate
     return costObject
+  }
+
+  #getProvider(providerName: ExchangeRateProviderName) {
+    if (!this.#providers[providerName]) {
+      throw new Error(`No exchange rate provider found for provider ${providerName}`)
+    }
+    return this.#providers[providerName]
+  }
+
+  setProvider(providerName: ExchangeRateProviderName) {
+    if (!this.#providers[providerName]) {
+      throw new Error(`No exchange rate provider found for provider ${providerName}`)
+    }
+    this.#provider = providerName
   }
 }
