@@ -99,7 +99,7 @@ export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.ex
       if (rates.length === 0) {
         return
       }
-      const cacheDate = new Date(date.setUTCDate(1))
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
       await ExchangeRate.bulkWrite(
         rates.map((rate) => ({
           updateOne: {
@@ -111,7 +111,8 @@ export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.ex
       )
     },
     async (date, FROM, _TO) => {
-      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: new Date(date.setUTCDate(1)) }).lean()
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: cacheDate }).lean()
       if (rateDoc?.rate) {
         return 1 / rateDoc.rate
       }
@@ -128,11 +129,12 @@ export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.ex
       if (rates.length === 0) {
         return
       }
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
       await ExchangeRate.bulkWrite(
         rates.map((rate) => ({
           updateOne: {
-            filter: { provider: 'Frankfurter', currency: rate.currency, date },
-            update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date } },
+            filter: { provider: 'Frankfurter', currency: rate.currency, date: cacheDate },
+            update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date: cacheDate } },
             upsert: true
           }
         }))
@@ -142,7 +144,8 @@ export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.ex
       if (TO !== 'EUR') {
         return null
       }
-      const rateDoc = await ExchangeRate.findOne({ provider: 'Frankfurter', currency: FROM, date: date }).lean()
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+      const rateDoc = await ExchangeRate.findOne({ provider: 'Frankfurter', currency: FROM, date: cacheDate }).lean()
       if (rateDoc?.rate) {
         return 1 / rateDoc.rate
       }
