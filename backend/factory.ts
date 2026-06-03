@@ -5,15 +5,14 @@ import {
   _id,
   CountryCode,
   Country as ICountry,
-  ExchangeRate as IExchangeRate,
   Locale,
   NameDisplayFormat,
   PrinterSettings,
   TravelSettings
 } from 'abrechnung-common/types.js'
-import { CurrencyConverter, ExchangeRateProvider, InforEuroResponse } from 'abrechnung-common/utils/currencyConverter.js'
+import { CurrencyConverter, ExchangeRateProviderWithLocalStorage } from 'abrechnung-common/utils/currencyConverter.js'
+import { sources } from 'abrechnung-common/utils/exchangeRateSource.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
-import axios from 'axios'
 import { Types } from 'mongoose'
 import { BACKEND_CACHE } from './db.js'
 import i18n from './i18n.js'
@@ -92,27 +91,65 @@ export const travelCalculator = new TravelCalculator(
   BACKEND_CACHE.travelSettings
 )
 
-export const currencyConverter = new CurrencyConverter('InforEuro', [
-  new ExchangeRateProvider('InforEuro', async (date, FROM, TO) => {
-    if (TO !== 'EUR') {
-      return null
-    }
-    const month = (date.getUTCMonth() + 1) as IExchangeRate['month']
-    const year = date.getUTCFullYear()
-    let data: IExchangeRate | null | undefined = await ExchangeRate.findOne({ currency: FROM, month: month, year: year }).lean()
-    if (!data && !(await ExchangeRate.findOne({ month: month, year: year }).lean())) {
-      const res = await axios.get(`https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`)
-      if (res.status === 200) {
-        const rates = (res.data as InforEuroResponse).map(
-          (r) => ({ currency: r.isoA3Code, value: r.value, month: month, year: year }) as IExchangeRate
-        )
-        await ExchangeRate.insertMany(rates)
-        data = rates.find((r) => r.currency === FROM)
+export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.exchangeRateProvider, [
+  new ExchangeRateProviderWithLocalStorage(
+    'InforEuro',
+    sources.InforEuro,
+    async (date, _TO, rates) => {
+      if (rates.length === 0) {
+        return
       }
-    }
-    if (!data?.value) {
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+      await ExchangeRate.bulkWrite(
+        rates.map((rate) => ({
+          updateOne: {
+            filter: { provider: 'InforEuro', currency: rate.currency, date: cacheDate },
+            update: { $setOnInsert: { ...rate, provider: 'InforEuro', date: cacheDate } },
+            upsert: true
+          }
+        }))
+      )
+    },
+    async (date, FROM, _TO) => {
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: cacheDate }).lean()
+      if (rateDoc?.rate) {
+        return 1 / rateDoc.rate
+      }
       return null
     }
-    return 1 / data.value
-  })
+  ),
+  new ExchangeRateProviderWithLocalStorage(
+    'Frankfurter',
+    sources.Frankfurter,
+    async (date, TO, rates) => {
+      if (TO !== 'EUR') {
+        return
+      }
+      if (rates.length === 0) {
+        return
+      }
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+      await ExchangeRate.bulkWrite(
+        rates.map((rate) => ({
+          updateOne: {
+            filter: { provider: 'Frankfurter', currency: rate.currency, date: cacheDate },
+            update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date: cacheDate } },
+            upsert: true
+          }
+        }))
+      )
+    },
+    async (date, FROM, TO) => {
+      if (TO !== 'EUR') {
+        return null
+      }
+      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+      const rateDoc = await ExchangeRate.findOne({ provider: 'Frankfurter', currency: FROM, date: cacheDate }).lean()
+      if (rateDoc?.rate) {
+        return 1 / rateDoc.rate
+      }
+      return null
+    }
+  )
 ])

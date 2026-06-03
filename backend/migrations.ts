@@ -116,6 +116,11 @@ export async function checkForMigrations() {
 
       await settingsCol.updateMany({}, { $unset: { retentionPolicy: '' } })
     }
+    if (semver.lte(migrateFrom, '2.6.2')) {
+      logger.info('Apply migration from v2.6.2: Drop exchange rate collection')
+      await mongoose.connection.collection('exchangerates').drop()
+      await mongoose.connection.collection('settings').updateMany({}, { $set: { exchangeRateProvider: 'InforEuro' } })
+    }
     settings.migrateFrom = undefined
     await settings.save()
   }

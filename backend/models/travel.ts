@@ -185,7 +185,7 @@ schema.methods.calculateExchangeRates = async function () {
   for (const expense of this.expenses) {
     promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
   }
-  await Promise.allSettled(promiseList)
+  await Promise.all(promiseList)
 }
 
 schema.methods.addComment = function () {
