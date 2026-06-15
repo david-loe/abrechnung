@@ -11,9 +11,9 @@
     "./data/*.js": "./dist/data/*.js"
   },
   "dependencies": {
-    "axios": "^1.17.0",
+    "axios": "^1.18.0",
     "big.js": "^7.0.1",
-    "envalid": "^8.1.1",
+    "envalid": "^8.2.0",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1"
   },
@@ -24,9 +24,9 @@
   },
   "devDependencies": {
     "@types/big.js": "^7.0.0",
-    "@types/node": "^24.12.4",
+    "@types/node": "^24.13.2",
     "ava": "^8.0.1",
-    "mongodb": "~7.2",
+    "mongodb": "~7.3",
     "mongoose": "^9.6.3",
     "nodemon": "^3.1.14",
     "typescript": "^6.0.3"
