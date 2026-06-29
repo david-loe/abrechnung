@@ -6,7 +6,7 @@
   "dependencies": {
     "abrechnung-common": "file:../common",
     "axios": "^1.17.0",
-    "bullmq": "^5.78.0",
+    "bullmq": "^5.79.2",
     "connect-mongo": "^6.0.0",
     "cors": "^2.8.6",
     "ejs": "^6.0.1",
@@ -18,7 +18,7 @@
     "isolated-vm": "^7.0.0",
     "mongodb": "~7.2",
     "mongoose": "^9.6.3",
-    "multer": "^2.1.1",
+    "multer": "^2.2.0",
     "nodemailer": "^8.0.10",
     "openid-client": "^6.8.4",
     "passport": "^0.7.0",
