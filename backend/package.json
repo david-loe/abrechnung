@@ -14,7 +14,7 @@
     "express": "^5.2.1",
     "express-rate-limit": "^8.5.2",
     "express-session": "^1.19.0",
-    "i18next": "^26.3.0",
+    "i18next": "^26.3.3",
     "isolated-vm": "^7.0.0",
     "mongodb": "~7.2",
     "mongoose": "^9.6.3",
@@ -26,7 +26,7 @@
     "passport-ldapauth": "^3.0.1",
     "passport-magic-login": "^1.2.4",
     "passport-microsoft": "^2.1.0",
-    "semver": "^7.8.1",
+    "semver": "^7.8.5",
     "swagger-ui-express": "^5.0.1",
     "tsoa": "^6.6.0",
     "web-push": "^3.6.7"
