@@ -57,6 +57,7 @@ export class LOGIN_APP_DATA {
   }
   set language(locale: Locale) {
     this._language = locale
+    document.documentElement.lang = locale
 
     // fix wired change in composer structure - sometimes Ref and sometimes not
     if (isRef(this.i18n.locale)) {

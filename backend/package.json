@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "dependencies": {
+    "@tsoa/runtime": "^6.6.0",
     "abrechnung-common": "file:../common",
     "axios": "^1.18.1",
     "bullmq": "^5.81.2",
@@ -28,7 +29,6 @@
     "passport-microsoft": "^2.1.0",
     "semver": "^7.8.1",
     "swagger-ui-express": "^5.0.1",
-    "@tsoa/runtime": "^6.6.0",
     "web-push": "^3.6.7"
   },
   "peerDependencies": {
@@ -36,7 +36,7 @@
     "ldapjs": "^3.0.7"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.14",
+    "@biomejs/biome": "2.5.5",
     "@types/cors": "^2.8.19",
     "@types/ejs": "^3.1.5",
     "@types/escape-html": "^1.0.4",

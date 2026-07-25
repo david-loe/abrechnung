@@ -1,7 +1,8 @@
 import type { mongo, Types } from 'mongoose'
 import { DocumentFileType, documentFileTypes, ImageType, imageTypes } from './utils/file.js'
-export { documentFileTypes, imageTypes }
+
 export type { DocumentFileType, ImageType }
+export { documentFileTypes, imageTypes }
 
 /**
  * @pattern ^[0-9a-fA-F]{24}$

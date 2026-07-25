@@ -17,7 +17,9 @@ case "$(uname -s)" in
     ;;
 esac
 
-BIOME_VERSION="2.3.14" # update blocked by https://github.com/biomejs/biome/issues/9155
+# Keep this version in sync with backend/package.json.
+# Vue files are excluded in biome.json until https://github.com/biomejs/biome/issues/9155 is fixed.
+BIOME_VERSION="2.5.5"
 IMAGE_NAME="ghcr.io/biomejs/biome:${BIOME_VERSION}"
 
 # Run Docker
