@@ -16,12 +16,12 @@ import {
 } from 'abrechnung-common/types.js'
 import { Ref, ref } from 'vue'
 import API from './api.js'
-import { app } from './app.js'
 import { APP_DATA, LOGIN_APP_DATA } from './appData.js'
 import { eventBus } from './eventBus.js'
 import { formatter } from './formatter.js'
 import i18n, { getLanguageFromNavigator } from './i18n.js'
 import { logger } from './logger.js'
+import { registerSessionPurgeHandler } from './session.js'
 
 type APP_DATA_REQUIRED_ENDPOINTS =
   | 'user'
@@ -38,10 +38,11 @@ type APP_DATA_REQUIRED_ENDPOINTS =
 type APP_DATA_OPTIONAL_ENDPOINTS = 'project' | 'users'
 type APP_DATA_ENDPOINTS = APP_DATA_REQUIRED_ENDPOINTS | APP_DATA_OPTIONAL_ENDPOINTS
 
-const languageChangeCB = (locale: Locale) => {
-  if (app.config.globalProperties.$vueform) {
-    app.config.globalProperties.$vueform.i18n.locale = locale
-  }
+let vueformLanguageChange: ((locale: Locale) => void) | undefined
+const languageChangeCB = (locale: Locale) => vueformLanguageChange?.(locale)
+
+export function registerVueformLanguageChange(handler: (locale: Locale) => void) {
+  vueformLanguageChange = handler
 }
 
 class APP_LOADER {
@@ -52,8 +53,10 @@ class APP_LOADER {
   state: Ref<'UNLOADED' | 'LOADING' | 'LOADED'> = ref('UNLOADED')
   progress = ref(0)
   progressIncrement = 10 // 10 * 10 = 100
+  private generation = 0
 
   constructor() {
+    registerSessionPurgeHandler(() => this.reset())
     eventBus.addEventListener('lastCurrencies-updated', (e) =>
       API.setter('user/settings', { lastCurrencies: (e as CustomEvent).detail.map((c: Currency) => c._id) }, {}, false)
     )
@@ -86,6 +89,7 @@ class APP_LOADER {
 
   loadData(reload = false) {
     if (this.dataPromise === undefined || reload) {
+      const generation = ++this.generation
       this.state.value = 'LOADING'
       this.progress.value = 0
       this.loginDataPromise = this.dataPromise = new Promise((resolve, reject) => {
@@ -159,6 +163,7 @@ class APP_LOADER {
             logger.info(`${i18n.global.t('labels.user')}:`)
             logger.info(user)
             resolve(data)
+            if (generation !== this.generation) return
             this.data.value = data
             this.loginData.value = data
             this.state.value = 'LOADED'
@@ -171,12 +176,14 @@ class APP_LOADER {
 
   loadLoginData(reload = false) {
     if (this.loginDataPromise === undefined || reload) {
+      const generation = ++this.generation
       this.state.value = 'LOADING'
       this.loginDataPromise = new Promise((resolve, reject) => {
         API.getter<DisplaySettings<string>>('displaySettings').then((result) => {
           if (result.ok) {
             const loginData = new LOGIN_APP_DATA(result.ok.data, i18n.global, formatter, languageChangeCB)
             resolve(loginData)
+            if (generation !== this.generation) return
             this.loginData.value = loginData
             this.state.value = 'LOADED'
           } else {
@@ -193,6 +200,16 @@ class APP_LOADER {
       this.progress.value += this.progressIncrement
       return result
     })
+  }
+
+  reset() {
+    this.generation += 1
+    this.data.value = null
+    this.loginData.value = null
+    this.dataPromise = undefined
+    this.loginDataPromise = undefined
+    this.state.value = 'UNLOADED'
+    this.progress.value = 0
   }
 }
 

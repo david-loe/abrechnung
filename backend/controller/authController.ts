@@ -1,9 +1,24 @@
-import { tokenAdminUser } from 'abrechnung-common/types.js'
+import { createHmac } from 'node:crypto'
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Middlewares,
+  Post,
+  Query,
+  Request,
+  Response,
+  Route,
+  Security,
+  SuccessResponse,
+  Tags
+} from '@tsoa/runtime'
+import { AuthContext, idDocumentToId, tokenAdminUser } from 'abrechnung-common/types.js'
 import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
 import passport from 'passport'
-import { Body, Controller, Delete, Get, Middlewares, Post, Query, Request, Response, Route, Security, SuccessResponse, Tags } from 'tsoa'
 import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
@@ -103,9 +118,13 @@ const magicloginCallbackHandler = async (req: ExRequest, res: ExResponse, next: 
 }
 
 const logoutMiddleware = async (req: AuthenticatedExpressRequest, _res: ExResponse, next: NextFunction) => {
-  req.logout((err) => {
-    next(err)
-  })
+  try {
+    await new Promise<void>((resolve, reject) => req.logout((error) => (error ? reject(error) : resolve())))
+    await new Promise<void>((resolve, reject) => req.session.destroy((error) => (error ? reject(error) : resolve())))
+    next()
+  } catch (error) {
+    next(error)
+  }
 }
 
 @Tags('Auth')
@@ -197,13 +216,24 @@ export class AuthController extends Controller {
   @Middlewares(logoutMiddleware)
   public logout() {}
 
-  /**
-   * Empty method
-   * @summary Check if request is authenticated
-   */
+  /** @summary Return the current authentication and offline-cache context */
   @Get('authenticated')
   @Security('cookieAuth')
   @Security('httpBearer')
+  @SuccessResponse(200, 'Authenticated')
   @Response(401, 'Unauthorized')
-  public authenticated(): void {}
+  public authenticated(@Request() req: AuthenticatedExpressRequest): AuthContext {
+    const userId = String(req.user._id)
+    const sessionExpiresAt = req.session.cookie.expires ?? new Date(Date.now() + ENV.COOKIE_MAX_AGE_DAYS * 86_400_000)
+    const accessExpiresAt = req.user.loseAccessAt ? new Date(req.user.loseAccessAt) : sessionExpiresAt
+    const expiresAt = accessExpiresAt < sessionExpiresAt ? accessExpiresAt : sessionExpiresAt
+    const permissions = req.user.access
+    const projectIds = [
+      ...req.user.projects.assigned.map((project) => String(idDocumentToId(project))),
+      ...req.user.projects.supervised.map((project) => String(idDocumentToId(project)))
+    ].sort()
+    const scopeInput = JSON.stringify({ sessionId: req.sessionID, userId, permissions, projectIds })
+    const cacheScope = createHmac('sha256', ENV.COOKIE_SECRET).update(scopeInput).digest('base64url')
+    return { userId, cacheScope, expiresAt: expiresAt.toISOString(), permissions }
+  }
 }

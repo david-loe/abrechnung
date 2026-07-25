@@ -9,6 +9,14 @@ export type { DocumentFileType, ImageType }
 export type _id = string | Types.ObjectId
 export type binary = mongo.Binary | Blob
 
+/** A browser-safe authentication snapshot used to bind offline data to one session context. */
+export interface AuthContext {
+  userId: string
+  cacheScope: string
+  expiresAt: string
+  permissions: Partial<Record<Access, boolean>>
+}
+
 export type IdDocument<idType = _id> = idType | { _id: idType }
 
 type IdOf<T> = T extends { _id: infer I } ? I : T

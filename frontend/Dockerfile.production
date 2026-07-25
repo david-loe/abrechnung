@@ -1,31 +1,38 @@
-FROM node:24.14-alpine
+FROM node:24.14-alpine AS common-build
+
+WORKDIR /common
+
+COPY common/package*.json ./
+RUN npm ci
+
+COPY common/ ./
+RUN npm run build
+
+FROM node:24.14-alpine AS frontend-build
+
+WORKDIR /app
+
+COPY --from=common-build /common /common
+COPY frontend/package*.json ./
+RUN npm ci
+
+COPY frontend/ ./
+RUN npm run build
+
+FROM nginx:1.28.0-alpine AS runtime
 
 LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 frontend"
 LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
-# install nginx
-RUN apk add nginx
+RUN apk add --no-cache jq
 
 COPY frontend/nginx.conf /etc/nginx/nginx.conf
+COPY frontend/docker-entrypoint.production.sh /usr/local/bin/abrechnung-entrypoint
+COPY --from=frontend-build --chown=nginx:nginx /app/dist /app/dist
 
-WORKDIR /app
+RUN chmod 755 /usr/local/bin/abrechnung-entrypoint
 
-ENV HOME=/home/node
-
-COPY common ../common
-RUN npm install --prefix ../common
-RUN npm run --prefix ../common build
-
-COPY frontend/package*.json ./
-
-RUN npm install
-
-COPY frontend/ .
-
-RUN mkdir -p /home/node && chown -R node:node /home/node /app
-
-USER node
-ENTRYPOINT [ "/bin/sh", "-c" ]
-
-CMD ["npm run build && nginx -e /dev/stderr -g 'daemon off;'"]
+USER nginx
+ENTRYPOINT ["/usr/local/bin/abrechnung-entrypoint"]
+CMD ["nginx", "-e", "/dev/stderr", "-g", "daemon off;"]
