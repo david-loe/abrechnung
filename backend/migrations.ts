@@ -1,9 +1,37 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
+import { ReportModelName } from 'abrechnung-common/types.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
 import Settings from './models/settings.js'
+
+const reportCollections: Record<ReportModelName, string> = {
+  Travel: 'travels',
+  ExpenseReport: 'expensereports',
+  HealthCareCost: 'healthcarecosts',
+  Advance: 'advances'
+}
+
+export async function initializeReferenceCounters() {
+  const counters = mongoose.connection.collection<{ _id: ReportModelName; value: number }>('referencecounters')
+
+  await Promise.all(
+    Object.entries(reportCollections).map(async ([modelName, collectionName]) => {
+      const [reportWithHighestReference] = await mongoose.connection
+        .collection<{ reference?: number; historic?: boolean }>(collectionName)
+        .find({ historic: { $ne: true }, reference: { $exists: true } })
+        .sort({ reference: -1 })
+        .limit(1)
+        .toArray()
+      await counters.updateOne(
+        { _id: modelName as ReportModelName },
+        { $max: { value: reportWithHighestReference?.reference || 0 } },
+        { upsert: true }
+      )
+    })
+  )
+}
 
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
@@ -120,6 +148,10 @@ export async function checkForMigrations() {
       logger.info('Apply migration from v2.6.2: Drop exchange rate collection')
       await mongoose.connection.collection('exchangerates').drop()
       await mongoose.connection.collection('settings').updateMany({}, { $set: { exchangeRateProvider: 'InforEuro' } })
+    }
+    if (semver.lte(migrateFrom, '2.6.3')) {
+      logger.info('Apply migration from v2.6.3: initialize atomic report reference counters')
+      await initializeReferenceCounters()
     }
     settings.migrateFrom = undefined
     await settings.save()

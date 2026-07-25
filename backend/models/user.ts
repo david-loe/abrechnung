@@ -18,10 +18,15 @@ interface Methods {
   addProjects(projects: { assigned?: Types.ObjectId[]; supervised?: Types.ObjectId[] }): Promise<void>
 }
 
-export const userSchema = async () => {
-  const accessObject: { [key in Access]?: { type: BooleanConstructor; default: boolean; label: string } } = {}
+function createUserSchema(useRuntimeMetadata: boolean) {
+  const snapshot = useRuntimeMetadata ? BACKEND_CACHE.getSnapshot() : undefined
+  const accessObject: { [key in Access]?: { type: BooleanConstructor; default: () => boolean; label: string } } = {}
   for (const access of accesses) {
-    accessObject[access] = { type: Boolean, default: BACKEND_CACHE.settings.defaultAccess[access], label: `accesses.${access}` }
+    accessObject[access] = {
+      type: Boolean,
+      default: () => BACKEND_CACHE.settings.defaultAccess[access] ?? false,
+      label: `accesses.${access}`
+    }
   }
   return new Schema<User<Types.ObjectId, mongo.Binary>, Model<User<Types.ObjectId, mongo.Binary>>, Methods>({
     fk: {
@@ -32,16 +37,23 @@ export const userSchema = async () => {
           unique: true,
           sparse: true,
           label: 'Microsoft ID',
-          meta: !BACKEND_CACHE.displaySettings.auth.microsoft
+          meta: snapshot ? !snapshot.displaySettings.auth.microsoft : false
         },
-        oidc: { type: String, index: true, unique: true, sparse: true, label: 'OIDC ID', meta: !BACKEND_CACHE.displaySettings.auth.oidc },
+        oidc: {
+          type: String,
+          index: true,
+          unique: true,
+          sparse: true,
+          label: 'OIDC ID',
+          meta: snapshot ? !snapshot.displaySettings.auth.oidc : false
+        },
         ldapauth: {
           type: String,
           index: true,
           unique: true,
           sparse: true,
           label: 'LDAP UID',
-          meta: !BACKEND_CACHE.displaySettings.auth.ldapauth
+          meta: snapshot ? !snapshot.displaySettings.auth.ldapauth : false
         },
         magiclogin: {
           type: String,
@@ -51,7 +63,7 @@ export const userSchema = async () => {
           validate: emailRegex,
           trim: true,
           label: 'Magic Login Email',
-          meta: !BACKEND_CACHE.displaySettings.auth.magiclogin
+          meta: snapshot ? !snapshot.displaySettings.auth.magiclogin : false
         },
         httpBearer: { type: String, index: true, unique: true, sparse: true, label: 'API Key Hash' }
       },
@@ -95,7 +107,7 @@ export const userSchema = async () => {
       type: {
         language: {
           type: String,
-          default: BACKEND_CACHE.displaySettings.locale.default,
+          default: () => BACKEND_CACHE.displaySettings.locale.default,
           enum: locales,
           required: true,
           translationPrefix: 'languages.'
@@ -103,7 +115,11 @@ export const userSchema = async () => {
         hasUserSetLanguage: { type: Boolean, required: true, default: false, meta: true },
         lastCurrencies: { type: [{ type: String, ref: 'Currency' }], required: true, meta: true },
         lastCountries: { type: [{ type: String, ref: 'Country' }], required: true, meta: true },
-        insurance: { type: Schema.Types.ObjectId, ref: 'HealthInsurance', meta: BACKEND_CACHE.settings.disableReportType.healthCareCost },
+        insurance: {
+          type: Schema.Types.ObjectId,
+          ref: 'HealthInsurance',
+          meta: snapshot?.settings.disableReportType.healthCareCost ?? false
+        },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
         showInstallBanner: { type: Boolean, required: true, default: true, meta: true }
       },
@@ -115,7 +131,9 @@ export const userSchema = async () => {
   })
 }
 
-const schema = await userSchema()
+export const userSchema = async () => createUserSchema(true)
+
+const schema = createUserSchema(false)
 
 const populates = {
   settings: [

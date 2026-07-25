@@ -28,10 +28,11 @@ interface msProfile {
 }
 
 export async function getMicrosoftStrategy() {
-  if (!BACKEND_CACHE.connectionSettings.auth.microsoft) {
+  const { connectionSettings } = BACKEND_CACHE.getSnapshot()
+  if (!connectionSettings.auth.microsoft) {
     throw new Error('Microsoft not configured in Connection Settings')
   }
-  const config: microsoftSettings = BACKEND_CACHE.connectionSettings.auth.microsoft
+  const config: microsoftSettings = connectionSettings.auth.microsoft
   return new MicrosoftStrategy(
     {
       clientID: config.clientId,

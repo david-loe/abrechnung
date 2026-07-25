@@ -37,10 +37,11 @@ export class CustomStrategy extends OidcStrategy {
 }
 
 export async function getOidcStrategy() {
-  if (!BACKEND_CACHE.connectionSettings.auth.oidc) {
+  const { connectionSettings } = BACKEND_CACHE.getSnapshot()
+  if (!connectionSettings.auth.oidc) {
     throw new Error('OIDC not configured in Connection Settings')
   }
-  const { server, clientId, clientSecret } = BACKEND_CACHE.connectionSettings.auth.oidc
+  const { server, clientId, clientSecret } = connectionSettings.auth.oidc
 
   const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
 

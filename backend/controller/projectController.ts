@@ -1,6 +1,6 @@
+import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Project as IProject, locales, ProjectSimple, ProjectSimpleWithName, ProjectWithUsers } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
-import { Body, Delete, Get, Post, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -20,6 +20,7 @@ import { AuthenticatedExpressRequest } from './types.js'
 export class ProjectController extends Controller {
   @Get()
   public async get(@Queries() query: GetterQuery<ProjectSimple>, @Request() request: AuthenticatedExpressRequest) {
+    const { settings } = BACKEND_CACHE.getSnapshot()
     const userHasExtendedAccess = await isUserAllowedToAccess(
       request.user,
       [
@@ -36,7 +37,7 @@ export class ProjectController extends Controller {
       ],
       'one'
     )
-    if (!BACKEND_CACHE.settings.userCanSeeAllProjects && !userHasExtendedAccess) {
+    if (!settings.userCanSeeAllProjects && !userHasExtendedAccess) {
       throw new AuthorizationError()
     }
     return await this.getter<ProjectSimpleWithName, IProject<Types.ObjectId>>(Project, {
@@ -44,7 +45,7 @@ export class ProjectController extends Controller {
       projection: {
         identifier: 1,
         organisation: 1,
-        ...(!userHasExtendedAccess && BACKEND_CACHE.settings.onlyShowProjectNamesOnAssigned ? {} : { name: 1 })
+        ...(!userHasExtendedAccess && settings.onlyShowProjectNamesOnAssigned ? {} : { name: 1 })
       },
       sort: { identifier: 1 }
     })

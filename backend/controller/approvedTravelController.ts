@@ -1,8 +1,8 @@
 import { Readable } from 'node:stream'
+import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { ApprovedTravel as IApprovedTravel } from 'abrechnung-common/types.js'
 import { datetimeToDateString } from 'abrechnung-common/utils/scripts.js'
-import { Get, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
-import { approvedTravelsPrinter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import i18n from '../i18n.js'
 import ApprovedTravel from '../models/approvedTravel.js'
 import { Controller, GetterQuery } from './controller.js'
@@ -35,7 +35,7 @@ export class ApprovedTravelController extends Controller {
     if (travels.length === 0) {
       throw new NotFoundError(`No travels found`)
     }
-    const report = await approvedTravelsPrinter.print(travels, request.user.settings.language, from, to)
+    const report = await createOperationServices().approvedTravelsPrinter.print(travels, request.user.settings.language, from, to)
     this.setHeader(
       'Content-disposition',
       `attachment; filename*=UTF-8''${encodeURIComponent(`${i18n.t('labels.travels')} ${datetimeToDateString(from)} - ${datetimeToDateString(to)}`)}.pdf`

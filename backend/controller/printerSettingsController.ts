@@ -1,6 +1,6 @@
+import { Body, Get, Post, Route, Security, Tags } from '@tsoa/runtime'
 import { PrinterSettings as IPrinterSettings, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
-import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import PrinterSettings, { printerSettingsSchema } from '../models/printerSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'

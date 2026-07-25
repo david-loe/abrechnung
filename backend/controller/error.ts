@@ -1,6 +1,6 @@
+import { ValidateError } from '@tsoa/runtime'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import { Error as MongooseErrors } from 'mongoose'
-import { ValidateError } from 'tsoa'
 import { logger } from '../logger.js'
 
 export class ClientError extends Error {

@@ -1,9 +1,9 @@
 import { Readable } from 'node:stream'
+import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
 import { QueryFilter, Types } from 'mongoose'
-import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import { currencyConverter, reportPrinter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
@@ -113,7 +113,7 @@ export class AdvanceController extends Controller {
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(advance, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(advance, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -191,7 +191,7 @@ export class AdvanceApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      await currencyConverter.addExchangeRate((extendedBody as AdvanceApplication).budget, new Date())
+      await createOperationServices().currencyConverter.addExchangeRate((extendedBody as AdvanceApplication).budget, new Date())
       setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
@@ -264,7 +264,7 @@ export class AdvanceApproveController extends Controller {
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(advance, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(advance, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -304,7 +304,7 @@ export class AdvanceBookableController extends Controller {
     if (!advance) {
       throw new NotFoundError(`No advance with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(advance, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(advance, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(advance.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)

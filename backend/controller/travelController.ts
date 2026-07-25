@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import {
   IdDocument,
   Travel as ITravel,
@@ -11,9 +12,8 @@ import {
   UserWithName
 } from 'abrechnung-common/types.js'
 import { mongo, QueryFilter, Types } from 'mongoose'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import { reportPrinter, travelCalculator } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
@@ -25,7 +25,9 @@ import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './ty
 
 async function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
   const owner = await User.findOne({ _id: report.owner._id }, { vehicleRegistration: 1 }).lean()
-  const reviewSummary = travelCalculator.validator.getValidationSummary(report, { vehicleRegistration: owner?.vehicleRegistration })
+  const reviewSummary = createOperationServices().travelCalculator.validator.getValidationSummary(report, {
+    vehicleRegistration: owner?.vehicleRegistration
+  })
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
@@ -272,7 +274,7 @@ export class TravelController extends Controller {
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(travel, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(travel, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(travel.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -588,7 +590,7 @@ export class TravelExamineController extends Controller {
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(travel, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(travel, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(travel.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -629,7 +631,7 @@ export class TravelBookableController extends Controller {
     if (!travel) {
       throw new NotFoundError(`No travel with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(travel, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(travel, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(travel.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)

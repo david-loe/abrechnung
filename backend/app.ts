@@ -14,11 +14,13 @@ import i18n from './i18n.js'
 import { closeIntegrationQueue } from './integrations/queue.js'
 import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
+import { initializeBackendRuntime, shutdownBackendRuntime } from './runtime.js'
 
 export default async function () {
   await connectDB()
   await checkForMigrations()
   await mongoose.syncIndexes()
+  await initializeBackendRuntime()
 
   const app = express()
 
@@ -102,5 +104,6 @@ export default async function () {
 
 export async function shutdown() {
   await closeIntegrationQueue()
+  await shutdownBackendRuntime()
   await disconnectDB()
 }

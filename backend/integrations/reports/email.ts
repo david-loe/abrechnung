@@ -9,8 +9,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { getTotalBalance } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
-import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
-import { createFormatter } from '../../factory.js'
+import { createFormatter, createOperationServices } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
 import { renderReportPdf } from '../../pdf/report.js'
@@ -48,15 +47,13 @@ export const reportMailIntegration = new ReportMailIntegration()
 export async function sendReportViaMail(
   report: Travel<Types.ObjectId> | ExpenseReport<Types.ObjectId> | HealthCareCost<Types.ObjectId> | Advance<Types.ObjectId>
 ) {
-  const connectionSettings = await getConnectionSettings(false)
+  const { snapshot } = createOperationServices()
+  const { connectionSettings, displaySettings, printerSettings, travelSettings } = snapshot
   if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
     const org = await Organisation.findOne({ _id: report.project.organisation._id })
     if (org?.reportEmail) {
       const mailClient = await getMailClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
-      const displaySettings = await getDisplaySettings(false)
-      const printerSettings = await getPrinterSettings(false)
-      const travelSettings = await getTravelSettings(false)
       const formatter = createFormatter(lng, displaySettings.nameDisplayFormat)
       let subject = '🧾 '
       const pdf = await renderReportPdf(report, lng, { displaySettings, printerSettings, travelSettings })

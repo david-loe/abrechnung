@@ -8,6 +8,7 @@ import {
   idDocumentToId,
   Log,
   Project,
+  ReportModelName,
   ReportModelNameWithoutAdvance,
   textColors,
   UserSimple
@@ -15,6 +16,7 @@ import {
 import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
+import { nextReference } from './referenceCounter.js'
 
 export function costObject(options: {
   exchangeRate: boolean
@@ -244,23 +246,9 @@ export async function addToProjectBalance(report: { addUp: AddUp[]; project: Pro
 }
 
 type ReferenceDoc = { reference: number; historic?: boolean }
-export async function addReferenceOnNewDocs(
-  doc: HydratedDocument<ReferenceDoc>,
-  modelName: string,
-  session: mongoose.ClientSession | null = null
-) {
+export async function addReferenceOnNewDocs(doc: HydratedDocument<ReferenceDoc>, modelName: ReportModelName) {
   if (doc.isNew && !doc.historic) {
-    const maxRef =
-      (
-        await mongoose
-          .model<ReferenceDoc>(modelName)
-          .findOne({ historic: { $ne: true } })
-          .session(session)
-          .sort({ reference: -1 })
-          .select({ reference: 1 })
-          .lean()
-      )?.reference || 0
-    doc.reference = maxRef + 1
+    doc.reference = await nextReference(modelName)
   }
 }
 

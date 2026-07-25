@@ -10,8 +10,8 @@ import {
 } from 'abrechnung-common/types.js'
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import axios from 'axios'
-import { getConnectionSettings, getDisplaySettings, getPrinterSettings, getTravelSettings } from '../../db.js'
 import ENV from '../../env.js'
+import { createOperationServices } from '../../factory.js'
 import Webhook from '../../models/webhook.js'
 import { renderReportPdf } from '../../pdf/report.js'
 import { type IntegrationEventHandlerMap } from '../events.js'
@@ -77,12 +77,10 @@ export async function processWebhookJob({ webhookId, input }: WebhookJobData) {
   if (request.convertBodyToFormData) {
     const form = buildFormData(request.body && typeof request.body === 'object' ? request.body : {})
     if (request.pdfFormFieldName && input.state >= State.BOOKABLE) {
-      const connectionSettings = await getConnectionSettings(false)
+      const { snapshot } = createOperationServices()
+      const { connectionSettings, displaySettings, printerSettings, travelSettings } = snapshot
       const lng = connectionSettings.PDFReportsViaEmail.locale
 
-      const displaySettings = await getDisplaySettings(false)
-      const printerSettings = await getPrinterSettings(false)
-      const travelSettings = await getTravelSettings(false)
       form.append(
         request.pdfFormFieldName,
         new Blob([await renderReportPdf(input, lng, { displaySettings, printerSettings, travelSettings })], { type: 'application/pdf' }),

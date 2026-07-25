@@ -8,7 +8,6 @@ import {
 } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
-import { approvedTravelsPrinter, reportPrinter, travelCalculator } from '../factory.js'
 
 export const travelSettingsSchema = () => {
   const distanceRefunds = {} as { [key in DistanceRefundType]: { type: NumberConstructor; min: 0; required: true; label: string } }
@@ -44,12 +43,8 @@ export const travelSettingsSchema = () => {
 
 const schema = travelSettingsSchema()
 
-schema.post('save', function () {
-  const settings = this.toObject()
-  travelCalculator.updateSettings(settings)
-  reportPrinter.setTravelSettings(settings)
-  approvedTravelsPrinter.setAllowSpouseRefund(settings.allowSpouseRefund)
-  BACKEND_CACHE.setTravelSettings(settings)
+schema.post('save', async () => {
+  if (BACKEND_CACHE.initialized) await BACKEND_CACHE.refreshAndPublish()
 })
 
 export default model('TravelSettings', schema)

@@ -15,7 +15,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { model } from 'mongoose'
 import ENV from './env.js'
-import { formatter } from './factory.js'
+import { createOperationServices } from './factory.js'
 import i18n from './i18n.js'
 import { enqueueMail } from './integrations/notifications/email.js'
 import { getIntegrationSettings } from './integrations/settings.js'
@@ -82,6 +82,7 @@ async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number
 }
 
 async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: ReportModelNameWithoutAdvance) {
+  const { formatter } = createOperationServices()
   for (let i = 0; i < reports.length; i++) {
     const result = await model(schema).deleteOne({ _id: reports[i]._id })
     if (result && result.deletedCount === 1) {

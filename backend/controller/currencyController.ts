@@ -1,5 +1,5 @@
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from '@tsoa/runtime'
 import { CurrencyCode, Currency as ICurrency, locales } from 'abrechnung-common/types.js'
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import Advance from '../models/advance.js'
 import Currency, { currencySchema } from '../models/currency.js'
 import ExpenseReport from '../models/expenseReport.js'

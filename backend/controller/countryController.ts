@@ -1,6 +1,6 @@
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from '@tsoa/runtime'
 import { getSpecialLumpSumsList } from 'abrechnung-common/travel/lumpSums.js'
 import { CountryCode, Country as ICountry, locales } from 'abrechnung-common/types.js'
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import Country, { countrySchema } from '../models/country.js'
 import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'

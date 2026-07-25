@@ -12,7 +12,7 @@ import {
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
-import { currencyConverter, travelCalculator } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
 import DocumentFile from './documentFile.js'
 import {
@@ -132,21 +132,23 @@ schema.pre(
   }
 )
 
-schema.pre('deleteOne', { document: true, query: false }, function () {
-  for (const historyId of this.history) {
-    model('Travel').deleteOne({ _id: historyId }).exec()
-  }
-  function deleteReceipts(records: TravelRecord[]) {
+schema.pre('deleteOne', { document: true, query: false }, async function () {
+  const receiptIds: (string | Types.ObjectId)[] = []
+  function collectReceipts(records: TravelRecord[]) {
     for (const record of records) {
       if (record.cost) {
         for (const receipt of record.cost.receipts) {
-          model('DocumentFile').deleteOne({ _id: receipt._id }).exec()
+          receiptIds.push(receipt._id)
         }
       }
     }
   }
-  deleteReceipts(this.stages)
-  deleteReceipts(this.expenses)
+  collectReceipts(this.stages)
+  collectReceipts(this.expenses)
+  await Promise.all([
+    model('Travel').deleteMany({ _id: { $in: this.history } }),
+    model('DocumentFile').deleteMany({ _id: { $in: receiptIds } })
+  ])
 })
 
 schema.methods.saveToHistory = async function () {
@@ -178,6 +180,7 @@ schema.methods.saveToHistory = async function () {
 }
 
 schema.methods.calculateExchangeRates = async function () {
+  const { currencyConverter } = createOperationServices()
   const promiseList = []
   for (const stage of this.stages) {
     promiseList.push(currencyConverter.addExchangeRate(stage.cost, stage.cost.date))
@@ -200,6 +203,7 @@ schema.pre('validate', async function () {
 
   await populateAll(this, populates)
 
+  const { travelCalculator } = createOperationServices()
   const { conflicts } = await travelCalculator.calc(this)
   const shouldInvalidateConflicts = this.state >= TravelState.IN_REVIEW
 

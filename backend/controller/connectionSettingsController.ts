@@ -1,5 +1,5 @@
+import { Body, Get, Post, Route, Security, Tags } from '@tsoa/runtime'
 import { ConnectionSettings as IConnectionSettings, locales } from 'abrechnung-common/types.js'
-import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import ConnectionSettings, { connectionSettingsSchema } from '../models/connectionSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller } from './controller.js'

@@ -134,7 +134,7 @@ export async function initDB() {
   await initer(Currency, 'currencies', currencies)
   await initer(Country, 'countries', countries)
   await syncLumpSums()
-  initer(HealthInsurance, 'health insurances', healthInsurances)
+  await initer(HealthInsurance, 'health insurances', healthInsurances)
 
   const organisations = [{ name: 'My Organisation' }]
   await initer(Organisation, 'organisation', organisations)
@@ -223,13 +223,10 @@ export async function getDisplaySettings(init = true): Promise<IDisplaySettings>
   throw Error('Display Settings not found')
 }
 
-export const BACKEND_CACHE = await CACHE.create(
-  {
-    loadSettings: getSettings,
-    loadConnectionSettings: getConnectionSettings,
-    loadDisplaySettings: getDisplaySettings,
-    loadPrinterSettings: getPrinterSettings,
-    loadTravelSettings: getTravelSettings
-  }, // only init on server start or setup(migration test) or test NOT workers
-  process.argv[1].endsWith('server.js') || process.argv[1].endsWith('setup.js') || process.argv[1].includes('ava')
-)
+export const BACKEND_CACHE = new CACHE({
+  loadSettings: getSettings,
+  loadConnectionSettings: getConnectionSettings,
+  loadDisplaySettings: getDisplaySettings,
+  loadPrinterSettings: getPrinterSettings,
+  loadTravelSettings: getTravelSettings
+})

@@ -1,6 +1,6 @@
+import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from '@tsoa/runtime'
 import { Webhook as IWebhook, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
-import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from 'tsoa'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import Webhook, { webhookSchema } from '../models/webhook.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
