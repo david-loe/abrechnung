@@ -34,7 +34,7 @@ services:
   
   worker:
     image: davidloe/abrechnung-backend:2
-    command: npm run worker
+    command: node dist/workers/start.js
     restart: unless-stopped
     depends_on:
       - backend
