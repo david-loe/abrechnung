@@ -1,4 +1,4 @@
-import { bool, CleanOptions, cleanEnv, EnvError, json, makeValidator, str } from 'envalid'
+import { CleanOptions, cleanEnv, EnvError, json, makeValidator, str } from 'envalid'
 import { ConnectionSettings, Contact } from '../types.js'
 
 const int = makeValidator<number>((input: string) => {
@@ -84,11 +84,7 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
     desc: 'Initial connection settings for production environment as JSON object'
   }),
   PROD_INIT_ADMIN_USER: json<Contact>({ default: undefined, desc: 'Initial Admin User for production environment as JSON object' }),
-  USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' }),
-  BACKEND_SAVE_REPORTS_ON_DISK: bool({
-    default: false,
-    desc: "⚠️Deprecated⚠️ If set to 'TRUE', all reports will be saved to `/reports` in the backend container. Uncomment the corresponding backend volume in `docker-compose.yml` to get reports on host machine"
-  })
+  USAGE_API_TOKEN: notEmptyString({ default: undefined, desc: 'Token to authenticate against the usage endpoints.' })
 })
 
 export function cleanFrontendEnv(env: Record<string, unknown>, options?: CleanOptions<typeof frontendEnvConfig>) {

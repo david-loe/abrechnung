@@ -28,7 +28,6 @@ function createIntegrations() {
     webhooks: [] as IntegrationReport[],
     notifications: [] as Array<{ report: unknown; textState?: string }>,
     reportMails: [] as IntegrationReport[],
-    disk: [] as Array<{ filePath: string; report: IntegrationReport }>,
     a1: [] as IntegrationReport[]
   }
 
@@ -98,13 +97,6 @@ function createIntegrations() {
     },
     {
       events: {
-        'report.review_completed': async (event) => {
-          calls.disk.push({ filePath: '/reports/test.pdf', report: event.report as IntegrationReport })
-        }
-      }
-    },
-    {
-      events: {
         'travel.directly_approved': async (event) => {
           const report = event.report as { isCrossBorder: boolean; destinationPlace: { country: { needsA1Certificate: boolean } } }
           if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
@@ -132,11 +124,10 @@ test('report.submitted fans out to webhooks and notifications only', async (t) =
   t.deepEqual(calls.webhooks, [report])
   t.deepEqual(calls.notifications, [{ report, textState: undefined }])
   t.deepEqual(calls.reportMails, [])
-  t.deepEqual(calls.disk, [])
   t.deepEqual(calls.a1, [])
 })
 
-test('report.review_completed fans out to all report outbound integrations', async (t) => {
+test('report.review_completed fans out to report outbound integrations', async (t) => {
   const report = createReport()
   const { calls, integrations } = createIntegrations()
 
@@ -145,7 +136,6 @@ test('report.review_completed fans out to all report outbound integrations', asy
   t.deepEqual(calls.webhooks, [report])
   t.deepEqual(calls.notifications, [{ report, textState: undefined }])
   t.deepEqual(calls.reportMails, [report])
-  t.deepEqual(calls.disk, [{ filePath: '/reports/test.pdf', report }])
 })
 
 test('travel.back_to_approved only triggers notification with custom state label', async (t) => {
@@ -157,7 +147,6 @@ test('travel.back_to_approved only triggers notification with custom state label
   t.deepEqual(calls.webhooks, [])
   t.deepEqual(calls.notifications, [{ report, textState: 'BACK_TO_APPROVED' }])
   t.deepEqual(calls.reportMails, [])
-  t.deepEqual(calls.disk, [])
   t.deepEqual(calls.a1, [])
 })
 
