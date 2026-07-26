@@ -4,6 +4,7 @@ import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
 import {
   _id,
   CountryCode,
+  DisplaySettings,
   Country as ICountry,
   Locale,
   NameDisplayFormat,
@@ -53,7 +54,8 @@ export function createFormatter(
 export function createReportPrinter(
   settings: PrinterSettings = BACKEND_CACHE.printerSettings,
   travelSettings: TravelSettings = BACKEND_CACHE.travelSettings,
-  nameDisplayFormat: NameDisplayFormat = BACKEND_CACHE.displaySettings.nameDisplayFormat
+  nameDisplayFormat: NameDisplayFormat = BACKEND_CACHE.displaySettings.nameDisplayFormat,
+  reportTypeIcons: DisplaySettings['reportTypeIcons'] = BACKEND_CACHE.displaySettings.reportTypeIcons
 ) {
   return new ReportPrinter<_id>(
     settings,
@@ -61,7 +63,8 @@ export function createReportPrinter(
     createFormatter(undefined, nameDisplayFormat),
     translateText,
     getDocumentFileBuffer,
-    getOrganisationLogo
+    getOrganisationLogo,
+    reportTypeIcons
   )
 }
 
@@ -150,7 +153,12 @@ export function createOperationServices(snapshot = BACKEND_CACHE.getSnapshot()) 
   return {
     snapshot,
     formatter: createFormatter(snapshot.displaySettings.locale.default, snapshot.displaySettings.nameDisplayFormat),
-    reportPrinter: createReportPrinter(snapshot.printerSettings, snapshot.travelSettings, snapshot.displaySettings.nameDisplayFormat),
+    reportPrinter: createReportPrinter(
+      snapshot.printerSettings,
+      snapshot.travelSettings,
+      snapshot.displaySettings.nameDisplayFormat,
+      snapshot.displaySettings.reportTypeIcons
+    ),
     approvedTravelsPrinter: createApprovedTravelsPrinter(
       snapshot.printerSettings,
       snapshot.displaySettings.nameDisplayFormat,

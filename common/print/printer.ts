@@ -317,14 +317,8 @@ export class PDFDrawer<idType extends _id> {
     return opts.yStart - multiLineText.bounds.height
   }
 
-  drawText(text: string, options: Options) {
-    this.currentPage.drawText(text, {
-      x: options.xStart,
-      y: options.yStart,
-      size: options.fontSize,
-      font: this.font,
-      color: this.settings.textColor
-    })
+  drawText(text: string, options: Options, font = this.font) {
+    this.currentPage.drawText(text, { x: options.xStart, y: options.yStart, size: options.fontSize, font, color: this.settings.textColor })
   }
 
   drawReceiptNumber(receipt: ReceiptMapEntry<idType>) {
