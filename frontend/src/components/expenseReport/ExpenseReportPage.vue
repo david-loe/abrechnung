@@ -306,6 +306,7 @@ import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { downloadReportCSV } from '@/reportExport.js'
+import { sessionState } from '@/session.js'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import { sortByPath } from 'abrechnung-common/utils/sort.js'
 import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
@@ -339,9 +340,10 @@ const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
-    (expenseReport.value.state > State.EDITABLE_BY_OWNER ||
+    !sessionState.isOnline.value ||
+    ((expenseReport.value.state > State.EDITABLE_BY_OWNER ||
       (expenseReport.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
-    isReadOnlySwitchOn.value
+      isReadOnlySwitchOn.value)
   )
 })
 

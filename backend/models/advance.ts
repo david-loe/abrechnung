@@ -11,7 +11,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { subtractAmounts } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
-import { currencyConverter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
 import { addHistoryEntry, addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import ReportUsage from './reportUsage.js'
@@ -65,10 +65,8 @@ schema.pre(/^find((?!Update).)*$/, async function (this: Query<Advance<Types.Obj
   await populateSelected(this, populates)
 })
 
-schema.pre('deleteOne', { document: true, query: false }, function () {
-  for (const historyId of this.history) {
-    model('Advance').deleteOne({ _id: historyId }).exec()
-  }
+schema.pre('deleteOne', { document: true, query: false }, async function () {
+  await model('Advance').deleteMany({ _id: { $in: this.history } })
 })
 
 schema.methods.saveToHistory = async function (save = true, session: mongoose.ClientSession | null = null) {
@@ -85,7 +83,7 @@ schema.methods.saveToHistory = async function (save = true, session: mongoose.Cl
 }
 
 schema.methods.calculateExchangeRates = async function () {
-  await currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
+  await createOperationServices().currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
 }
 
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {

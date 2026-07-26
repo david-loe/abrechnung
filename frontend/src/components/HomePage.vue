@@ -5,7 +5,7 @@
       :header="modalMode === 'add' ? t('labels.newX', { X: t('labels.' + modalObjectType) }) : modalObject ? modalObject.name : ''"
       @afterClose="modalMode === 'edit' || modalMode === 'view' ? resetModal() : null">
       <template #header="{header}">
-        <h5 class="modal-title">{{header}}</h5>
+        <h5 class="modal-title">{{ header }}</h5>
         <RefStringBadge
           v-if="modalObject.reference"
           class="ms-2"
@@ -18,7 +18,11 @@
           <Advance v-else-if="modalObjectType === 'advance'" :advance="(modalObject as AdvanceSimple<string>)">
             <template #buttons>
               <template v-if="canConfirmReceipt(modalObject as AdvanceSimple<string>)">
-                <button type="button" class="btn btn-success" @click="openReceiptModal(modalObject as AdvanceSimple<string>)">
+                <button
+                  type="button"
+                  class="btn btn-success"
+                  :disabled="!sessionState.isOnline.value"
+                  @click="openReceiptModal(modalObject as AdvanceSimple<string>)">
                   {{ t('labels.confirmReceipt') }}
                 </button>
               </template>
@@ -26,7 +30,11 @@
           </Advance>
           <div v-if="modalObject.state !== undefined" class="mb-1">
             <template v-if="modalObject.state <= State.APPLIED_FOR">
-              <button type="submit" class="btn btn-primary me-2" @click="showModal('edit', modalObjectType, modalObject)">
+              <button
+                type="submit"
+                class="btn btn-primary me-2"
+                :disabled="!sessionState.isOnline.value"
+                @click="showModal('edit', modalObjectType, modalObject)">
                 {{ t('labels.edit') }}
               </button>
             </template>
@@ -39,6 +47,7 @@
               <button
                 type="button"
                 class="btn btn-danger me-2"
+                :disabled="!sessionState.isOnline.value"
                 @click="deleteReport(modalObjectType as 'travel' | 'advance', modalObject._id as string)">
                 {{ t('labels.delete') }}
               </button>
@@ -103,7 +112,7 @@
           <h2>{{ t('headlines.home') }}</h2>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', 'travel', undefined)">
+          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'travel', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">
               {{ t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: t('labels.travel') }) }}
@@ -111,19 +120,19 @@
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.expenseReport && APP_DATA.user.access['inWork:expenseReport']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', 'expenseReport', undefined)">
+          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'expenseReport', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.addX', { X: t('labels.expenseReport') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.healthCareCost && APP_DATA.user.access['inWork:healthCareCost']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', 'healthCareCost', undefined)">
+          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'healthCareCost', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.submitX', { X: t('labels.healthCareCost') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.advance && APP_DATA.user.access['appliedFor:advance']" class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', 'advance', undefined)">
+          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'advance', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.applyForX', { X: t('labels.advance') }) }}</span>
           </button>
@@ -198,6 +207,7 @@ import TravelApplication from '@/components/travel/elements/TravelApplication.vu
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
 import APP_LOADER from '@/dataLoader.js'
+import { sessionState } from '@/session.js'
 
 type ModalMode = 'view' | 'add' | 'edit'
 type ModalObjectType = 'travel' | 'expenseReport' | 'healthCareCost' | 'advance'

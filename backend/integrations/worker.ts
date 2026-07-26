@@ -49,3 +49,10 @@ export function startIntegrationWorker() {
 
   return workerPromise
 }
+
+export async function closeIntegrationWorker() {
+  if (!workerPromise) return
+  const worker = await workerPromise
+  await worker.close()
+  workerPromise = null
+}

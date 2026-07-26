@@ -14,6 +14,7 @@ import { CurrencyConverter, ExchangeRateProviderWithLocalStorage } from 'abrechn
 import { sources } from 'abrechnung-common/utils/exchangeRateSource.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
 import { Types } from 'mongoose'
+import { BackendConfigSnapshot } from './data/cache.js'
 import { BACKEND_CACHE } from './db.js'
 import i18n from './i18n.js'
 import Country from './models/country.js'
@@ -80,76 +81,85 @@ export function createApprovedTravelsPrinter(
   return printer
 }
 
-export const formatter = createFormatter()
-
-export const reportPrinter = createReportPrinter()
-
-export const approvedTravelsPrinter = createApprovedTravelsPrinter()
-
-export const travelCalculator = new TravelCalculator(
-  (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
-  BACKEND_CACHE.travelSettings
-)
-
-export const currencyConverter = new CurrencyConverter(BACKEND_CACHE.settings.exchangeRateProvider, [
-  new ExchangeRateProviderWithLocalStorage(
-    'InforEuro',
-    sources.InforEuro,
-    async (date, _TO, rates) => {
-      if (rates.length === 0) {
-        return
-      }
-      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
-      await ExchangeRate.bulkWrite(
-        rates.map((rate) => ({
-          updateOne: {
-            filter: { provider: 'InforEuro', currency: rate.currency, date: cacheDate },
-            update: { $setOnInsert: { ...rate, provider: 'InforEuro', date: cacheDate } },
-            upsert: true
-          }
-        }))
-      )
-    },
-    async (date, FROM, _TO) => {
-      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
-      const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: cacheDate }).lean()
-      if (rateDoc?.rate) {
-        return 1 / rateDoc.rate
-      }
-      return null
-    }
-  ),
-  new ExchangeRateProviderWithLocalStorage(
-    'Frankfurter',
-    sources.Frankfurter,
-    async (date, TO, rates) => {
-      if (TO !== 'EUR') {
-        return
-      }
-      if (rates.length === 0) {
-        return
-      }
-      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
-      await ExchangeRate.bulkWrite(
-        rates.map((rate) => ({
-          updateOne: {
-            filter: { provider: 'Frankfurter', currency: rate.currency, date: cacheDate },
-            update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date: cacheDate } },
-            upsert: true
-          }
-        }))
-      )
-    },
-    async (date, FROM, TO) => {
-      if (TO !== 'EUR') {
+function createCurrencyConverter(snapshot: BackendConfigSnapshot) {
+  return new CurrencyConverter(snapshot.settings.exchangeRateProvider, [
+    new ExchangeRateProviderWithLocalStorage(
+      'InforEuro',
+      sources.InforEuro,
+      async (date, _TO, rates) => {
+        if (rates.length === 0) {
+          return
+        }
+        const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+        await ExchangeRate.bulkWrite(
+          rates.map((rate) => ({
+            updateOne: {
+              filter: { provider: 'InforEuro', currency: rate.currency, date: cacheDate },
+              update: { $setOnInsert: { ...rate, provider: 'InforEuro', date: cacheDate } },
+              upsert: true
+            }
+          }))
+        )
+      },
+      async (date, FROM, _TO) => {
+        const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1))
+        const rateDoc = await ExchangeRate.findOne({ provider: 'InforEuro', currency: FROM, date: cacheDate }).lean()
+        if (rateDoc?.rate) {
+          return 1 / rateDoc.rate
+        }
         return null
       }
-      const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
-      const rateDoc = await ExchangeRate.findOne({ provider: 'Frankfurter', currency: FROM, date: cacheDate }).lean()
-      if (rateDoc?.rate) {
-        return 1 / rateDoc.rate
+    ),
+    new ExchangeRateProviderWithLocalStorage(
+      'Frankfurter',
+      sources.Frankfurter,
+      async (date, TO, rates) => {
+        if (TO !== 'EUR') {
+          return
+        }
+        if (rates.length === 0) {
+          return
+        }
+        const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+        await ExchangeRate.bulkWrite(
+          rates.map((rate) => ({
+            updateOne: {
+              filter: { provider: 'Frankfurter', currency: rate.currency, date: cacheDate },
+              update: { $setOnInsert: { ...rate, provider: 'Frankfurter', date: cacheDate } },
+              upsert: true
+            }
+          }))
+        )
+      },
+      async (date, FROM, TO) => {
+        if (TO !== 'EUR') {
+          return null
+        }
+        const cacheDate = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()))
+        const rateDoc = await ExchangeRate.findOne({ provider: 'Frankfurter', currency: FROM, date: cacheDate }).lean()
+        if (rateDoc?.rate) {
+          return 1 / rateDoc.rate
+        }
+        return null
       }
-      return null
-    }
-  )
-])
+    )
+  ])
+}
+
+export function createOperationServices(snapshot = BACKEND_CACHE.getSnapshot()) {
+  return {
+    snapshot,
+    formatter: createFormatter(snapshot.displaySettings.locale.default, snapshot.displaySettings.nameDisplayFormat),
+    reportPrinter: createReportPrinter(snapshot.printerSettings, snapshot.travelSettings, snapshot.displaySettings.nameDisplayFormat),
+    approvedTravelsPrinter: createApprovedTravelsPrinter(
+      snapshot.printerSettings,
+      snapshot.displaySettings.nameDisplayFormat,
+      snapshot.travelSettings.allowSpouseRefund
+    ),
+    travelCalculator: new TravelCalculator(
+      (id: CountryCode) => Country.findOne({ _id: id }).lean() as Promise<ICountry>,
+      snapshot.travelSettings
+    ),
+    currencyConverter: createCurrencyConverter(snapshot)
+  }
+}

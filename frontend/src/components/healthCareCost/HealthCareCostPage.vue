@@ -299,6 +299,7 @@ import { formatter } from '@/formatter.js'
 import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { downloadReportCSV } from '@/reportExport.js'
+import { sessionState } from '@/session.js'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import { sortByPath } from 'abrechnung-common/utils/sort.js'
 import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
@@ -332,9 +333,10 @@ const isDownloadingFn = () => isDownloading
 
 const isReadOnly = computed(() => {
   return (
-    (healthCareCost.value.state > State.EDITABLE_BY_OWNER ||
+    !sessionState.isOnline.value ||
+    ((healthCareCost.value.state > State.EDITABLE_BY_OWNER ||
       (healthCareCost.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
-    isReadOnlySwitchOn.value
+      isReadOnlySwitchOn.value)
   )
 })
 

@@ -1,4 +1,5 @@
 import { Readable } from 'node:stream'
+import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Validator } from 'abrechnung-common/report/validator.js'
 import {
   Expense,
@@ -12,9 +13,8 @@ import {
   UserWithName
 } from 'abrechnung-common/types.js'
 import { mongo, QueryFilter, Types } from 'mongoose'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
-import { reportPrinter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
@@ -191,7 +191,7 @@ export class HealthCareCostController extends Controller {
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(healthCareCost, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(healthCareCost, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(healthCareCost.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -413,7 +413,7 @@ export class HealthCareCostExamineController extends Controller {
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(healthCareCost, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(healthCareCost, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(healthCareCost.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
@@ -461,7 +461,7 @@ export class HealthCareCostBookableController extends Controller {
     if (!healthCareCost) {
       throw new NotFoundError(`No health care cost with id: '${_id}' found or not allowed`)
     }
-    const report = await reportPrinter.print(healthCareCost, request.user.settings.language)
+    const report = await createOperationServices().reportPrinter.print(healthCareCost, request.user.settings.language)
     this.setHeader('Content-disposition', `attachment; filename*=UTF-8''${encodeURIComponent(healthCareCost.name)}.pdf`)
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)

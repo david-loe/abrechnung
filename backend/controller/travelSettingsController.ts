@@ -1,6 +1,6 @@
+import { Body, Get, Post, Route, Security, Tags } from '@tsoa/runtime'
 import { TravelSettings as ITravelSettings, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
-import { Body, Get, Post, Route, Security, Tags } from 'tsoa'
 import TravelSettings, { travelSettingsSchema } from '../models/travelSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, SetterBody } from './controller.js'

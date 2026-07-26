@@ -1,6 +1,6 @@
 import { ApprovedTravel, Travel, TravelState } from 'abrechnung-common/types.js'
 import { Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { formatter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import { populateSelected, travelBaseSchema } from './helper.js'
 
 interface ApprovedTravelModelType extends Model<ApprovedTravel<Types.ObjectId>> {
@@ -8,6 +8,7 @@ interface ApprovedTravelModelType extends Model<ApprovedTravel<Types.ObjectId>> 
 }
 
 function convert(travel: Travel<Types.ObjectId, mongo.Binary>): ApprovedTravel<Types.ObjectId> {
+  const { formatter } = createOperationServices()
   return {
     startDate: travel.startDate,
     endDate: travel.endDate,

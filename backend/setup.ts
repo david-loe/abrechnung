@@ -1,8 +1,11 @@
-import APP, { shutdown } from './app.js'
+import mongoose from 'mongoose'
+import { connectDB, disconnectDB } from './db.js'
+import { checkForMigrations } from './migrations.js'
 
-await APP()
-
-// sleep 5 seconds
-await new Promise((resolve) => setTimeout(resolve, 5000))
-
-await shutdown()
+try {
+  await connectDB()
+  await checkForMigrations()
+  await mongoose.syncIndexes()
+} finally {
+  await disconnectDB()
+}

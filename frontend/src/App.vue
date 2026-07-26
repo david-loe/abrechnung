@@ -172,7 +172,7 @@ import StateBadge from '@/components/elements/StateBadge.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { getRouteForReport, isMobile, subscribeToPush } from '@/helper.js'
-import { clearStore } from './indexedDB'
+import { beginLogout, completeLogout, sessionState } from './session.js'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -186,12 +186,12 @@ const installationBannerRef = useTemplateRef('installBanner')
 const offlineBannerRef = useTemplateRef('offlineBanner')
 
 async function logout() {
-  const success = await API.deleter('auth/logout', {}, false, { success: false, error: true })
-  if (success) {
-    APP_LOADER.data.value = null
-    clearStore('urls')
-    router.push({ path: '/login' })
+  await beginLogout()
+  if (sessionState.isOnline.value) {
+    const success = await API.deleter('auth/logout', {}, false, { success: false, error: true })
+    if (success) await completeLogout()
   }
+  await router.replace({ path: '/login' })
 }
 async function updateLanguage(locale: Locale) {
   if (APP_LOGIN_DATA.value) {

@@ -5,10 +5,11 @@ import { BACKEND_CACHE } from '../db.js'
 import { findOrCreateUser } from './index.js'
 
 export async function getLdapauthStrategy() {
-  if (!BACKEND_CACHE.connectionSettings.auth.ldapauth) {
+  const { connectionSettings } = BACKEND_CACHE.getSnapshot()
+  if (!connectionSettings.auth.ldapauth) {
     throw new Error('LDAP not configured in Connection Settings')
   }
-  const config: ldapauthSettings = BACKEND_CACHE.connectionSettings.auth.ldapauth
+  const config: ldapauthSettings = connectionSettings.auth.ldapauth
   return new LdapStrategy(
     { server: mapLdapauthConfig(config) },
     async (ldapUser: Record<string, unknown>, cb: (error: unknown, user?: Express.User) => void) => {

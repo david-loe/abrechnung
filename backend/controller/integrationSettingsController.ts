@@ -1,5 +1,5 @@
+import { Body, Get, Path, Post, Route, Security, Tags } from '@tsoa/runtime'
 import { locales } from 'abrechnung-common/types.js'
-import { Body, Get, Path, Post, Route, Security, Tags } from 'tsoa'
 import { syncIntegrationSchedules } from '../integrations/scheduler.js'
 import {
   getIntegrationSettings,

@@ -23,3 +23,7 @@ jobs:
         run: docker compose run backend npm run setup
       - name: Run backend tests
         run: docker compose run backend npm run test
+      - name: Run frontend tests
+        run: docker compose run frontend npm run test
+      - name: Run frontend production build and bundle budgets
+        run: docker compose run -e NODE_ENV=production frontend npm run build

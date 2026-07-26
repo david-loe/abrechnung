@@ -1,6 +1,6 @@
+import { Body, Delete, Get, Post, Query, Route, Security, Tags } from '@tsoa/runtime'
 import { IdDocument, ProjectSimple, ReportModelName, UserSimple } from 'abrechnung-common/types.js'
 import mongoose from 'mongoose'
-import { Body, Delete, Get, Post, Query, Route, Security, Tags } from 'tsoa'
 import { Controller } from './controller.js'
 import { NotFoundError } from './error.js'
 

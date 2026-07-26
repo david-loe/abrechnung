@@ -1,9 +1,10 @@
+import { Body, Get, Post, Queries, Route, Security, Tags } from '@tsoa/runtime'
 import { datetimeToDate, isValidDate } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
-import { Body, Get, Post, Queries, Route, Security, Tags } from 'tsoa'
 import { BACKEND_CACHE } from '../db.js'
 import ReportUsage from '../models/reportUsage.js'
 import Settings from '../models/settings.js'
+import { getRuntimeStatus } from '../runtime.js'
 import { Controller } from './controller.js'
 import { ClientError, NotFoundError } from './error.js'
 
@@ -29,9 +30,10 @@ export class StatsController extends Controller {
   @Get('ready')
   public async getReady() {
     const db = getDbState()
-    const isReady = db === 'connected'
+    const runtime = getRuntimeStatus()
+    const isReady = db === 'connected' && runtime.config === 'ready' && runtime.redis === 'ready'
     this.setStatus(isReady ? 200 : 503)
-    return { status: isReady ? 'ok' : 'not_ready', db }
+    return { status: isReady ? 'ok' : 'not_ready', db, ...runtime }
   }
 
   @Get('stats/dbUsage')

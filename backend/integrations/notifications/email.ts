@@ -2,8 +2,8 @@ import { Contact, User as IUser, Locale } from 'abrechnung-common/types.js'
 import ejs from 'ejs'
 import nodemailer from 'nodemailer'
 import { mapSmtpConfig } from '../../data/settingsValidator.js'
-import { getConnectionSettings, getDisplaySettings } from '../../db.js'
 import ENV from '../../env.js'
+import { createOperationServices } from '../../factory.js'
 import { genAuthenticatedLink } from '../../helper.js'
 import i18n, { updateI18n } from '../../i18n.js'
 import { logger } from '../../logger.js'
@@ -11,8 +11,7 @@ import { getMailTemplate } from '../../templates/cache.js'
 import { Integration } from '../integration.js'
 
 export async function getMailClient() {
-  // NO BACKEND_CACHE bc used in worker
-  const connectionSettings = await getConnectionSettings()
+  const { connectionSettings } = createOperationServices().snapshot
   if (connectionSettings.smtp?.host) {
     return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
   }
@@ -54,7 +53,7 @@ export async function enqueueMail(
   lastParagraph?: string | string[],
   authenticateLink = true
 ) {
-  const displaySettings = await getDisplaySettings(false)
+  const { displaySettings } = createOperationServices().snapshot
   updateI18n(displaySettings.locale)
 
   for (const recipient of recipients) {

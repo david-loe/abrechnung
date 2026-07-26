@@ -31,4 +31,23 @@ jobs:
       - name: Build backend
         run: docker compose build backend
       - name: Build frontend
-        run: docker compose build frontend && docker run abrechnung-frontend "npm run build"
+        run: docker compose build frontend
+      - name: Smoke-test immutable frontend image with runtime configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          cleanup() { docker rm -f frontend-smoke-a frontend-smoke-b >/dev/null 2>&1 || true; }
+          trap cleanup EXIT
+          image_id="$(docker image inspect abrechnung-frontend --format '{{.Id}}')"
+          docker run -d --name frontend-smoke-a -p 18080:8080 \
+            -e VITE_FRONTEND_URL=http://localhost:18080 -e VITE_BACKEND_URL=http://backend-a.test abrechnung-frontend
+          docker run -d --name frontend-smoke-b -p 18081:8080 \
+            -e VITE_FRONTEND_URL=http://localhost:18081 -e VITE_BACKEND_URL=http://backend-b.test abrechnung-frontend
+          for port in 18080 18081; do
+            for _ in {1..30}; do curl --fail --silent "http://127.0.0.1:${port}/" >/dev/null && break; sleep 1; done
+          done
+          test "$(docker inspect frontend-smoke-a --format '{{.Image}}')" = "$image_id"
+          test "$(docker inspect frontend-smoke-b --format '{{.Image}}')" = "$image_id"
+          curl --fail --silent http://127.0.0.1:18080/runtime-config.js | grep -q 'http://backend-a.test'
+          curl --fail --silent http://127.0.0.1:18081/runtime-config.js | grep -q 'http://backend-b.test'
+          curl --fail --silent --head http://127.0.0.1:18080/runtime-config.js | grep -qi 'cache-control: no-store'

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="LOGIN_APP_DATA.displaySettings" class="text-center" id="loginPage">
+  <div v-if="LOGIN_APP_DATA.displaySettings && loginReady" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
     <h2 class="h3 mb-3 fw-normal">{{ t('login.signIn') }}</h2>
     <div v-if="strategy === 'ldapauth'">
@@ -83,12 +83,13 @@
 
 <script lang="ts" setup>
 import axios from 'axios'
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
 import ENV from '@/env.js'
+import { prepareLogin, refreshAuthContext } from '@/session.js'
 
 const router = useRouter()
 const route = useRoute()
@@ -101,6 +102,21 @@ const passwordLDAP = ref('')
 const usernameLDAP = ref('')
 const magicLoginMail = ref('')
 const magicLoginSend = ref(false)
+const loginReady = ref(false)
+
+async function enableLogin() {
+  try {
+    loginReady.value = await prepareLogin()
+  } catch {
+    loginReady.value = false
+  }
+}
+
+onMounted(() => {
+  void enableLogin()
+  window.addEventListener('online', enableLogin)
+})
+onBeforeUnmount(() => window.removeEventListener('online', enableLogin))
 
 async function login() {
   try {
@@ -110,8 +126,9 @@ async function login() {
       { withCredentials: true }
     )
     if (res.status === 204) {
+      await refreshAuthContext()
       await APP_LOADER.loadData(true)
-      router.push(route.query.redirect ? (route.query.redirect as string) : '/')
+      await router.push(route.query.redirect ? (route.query.redirect as string) : '/')
     }
   } catch (error) {
     passwordLDAP.value = ''

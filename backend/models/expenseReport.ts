@@ -1,7 +1,7 @@
 import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
-import { currencyConverter } from '../factory.js'
+import { createOperationServices } from '../factory.js'
 import {
   addHistoryEntry,
   addReferenceOnNewDocs,
@@ -62,17 +62,19 @@ schema.pre(
   }
 )
 
-schema.pre('deleteOne', { document: true, query: false }, function () {
-  for (const historyId of this.history) {
-    model('ExpenseReport').deleteOne({ _id: historyId }).exec()
-  }
+schema.pre('deleteOne', { document: true, query: false }, async function () {
+  const receiptIds: (string | Types.ObjectId)[] = []
   for (const expense of this.expenses) {
     if (expense.cost) {
       for (const receipt of expense.cost.receipts) {
-        model('DocumentFile').deleteOne({ _id: receipt._id }).exec()
+        receiptIds.push(receipt._id)
       }
     }
   }
+  await Promise.all([
+    model('ExpenseReport').deleteMany({ _id: { $in: this.history } }),
+    model('DocumentFile').deleteMany({ _id: { $in: receiptIds } })
+  ])
 })
 
 schema.methods.saveToHistory = async function () {
@@ -83,6 +85,7 @@ schema.methods.saveToHistory = async function () {
 }
 
 schema.methods.calculateExchangeRates = async function () {
+  const { currencyConverter } = createOperationServices()
   const promiseList = []
   for (const expense of this.expenses) {
     promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))

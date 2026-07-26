@@ -194,9 +194,8 @@ schema.pre('validate', async function () {
   }
 })
 
-schema.post('save', function () {
-  const settings = this.toObject()
-  BACKEND_CACHE.setConnectionSettings(settings)
+schema.post('save', async () => {
+  if (BACKEND_CACHE.initialized) await BACKEND_CACHE.refreshAndPublish()
 })
 
 export default model<ConnectionSettings<Types.ObjectId>>('ConnectionSettings', schema)

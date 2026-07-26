@@ -1,8 +1,7 @@
 import { TravelSimple } from 'abrechnung-common/types.js'
 import { getDiffInDays, placeToString } from 'abrechnung-common/utils/scripts.js'
 import escapeHtml from 'escape-html'
-import { BACKEND_CACHE } from '../../db.js'
-import { formatter } from '../../factory.js'
+import { createOperationServices } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
 import { type IntegrationEvent, type IntegrationEventHandlerMap } from '../events.js'
@@ -40,7 +39,8 @@ export async function sendA1Notification(report: TravelSimple) {
     return
   }
 
-  const language = BACKEND_CACHE.displaySettings.locale.default
+  const { formatter, snapshot } = createOperationServices()
+  const language = snapshot.displaySettings.locale.default
   const dif = getDiffInDays(report.startDate, report.endDate) + 1
   const t = (key: string) => i18n.t(key, { lng: language })
   const subject = t('mail.travel.a1.subject')

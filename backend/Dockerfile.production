@@ -1,26 +1,40 @@
-FROM node:24.14-alpine
+FROM node:24.14-alpine AS common-build
+
+WORKDIR /common
+
+COPY common/package*.json ./
+RUN npm ci
+
+COPY common/ ./
+RUN npm run build && npm prune --omit=dev && npm uninstall --no-save --omit=dev typescript
+
+FROM node:24.14-alpine AS backend-build
+
+WORKDIR /build
+
+COPY --from=common-build /common /common
+COPY backend/package*.json ./
+RUN npm ci
+
+COPY backend/ ./
+RUN npm run build \
+  && node -e "require('fs').rmSync('dist/tests', { recursive: true, force: true })" \
+  && npm prune --omit=dev \
+  && npm uninstall --no-save --omit=dev typescript
+
+FROM node:24.14-alpine AS runtime
 
 LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 backend"
 LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
-RUN mkdir -p /reports && chown node:node /reports && chmod 775 /reports
-
 WORKDIR /build
 
-COPY common ../common
-RUN npm install --prefix ../common
-RUN npm run --prefix ../common build
-
-COPY backend/package*.json ./
-
-RUN npm install
-
-COPY backend/ .
-
-RUN npm run build
-
-RUN chown -R node:node /build
+COPY --from=common-build --chown=node:node /common /common
+COPY --from=backend-build --chown=node:node /build/package.json /build/package-lock.json ./
+COPY --from=backend-build --chown=node:node /build/node_modules ./node_modules
+COPY --from=backend-build --chown=node:node /build/dist ./dist
+COPY --from=backend-build --chown=node:node /build/templates ./templates
 
 USER node
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/server.js"]

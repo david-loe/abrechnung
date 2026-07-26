@@ -109,7 +109,8 @@
     "deleteBookedAfterXDays": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "deleteInWorkReportsAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "keyFullIdentifier": "Der Schlüssel ist der komplette Identifier z.B.: {\"labels.new\": \"NEU\"}",
-    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben"
+    "mailXDaysBeforeDeletion": "Um keine Hinweismail zu versenden 0 eingeben",
+    "uploadTokenExpireAfterSeconds": "Legt fest, wie lange der QR-Code für den Handyupload gültig ist"
   },
   "distanceRefundTypes": {
     "car": "Auto 🚗",
