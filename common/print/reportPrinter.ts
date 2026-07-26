@@ -1,4 +1,4 @@
-import { PDFFont, TextAlignment } from 'pdf-lib'
+import { TextAlignment } from 'pdf-lib'
 import {
   _id,
   Advance,
@@ -20,7 +20,6 @@ import {
   Purpose,
   PurposeSimple,
   ReportModelNameWithoutAdvance,
-  ReportType,
   reportIsAdvance,
   reportIsHealthCareCost,
   reportIsTravel,
@@ -35,7 +34,6 @@ import {
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
 import { getAddUpTableData, getTotalBalance, isValidDate, refNumberToString } from '../utils/scripts.js'
-import { embedBootstrapIconFont, getBootstrapIconGlyph } from './bootstrapIcons.js'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
 function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], startNumber = 1) {
@@ -104,22 +102,19 @@ class ReportPrint<idType extends _id> {
   travelSettings: ReportPrinterTravelSettings
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
   reportTypeIcons: DisplaySettings['reportTypeIcons']
-  bootstrapIconFont: PDFFont
 
   constructor(
     report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>,
     drawer: PDFDrawer<idType>,
     travelSettings: ReportPrinterTravelSettings,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
-    reportTypeIcons: DisplaySettings['reportTypeIcons'],
-    bootstrapIconFont: PDFFont
+    reportTypeIcons: DisplaySettings['reportTypeIcons']
   ) {
     this.report = report
     this.drawer = drawer
     this.travelSettings = travelSettings
     this.translateFunc = translateFunc
     this.reportTypeIcons = reportTypeIcons
-    this.bootstrapIconFont = bootstrapIconFont
   }
 
   static async create<idType extends _id>(
@@ -134,8 +129,7 @@ class ReportPrint<idType extends _id> {
     reportTypeIcons: DisplaySettings['reportTypeIcons']
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
-    const bootstrapIconFont = await embedBootstrapIconFont(drawer.doc)
-    return new ReportPrint<idType>(report, drawer, travelSettings, translateFunc, reportTypeIcons, bootstrapIconFont)
+    return new ReportPrint<idType>(report, drawer, travelSettings, translateFunc, reportTypeIcons)
   }
 
   async run(options?: Partial<PrintOptions>) {
@@ -143,19 +137,20 @@ class ReportPrint<idType extends _id> {
 
     const reportType = getReportTypeFromModelName(modelName)
     const opts = { ...this.drawer.settings.options[reportType], ...options }
-    let y = this.drawer.currentPage.getSize().height
+    const pageTop = this.drawer.currentPage.getSize().height
 
-    await this.drawer.drawLogo(this.t('headlines.title'), {
-      fontSize: this.drawer.settings.fontSizes.L,
-      xStart: this.drawer.settings.pagePadding / 3,
-      yStart: y - this.drawer.settings.pagePadding / 3
+    const headerX = this.drawer.settings.pagePadding / 3
+    let y = this.drawer.drawLogo(this.t('headlines.title'), {
+      fontSize: this.drawer.settings.fontSizes.M,
+      xStart: headerX,
+      yStart: pageTop - headerX
     })
 
     if (this.report.reference > 0) {
       await this.drawer.drawMultilineText(refNumberToString(this.report.reference, modelName), {
         alignment: TextAlignment.Center,
         xStart: 0,
-        yStart: y - this.drawer.settings.pagePadding / 5,
+        yStart: pageTop - this.drawer.settings.pagePadding / 5,
         width: this.drawer.currentPage.getSize().width,
         fontSize: this.drawer.settings.fontSizes.S
       })
@@ -163,15 +158,13 @@ class ReportPrint<idType extends _id> {
 
     await this.drawer.drawOrganisationLogo(this.report.project.organisation, {
       xStart: this.drawer.currentPage.getSize().width - 166,
-      yStart: y - 66,
+      yStart: pageTop - 66,
       maxHeight: 50,
       maxWidth: 150
     })
-    y = y - this.drawer.settings.pagePadding
-
-    y = this.drawReportType(reportType, {
-      xStart: this.drawer.settings.pagePadding,
-      yStart: y - this.drawer.settings.fontSizes.L,
+    y = this.drawer.drawIconLabel(this.reportTypeIcons[reportType], this.t(`labels.${reportType}`), {
+      xStart: headerX,
+      yStart: y - this.drawer.settings.fontSizes.S / 3,
       fontSize: this.drawer.settings.fontSizes.L
     })
 
@@ -239,20 +232,6 @@ class ReportPrint<idType extends _id> {
     await this.drawer.attachReceipts(receiptMap)
 
     return await this.drawer.finish()
-  }
-
-  drawReportType(reportType: ReportType, options: Options) {
-    let x = options.xStart
-    for (const iconName of this.reportTypeIcons[reportType]) {
-      const glyph = getBootstrapIconGlyph(iconName)
-      if (glyph === undefined) {
-        continue
-      }
-      this.drawer.drawText(glyph, { ...options, xStart: x }, this.bootstrapIconFont)
-      x += this.bootstrapIconFont.widthOfTextAtSize(glyph, options.fontSize) + options.fontSize / 3
-    }
-
-    return this.drawer.drawMultilineText(this.t(`labels.${reportType}`), { ...options, xStart: x })
   }
 
   drawNameAndProject(options: Options, drawProject = true) {

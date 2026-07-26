@@ -20,7 +20,7 @@ export class ApprovedTravelsPrinter<idType extends _id> extends Printer<idType> 
     )
     let y = drawer.currentPage.getSize().height
     await drawer.drawLogo(this.translateFunc('headlines.title', language), {
-      fontSize: this.settings.fontSizes.L,
+      fontSize: this.settings.fontSizes.M,
       xStart: this.settings.pagePadding / 3,
       yStart: y - this.settings.pagePadding / 3
     })
