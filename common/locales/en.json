@@ -109,7 +109,8 @@
     "deleteBookedAfterXDays": "Enter 0 to prevent automatic deletion",
     "deleteInWorkReportsAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "keyFullIdentifier": "The key is the complete identifier, e.g: {\"labels.new\": \"NEW\"}",
-    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email"
+    "mailXDaysBeforeDeletion": "Enter 0 to prevent reminder email",
+    "uploadTokenExpireAfterSeconds": "Determines how long the QR code for uploads from a phone remains valid"
   },
   "distanceRefundTypes": {
     "car": "Car 🚗",

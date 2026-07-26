@@ -109,7 +109,8 @@
     "deleteBookedAfterXDays": "Автоматты түрде жою үшін 0 енгізіңіз",
     "deleteInWorkReportsAfterXDaysUnused": "Автоматты түрде жою үшін 0 енгізіңіз",
     "keyFullIdentifier": "Кілт толық көрсеткіші ретінде, мысалы: {\"labels.new\": \"NEU\"}",
-    "mailXDaysBeforeDeletion": "Электрондық хат жіберілмес үшін 0 енгізіңіз"
+    "mailXDaysBeforeDeletion": "Электрондық хат жіберілмес үшін 0 енгізіңіз",
+    "uploadTokenExpireAfterSeconds": "Телефоннан файл жүктеуге арналған QR-кодтың жарамдылық мерзімін анықтайды"
   },
   "distanceRefundTypes": {
     "car": "Көлік 🚗",

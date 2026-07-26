@@ -20,7 +20,7 @@ export const settingsSchema = () => {
     preventOwnersFromDeletingReportsAfterReviewCompleted: { type: Boolean, required: true },
     defaultAccess: { type: defaultAccess, required: true },
     disableReportType: { type: disableReportType, required: true },
-    uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true },
+    uploadTokenExpireAfterSeconds: { type: Number, min: 0, required: true, description: 'description.uploadTokenExpireAfterSeconds' },
     exchangeRateProvider: { type: String, enum: exchangeRateProviderNames, required: true, translationPrefix: '' },
     isReadOnly: { type: Boolean, required: true, hide: true },
     version: { type: String, required: true, hide: true },

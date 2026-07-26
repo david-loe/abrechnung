@@ -109,7 +109,8 @@
     "deleteBookedAfterXDays": "Entrez 0 pour ne pas effectuer de suppression automatique",
     "deleteInWorkReportsAfterXDaysUnused": "Entrez 0 pour ne pas effectuer de suppression automatique",
     "keyFullIdentifier": "La clé est l'identifiant complet, par exemple : {\"labels.new\": \"NEU\"}",
-    "mailXDaysBeforeDeletion": "Entrez 0 pour ne pas envoyer de courriel d'information"
+    "mailXDaysBeforeDeletion": "Entrez 0 pour ne pas envoyer de courriel d'information",
+    "uploadTokenExpireAfterSeconds": "Détermine la durée de validité du code QR pour les téléchargements depuis un téléphone"
   },
   "distanceRefundTypes": {
     "car": "Voiture 🚗",

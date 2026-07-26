@@ -109,7 +109,8 @@
     "deleteBookedAfterXDays": "Введите 0, чтобы избежать автоматического удаления.",
     "deleteInWorkReportsAfterXDaysUnused": "Введите 0, чтобы избежать автоматического удаления.",
     "keyFullIdentifier": "Ключ — это полный идентификатор, например: {\"labels.new\": \"НОВЫЙ\"}",
-    "mailXDaysBeforeDeletion": "Введите 0, чтобы не отправлять уведомление по почте об удалении"
+    "mailXDaysBeforeDeletion": "Введите 0, чтобы не отправлять уведомление по почте об удалении",
+    "uploadTokenExpireAfterSeconds": "Определяет срок действия QR-кода для загрузки файлов с телефона"
   },
   "distanceRefundTypes": {
     "car": "Автомобиль 🚗",
