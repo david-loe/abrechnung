@@ -12538,6 +12538,85 @@
 			"SetterBody_ICategory_mongoose.Types.ObjectId__": {
 				"$ref": "#/components/schemas/SetterPartial_ICategory_mongoose.Types.ObjectId_.NoPost_"
 			},
+			"Partial_Record_Access.boolean__": {
+				"properties": {
+					"user": {
+						"type": "boolean"
+					},
+					"inWork:expenseReport": {
+						"type": "boolean"
+					},
+					"inWork:healthCareCost": {
+						"type": "boolean"
+					},
+					"appliedFor:advance": {
+						"type": "boolean"
+					},
+					"appliedFor:travel": {
+						"type": "boolean"
+					},
+					"approved:travel": {
+						"type": "boolean"
+					},
+					"approve/advance": {
+						"type": "boolean"
+					},
+					"approve/travel": {
+						"type": "boolean"
+					},
+					"examine/travel": {
+						"type": "boolean"
+					},
+					"examine/expenseReport": {
+						"type": "boolean"
+					},
+					"examine/healthCareCost": {
+						"type": "boolean"
+					},
+					"book/advance": {
+						"type": "boolean"
+					},
+					"book/travel": {
+						"type": "boolean"
+					},
+					"book/expenseReport": {
+						"type": "boolean"
+					},
+					"book/healthCareCost": {
+						"type": "boolean"
+					},
+					"admin": {
+						"type": "boolean"
+					}
+				},
+				"type": "object",
+				"description": "Make all properties in T optional"
+			},
+			"AuthContext": {
+				"description": "A browser-safe authentication snapshot used to bind offline data to one session context.",
+				"properties": {
+					"userId": {
+						"type": "string"
+					},
+					"cacheScope": {
+						"type": "string"
+					},
+					"expiresAt": {
+						"type": "string"
+					},
+					"permissions": {
+						"$ref": "#/components/schemas/Partial_Record_Access.boolean__"
+					}
+				},
+				"required": [
+					"userId",
+					"cacheScope",
+					"expiresAt",
+					"permissions"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ApprovedTravel__id_": {
 				"properties": {
 					"reason": {
@@ -13519,7 +13598,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "2.6.3",
+		"version": "2.6.4",
 		"contact": {}
 	},
 	"paths": {
@@ -17125,11 +17204,27 @@
 										},
 										"status": {
 											"type": "string"
+										},
+										"redis": {
+											"type": "string",
+											"enum": [
+												"ready",
+												"not_ready"
+											]
+										},
+										"config": {
+											"type": "string",
+											"enum": [
+												"ready",
+												"not_ready"
+											]
 										}
 									},
 									"required": [
 										"db",
-										"status"
+										"status",
+										"redis",
+										"config"
 									],
 									"type": "object"
 								}
@@ -23815,15 +23910,21 @@
 			"get": {
 				"operationId": "Authenticated",
 				"responses": {
-					"204": {
-						"description": "No content"
+					"200": {
+						"description": "Authenticated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AuthContext"
+								}
+							}
+						}
 					},
 					"401": {
 						"description": "Unauthorized"
 					}
 				},
-				"description": "Empty method",
-				"summary": "Check if request is authenticated",
+				"summary": "Return the current authentication and offline-cache context",
 				"tags": [
 					"Auth"
 				],
