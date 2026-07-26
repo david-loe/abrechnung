@@ -16,7 +16,7 @@
     "express-rate-limit": "^8.6.0",
     "express-session": "^1.19.0",
     "i18next": "^26.3.6",
-    "isolated-vm": "^6.1.2",
+    "isolated-vm": "^7.0.0",
     "mongodb": "~7.5",
     "mongoose": "^9.8.0",
     "multer": "^2.2.0",
