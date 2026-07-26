@@ -50,7 +50,7 @@ Use the same validation intent as CI production build:
 ```bash
 docker compose build frontend
 docker compose run frontend npm run test
-docker compose run frontend npm run build
+docker compose run -e NODE_ENV=production frontend npm run build
 ```
 
 Note:
