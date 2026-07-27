@@ -25,6 +25,7 @@
     "areYouSureDelete": "Бұл өшіруді аяқтауыңызға сенімдісіз бе? Егер өшірілсе, ол қайта қалпына келтірілмейді!",
     "areYouSureEdit": "Өңдеуді бастауыңызға сенімдісіз бе?",
     "areYouSureMerge": "Бұл пайдаланушыларды біріктіргіңіз келетіні рас па? Бұл қайтымсыз.",
+    "areYouSureWithdrawApproval": "Бұл бекітуді қайтарып алғыңыз келетініне сенімдісіз бе?",
     "conflict": "Қақтығыс!",
     "countryChangeBetweenStages": "Кезеңдер арасындағы елдің ауысуы",
     "departureAndArrivalOnDifferentDaysX": "'{X}' ішінде бірнеше күн бойы отырдыңыз ба, сенімдісіз бе?",
@@ -595,6 +596,7 @@
     "weekly": "Апта сайын",
     "white": "Ақ",
     "width": "Ен",
+    "withdrawApproval": "Бекітуді қайтарып алу",
     "XDetails": "{X}өлшемдері"
   },
   "languages": {
@@ -622,6 +624,11 @@
         "lastParagraph": "{commentator} жазды: '{comment}'",
         "paragraph": "{owner}-ден жаңа аванс сұранысы келді.",
         "subject": "🆕 Жаңа аванс сұранысы"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} жазды: '{comment}'",
+        "paragraph": "Авансыңыздың бекітуі қайтарып алынды.",
+        "subject": "↩️ Аванс бекітуі қайтарып алынды"
       },
       "APPROVED": {
         "confirmationLine": "Ақша қолыңызға тиген соң, [мұнда]({- confirmLink}) растауға болады.",
@@ -722,6 +729,11 @@
         "lastParagraph": "{commentator} жазды: '{comment}'",
         "paragraph": "{owner} тарапынан жаңа саяхат өтініші жаңа түсті.",
         "subject": "🆕 Жаңа саяхат"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} жазды: '{comment}'",
+        "paragraph": "Сапарыңыздың бекітуі қайтарып алынды.",
+        "subject": "↩️ Сапар бекітуі қайтарып алынды"
       },
       "APPROVED": {
         "lastParagraph": "{commentator} жазды: '{comment}'",

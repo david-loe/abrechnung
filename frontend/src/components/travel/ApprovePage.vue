@@ -67,7 +67,17 @@
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
           @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)" />
-        <TravelApply v-else-if="modalTravel.state === TravelState.APPROVED" :travel="(modalTravel as TravelSimple)" />
+        <template v-else-if="modalTravel.state === TravelState.APPROVED">
+          <TravelApply :travel="(modalTravel as TravelSimple)" />
+          <div class="mb-3">
+            <label for="withdrawTravelApprovalComment" class="form-label">{{ t('labels.comment') }}</label>
+            <CTextArea id="withdrawTravelApprovalComment" v-model="withdrawalComment" />
+          </div>
+          <button type="button" class="btn btn-danger" :disabled="modalFormIsLoading" @click="withdrawApproval()">
+            <span v-if="modalFormIsLoading" class="spinner-border spinner-border-sm"></span>
+            {{ t('labels.withdrawApproval') }}
+          </button>
+        </template>
         <TravelApplyForm
           v-else-if="modalMode !== 'view'"
           :mode="modalMode"
@@ -125,6 +135,7 @@
         </button>
         <hr class="hr" >
         <TravelList
+          ref="approvedTravelList"
           endpoint="approve/travel"
           :stateFilter="show"
           :columns-to-hide="['state', 'addUp.totalTotal', 'addUp.totalBalance', 'updatedAt', 'report', 'organisation', 'bookingRemark','addUp.totalAdvance', 'reference']"
@@ -145,6 +156,7 @@ import DateInput from '@/components/elements/DateInput.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
@@ -168,9 +180,11 @@ const approvedTravelsReportForm = ref({
 const modalMode = ref<ModalMode>('view')
 const show = ref<null | TravelState.APPROVED>(null)
 const modalFormIsLoading = ref(false)
+const withdrawalComment = ref('')
 
 const modalComp = useTemplateRef('modalComp')
 const travelList = useTemplateRef('travelList')
+const approvedTravelList = useTemplateRef('approvedTravelList')
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
@@ -194,6 +208,7 @@ function hideModal() {
 function resetModal() {
   modalTravel.value = {}
   modalMode.value = 'view'
+  withdrawalComment.value = ''
   router.push('/approve/travel')
 }
 function resetAndHide() {
@@ -211,6 +226,22 @@ async function approveTravel(travel: Partial<TravelSimple>, decision: 'approved'
       travelList.value?.loadFromServer()
       resetAndHide()
     }
+  }
+}
+async function withdrawApproval() {
+  if (!modalTravel.value._id || !confirm(t('alerts.areYouSureWithdrawApproval'))) {
+    return
+  }
+  modalFormIsLoading.value = true
+  const result = await API.setter<TravelSimple>('approve/travel/withdrawApproval', {
+    _id: modalTravel.value._id,
+    comment: withdrawalComment.value || undefined
+  })
+  modalFormIsLoading.value = false
+  if (result.ok) {
+    travelList.value?.loadFromServer()
+    approvedTravelList.value?.loadFromServer()
+    resetAndHide()
   }
 }
 async function showTravel(_id: string) {

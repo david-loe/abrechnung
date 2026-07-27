@@ -25,6 +25,7 @@
     "areYouSureDelete": "Bist du dir sicher, dass du das löschen willst? Dies kann NICHT rückgängig gemacht werden!",
     "areYouSureEdit": "Bist du dir sicher, dass du das bearbeiten willst?",
     "areYouSureMerge": "Bist du dir sicher, dass du diese Benutzer zusammenführen willst? Das kann nicht rückgängig gemacht werden.",
+    "areYouSureWithdrawApproval": "Bist du dir sicher, dass du diese Genehmigung zurückziehen möchtest?",
     "conflict": "Konflikt!",
     "countryChangeBetweenStages": "Länderwechsel zwischen aufeinanderfolgenden Etappen",
     "departureAndArrivalOnDifferentDaysX": "Bist du sicher, dass du über mehrere Tage im '{X}' saßt?",
@@ -595,6 +596,7 @@
     "weekly": "Wöchentlich",
     "white": "Weiß",
     "width": "Breite",
+    "withdrawApproval": "Genehmigung zurückziehen",
     "XDetails": "{X}details"
   },
   "languages": {
@@ -622,6 +624,11 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Vorschussantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Vorschussantrag"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Die Genehmigung deines Vorschusses wurde zurückgezogen.",
+        "subject": "↩️ Vorschussgenehmigung zurückgezogen"
       },
       "APPROVED": {
         "confirmationLine": "Sobald du das Geld erhalten hast, kannst du das [hier]({- confirmLink}) bestätigen.",
@@ -722,6 +729,11 @@
         "lastParagraph": "{commentator} schrieb: '{comment}'",
         "paragraph": "Ein neuer Reiseantrag von {owner} kam gerade rein.",
         "subject": "🆕 Neue Reise"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} schrieb: '{comment}'",
+        "paragraph": "Die Genehmigung deiner Reise wurde zurückgezogen.",
+        "subject": "↩️ Reisegenehmigung zurückgezogen"
       },
       "APPROVED": {
         "lastParagraph": "{commentator} schrieb: '{comment}'",

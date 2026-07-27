@@ -25,6 +25,7 @@
     "areYouSureDelete": "¿Estás seguro de que quieres eliminar esto? ¡Esto no se puede deshacer!",
     "areYouSureEdit": "¿Estás seguro de que quieres editar esto?",
     "areYouSureMerge": "¿Estás seguro de que quieres fusionar estos usuarios? Esto no se puede deshacer.",
+    "areYouSureWithdrawApproval": "¿Estás seguro de que quieres retirar esta aprobación?",
     "conflict": "¡Conflicto!",
     "countryChangeBetweenStages": "Cambio de país entre etapas consecutivas",
     "departureAndArrivalOnDifferentDaysX": "¿Estás seguro de que estuviste en \"{X}\" durante varios días?",
@@ -595,6 +596,7 @@
     "weekly": "Semanal",
     "white": "Blanco",
     "width": "Ancho",
+    "withdrawApproval": "Retirar aprobación",
     "XDetails": "Detalles de {X}"
   },
   "languages": {
@@ -622,6 +624,11 @@
         "lastParagraph": "{commentator} escribió: '{comment}'",
         "paragraph": "Un nuevo solicitud de anticipo de {owner} acaba de llegar.",
         "subject": "🆕 Nueva solicitud de anticipo"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} escribió: '{comment}'",
+        "paragraph": "Se ha retirado la aprobación de tu anticipo.",
+        "subject": "↩️ Aprobación del anticipo retirada"
       },
       "APPROVED": {
         "confirmationLine": "Una vez que hayas recibido el dinero, puedes confirmarlo [aquí]({- confirmLink}).",
@@ -722,6 +729,11 @@
         "lastParagraph": "{commentator} escribió: '{comment}'",
         "paragraph": "Acaba de llegar una nueva solicitud de viaje de {owner}.",
         "subject": "🆕 Nuevo viaje"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} escribió: '{comment}'",
+        "paragraph": "Se ha retirado la aprobación de tu viaje.",
+        "subject": "↩️ Aprobación del viaje retirada"
       },
       "APPROVED": {
         "lastParagraph": "{commentator} escribió: '{comment}'",

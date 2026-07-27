@@ -36,6 +36,14 @@
                   </button>
                 </template>
               </Advance>
+              <div v-if="canWithdrawApproval(modalAdvance as AdvanceSimple<string>)" class="mt-3">
+                <label for="withdrawAdvanceApprovalComment" class="form-label">{{ t('labels.comment') }}</label>
+                <CTextArea id="withdrawAdvanceApprovalComment" v-model="withdrawalComment" />
+                <button type="button" class="btn btn-danger mt-3" :disabled="modalFormIsLoading" @click="withdrawApproval()">
+                  <span v-if="modalFormIsLoading" class="spinner-border spinner-border-sm"></span>
+                  {{ t('labels.withdrawApproval') }}
+                </button>
+              </div>
               <form class="mb-2 mt-3" v-if="isOffsetFormVisible" @submit.prevent="offsetAdvance(modalAdvance._id, offsetAmount)">
                 <div class="row gy-3">
                   <label for="amount" class="col-form-label col-auto">
@@ -134,6 +142,7 @@ import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
+import CTextArea from '@/components/elements/TextArea.vue'
 
 const props = defineProps<{ _id?: string }>()
 const router = useRouter()
@@ -146,6 +155,7 @@ const modalFormIsLoading = ref(false)
 const isOffsetFormVisible = ref(false)
 const offsetAmount = ref(0)
 const offsetSubject = ref('')
+const withdrawalComment = ref('')
 
 const modalComp = useTemplateRef('modalComp')
 const advanceList = useTemplateRef('advanceList')
@@ -170,6 +180,7 @@ function resetModal() {
   isOffsetFormVisible.value = false
   offsetAmount.value = 0
   offsetSubject.value = ''
+  withdrawalComment.value = ''
   router.push('/approve/advance')
 }
 function resetAndHide() {
@@ -178,6 +189,10 @@ function resetAndHide() {
 }
 
 function canDeleteAdvance(advance: AdvanceSimple<string>) {
+  return advance.state === AdvanceState.APPROVED && !advance.receivedOn && advance.offsetAgainst.length === 0
+}
+
+function canWithdrawApproval(advance: AdvanceSimple<string>) {
   return advance.state === AdvanceState.APPROVED && !advance.receivedOn && advance.offsetAgainst.length === 0
 }
 
@@ -223,6 +238,23 @@ async function deleteAdvance(_id: string) {
   const result = await API.deleter('approve/advance', { _id })
   modalFormIsLoading.value = false
   if (result) {
+    advanceList.value?.loadFromServer()
+    approvedAdvanceList.value?.loadFromServer()
+    resetAndHide()
+  }
+}
+
+async function withdrawApproval() {
+  if (!modalAdvance.value._id || !confirm(t('alerts.areYouSureWithdrawApproval'))) {
+    return
+  }
+  modalFormIsLoading.value = true
+  const result = await API.setter<AdvanceSimple<string>>('approve/advance/withdrawApproval', {
+    _id: modalAdvance.value._id,
+    comment: withdrawalComment.value || undefined
+  })
+  modalFormIsLoading.value = false
+  if (result.ok) {
     advanceList.value?.loadFromServer()
     approvedAdvanceList.value?.loadFromServer()
     resetAndHide()

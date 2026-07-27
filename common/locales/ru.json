@@ -25,6 +25,7 @@
     "areYouSureDelete": "Вы уверены, что хотите удалить это? Это действие НЕ МОЖЕТ быть отменено!",
     "areYouSureEdit": "Вы уверены, что хотите это изменить?",
     "areYouSureMerge": "Вы уверены, что хотите объединить этих пользователей? Это действие необратимо.",
+    "areYouSureWithdrawApproval": "Вы уверены, что хотите отозвать это утверждение?",
     "conflict": "Конфликт!",
     "countryChangeBetweenStages": "Смена страны между последовательными этапами",
     "departureAndArrivalOnDifferentDaysX": "Вы уверены, что провели несколько дней в '{X}'?",
@@ -595,6 +596,7 @@
     "weekly": "Еженедельно",
     "white": "Белый",
     "width": "Ширина",
+    "withdrawApproval": "Отозвать утверждение",
     "XDetails": "{X}детали"
   },
   "languages": {
@@ -622,6 +624,11 @@
         "lastParagraph": "{commentator} написал: '{comment}'",
         "paragraph": "Новая заявка на аванс от {owner} только что поступила.",
         "subject": "🆕 Новая заявка на аванс"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} написал(а): '{comment}'",
+        "paragraph": "Утверждение вашего аванса было отозвано.",
+        "subject": "↩️ Утверждение аванса отозвано"
       },
       "APPROVED": {
         "confirmationLine": "Как только получите деньги, можете подтвердить [здесь]({- confirmLink}).",
@@ -722,6 +729,11 @@
         "lastParagraph": "{commentator} написал: '{comment}'",
         "paragraph": "Поступил новый запрос на поездку от {owner}.",
         "subject": "🆕 Новая поездка"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} написал(а): '{comment}'",
+        "paragraph": "Утверждение вашей поездки было отозвано.",
+        "subject": "↩️ Утверждение поездки отозвано"
       },
       "APPROVED": {
         "lastParagraph": "{commentator} написал: '{comment}'",
