@@ -151,27 +151,34 @@
     <template v-if="formStage.transport.type !== 'ownCar'">
       <div class="row mb-2">
         <div class="col">
-          <label for="stageFormCost" class="form-label me-2">{{ t('labels.cost') }}</label>
-          <InfoPoint :text="t('info.cost')" />
-          <div class="input-group" id="stageFormCost">
-            <input type="number" class="form-control" step="0.01" v-model="formStage.cost.amount" min="0" :disabled="disabled" >
-            <CurrencySelector v-model="formStage.cost.currency" :disabled="disabled" :required="true" />
-          </div>
+          <label for="stageFormCurrency" class="form-label me-2">{{ t('labels.currency') }}</label>
+          <CurrencySelector id="stageFormCurrency" v-model="formStage.cost.currency" :disabled="disabled" :required="true" />
         </div>
         <div class="col">
           <label for="invoiceDateInput" class="form-label">
             {{ t('labels.invoiceDate') }}
-            <span v-if="formStage.cost.amount" class="text-danger">*</span>
+            <span v-if="hasCostAmount" class="text-danger">*</span>
           </label>
           <DateInput
             id="invoiceDateInput"
-            v-model="formStage.cost.date"
-            :required="Boolean(formStage.cost.amount)"
+            :model-value="formStage.cost.date || undefined"
+            @update:model-value="(date) => (formStage.cost.date = date)"
+            :required="hasCostAmount"
             :disabled="disabled"
             :max="new Date()" />
         </div>
       </div>
     </template>
+
+    <CostPositionsEditor
+      v-model="formStage.cost.positions"
+      :default-project="defaultProject"
+      report-type="Travel"
+      :currency="formStage.cost.currency"
+      :disabled="disabled"
+      :required="true"
+      :amount-required="false"
+      :own-car="formStage.transport.type === 'ownCar'" />
 
     <template
       v-if="
@@ -181,7 +188,7 @@
       <div class="mb-3">
         <label for="stageFormFile" class="form-label me-2">
           {{ t('labels.receipts') }}
-          <span v-if="formStage.cost.amount" class="text-danger">*</span>
+          <span v-if="hasCostAmount" class="text-danger">*</span>
         </label>
         <InfoPoint :text="t('info.receipts')" />
         <FileUpload
@@ -189,6 +196,7 @@
           id="stageFormFile"
           v-model="formStage.cost.receipts"
           :disabled="disabled"
+          :required="hasCostAmount"
           :endpointPrefix="endpointPrefix"
           :ownerId="ownerId"
           :showUploadFromPhone="props.showUploadFromPhone" />
@@ -203,27 +211,6 @@
     <select class="form-select mb-3" v-model="formStage.purpose" id="stageFormPurpose" :disabled="disabled" required>
       <option v-for="purpose of ['professional', 'mixed', 'private']" :value="purpose" :key="purpose">{{ t('labels.' + purpose) }}</option>
     </select>
-
-    <template v-if="props.showProjectSelection">
-      <div class="mb-3" v-if="useDifferentProject || formStage.project">
-        <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
-        <InfoPoint :text="t('info.project')" />
-        <button
-          type="button"
-          class="btn btn-sm btn-link ms-3"
-          @click="
-          useDifferentProject = false;
-          //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
-          formStage.project = ''
-        ">
-          {{ t('labels.reset') }}
-        </button>
-        <ProjectSelector id="healthCareCostFormProject" v-model="formStage.project" />
-      </div>
-      <div class="mb-2" v-else>
-        <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
-      </div>
-    </template>
 
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
@@ -267,26 +254,29 @@
 <script lang="ts" setup>
 import {
   baseCurrency,
+  Category,
+  CostPosition,
   CountrySimple,
   DistanceRefundType,
   DocumentFile,
   distanceRefundTypes,
   Place,
+  ProjectSimple,
   Stage,
   TravelSettings,
   transportTypes
 } from 'abrechnung-common/types.js'
-import { datetimeToDate, datetimeToDateString, getDayList } from 'abrechnung-common/utils/scripts.js'
+import { datetimeToDate, datetimeToDateString, getDayList, multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../../formatter'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
+import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import DateInput from '../../elements/DateInput.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
-import ProjectSelector from '../../elements/ProjectSelector.vue'
 import CTextArea from '../../elements/TextArea.vue'
 
 const emit = defineEmits<{
@@ -312,15 +302,18 @@ const props = defineProps({
   showUploadFromPhone: { type: Boolean, default: true },
   showPrevButton: { type: Boolean, default: false },
   showNextButton: { type: Boolean, default: false },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true }
 })
 
 const { t } = useI18n()
 
 const fileUploadRef = useTemplateRef('fileUpload')
 
-const useDifferentProject = ref(false)
 const formStage = ref(input())
+const hasCostAmount = computed(() =>
+  formStage.value.cost.positions.some(({ grossAmount }) => Number.isFinite(grossAmount) && grossAmount !== 0)
+)
 const minDate = computed(() => {
   if (props.travelStartDate) {
     const date = new Date(props.travelStartDate)
@@ -338,6 +331,18 @@ const maxDate = computed(() => {
 
 const showDepartureAndArrivalOnDifferentDaysAlert = ref(false)
 
+function defaultCostPosition(position?: CostPosition<string>) {
+  return {
+    ...(position?._id ? { _id: position._id } : {}),
+    kind: 'manual' as const,
+    description: '',
+    grossAmount: 0,
+    vatRate: 0,
+    project: position?.project ?? props.defaultProject,
+    category: position?.category as Category<string>
+  }
+}
+
 function defaultStage() {
   return {
     departure: '',
@@ -346,10 +351,9 @@ function defaultStage() {
     endLocation: undefined as Place | undefined,
     midnightCountries: [],
     transport: { type: 'otherTransport', distance: null, distanceRefundType: distanceRefundTypes[0] },
-    cost: { amount: null, currency: baseCurrency, receipts: [], date: '' },
+    cost: { positions: [defaultCostPosition()], currency: baseCurrency, receipts: [], date: '' },
     purpose: 'professional',
-    note: undefined,
-    project: undefined
+    note: undefined
   }
 }
 function showMidnightCountries() {
@@ -406,16 +410,22 @@ function getGoogleMapsLink() {
 function clear() {
   fileUploadRef.value?.clear()
   formStage.value = defaultStage()
-  useDifferentProject.value = false
 }
 function output() {
+  for (const position of formStage.value.cost.positions) {
+    if (!Number.isFinite(position.grossAmount)) position.grossAmount = 0
+  }
   if (!showMidnightCountries()) {
     formStage.value.midnightCountries = []
   }
   return formStage.value as Partial<Stage<string>>
 }
 function input() {
-  return { ...defaultStage(), ...props.stage }
+  const stage = { ...defaultStage(), ...props.stage }
+  if (stage.transport?.type !== 'ownCar' && stage.cost.positions.length === 0) {
+    stage.cost.positions = [defaultCostPosition()]
+  }
+  return stage
 }
 
 watch(
@@ -425,7 +435,38 @@ watch(
     formStage.value = input()
   }
 )
-watch(() => formStage.value.transport.type, calcMidnightCountries)
+watch(
+  () => formStage.value.transport.type,
+  (transportType) => {
+    calcMidnightCountries()
+    if (transportType === 'ownCar') {
+      const oldPosition = formStage.value.cost.positions[0]
+      formStage.value.cost.positions = [
+        {
+          ...(oldPosition?._id ? { _id: oldPosition._id } : {}),
+          kind: 'ownCar',
+          grossAmount: 0,
+          vatRate: 0,
+          project: oldPosition?.project ?? props.defaultProject,
+          category: oldPosition?.category
+        }
+      ]
+      formStage.value.cost.currency = baseCurrency
+    } else if (formStage.value.cost.positions.some(({ kind }) => kind === 'ownCar')) {
+      formStage.value.cost.positions = [defaultCostPosition(formStage.value.cost.positions[0])]
+    }
+  }
+)
+watch(
+  [
+    () => (formStage.value.transport.type === 'ownCar' ? formStage.value.transport.distance : 0),
+    () => (formStage.value.transport.type === 'ownCar' ? formStage.value.transport.distanceRefundType : distanceRefundTypes[0])
+  ],
+  ([distance, refundType]) => {
+    const position = formStage.value.cost.positions.find(({ kind }) => kind === 'ownCar')
+    if (position && refundType) position.grossAmount = multiplyAmountAndRound(distance || 0, props.travelSettings.distanceRefunds[refundType])
+  }
+)
 watch(() => formStage.value.startLocation?.country, calcMidnightCountries)
 watch(() => formStage.value.endLocation?.country, calcMidnightCountries)
 watch(

@@ -13,6 +13,7 @@
         <StageForm
           v-if="modalObjectType === 'stage'"
           :mode="modalMode"
+          :default-project="travel.project"
           :stage="(modalObject as Partial<Stage<string>> | Gap | undefined)"
           :travelStartDate="travel.startDate"
           :travelEndDate="travel.endDate"
@@ -39,6 +40,7 @@
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
+          :default-project="travel.project"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(tableRef?.getNext((modalObject as TravelExpense), modalObjectType))"
@@ -601,9 +603,6 @@ async function postStage(stage: Partial<Stage>) {
   if (stage.cost) {
     if (stage.cost.receipts) {
       headers = { 'Content-Type': 'multipart/form-data' }
-    }
-    if ((stage.cost.amount as unknown) === '') {
-      stage.cost.amount = 0
     }
   }
   modalFormIsLoading.value = true

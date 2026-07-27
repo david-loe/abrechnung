@@ -1,4 +1,4 @@
-import { Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
+import { Category, Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
@@ -20,6 +20,22 @@ let travel: TravelSimple = {
 }
 
 let originalVehicleRegistrationSetting: 'required' | 'optional' | 'none' | undefined
+let category: Category
+
+function withCostPositions<T>(record: T, description: string, kind: 'manual' | 'ownCar' = 'manual') {
+  const input = record as T & { cost: { amount?: number | null } }
+  const { amount, ...cost } = input.cost
+  return {
+    ...record,
+    cost: {
+      ...cost,
+      positions:
+        typeof amount === 'number'
+          ? [{ kind, ...(kind === 'manual' ? { description } : {}), grossAmount: amount, vatRate: 0, project: travel.project, category }]
+          : []
+    }
+  }
+}
 
 async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none') {
   await loginUser(agent, 'admin')
@@ -38,6 +54,12 @@ test.serial('GET /project', async (t) => {
     console.log(res.body)
     t.fail()
   }
+})
+
+test.serial('GET /category', async (t) => {
+  const res = await agent.get('/category')
+  category = res.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
+  t.is(res.status, 200)
 })
 
 test.serial('POST /travel/appliedFor', async (t) => {
@@ -171,7 +193,7 @@ const stages: Stage[] = [
     midnightCountries: [],
     transport: { type: 'airplane' }, //@ts-ignore
     cost: {
-      amount: null, //@ts-ignore
+      amount: 0, //@ts-ignore
       currency: { _id: 'EUR' }
     },
     purpose: 'professional'
@@ -182,8 +204,9 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
+    const stageBody = withCostPositions(stage, stage.transport.type)
     let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(stage)) {
+    for (const entry of objectToFormFields(stageBody)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -217,8 +240,9 @@ const expenses: TravelExpense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
+    const expenseBody = withCostPositions(expense, expense.description)
     let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(expense)) {
+    for (const entry of objectToFormFields(expenseBody)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -394,7 +418,7 @@ test.serial('POST /travel/underExamination rejects ownCar without owner vehicle 
   }
 
   let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(ownCarStage)) {
+  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
     stageRequest = stageRequest.field(entry.field, entry.val)
   }
   const stageResponse = await stageRequest
@@ -472,7 +496,7 @@ test.serial('POST /travel/underExamination allows ownCar with owner vehicle regi
   }
 
   let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(ownCarStage)) {
+  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
     stageRequest = stageRequest.field(entry.field, entry.val)
   }
   const stageResponse = await stageRequest

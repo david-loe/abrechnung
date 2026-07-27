@@ -13,14 +13,6 @@
       <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" >
     </div>
 
-    <div v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1" class="mb-3">
-      <label for="expenseReportFormCategory" class="form-label">
-        {{ t('labels.category') }}
-        <span class="text-danger">*</span>
-      </label>
-      <CategorySelector v-model="formExpenseReport.category" id="expenseReportFormCategory" required />
-    </div>
-
     <div class="mb-3">
       <label for="expenseReportFormProject" class="form-label me-2">
         {{ t('labels.project') }}
@@ -58,7 +50,6 @@ import { ExpenseReportSimple, UserSimple } from 'abrechnung-common/types.js'
 import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
-import CategorySelector from '@/components/elements/CategorySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -80,7 +71,7 @@ const APP_DATA = APP_LOADER.data
 const formExpenseReport = ref(input())
 
 function defaultExpenseReport() {
-  return { name: '', advances: [], owner: props.owner, category: APP_DATA.value?.defaultCategory }
+  return { name: '', advances: [], owner: props.owner }
 }
 function output() {
   return formExpenseReport.value

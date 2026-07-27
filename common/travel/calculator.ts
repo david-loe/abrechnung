@@ -70,7 +70,7 @@ export class TravelCalculator {
   travelSettings!: TravelSettings<_id>
   stagesCompareFn = (a: Stage<_id, binary>, b: Stage<_id, binary>) => new Date(a.departure).valueOf() - new Date(b.departure).valueOf()
   expensesCompareFn = (a: TravelExpense<_id, binary>, b: TravelExpense<_id, binary>) =>
-    new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+    new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
 
   constructor(getCountryById: (id: CountryCode) => Promise<Country>, travelSettings: TravelSettings<_id>) {
     this.getCountryById = getCountryById
@@ -431,13 +431,16 @@ export class TravelCalculator {
     for (const stage of stages) {
       if (stage.transport.type === 'ownCar') {
         if (stage.transport.distance && stage.transport.distanceRefundType) {
-          stage.cost = Object.assign(stage.cost, {
-            amount: multiplyAmountAndRound(
-              stage.transport.distance,
-              this.travelSettings.distanceRefunds[stage.transport.distanceRefundType]
-            ),
-            currency: baseCurrency
-          })
+          const grossAmount = multiplyAmountAndRound(
+            stage.transport.distance,
+            this.travelSettings.distanceRefunds[stage.transport.distanceRefundType]
+          )
+          stage.cost = Object.assign(stage.cost, { currency: baseCurrency })
+          const position = stage.cost.positions.find((position) => position.kind === 'ownCar')
+          if (position) {
+            position.grossAmount = grossAmount
+            position.vatRate = 0
+          }
         }
       }
     }

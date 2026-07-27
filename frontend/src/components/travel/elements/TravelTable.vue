@@ -62,13 +62,13 @@
         <PlaceElement :place="(row.data as Stage).startLocation" />
         <i :class="getStageIcon(row.data as Stage) + ' d-md-none me-1'"></i>
         <i class="bi bi-arrow-right mx-2"></i>
-        <div v-if="(row.data as Stage).cost.amount" class="ms-3 text-secondary d-inline d-md-none">
+        <div v-if="getCostGrossAmount((row.data as Stage).cost)" class="ms-3 text-secondary d-inline d-md-none">
           <i class="bi bi-coin"></i>
           {{ formatter.money((row.data as Stage).cost) }}
         </div>
         <PlaceElement :place="(row.data as Stage).endLocation" />
       </div>
-      <div v-if="(row.data as Stage).cost.amount" class="col-auto text-secondary d-none d-md-block">
+      <div v-if="getCostGrossAmount((row.data as Stage).cost)" class="col-auto text-secondary d-none d-md-block">
         <i class="bi bi-coin"></i>
         {{ formatter.money((row.data as Stage).cost) }}
       </div>
@@ -99,6 +99,7 @@
 
 <script lang="ts" setup>
 import { Stage, Travel, TravelDay, TravelExpense, TravelRecord, TravelRecordType } from 'abrechnung-common/types.js'
+import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../../formatter.js'
@@ -132,7 +133,7 @@ function renderTable() {
   let stageIndex = 0
   // Füge zuerst alle Ausgaben ein, die vor dem ersten Reisetag liegen:
   for (const expense of props.travel.expenses) {
-    if (props.travel.days.length === 0 || expense.cost.date < props.travel.days[0].date) {
+    if (props.travel.days.length === 0 || new Date(expense.cost.date || 0).valueOf() < new Date(props.travel.days[0].date).valueOf()) {
       table.value.push({ type: 'expense', data: expense })
     }
   }
@@ -152,7 +153,7 @@ function renderTable() {
     }
     table.value.push({ type: 'day', data: { ...props.travel.days[i] } as TravelDay })
     for (const expense of props.travel.expenses) {
-      if (expense.cost.date === props.travel.days[i].date) {
+      if (new Date(expense.cost.date || 0).valueOf() === new Date(props.travel.days[i].date).valueOf()) {
         table.value.push({ type: 'expense', data: expense })
       }
     }
@@ -168,7 +169,7 @@ function renderTable() {
   // Füge alle Ausgaben ein, die nach dem letzten Tag liegen:
   if (props.travel.days.length > 0) {
     for (const expense of props.travel.expenses) {
-      if (expense.cost.date > props.travel.days[props.travel.days.length - 1].date) {
+      if (new Date(expense.cost.date || 0).valueOf() > new Date(props.travel.days[props.travel.days.length - 1].date).valueOf()) {
         table.value.push({ type: 'expense', data: expense })
       }
     }

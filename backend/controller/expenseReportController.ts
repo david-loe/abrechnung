@@ -37,14 +37,6 @@ function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expense
   }
 }
 
-function normalizeExpenseProject(requestBody: ExpenseSetterBody) {
-  // multipart/form-data does not send null values
-  // so we need to set it to null if the value is an empty string
-  if (requestBody.project?.toString() === '') {
-    requestBody.project = null
-  }
-}
-
 function upsertExpense(expenses: Expense[], requestBody: ExpenseSetterBody) {
   if (requestBody._id && requestBody._id !== '') {
     const existingExpense = expenses.find((expense) => (expense._id as Types.ObjectId).equals(requestBody._id as string))
@@ -60,7 +52,7 @@ function upsertExpense(expenses: Expense[], requestBody: ExpenseSetterBody) {
 
 async function postExpensesBulk(
   parentId: string,
-  requestBody: ExpenseSetterBody[],
+  requestBody: ExpenseBulkImportPost[],
   language: string,
   checkOldObject: (oldObject: ExpenseReportDoc) => Promise<boolean>
 ) {
@@ -78,11 +70,10 @@ async function postExpensesBulk(
 
   const expenses = parentObject.expenses as Expense[]
   for (const expense of requestBody) {
-    normalizeExpenseProject(expense)
-    upsertExpense(expenses, expense)
+    upsertExpense(expenses, expense as unknown as ExpenseSetterBody)
   }
 
-  expenses.sort((a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf())
+  expenses.sort((a, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf())
   parentObject.markModified('expenses')
 
   return { message: 'alerts.successSaving', result: (await parentObject.save()).toObject() }
@@ -123,7 +114,6 @@ export class ExpenseReportController extends Controller {
     @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -138,7 +128,7 @@ export class ExpenseReportController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -177,13 +167,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id?: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
-    },
+    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id?: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
@@ -308,7 +292,6 @@ export class ExpenseReportExamineController extends Controller {
     @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -327,7 +310,7 @@ export class ExpenseReportExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -374,13 +357,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post()
   public async postAny(
-    @Body() requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
-    },
+    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
@@ -403,7 +380,6 @@ export class ExpenseReportExamineController extends Controller {
       _id?: string
       name?: string
       advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
       owner?: IdDocument<Types.ObjectId>
       comment?: string
     },

@@ -6,10 +6,11 @@ import {
   addHistoryEntry,
   addReferenceOnNewDocs,
   addToProjectBalance,
-  costObject,
+  getCostPositionValidationIssues,
   offsetAdvance,
   populateAll,
   populateSelected,
+  positionedCostObject,
   requestBaseSchema,
   setLog
 } from './helper.js'
@@ -24,12 +25,10 @@ interface Methods {
 const expenseReportSchema = () =>
   new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, Model<ExpenseReport<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
-      category: { type: Schema.Types.ObjectId, ref: 'Category', required: true },
       expenses: [
         {
           description: { type: String, required: true },
-          cost: costObject({ exchangeRate: true, receipts: true, required: true, receiptsRequired: false }),
-          project: { type: Schema.Types.ObjectId, ref: 'Project' },
+          cost: positionedCostObject({ required: true, receiptsRequired: false }),
           note: { type: String }
         }
       ]
@@ -40,11 +39,11 @@ const expenseReportSchema = () =>
 const schema = expenseReportSchema()
 
 const populates = {
-  category: [{ path: 'category' }],
   expenses: [
     { path: 'expenses.cost.currency' },
     { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } },
-    { path: 'expenses.project', select: { identifier: 1, organisation: 1 } }
+    { path: 'expenses.cost.positions.project', select: { identifier: 1, organisation: 1 } },
+    { path: 'expenses.cost.positions.category' }
   ],
   addUp: [{ path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
   advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
@@ -89,7 +88,7 @@ schema.methods.calculateExchangeRates = async function () {
   const { currencyConverter } = createOperationServices()
   const promiseList = []
   for (const expense of this.expenses) {
-    promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
+    promiseList.push(currencyConverter.addCostExchangeRate(expense.cost, expense.cost.date as Date))
   }
   await Promise.all(promiseList)
 }
@@ -103,6 +102,19 @@ schema.methods.addComment = function () {
 
 schema.pre('validate', function () {
   this.addComment()
+})
+
+schema.pre('validate', async function () {
+  if (!this.isNew && !this.isModified('expenses')) return
+  const issues = await getCostPositionValidationIssues(
+    this.expenses.map(({ cost }) => cost),
+    'ExpenseReport',
+    true,
+    false
+  )
+  for (const issue of issues) {
+    this.invalidate(`expenses.${issue.path.replace(/^(\d+)\./, '$1.cost.')}`, issue.message)
+  }
 })
 
 schema.pre('save', async function () {

@@ -7,7 +7,7 @@ import {
   HealthInsurance,
   LedgerAccount,
   Locale,
-  OrganisationSimple,
+  OrganisationWithVatSettings,
   PrinterSettings,
   ProjectSimpleWithName,
   Settings,
@@ -102,7 +102,7 @@ class APP_LOADER {
             this.withProgress(this.loadRequired<Settings<string>>('settings')),
             this.withProgress(this.loadRequired<TravelSettings<string>>('travelSettings')),
             this.withProgress(this.loadRequired<HealthInsurance<string>[]>('healthInsurance')),
-            this.withProgress(this.loadRequired<OrganisationSimple<string>[]>('organisation')),
+            this.withProgress(this.loadRequired<OrganisationWithVatSettings<string>[]>('organisation')),
             this.withProgress(this.loadRequired<Category<string>[]>('category')),
             this.withProgress(this.loadRequired<Record<string, string[]>>('specialLumpSums')),
             this.withProgress(this.loadRequired<DisplaySettings<string>>('displaySettings')),
@@ -239,7 +239,7 @@ function setData(appData: APP_DATA, endpoint: APP_DATA_ENDPOINTS, newData: unkno
       appData.healthInsurances = newData as HealthInsurance<string>[]
       break
     case 'organisation':
-      appData.organisations = newData as OrganisationSimple<string>[]
+      appData.organisations = newData as OrganisationWithVatSettings<string>[]
       break
     case 'category':
       appData.categories = newData as Category<string>[]

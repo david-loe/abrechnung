@@ -11,6 +11,7 @@ import {
   LedgerAccount,
   Locale,
   OrganisationSimple,
+  OrganisationWithVatSettings,
   PrinterSettings,
   Project,
   ProjectSimpleWithName,
@@ -89,7 +90,7 @@ export class TRAVEL_APP_DATA extends LOGIN_APP_DATA {
   private _categories!: Category<string>[]
   specialLumpSums!: Record<string, string[]>
 
-  organisations = [] as OrganisationSimple<string>[]
+  organisations = [] as OrganisationWithVatSettings<string>[]
   projects?: ProjectSimpleWithName<string>[]
 
   private _userSimple = {
@@ -184,7 +185,7 @@ export class APP_DATA extends TRAVEL_APP_DATA {
       travelSettings: TravelSettings<string>
       displaySettings: DisplaySettings<string>
       healthInsurances: HealthInsurance<string>[]
-      organisations: OrganisationSimple<string>[]
+      organisations: OrganisationWithVatSettings<string>[]
       categories: Category<string>[]
       printerSettings: PrinterSettings<string>
 

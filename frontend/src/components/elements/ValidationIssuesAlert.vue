@@ -84,6 +84,8 @@ function getFieldLabel(path?: string) {
       return t('labels.description')
     case 'cost.amount':
       return t('labels.amount')
+    case 'cost.positions':
+      return t('labels.position')
     case 'cost.currency':
       return t('labels.currency')
     case 'cost.date':

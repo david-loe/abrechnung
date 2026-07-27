@@ -42,6 +42,7 @@ export class LedgerAccountAdminController extends Controller {
           paths: [
             'accountingSettings.employeeLiabilitiesAccount',
             'accountingSettings.employeeClaimsAccount',
+            'accountingSettings.vatRates.inputTaxAccount',
             ...travelExpenseItems.map((item) => `accountingSettings.accountMapping.${item}`)
           ]
         },

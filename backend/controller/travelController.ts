@@ -87,11 +87,6 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as TravelExpense,
       parentId,
@@ -106,7 +101,7 @@ export class TravelController extends Controller {
         }
         return false
       },
-      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -118,11 +113,6 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as Stage,
       parentId,
@@ -432,11 +422,6 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as TravelExpense,
       parentId,
@@ -455,7 +440,7 @@ export class TravelExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -467,11 +452,6 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as Stage,
       parentId,

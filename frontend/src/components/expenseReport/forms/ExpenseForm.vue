@@ -1,40 +1,5 @@
 <template>
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
-    <div class="mb-2">
-      <label for="travelFormDescription" class="form-label">
-        {{ t('labels.description') }}
-        <span class="text-danger">*</span>
-      </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
-    </div>
-
-    <div class="row mb-2">
-      <div class="col">
-        <label for="expenseFormCost" class="form-label me-2">
-          {{ t('labels.cost') }}
-          <span class="text-danger">*</span>
-        </label>
-        <InfoPoint :text="t('info.cost')" />
-        <div class="input-group" id="expenseFormCost">
-          <input type="number" class="form-control" step="0.01" v-model="formExpense.cost.amount" :disabled="disabled" required >
-          <CurrencySelector v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
-        </div>
-        <div v-if="formExpense.cost.amount && formExpense.cost.amount < 0" class="alert alert-info d-flex px-2 py-1 mt-2" role="alert">
-          <small>
-            <i class="bi bi-info-circle-fill"></i>
-            <span class="ms-2"> {{ t('alerts.amountIsNegative') }}</span>
-          </small>
-        </div>
-      </div>
-      <div class="col">
-        <label for="invoiceDateInput" class="form-label">
-          {{ t('labels.invoiceDate') }}
-          <span class="text-danger">*</span>
-        </label>
-        <DateInput id="invoiceDateInput" v-model="formExpense.cost.date" :required="true" :disabled="disabled" :max="new Date()" />
-      </div>
-    </div>
-
     <div class="mb-3">
       <label for="expenseFormFile" class="form-label me-2">
         {{ t('labels.receipts') }}
@@ -51,25 +16,47 @@
         :ownerId="ownerId" />
     </div>
 
-    <div class="mb-3" v-if="useDifferentProject || formExpense.project">
-      <label for="healthCareCostFormProject" class="form-label me-2">{{ t('labels.project') }}</label>
-      <InfoPoint :text="t('info.project')" />
-      <button
-        type="button"
-        class="btn btn-sm btn-link ms-3"
-        @click="
-          useDifferentProject = false;
-          //@ts-ignore using empty string to reset project as multipart/form-data doesn't sends null
-          formExpense.project = ''
-        ">
-        {{ t('labels.reset') }}
-      </button>
+    <div class="mb-2">
+      <label for="travelFormDescription" class="form-label">
+        {{ t('labels.description') }}
+        <span class="text-danger">*</span>
+      </label>
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
+    </div>
 
-      <ProjectSelector id="healthCareCostFormProject" v-model="formExpense.project" />
+    <div class="row mb-2">
+      <div class="col">
+        <label for="expenseFormCurrency" class="form-label me-2">
+          {{ t('labels.currency') }}
+          <span class="text-danger">*</span>
+        </label>
+        <CurrencySelector id="expenseFormCurrency" v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
+        <small v-if="formExpense.cost.positions.length > 1" class="text-secondary tnum">
+          {{ t('labels.total') }}: {{ formatter.currency(getCostGrossAmount(formExpense.cost), formExpense.cost.currency._id) }}
+        </small>
+      </div>
+      <div class="col">
+        <label for="invoiceDateInput" class="form-label">
+          {{ t('labels.invoiceDate') }}
+          <span class="text-danger">*</span>
+        </label>
+        <DateInput
+          id="invoiceDateInput"
+          :model-value="formExpense.cost.date || undefined"
+          @update:model-value="(date) => (formExpense.cost.date = date)"
+          :required="true"
+          :disabled="disabled"
+          :max="new Date()" />
+      </div>
     </div>
-    <div class="mb-2" v-else>
-      <button type="button" class="btn btn-link ps-0" @click="useDifferentProject = true">{{ t('labels.useDifferentProject') }}</button>
-    </div>
+
+    <CostPositionsEditor
+      v-model="formExpense.cost.positions"
+      :default-project="defaultProject"
+      report-type="ExpenseReport"
+      :currency="formExpense.cost.currency"
+      :disabled="disabled"
+      :require-single-position-description="false" />
 
     <div class="mb-3">
       <label for="travelFormDescription" class="form-label">{{ t('labels.note') }}</label>
@@ -111,14 +98,16 @@
 </template>
 
 <script lang="ts" setup>
-import { baseCurrency, Expense } from 'abrechnung-common/types.js'
+import { baseCurrency, Expense, ProjectSimple } from 'abrechnung-common/types.js'
+import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import CostPositionsEditor from '@/components/elements/CostPositionsEditor.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
-import ProjectSelector from '@/components/elements/ProjectSelector.vue'
+import { formatter } from '@/formatter.js'
 import CTextArea from '@/components/elements/TextArea.vue'
 
 const { t } = useI18n()
@@ -139,20 +128,19 @@ const props = defineProps({
   ownerId: { type: String },
   showPrevButton: { type: Boolean, default: false },
   showNextButton: { type: Boolean, default: false },
-  loading: { type: Boolean, default: false }
+  loading: { type: Boolean, default: false },
+  defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true }
 })
 
 const formExpense = ref(input())
-const useDifferentProject = ref(false)
 const fileUploadRef = useTemplateRef('fileUpload')
 
 function defaultExpense() {
-  return { description: '', cost: { amount: null, currency: baseCurrency, receipts: [], date: '' }, note: undefined, project: undefined }
+  return { description: '', cost: { positions: [], currency: baseCurrency, receipts: [], date: '' }, note: undefined }
 }
 function clear() {
   fileUploadRef.value?.clear()
   formExpense.value = defaultExpense()
-  useDifferentProject.value = false
 }
 
 function input() {

@@ -153,6 +153,171 @@ export async function checkForMigrations() {
       logger.info('Apply migration from v2.6.3: initialize atomic report reference counters')
       await initializeReferenceCounters()
     }
+    if (semver.lte(migrateFrom, '2.6.4')) {
+      logger.info('Apply migration from v2.6.4: introduce cost positions and VAT settings')
+      const ledgerAccounts = mongoose.connection.collection('ledgeraccounts')
+      await Promise.all([
+        ledgerAccounts.updateOne(
+          { identifier: '1571' },
+          { $setOnInsert: { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' } },
+          { upsert: true }
+        ),
+        ledgerAccounts.updateOne(
+          { identifier: '1576' },
+          { $setOnInsert: { identifier: '1576', name: 'Abziehbare Vorsteuer 19 %' } },
+          { upsert: true }
+        ),
+        ledgerAccounts.updateOne(
+          { identifier: '4660' },
+          { $setOnInsert: { identifier: '4660', name: 'Reisekosten Arbeitnehmer' } },
+          { upsert: true }
+        ),
+        ledgerAccounts.updateOne(
+          { identifier: '4900' },
+          { $setOnInsert: { identifier: '4900', name: 'Sonstige betriebliche Aufwendungen' } },
+          { upsert: true }
+        )
+      ])
+      const [account1571, account1576, account4660, account4900] = await Promise.all(
+        ['1571', '1576', '4660', '4900'].map((identifier) => ledgerAccounts.findOne({ identifier }))
+      )
+      if (!account1571 || !account1576 || !account4660 || !account4900) {
+        throw new Error('Required default ledger accounts for the cost-position migration are missing')
+      }
+
+      await mongoose.connection
+        .collection('organisations')
+        .updateMany(
+          {},
+          {
+            $set: {
+              'accountingSettings.vatAccountingEnabled': false,
+              'accountingSettings.vatRates': [
+                { rate: 0 },
+                { rate: 7, inputTaxAccount: account1571._id },
+                { rate: 19, inputTaxAccount: account1576._id }
+              ]
+            }
+          }
+        )
+
+      const categories = mongoose.connection.collection('categories')
+      async function ensureCategory(forType: 'Travel' | 'ExpenseReport', ledgerAccount: mongoose.Types.ObjectId, name: string) {
+        const existing = await categories.findOne({ for: { $in: [forType, 'both'] }, ledgerAccount })
+        if (existing) return existing._id
+        const inserted = await categories.insertOne({
+          name,
+          ledgerAccount,
+          for: forType,
+          isDefault: false,
+          style: { color: '#D8DCFF', text: 'black' }
+        })
+        return inserted.insertedId
+      }
+
+      const expenseDefault =
+        (await categories.findOne({ for: { $in: ['ExpenseReport', 'both'] }, isDefault: true })) ??
+        (await categories.findOne({ for: { $in: ['ExpenseReport', 'both'] } }))
+      const expenseCategoryId = expenseDefault?._id ?? (await ensureCategory('ExpenseReport', account4900._id, 'General'))
+      const travelDefault =
+        (await categories.findOne({ for: { $in: ['Travel', 'both'] }, isDefault: true })) ??
+        (await categories.findOne({ for: { $in: ['Travel', 'both'] } }))
+      const travelCategoryId = travelDefault?._id ?? (await ensureCategory('Travel', account4660._id, 'Travel expenses'))
+
+      const projects = mongoose.connection.collection('projects')
+      const organisations = mongoose.connection.collection('organisations')
+      const travelCategoryByAccount = new Map<string, mongoose.Types.ObjectId>()
+      async function categoryForTravelStage(projectId: mongoose.Types.ObjectId, transportType: string) {
+        const project = await projects.findOne({ _id: projectId })
+        const organisation = project ? await organisations.findOne({ _id: project.organisation }) : null
+        const account = organisation?.accountingSettings?.accountMapping?.[transportType]
+        if (!account) return travelCategoryId
+        const key = account.toString()
+        if (!travelCategoryByAccount.has(key)) {
+          const ledgerAccount = await ledgerAccounts.findOne({ _id: account })
+          travelCategoryByAccount.set(
+            key,
+            await ensureCategory('Travel', account, ledgerAccount?.name ?? `Travel ${ledgerAccount?.identifier ?? ''}`.trim())
+          )
+        }
+        return travelCategoryByAccount.get(key) as mongoose.Types.ObjectId
+      }
+
+      async function migrateReports(collectionName: 'travels' | 'expensereports' | 'healthcarecosts') {
+        const collection = mongoose.connection.collection(collectionName)
+        const cursor = collection.find()
+        for await (const report of cursor) {
+          const expenses = []
+          for (const expense of report.expenses ?? []) {
+            const cost = { ...expense.cost }
+            const project = expense.project ?? report.project
+            const category =
+              collectionName === 'expensereports'
+                ? (report.category ?? expenseCategoryId)
+                : collectionName === 'travels'
+                  ? travelCategoryId
+                  : expenseCategoryId
+            if (!Array.isArray(cost.positions)) {
+              cost.positions = [
+                {
+                  _id: new mongoose.Types.ObjectId(),
+                  kind: 'manual',
+                  description: expense.description,
+                  grossAmount: typeof cost.amount === 'number' ? cost.amount : 0,
+                  vatRate: 0,
+                  project,
+                  category
+                }
+              ]
+            }
+            delete cost.amount
+            if (cost.exchangeRate) delete cost.exchangeRate.amount
+            const migratedExpense = { ...expense, cost }
+            delete migratedExpense.project
+            expenses.push(migratedExpense)
+          }
+
+          const update: Record<string, unknown> = { expenses }
+          if (collectionName === 'travels') {
+            const stages = []
+            for (const stage of report.stages ?? []) {
+              const cost = { ...stage.cost }
+              const project = stage.project ?? report.project
+              if (!Array.isArray(cost.positions)) {
+                const hasCost = typeof cost.amount === 'number' && (cost.amount !== 0 || stage.transport?.type === 'ownCar')
+                cost.positions = hasCost
+                  ? [
+                      {
+                        _id: new mongoose.Types.ObjectId(),
+                        kind: stage.transport?.type === 'ownCar' ? 'ownCar' : 'manual',
+                        ...(stage.transport?.type === 'ownCar' ? {} : { description: stage.transport?.type }),
+                        grossAmount: cost.amount,
+                        vatRate: 0,
+                        project,
+                        category: await categoryForTravelStage(project, stage.transport?.type)
+                      }
+                    ]
+                  : []
+              }
+              delete cost.amount
+              if (cost.exchangeRate) delete cost.exchangeRate.amount
+              const migratedStage = { ...stage, cost }
+              delete migratedStage.project
+              stages.push(migratedStage)
+            }
+            update.stages = stages
+          }
+          await collection.updateOne(
+            { _id: report._id },
+            { $set: update, ...(collectionName === 'expensereports' ? { $unset: { category: '' } } : {}) }
+          )
+        }
+      }
+
+      await migrateReports('travels')
+      await migrateReports('expensereports')
+      await migrateReports('healthcarecosts')
+    }
     settings.migrateFrom = undefined
     await settings.save()
   }

@@ -3,6 +3,8 @@ import { Category as ICategory, locales } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
 import Category, { categorySchema } from '../models/category.js'
 import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
+import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
@@ -34,7 +36,11 @@ export class CategoryAdminController extends Controller {
   public async delete(@Query() _id: string) {
     return await this.deleter(Category, {
       _id: _id,
-      referenceChecks: [{ model: ExpenseReport, paths: ['category'], conditions: { historic: false } }],
+      referenceChecks: [
+        { model: ExpenseReport, paths: ['expenses.cost.positions.category'], conditions: { historic: false } },
+        { model: HealthCareCost, paths: ['expenses.cost.positions.category'], conditions: { historic: false } },
+        { model: Travel, paths: ['expenses.cost.positions.category', 'stages.cost.positions.category'], conditions: { historic: false } }
+      ],
       minDocumentCount: 1
     })
   }

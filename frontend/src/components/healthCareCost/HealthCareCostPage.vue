@@ -15,6 +15,7 @@
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
+          :default-project="healthCareCost.project"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
@@ -146,9 +147,9 @@
               @click-row="(expense) => showModal('edit', 'expense', expense as Expense)"
               @update-sort="updateExpenseSorting">
               <template #item-cost.date="{ cost }: Expense">
-                {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                    ? formatter.simpleDate(cost.date)
-                    : formatter.date(cost.date) }}
+                {{ new Date(cost.date || 0).getUTCFullYear() === new Date().getUTCFullYear()
+                    ? formatter.simpleDate(cost.date || '')
+                    : formatter.date(cost.date || '') }}
               </template>
               <template #item-cost="{ cost }: Expense">
                 <div class="text-end tnum">{{ formatter.money(cost) }}</div>

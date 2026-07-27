@@ -1,6 +1,9 @@
 import test from 'ava'
-import { baseCurrency, Country, Stage } from '../types.js'
+import { baseCurrency, Category, Country, ProjectSimple, Stage } from '../types.js'
 import { getStagesInBounds, getStagesOutOfBounds } from './utils.js'
+
+const project = { _id: 'project', name: 'Project', identifier: 'project', organisation: 'organisation' } as ProjectSimple<string>
+const category = { _id: 'category', name: 'Category' } as Category<string>
 
 const countryDE: Country = {
   _id: 'DE',
@@ -16,7 +19,12 @@ function createStage(_id: string, departure: string, arrival: string): Stage<str
     startLocation: { place: 'Berlin', country: countryDE },
     endLocation: { place: 'Berlin', country: countryDE },
     transport: { type: 'otherTransport' },
-    cost: { amount: 0, currency: baseCurrency, date: new Date('2024-01-01T00:00:00Z'), receipts: [] },
+    cost: {
+      positions: [{ _id: `${_id}-position`, kind: 'manual', grossAmount: 0, vatRate: 0, project, category }],
+      currency: baseCurrency,
+      date: new Date('2024-01-01T00:00:00Z'),
+      receipts: []
+    },
     purpose: 'professional'
   }
 }

@@ -2,6 +2,7 @@ import {
   AddUp,
   AdvanceBase,
   AnyState,
+  Cost,
   FlatAddUp,
   hexColorRegex,
   IdDocument,
@@ -52,6 +53,122 @@ export function costObject(options: {
     }
   }
   return { type, required: opts.required, default: () => ({}) }
+}
+
+export function positionedCostObject(options: { required: boolean; receiptsRequired?: boolean; min?: number }) {
+  const opts = { receiptsRequired: options.required, ...options }
+  return {
+    type: {
+      positions: {
+        type: [
+          {
+            kind: { type: String, enum: ['manual', 'ownCar'], required: true, default: 'manual' },
+            description: { type: String, trim: true },
+            grossAmount: { type: Number, min: opts.min, required: true },
+            vatRate: { type: Number, min: 0, max: 100, required: true, default: 0 },
+            project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+            category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }
+          }
+        ],
+        required: options.required,
+        default: () => []
+      },
+      exchangeRate: { type: { date: { type: Date }, rate: { type: Number, min: 0 } } },
+      currency: { type: String, ref: 'Currency', required: options.required, default: options.required ? 'EUR' : null },
+      receipts: { type: [{ type: Schema.Types.ObjectId, ref: 'DocumentFile', required: opts.receiptsRequired }] },
+      date: {
+        type: Date,
+        validate: { validator: (v: Date | string | number) => Date.now() >= new Date(v).valueOf(), message: 'futureNotAllowed' },
+        required: options.required
+      }
+    },
+    required: options.required,
+    default: () => ({ positions: [] })
+  }
+}
+
+export async function getCostPositionValidationIssues(
+  costs: Cost<Types.ObjectId>[],
+  categoryFor: 'Travel' | 'ExpenseReport',
+  requirePositions: boolean,
+  requireSinglePositionDescription: boolean
+) {
+  const issues: { path: string; message: string }[] = []
+  const positions = costs.flatMap((cost, costIndex) =>
+    cost.positions.map((position, positionIndex) => ({ costIndex, positionIndex, position }))
+  )
+  if (positions.length === 0) {
+    if (requirePositions) {
+      costs.forEach((_, costIndex) => {
+        issues.push({ path: `${costIndex}.positions`, message: 'required' })
+      })
+    }
+    return issues
+  }
+  const projectIds = Array.from(
+    new Set(positions.map(({ position }) => idDocumentToId(position.project)?.toString()).filter((id): id is string => Boolean(id)))
+  )
+  const categoryIds = Array.from(
+    new Set(positions.map(({ position }) => idDocumentToId(position.category)?.toString()).filter((id): id is string => Boolean(id)))
+  )
+  const [projects, categories] = await Promise.all([
+    mongoose
+      .model<{ _id: Types.ObjectId; organisation: Types.ObjectId }>('Project')
+      .find({ _id: { $in: projectIds } }, { organisation: 1 })
+      .lean(),
+    mongoose
+      .model<{ _id: Types.ObjectId; for: 'Travel' | 'ExpenseReport' | 'both' }>('Category')
+      .find({ _id: { $in: categoryIds } }, { for: 1 })
+      .lean()
+  ])
+  const projectsById = new Map(projects.map((project) => [project._id.toString(), project]))
+  const categoriesById = new Map(categories.map((category) => [category._id.toString(), category]))
+  const organisationIds = Array.from(new Set(projects.map(({ organisation }) => organisation.toString())))
+  const organisations = await mongoose
+    .model<{ _id: Types.ObjectId; accountingSettings: { vatRates: { rate: number }[] } }>('Organisation')
+    .find({ _id: { $in: organisationIds } }, { 'accountingSettings.vatRates.rate': 1 })
+    .lean()
+  const organisationsById = new Map(organisations.map((organisation) => [organisation._id.toString(), organisation]))
+
+  for (const [costIndex, cost] of costs.entries()) {
+    if (requirePositions && cost.positions.length < 1) {
+      issues.push({ path: `${costIndex}.positions`, message: 'required' })
+    }
+    for (const [positionIndex, position] of cost.positions.entries()) {
+      const prefix = `${costIndex}.positions.${positionIndex}`
+      if (position.kind === 'manual' && (requireSinglePositionDescription || cost.positions.length > 1) && !position.description?.trim()) {
+        issues.push({ path: `${prefix}.description`, message: 'required' })
+      }
+      const projectValue = idDocumentToId(position.project)
+      if (!projectValue) {
+        issues.push({ path: `${prefix}.project`, message: 'invalidProject' })
+        continue
+      }
+      const projectId = projectValue.toString()
+      const project = projectsById.get(projectId)
+      if (!project) {
+        issues.push({ path: `${prefix}.project`, message: 'invalidProject' })
+      } else {
+        const accountingSettings = organisationsById.get(project.organisation.toString())?.accountingSettings
+        const allowedRates = accountingSettings?.vatRates.map(({ rate }) => rate) ?? [0]
+        if (!allowedRates.includes(position.vatRate)) {
+          issues.push({ path: `${prefix}.vatRate`, message: 'invalidVatRate' })
+        }
+      }
+
+      const categoryValue = idDocumentToId(position.category)
+      if (!categoryValue) {
+        issues.push({ path: `${prefix}.category`, message: 'invalidCategory' })
+        continue
+      }
+      const categoryId = categoryValue.toString()
+      const category = categoriesById.get(categoryId)
+      if (!category || (category.for !== 'both' && category.for !== categoryFor)) {
+        issues.push({ path: `${prefix}.category`, message: 'invalidCategory' })
+      }
+    }
+  }
+  return issues
 }
 
 export function logObject<T extends AnyState>(states: readonly T[]) {

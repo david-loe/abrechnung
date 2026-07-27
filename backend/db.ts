@@ -143,6 +143,8 @@ export async function initDB() {
   const ledgerAccounts = [
     { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' },
     { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' },
+    { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' },
+    { identifier: '1576', name: 'Abziehbare Vorsteuer 19 %' },
     { identifier: '4660', name: 'Reisekosten Arbeitnehmer' },
     { identifier: '4900', name: 'Sonstige betriebliche Aufwendungen' }
   ]
@@ -150,6 +152,8 @@ export async function initDB() {
 
   const account1530 = await LedgerAccount.findOne({ identifier: '1530' }).lean()
   const account1740 = await LedgerAccount.findOne({ identifier: '1740' }).lean()
+  const account1571 = await LedgerAccount.findOne({ identifier: '1571' }).lean()
+  const account1576 = await LedgerAccount.findOne({ identifier: '1576' }).lean()
   const account4660 = await LedgerAccount.findOne({ identifier: '4660' }).lean()
   const account4900 = await LedgerAccount.findOne({ identifier: '4900' }).lean()
   const organisation = {
@@ -157,6 +161,8 @@ export async function initDB() {
     accountingSettings: {
       employeeLiabilitiesAccount: account1740?._id,
       employeeClaimsAccount: account1530?._id,
+      vatAccountingEnabled: true,
+      vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account1571?._id }, { rate: 19, inputTaxAccount: account1576?._id }],
       accountMapping: {} as { [key in TravelExpenseItem]?: _id }
     }
   }

@@ -1,4 +1,4 @@
-import { Advance, Expense, ExpenseReport, User } from 'abrechnung-common/types.js'
+import { Advance, ExpenseReport, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
@@ -18,7 +18,9 @@ let advance: Partial<Advance> = {
   budget: { amount: 1_000, currency: 'EUR' as any }
 }
 const project = (await agent.get('/project')).body.data[0]
-const category = (await agent.get('/category')).body.data[0]
+const category = (await agent.get('/category')).body.data.find(
+  ({ for: value }: { for: string }) => value === 'ExpenseReport' || value === 'both'
+)
 
 advance.project = project
 advance = (await agent.post('/approve/advance/approved').send(advance)).body.result
@@ -27,11 +29,11 @@ await loginUser(agent, 'expenseReport')
 const expenseReport: ExpenseReport = (await agent.post('/expenseReport/inWork').send({ project, category, advances: [advance._id] })).body
   .result
 
-const expense: Expense = {
+const expense = {
   description: 'English Course',
   cost: {
-    amount: 100, //@ts-ignore
-    currency: { _id: 'EUR' }, //@ts-ignore
+    positions: [{ kind: 'manual', description: 'English Course', grossAmount: 100, vatRate: 0, project, category }],
+    currency: { _id: 'EUR' },
     receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
     date: new Date('2023-09-14T00:00:00.000Z')
   }

@@ -5,6 +5,7 @@ import {
   type AdvanceBase,
   AdvanceState,
   baseCurrency,
+  type Category,
   type Cost,
   type CountrySimple,
   type FlatAddUp,
@@ -21,6 +22,9 @@ import {
   detectSeparator,
   escapeRegExp,
   getById,
+  getCostGrossAmount,
+  getCostPositionNetAmount,
+  getCostPositionVatAmount,
   getFlagEmoji,
   hexToRGB,
   htmlInputStringToDateTime,
@@ -193,6 +197,21 @@ test('multiplyAmountAndRound multiplies in decimal space before cent rounding', 
   t.is(multiplyAmountAndRound(1, 1.0049999999999997), 1)
 })
 
+test('cost position helpers calculate gross, net, and VAT amounts', (t) => {
+  const project = createProject('A')
+  const cost = createCost(100, project)
+  cost.positions.push({ ...cost.positions[0], _id: 'position-2', grossAmount: 11.76, vatRate: 19 })
+  cost.positions[0].vatRate = 7
+
+  t.is(getCostGrossAmount(cost), 111.76)
+  t.is(getCostPositionVatAmount(cost.positions[0], true), 6.54)
+  t.is(getCostPositionNetAmount(cost.positions[0], true), 93.46)
+  t.is(getCostPositionVatAmount(cost.positions[1], true), 1.88)
+  t.is(getCostPositionNetAmount(cost.positions[1], true), 9.88)
+  t.is(getCostPositionVatAmount(cost.positions[1], false), 0)
+  t.is(getCostPositionNetAmount(cost.positions[1], false), 11.76)
+})
+
 const resolveProjectId = (entry: FlatAddUp<Id>['project']) => (typeof entry === 'string' ? entry : entry._id)
 
 const createProject = (id: string): Project<Id> => ({
@@ -203,8 +222,17 @@ const createProject = (id: string): Project<Id> => ({
   balance: { amount: 0 }
 })
 
-const createCost = (amount: number): Cost<Id> => ({
-  amount,
+const category: Category<Id> = {
+  _id: 'category',
+  name: 'General',
+  style: { color: '#fff', text: 'black' },
+  ledgerAccount: { _id: 'ledger', identifier: '1', name: 'Expenses' },
+  isDefault: true,
+  for: 'both'
+}
+
+const createCost = (amount: number, project: Project<Id>): Cost<Id> => ({
+  positions: [{ _id: `position-${amount}`, kind: 'manual', description: 'Expense', grossAmount: amount, vatRate: 0, project, category }],
   currency: baseCurrency,
   exchangeRate: null,
   receipts: [],
@@ -244,9 +272,9 @@ test('addUp aggregates expenses and advances per project for expense reports', (
   const expenseReport: AddUpReport = {
     project: projectA,
     expenses: [
-      { _id: 'e1', description: 'Base project expense', cost: createCost(50), note: null, project: null },
-      { _id: 'e2', description: 'Other project expense', cost: createCost(30), note: null, project: projectB },
-      { _id: 'e3', description: 'Refund', cost: createCost(-100), note: null, project: projectB }
+      { _id: 'e1', description: 'Base project expense', cost: createCost(50, projectA), note: null },
+      { _id: 'e2', description: 'Other project expense', cost: createCost(30, projectB), note: null },
+      { _id: 'e3', description: 'Refund', cost: createCost(-100, projectB), note: null }
     ],
     advances: [createAdvance('adv-base', projectA, 40), createAdvance('adv-b', projectB, 25)]
   }
@@ -292,20 +320,18 @@ test('addUp sums travel lump sums, applies professional share, and splits by pro
         startLocation: place,
         endLocation: place,
         transport: { type: 'airplane' },
-        cost: createCost(200),
+        cost: createCost(200, projectB),
         purpose: 'mixed',
-        project: projectB,
         note: null
       }
     ],
     expenses: [
-      { _id: 'texp-1', description: 'Mixed expense on main project', cost: createCost(100), note: null, project: null, purpose: 'mixed' },
+      { _id: 'texp-1', description: 'Mixed expense on main project', cost: createCost(100, projectA), note: null, purpose: 'mixed' },
       {
         _id: 'texp-2',
         description: 'Professional expense on third project',
-        cost: createCost(25),
+        cost: createCost(25, projectC),
         note: null,
-        project: projectC,
         purpose: 'professional'
       }
     ],
@@ -359,7 +385,7 @@ test('addUp rounds mixed professional share totals with decimal multiplication',
     project: projectA,
     startDate: new Date('2024-01-01').toISOString(),
     stages: [],
-    expenses: [{ _id: 'texp-1', description: 'Mixed expense', cost: createCost(2.01), note: null, project: null, purpose: 'mixed' }],
+    expenses: [{ _id: 'texp-1', description: 'Mixed expense', cost: createCost(2.01, projectA), note: null, purpose: 'mixed' }],
     days: [],
     professionalShare: 0.5,
     advances: []
@@ -390,9 +416,8 @@ test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
         startLocation: place,
         endLocation: place,
         transport: { type: 'airplane' },
-        cost: createCost(100),
+        cost: createCost(100, projectA),
         purpose: 'professional',
-        project: null,
         note: null
       },
       {
@@ -402,9 +427,8 @@ test('addUp keeps totals numeric when travel lump sums are invalid', (t) => {
         startLocation: place,
         endLocation: place,
         transport: { type: 'airplane' },
-        cost: createCost(20),
+        cost: createCost(20, projectA),
         purpose: 'professional',
-        project: null,
         note: null
       }
     ],
@@ -428,8 +452,8 @@ test('addUp ignores tiny negative float remainders after cent rounding', (t) => 
   const expenseReport: AddUpReport = {
     project: projectA,
     expenses: [
-      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
-      { _id: 'e2', description: 'Refund', cost: createCost(-0.1001), note: null, project: null }
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1, projectA), note: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.1001, projectA), note: null }
     ],
     advances: []
   }
@@ -449,8 +473,8 @@ test('addUp still flags totals that are negative after cent rounding', (t) => {
   const expenseReport: AddUpReport = {
     project: projectA,
     expenses: [
-      { _id: 'e1', description: 'Expense', cost: createCost(0.1), note: null, project: null },
-      { _id: 'e2', description: 'Refund', cost: createCost(-0.105), note: null, project: null }
+      { _id: 'e1', description: 'Expense', cost: createCost(0.1, projectA), note: null },
+      { _id: 'e2', description: 'Refund', cost: createCost(-0.105, projectA), note: null }
     ],
     advances: []
   }

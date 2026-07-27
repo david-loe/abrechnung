@@ -17,7 +17,24 @@ export const organisationSchema = () => {
         employeeLiabilitiesAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
         employeeClaimsAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
         employeeSpecificTemplate: { type: String, trim: true },
-        accountMapping: { type: accountMapping, required: true }
+        accountMapping: { type: accountMapping, required: true },
+        vatAccountingEnabled: { type: Boolean, required: true, default: true },
+        vatRates: {
+          type: [
+            {
+              rate: { type: Number, min: 0, max: 100, required: true },
+              inputTaxAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+            }
+          ],
+          required: true,
+          validate: {
+            validator: (rates: { rate: number; inputTaxAccount?: Types.ObjectId }[]) =>
+              rates.some(({ rate }) => rate === 0) &&
+              new Set(rates.map(({ rate }) => rate)).size === rates.length &&
+              rates.every(({ rate, inputTaxAccount }) => rate === 0 || Boolean(inputTaxAccount)),
+            message: 'invalidVatRates'
+          }
+        }
       },
       required: true
     },

@@ -279,16 +279,15 @@ class ReportPrint<idType extends _id> {
         `${this.t('labels.patientName')}: ${this.report.patientName}`,
         `${this.t('labels.insurance')}: ${this.report.insurance.name}`,
         ec > 0
-          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date || '')}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date || '')}`
           : ''
       ].filter((line) => line !== '')
     } else {
       ownerLine = `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}`
       const ec = this.report.expenses.length
       metaInformation = [
-        `${this.t('labels.category')}: ${this.report.category.name}`,
         ec > 0
-          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date)}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date)}`
+          ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date || '')}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date || '')}`
           : ''
       ].filter((line) => line !== '')
     }
@@ -452,6 +451,15 @@ class ReportPrint<idType extends _id> {
       return options.yStart
     }
     const travel = this.report
+    const rows = travel.stages.flatMap((stage) =>
+      (stage.cost.positions.length > 0 ? stage.cost.positions : [undefined]).map((position) => ({
+        ...stage,
+        positionDetails: position
+          ? `${position.kind === 'ownCar' ? this.t('labels.ownCar') : position.description || ''} · ${position.category.name} · ${position.vatRate} %`
+          : '',
+        cost: position ? { ...stage.cost, positions: [position] } : stage.cost
+      }))
+    )
     const columns: Column[] = []
     columns.push({
       key: 'departure',
@@ -469,7 +477,7 @@ class ReportPrint<idType extends _id> {
     })
     columns.push({
       key: 'startLocation',
-      width: 145,
+      width: 115,
       alignment: TextAlignment.Left,
       title: this.t('labels.startLocation'),
       fn: (p: Place) => `${p.place}, ${p.country.name[this.drawer.settings.language]}`,
@@ -477,7 +485,7 @@ class ReportPrint<idType extends _id> {
     })
     columns.push({
       key: 'endLocation',
-      width: 145,
+      width: 115,
       alignment: TextAlignment.Left,
       title: this.t('labels.endLocation'),
       fn: (p: Place) => `${p.place}, ${p.country.name[this.drawer.settings.language]}`,
@@ -485,7 +493,7 @@ class ReportPrint<idType extends _id> {
     })
     columns.push({
       key: 'transport',
-      width: 90,
+      width: 75,
       alignment: TextAlignment.Left,
       title: this.t('labels.transport'),
       fn: (t: Transport) =>
@@ -495,7 +503,7 @@ class ReportPrint<idType extends _id> {
     })
     columns.push({
       key: 'transport',
-      width: 65,
+      width: 45,
       alignment: TextAlignment.Right,
       title: this.t('labels.distance'),
       fn: (t: Transport) => (t.type === 'ownCar' ? String(t.distance) : EMPTY_CELL)
@@ -508,15 +516,16 @@ class ReportPrint<idType extends _id> {
       fn: (p: Purpose) =>
         this.t(`labels.${p}`) + (p === 'mixed' && travel.professionalShare ? ` (${Math.round(travel.professionalShare * 100)}%)` : '')
     })
+    columns.push({ key: 'positionDetails', width: 105, alignment: TextAlignment.Left, title: this.t('labels.position') })
     columns.push({
       key: 'cost',
-      width: 80,
+      width: 75,
       alignment: TextAlignment.Right,
       title: this.t('labels.cost'),
       fn: (m: Cost) => this.drawer.formatter.detailedMoney(m)
     })
     if (drawNotes) {
-      columns.push({ key: 'note', width: 70, alignment: TextAlignment.Left, title: this.t('labels.note') })
+      columns.push({ key: 'note', width: 55, alignment: TextAlignment.Left, title: this.t('labels.note') })
     }
     columns.push({
       key: 'cost',
@@ -534,15 +543,23 @@ class ReportPrint<idType extends _id> {
     this.drawer.drawText(this.t('labels.stages'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
-    return await this.drawer.drawTable(this.report.stages, columns, options)
+    return await this.drawer.drawTable(rows, columns, options)
   }
 
   async drawExpenses(receiptMap: ReceiptMap<idType>, options: Options, drawNotes = true) {
     if (reportIsAdvance(this.report) || this.report.expenses.length === 0) {
       return options.yStart
     }
+    const rows = this.report.expenses.flatMap((expense) =>
+      expense.cost.positions.map((position) => ({
+        ...expense,
+        positionDetails: `${position.description || ''} · ${position.category.name} · ${position.vatRate} %`,
+        cost: { ...expense.cost, positions: [position] }
+      }))
+    )
     const columns: Column[] = []
-    columns.push({ key: 'description', width: 270, alignment: TextAlignment.Left, title: this.t('labels.description') })
+    columns.push({ key: 'description', width: 140, alignment: TextAlignment.Left, title: this.t('labels.description') })
+    columns.push({ key: 'positionDetails', width: 140, alignment: TextAlignment.Left, title: this.t('labels.position') })
     if (reportIsTravel(this.report)) {
       const travel = this.report
       columns.push({
@@ -566,7 +583,7 @@ class ReportPrint<idType extends _id> {
       width: 90,
       alignment: TextAlignment.Left,
       title: this.t('labels.invoiceDate'),
-      fn: (c: Cost) => this.drawer.formatter.date(c.date)
+      fn: (c: Cost) => this.drawer.formatter.date(c.date || '')
     })
     if (drawNotes) {
       columns.push({ key: 'note', width: 130, alignment: TextAlignment.Left, title: this.t('labels.note') })
@@ -587,7 +604,7 @@ class ReportPrint<idType extends _id> {
     this.drawer.drawText(this.t('labels.expenses'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
-    return await this.drawer.drawTable(this.report.expenses, columns, options)
+    return await this.drawer.drawTable(rows, columns, options)
   }
 
   async drawDays(options: Options) {

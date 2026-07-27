@@ -327,6 +327,10 @@ export interface OrganisationSimple<idType extends _id = _id> {
   _id: idType
 }
 
+export interface OrganisationWithVatSettings<idType extends _id = _id> extends OrganisationSimple<idType> {
+  accountingSettings: { vatAccountingEnabled: boolean; vatRates: Pick<VatRate<idType>, 'rate'>[] }
+}
+
 export interface ProjectSimple<idType extends _id = _id> {
   identifier: string
   organisation: idType
@@ -354,6 +358,13 @@ export interface AccountingSettings<idType extends _id = _id> {
   employeeClaimsAccount: LedgerAccount<idType>
   employeeSpecificTemplate?: string | null
   accountMapping: { [key in TravelExpenseItem]: LedgerAccount<idType> }
+  vatAccountingEnabled: boolean
+  vatRates: VatRate<idType>[]
+}
+
+export interface VatRate<idType extends _id = _id> {
+  rate: number
+  inputTaxAccount?: LedgerAccount<idType> | null
 }
 
 export interface Organisation<idType extends _id = _id, dataType extends binary = binary> extends OrganisationSimple<idType> {
@@ -431,9 +442,22 @@ export interface MoneyPlus<idType extends _id = _id, dataType extends binary = b
   date?: Date | string | null
 }
 
-export interface Cost<idType extends _id = _id, dataType extends binary = binary> extends MoneyPlus<idType, dataType> {
+export interface CostPosition<idType extends _id = _id> {
+  kind: 'manual' | 'ownCar'
+  description?: string | null
+  grossAmount: number
+  vatRate: number
+  project: ProjectSimple<idType>
+  category: Category<idType>
+  _id?: idType
+}
+
+export interface Cost<idType extends _id = _id, dataType extends binary = binary> {
+  positions: CostPosition<idType>[]
+  currency: Currency
+  exchangeRate?: { date: Date | string; rate: number } | null
   receipts: DocumentFile<idType, dataType>[]
-  date: Date | string
+  date?: Date | string | null
 }
 
 export interface Stage<idType extends _id = _id, dataType extends binary = binary> {
@@ -445,7 +469,6 @@ export interface Stage<idType extends _id = _id, dataType extends binary = binar
   transport: Transport
   cost: Cost<idType, dataType>
   purpose: Purpose
-  project?: ProjectSimple<idType> | null
   note?: string | null
   _id: idType
 }
@@ -453,7 +476,6 @@ export interface Stage<idType extends _id = _id, dataType extends binary = binar
 export interface Expense<idType extends _id = _id, dataType extends binary = binary> {
   description: string
   cost: Cost<idType, dataType>
-  project?: ProjectSimple<idType> | null
   note?: string | null
   _id: idType
 }
@@ -572,7 +594,6 @@ export interface Travel<idType extends _id = _id, dataType extends binary = bina
 export interface ExpenseReportSimple<idType extends _id = _id> extends ReportSimple<idType, ExpenseReportState> {
   addUp: AddUp<idType, ExpenseReport<_id, binary>>[]
   advances: AdvanceBase<idType>[]
-  category: Category<idType>
 }
 export interface ExpenseReport<idType extends _id = _id, dataType extends binary = binary>
   extends ExpenseReportSimple<idType>,

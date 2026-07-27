@@ -74,11 +74,6 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
@@ -93,7 +88,7 @@ export class HealthCareCostController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -248,11 +243,6 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
@@ -271,7 +261,7 @@ export class HealthCareCostExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
