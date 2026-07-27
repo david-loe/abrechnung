@@ -10991,35 +10991,6 @@
 			},
 			"SetterPartial_IDisplaySettings_mongoose.Types.ObjectId_.NoPost_": {
 				"properties": {
-					"reportTypeIcons": {
-						"properties": {
-							"advance": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"healthCareCost": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"expenseReport": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							},
-							"travel": {
-								"items": {
-									"type": "string"
-								},
-								"type": "array"
-							}
-						},
-						"type": "object"
-					},
 					"accessIcons": {
 						"properties": {
 							"admin": {
@@ -11341,6 +11312,35 @@
 							},
 							"microsoft": {
 								"type": "boolean"
+							}
+						},
+						"type": "object"
+					},
+					"reportTypeIcons": {
+						"properties": {
+							"advance": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"healthCareCost": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"expenseReport": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"travel": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
 							}
 						},
 						"type": "object"
