@@ -7,6 +7,7 @@ import {
   Comment,
   Cost,
   CountrySimple,
+  DisplaySettings,
   ExpenseReport,
   getModelNameFromReport,
   getReportTypeFromModelName,
@@ -55,6 +56,7 @@ interface ReportPrinterTravelSettings {
 
 export class ReportPrinter<idType extends _id> extends Printer<idType> {
   travelSettings: ReportPrinterTravelSettings
+  reportTypeIcons: DisplaySettings['reportTypeIcons']
 
   constructor(
     settings: PrinterSettings,
@@ -62,10 +64,12 @@ export class ReportPrinter<idType extends _id> extends Printer<idType> {
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
     getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
-    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById']
+    getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
+    reportTypeIcons: DisplaySettings['reportTypeIcons']
   ) {
     super(settings, formatter, translateFunc, getDocumentFileBufferById, getOrganisationLogoIdById)
     this.travelSettings = travelSettings
+    this.reportTypeIcons = reportTypeIcons
   }
 
   async print(
@@ -81,7 +85,8 @@ export class ReportPrinter<idType extends _id> extends Printer<idType> {
       this.travelSettings,
       this.formatter,
       this.translateFunc,
-      language
+      language,
+      this.reportTypeIcons
     )
     return await print.run(options)
   }
@@ -96,17 +101,20 @@ class ReportPrint<idType extends _id> {
   report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>
   travelSettings: ReportPrinterTravelSettings
   translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
+  reportTypeIcons: DisplaySettings['reportTypeIcons']
 
   constructor(
     report: Travel<idType> | ExpenseReport<idType> | HealthCareCost<idType> | Advance<idType>,
     drawer: PDFDrawer<idType>,
     travelSettings: ReportPrinterTravelSettings,
-    translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string
+    translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
+    reportTypeIcons: DisplaySettings['reportTypeIcons']
   ) {
     this.report = report
     this.drawer = drawer
     this.travelSettings = travelSettings
     this.translateFunc = translateFunc
+    this.reportTypeIcons = reportTypeIcons
   }
 
   static async create<idType extends _id>(
@@ -117,29 +125,32 @@ class ReportPrint<idType extends _id> {
     travelSettings: ReportPrinterTravelSettings,
     formatter: Formatter,
     translateFunc: (textIdentifier: string, language: Locale, interpolation?: Record<string, string>) => string,
-    language: Locale
+    language: Locale,
+    reportTypeIcons: DisplaySettings['reportTypeIcons']
   ) {
     const drawer = await PDFDrawer.create(settings, getDocumentFileBufferById, getOrganisationLogoIdById, formatter, language, 'landscape')
-    return new ReportPrint<idType>(report, drawer, travelSettings, translateFunc)
+    return new ReportPrint<idType>(report, drawer, travelSettings, translateFunc, reportTypeIcons)
   }
 
   async run(options?: Partial<PrintOptions>) {
     const modelName = getModelNameFromReport(this.report)
 
-    const opts = { ...this.drawer.settings.options[getReportTypeFromModelName(modelName)], ...options }
-    let y = this.drawer.currentPage.getSize().height
+    const reportType = getReportTypeFromModelName(modelName)
+    const opts = { ...this.drawer.settings.options[reportType], ...options }
+    const pageTop = this.drawer.currentPage.getSize().height
 
-    await this.drawer.drawLogo(this.t('headlines.title'), {
-      fontSize: this.drawer.settings.fontSizes.L,
-      xStart: this.drawer.settings.pagePadding / 3,
-      yStart: y - this.drawer.settings.pagePadding / 3
+    const headerX = this.drawer.settings.pagePadding / 3
+    let y = this.drawer.drawLogo(this.t('headlines.title'), {
+      fontSize: this.drawer.settings.fontSizes.M,
+      xStart: headerX,
+      yStart: pageTop - headerX
     })
 
     if (this.report.reference > 0) {
       await this.drawer.drawMultilineText(refNumberToString(this.report.reference, modelName), {
         alignment: TextAlignment.Center,
         xStart: 0,
-        yStart: y - this.drawer.settings.pagePadding / 5,
+        yStart: pageTop - this.drawer.settings.pagePadding / 5,
         width: this.drawer.currentPage.getSize().width,
         fontSize: this.drawer.settings.fontSizes.S
       })
@@ -147,11 +158,15 @@ class ReportPrint<idType extends _id> {
 
     await this.drawer.drawOrganisationLogo(this.report.project.organisation, {
       xStart: this.drawer.currentPage.getSize().width - 166,
-      yStart: y - 66,
+      yStart: pageTop - 66,
       maxHeight: 50,
       maxWidth: 150
     })
-    y = y - this.drawer.settings.pagePadding
+    y = this.drawer.drawIconLabel(this.reportTypeIcons[reportType], this.t(`labels.${reportType}`), {
+      xStart: headerX,
+      yStart: y - this.drawer.settings.fontSizes.S / 3,
+      fontSize: this.drawer.settings.fontSizes.L
+    })
 
     y =
       this.drawNameAndProject(

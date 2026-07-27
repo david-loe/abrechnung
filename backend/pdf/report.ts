@@ -12,7 +12,7 @@ import { createReportPrinter } from '../factory.js'
 import { updateI18n } from '../i18n.js'
 
 interface RenderReportPdfOptions {
-  displaySettings: Pick<DisplaySettings, 'locale' | 'nameDisplayFormat'>
+  displaySettings: Pick<DisplaySettings, 'locale' | 'nameDisplayFormat' | 'reportTypeIcons'>
   printerSettings: PrinterSettings
   travelSettings: TravelSettings
 }
@@ -24,6 +24,6 @@ export async function renderReportPdf(
 ) {
   updateI18n(displaySettings.locale)
 
-  const printer = createReportPrinter(printerSettings, travelSettings, displaySettings.nameDisplayFormat)
+  const printer = createReportPrinter(printerSettings, travelSettings, displaySettings.nameDisplayFormat, displaySettings.reportTypeIcons)
   return await printer.print(report, language)
 }

@@ -28,8 +28,8 @@ import {
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
 import { hexToRGB } from '../utils/scripts.js'
+import { embedBootstrapIconFont, getBootstrapIconGlyph } from './bootstrapIcons.js'
 import flagsPNG from './flags.json' with { type: 'json' }
-import receiptPNG from './receipt.json' with { type: 'json' }
 
 export interface PrintSettings extends PrintSettingsBase {
   language: Locale
@@ -193,6 +193,7 @@ export const EMPTY_CELL = '---'
 
 export class PDFDrawer<idType extends _id> {
   font: PDFFont
+  bootstrapIconFont: PDFFont
   doc: PDFDocument
   formatter: Formatter
   settings: PrintSettingsWithColorObjects
@@ -207,10 +208,12 @@ export class PDFDrawer<idType extends _id> {
     getDocumentFileBufferById: PDFDrawer<idType>['getDocumentFileBufferById'],
     getOrganisationLogoIdById: PDFDrawer<idType>['getOrganisationLogoIdById'],
     font: PDFFont,
+    bootstrapIconFont: PDFFont,
     formatter: Formatter
   ) {
     this.doc = doc
     this.font = font
+    this.bootstrapIconFont = bootstrapIconFont
     this.formatter = formatter
     this.settings = {
       ...settings,
@@ -233,9 +236,12 @@ export class PDFDrawer<idType extends _id> {
   ) {
     const doc = await PDFDocument.create()
     doc.registerFontkit(pdf_fontkit)
-    const font = await doc.embedFont(fontsBASE64[settings.fontName], { subset: true })
+    const [font, bootstrapIconFont] = await Promise.all([
+      doc.embedFont(fontsBASE64[settings.fontName], { subset: true }),
+      embedBootstrapIconFont(doc)
+    ])
     const printSettings = { ...settings, language, defaultPageOrientation }
-    return new PDFDrawer(printSettings, doc, getDocumentFileBufferById, getOrganisationLogoIdById, font, formatter)
+    return new PDFDrawer(printSettings, doc, getDocumentFileBufferById, getOrganisationLogoIdById, font, bootstrapIconFont, formatter)
   }
 
   async finish() {
@@ -317,14 +323,8 @@ export class PDFDrawer<idType extends _id> {
     return opts.yStart - multiLineText.bounds.height
   }
 
-  drawText(text: string, options: Options) {
-    this.currentPage.drawText(text, {
-      x: options.xStart,
-      y: options.yStart,
-      size: options.fontSize,
-      font: this.font,
-      color: this.settings.textColor
-    })
+  drawText(text: string, options: Options, font = this.font) {
+    this.currentPage.drawText(text, { x: options.xStart, y: options.yStart, size: options.fontSize, font, color: this.settings.textColor })
   }
 
   drawReceiptNumber(receipt: ReceiptMapEntry<idType>) {
@@ -455,22 +455,26 @@ export class PDFDrawer<idType extends _id> {
   /**
    * Oben links (xStart, yStart)
    */
-  async drawLogo(title: string, options: Options) {
-    let filename: keyof typeof receiptPNG
-    if (options.fontSize > 24) {
-      filename = `receipt36`
-    } else if (options.fontSize > 12) {
-      filename = `receipt24`
-    } else {
-      filename = `receipt12`
+  drawLogo(title: string, options: Options) {
+    return this.drawIconLabel(['receipt'], title, options)
+  }
+
+  drawIconLabel(iconNames: string[], label: string, options: Options) {
+    const glyphs = iconNames.map(getBootstrapIconGlyph).filter((glyph) => glyph !== undefined)
+    const textHeight = this.font.heightAtSize(options.fontSize, { descender: false })
+    const iconHeight = glyphs.length > 0 ? this.bootstrapIconFont.heightAtSize(options.fontSize, { descender: false }) : 0
+    const lineHeight = Math.max(textHeight, iconHeight)
+    const textY = options.yStart - (lineHeight + textHeight) / 2
+    const iconY = options.yStart - (lineHeight + iconHeight) / 2
+
+    let x = options.xStart
+    for (const glyph of glyphs) {
+      this.drawText(glyph, { xStart: x, yStart: iconY, fontSize: options.fontSize }, this.bootstrapIconFont)
+      x += this.bootstrapIconFont.widthOfTextAtSize(glyph, options.fontSize) + options.fontSize / 3
     }
-    const logo = await this.doc.embedPng(receiptPNG[filename])
-    const logoSize = this.font.heightAtSize(options.fontSize)
-    const y = options.yStart - logoSize * 0.8
+    this.drawText(label, { xStart: x, yStart: textY, fontSize: options.fontSize })
 
-    this.currentPage.drawImage(logo, { x: options.xStart, y: y - logoSize / 5, height: logoSize, width: logoSize })
-
-    this.drawText(title, { xStart: options.xStart + logoSize + options.fontSize / 4, yStart: y, fontSize: options.fontSize })
+    return options.yStart - lineHeight
   }
 
   async drawOrganisationLogo(organisationId: idType, options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }) {
