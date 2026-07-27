@@ -9,6 +9,9 @@
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
+      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="exportBookings(selected)">
+        <i class="bi bi-download me-1"></i>{{ t('csv.download') }}
+      </button>
       <button type="button" class="btn btn-success" :disabled="selected.length === 0 || loading" @click="book(selected)">
         {{ t('labels.setSelectedToBooked') }}
       </button>
@@ -64,7 +67,7 @@
 </template>
 
 <script lang="ts" setup>
-import { State, TravelSimple, TravelState } from 'abrechnung-common/types.js'
+import { BookingExportRow, State, TravelSimple, TravelState } from 'abrechnung-common/types.js'
 import { ComponentPublicInstance, MaybeRefOrGetter, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -79,20 +82,36 @@ const { t } = useI18n()
 
 const tableRef = useTemplateRef('table')
 
-const selected = ref([])
+const selected = ref<TravelSimple<string>[]>([])
 const show = ref<null | TravelState.BOOKED>(null)
 const loading = ref(false)
 
-async function book(travels: TravelSimple[]) {
+async function book(travels: TravelSimple<string>[]) {
   loading.value = true
-  const result = await API.setter(
+  const result = await API.setter<{ status: 'fulfilled' | 'rejected' }[]>(
     'book/travel/booked',
     travels.map((e) => e._id)
   )
   loading.value = false
   if (result.ok) {
-    selected.value = []
+    selected.value = travels.filter((_, index) => result.ok?.[index]?.status !== 'fulfilled')
     tableRef.value?.loadFromServer()
+  }
+}
+
+async function exportBookings(travels: TravelSimple<string>[]) {
+  loading.value = true
+  const result = await API.setter<BookingExportRow<string>[]>(
+    'book/travel/bookingExport',
+    travels.map((travel) => travel._id),
+    {},
+    false
+  )
+  loading.value = false
+  if (result.ok) {
+    // Keep CSV formatting out of the report page bundle until the user requests an export.
+    const { downloadBookingExport } = await import('@/bookingCsv.js')
+    downloadBookingExport(result.ok, t)
   }
 }
 

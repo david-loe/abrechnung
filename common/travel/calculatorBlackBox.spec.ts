@@ -106,6 +106,7 @@ const travels = [
       endDate: '2025-03-13',
       project: projectSimple1,
       advances: [],
+      bookings: [],
       stages: [
         {
           _id: 'TA-S1',
@@ -209,6 +210,7 @@ const travels = [
       endDate: '2025-02-03',
       project: projectSimple1,
       advances: [],
+      bookings: [],
       stages: [
         {
           _id: 'TB-S0',
@@ -294,6 +296,7 @@ const travels = [
       endDate: '2025-05-12',
       project: projectSimple1,
       advances: [],
+      bookings: [],
       stages: [
         {
           _id: 'TC-S0',

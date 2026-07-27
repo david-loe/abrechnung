@@ -1,10 +1,13 @@
 import { Body, Delete, Get, Post, Queries, Query, Route, Security, Tags } from '@tsoa/runtime'
 import { LedgerAccount as ILedgerAccount, locales, travelExpenseItems } from 'abrechnung-common/types.js'
 import { Types } from 'mongoose'
-import Booking from '../models/booking.js'
+import Advance from '../models/advance.js'
 import Category from '../models/category.js'
+import ExpenseReport from '../models/expenseReport.js'
+import HealthCareCost from '../models/healthCareCost.js'
 import LedgerAccount, { ledgerAccountSchema } from '../models/ledgerAccount.js'
 import Organisation from '../models/organisation.js'
+import Travel from '../models/travel.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 
@@ -42,7 +45,10 @@ export class LedgerAccountAdminController extends Controller {
             ...travelExpenseItems.map((item) => `accountingSettings.accountMapping.${item}`)
           ]
         },
-        { model: Booking, paths: ['ledgerAccount'] }
+        { model: Travel, paths: ['bookings.ledgerAccount'] },
+        { model: ExpenseReport, paths: ['bookings.ledgerAccount'] },
+        { model: HealthCareCost, paths: ['bookings.ledgerAccount'] },
+        { model: Advance, paths: ['bookings.ledgerAccount'] }
       ],
       minDocumentCount: 1
     })

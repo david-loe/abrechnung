@@ -19,6 +19,7 @@ import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
+import { getBookingExportRows } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
@@ -98,7 +99,7 @@ export class ExpenseReportController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
@@ -283,7 +284,7 @@ export class ExpenseReportExamineController extends Controller {
     return await this.getter(ExpenseReport, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -510,7 +511,7 @@ export class ExpenseReportBookableController extends Controller {
     return await this.getter(ExpenseReport, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -533,6 +534,11 @@ export class ExpenseReportBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExport')
+  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportRows(ExpenseReport, 'ExpenseReport', requestBody, request) }
   }
 
   @Post('booked')

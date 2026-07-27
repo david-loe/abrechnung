@@ -2,6 +2,9 @@ import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import ExpenseReportModel from '../../models/expenseReport.js'
+import LedgerAccount from '../../models/ledgerAccount.js'
+import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -456,6 +459,39 @@ test.serial('GET /expenseReport/report', async (t) => {
 })
 
 // BOOK
+
+test.serial('POST /book/expenseReport/bookingExport', async (t) => {
+  const ledgerAccount = await LedgerAccount.findOne().lean()
+  t.truthy(ledgerAccount)
+  await User.updateOne({ _id: expenseReport.owner._id }, { $set: { employeeId: 'E-1' } })
+  await ExpenseReportModel.updateOne(
+    { _id: expenseReport._id },
+    {
+      $set: {
+        bookings: [
+          {
+            ledgerAccount: ledgerAccount?._id,
+            amount: 12.5,
+            date: new Date('2026-07-27T00:00:00.000Z'),
+            project: expenseReport.project._id,
+            remark: 'Booking export test'
+          }
+        ]
+      }
+    }
+  )
+
+  await loginUser(agent, 'expenseReport')
+  const res = await agent.post('/book/expenseReport/bookingExport').send([expenseReport._id])
+  t.is(res.status, 200)
+  t.is(res.body.result.length, 1)
+  t.is(res.body.result[0].reportType, 'ExpenseReport')
+  t.is(res.body.result[0].report._id, expenseReport._id)
+  t.is(res.body.result[0].employee.employeeId, 'E-1')
+  t.is(res.body.result[0].ledgerAccount._id, ledgerAccount?._id.toString())
+  t.is(res.body.result[0].project._id, expenseReport.project._id)
+  t.is(res.body.result[0].amount, 12.5)
+})
 
 test.serial('POST /book/expenseReport/booked', async (t) => {
   await loginUser(agent, 'expenseReport')

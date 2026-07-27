@@ -20,6 +20,7 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ApprovedTravel from '../models/approvedTravel.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
+import { getBookingExportRows } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -48,7 +49,7 @@ export class TravelController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { startDate: -1 }
     })
@@ -307,7 +308,7 @@ export class TravelApproveController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0 },
       sort: { updatedAt: -1 }
     })
   }
@@ -393,7 +394,7 @@ export class TravelExamineController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { updatedAt: -1 }
     })
@@ -638,7 +639,7 @@ export class TravelBookableController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -661,6 +662,11 @@ export class TravelBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExport')
+  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportRows(Travel, 'Travel', requestBody, request) }
   }
 
   @Post('booked')

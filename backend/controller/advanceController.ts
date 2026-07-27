@@ -13,6 +13,7 @@ import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import ReportUsage from '../models/reportUsage.js'
 import Travel from '../models/travel.js'
+import { getBookingExportRows } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -53,7 +54,7 @@ export class AdvanceController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, bookingRemark: 0 },
       sort: { createdAt: -1 }
     })
   }
@@ -156,7 +157,12 @@ export class AdvanceExamineController extends Controller {
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
-    return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0, bookingRemark: 0 }, sort: { updatedAt: -1 } })
+    return await this.getter(Advance, {
+      query,
+      filter,
+      projection: { history: 0, historic: 0, bookings: 0, bookingRemark: 0 },
+      sort: { updatedAt: -1 }
+    })
   }
 }
 
@@ -172,7 +178,7 @@ export class AdvanceApproveController extends Controller {
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
-    return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0 }, sort: { updatedAt: -1 } })
+    return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0, bookings: 0 }, sort: { updatedAt: -1 } })
   }
 
   @Delete()
@@ -334,7 +340,7 @@ export class AdvanceBookableController extends Controller {
     return await this.getter(Advance, {
       query,
       filter,
-      projection: { history: 0, historic: 0 },
+      projection: { history: 0, historic: 0, bookings: 0 },
       sort: { [`log.${State.BOOKABLE}.on`]: -1 }
     })
   }
@@ -356,6 +362,11 @@ export class AdvanceBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExport')
+  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportRows(Advance, 'Advance', requestBody, request) }
   }
 
   @Post('booked')

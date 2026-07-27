@@ -139,7 +139,7 @@ type _SetterPartial1<T, U extends string> = T extends object
     }
   : T
 
-export type NoPost = 'historic' | 'owner' | 'history' | 'createdAt' | 'updatedAt' | 'editor' | 'exchangeRate' | 'state'
+export type NoPost = 'historic' | 'owner' | 'history' | 'bookings' | 'createdAt' | 'updatedAt' | 'editor' | 'exchangeRate' | 'state'
 export type SetterBody<ModelType> = SetterPartial<ModelType, NoPost>
 
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing

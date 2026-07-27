@@ -186,6 +186,13 @@ test.serial('GET /healthCareCost/report', async (t) => {
 
 // BOOK
 
+test.serial('POST /book/healthCareCost/bookingExport', async (t) => {
+  await loginUser(agent, 'healthCareCost')
+  const res = await agent.post('/book/healthCareCost/bookingExport').send([healthCareCost._id])
+  t.is(res.status, 200)
+  t.deepEqual(res.body.result, [])
+})
+
 test.serial('POST /book/healthCareCost/booked', async (t) => {
   await loginUser(agent, 'healthCareCost')
   t.plan(2)

@@ -528,6 +528,13 @@ test.serial('GET /travel/report', async (t) => {
 
 // BOOK
 
+test.serial('POST /book/travel/bookingExport', async (t) => {
+  await loginUser(agent, 'travel')
+  const res = await agent.post('/book/travel/bookingExport').send([travel._id])
+  t.is(res.status, 200)
+  t.deepEqual(res.body.result, [])
+})
+
 test.serial('POST /book/travel/booked', async (t) => {
   await loginUser(agent, 'travel')
   t.plan(2)

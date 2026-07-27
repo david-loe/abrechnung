@@ -519,6 +519,7 @@ export interface ReportSimple<idType extends _id = _id, S extends AnyState = Any
 }
 
 export interface Report<idType extends _id = _id, S extends AnyState = AnyState> extends ReportSimple<idType, S> {
+  bookings: Booking<idType>[]
   history: idType[]
   historic: boolean
 }
@@ -652,14 +653,17 @@ export const healthCareCostStates = Object.values(HealthCareCostState).filter((v
 
 export interface Booking<idType extends _id = _id> {
   ledgerAccount: LedgerAccount<idType>
-  report: { _id: idType; name: string }
-  reportType: ReportModelNameWithoutAdvance
   amount: number
   date: Date | string
   project: ProjectSimple<idType>
-  employee: { _id: idType; name: User['name']; employeeId: User['employeeId'] }
   remark?: string | null
   _id: idType
+}
+
+export interface BookingExportRow<idType extends _id = _id> extends Booking<idType> {
+  report: { _id: idType; name: string; reference: number }
+  reportType: ReportModelName
+  employee: { _id: idType; name: User['name']; employeeId: User['employeeId'] }
 }
 
 export interface LedgerAccount<idType extends _id = _id> {

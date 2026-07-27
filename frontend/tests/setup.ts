@@ -5,6 +5,6 @@ globalThis.__ABRECHNUNG_ENV__ = { MODE: 'development', VITE_FRONTEND_URL: 'http:
 const browserWindow = new EventTarget()
 Object.defineProperties(globalThis, {
   window: { configurable: true, value: browserWindow },
-  navigator: { configurable: true, value: { onLine: true, serviceWorker: undefined } },
+  navigator: { configurable: true, value: { language: 'en-US', onLine: true, serviceWorker: undefined } },
   location: { configurable: true, value: new URL('http://frontend.test/') }
 })

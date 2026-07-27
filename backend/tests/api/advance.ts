@@ -250,6 +250,10 @@ test.serial('DELETE /approve/advance rejects booked advances', async (t) => {
   t.is(approvedResponse.status, 200)
 
   await loginUser(agent, 'advance')
+  const exportResponse = await agent.post('/book/advance/bookingExport').send([advance._id])
+  t.is(exportResponse.status, 200)
+  t.deepEqual(exportResponse.body.result, [])
+
   const bookedResponse = await agent.post('/book/advance/booked').send([advance._id])
   t.is(bookedResponse.status, 200)
 

@@ -89,6 +89,7 @@ function createSetup() {
     updatedAt: new Date(),
     addUp: [],
     advances: [],
+    bookings: [],
     reason: 'Reason',
     history: [],
     historic: false,

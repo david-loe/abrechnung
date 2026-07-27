@@ -110,6 +110,17 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
       ]
     },
     bookingRemark: { type: String },
+    bookings: {
+      type: [
+        {
+          ledgerAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
+          amount: { type: Number, min: 0, required: true },
+          date: { type: Date, required: true },
+          project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
+          remark: { type: String, trim: true }
+        }
+      ]
+    },
     history: { type: [{ type: Schema.Types.ObjectId, ref: modelName }] },
     historic: { type: Boolean, required: true, default: false }
   }

@@ -11,6 +11,9 @@
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
+      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="exportBookings(selected)">
+        <i class="bi bi-download me-1"></i>{{ t('csv.download') }}
+      </button>
       <button type="button" class="btn btn-success" :disabled="selected.length === 0 || loading" @click="book(selected)">
         {{ t('labels.setSelectedToBooked') }}
       </button>
@@ -68,7 +71,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ExpenseReportSimple, ExpenseReportState, State } from 'abrechnung-common/types.js'
+import { BookingExportRow, ExpenseReportSimple, ExpenseReportState, State } from 'abrechnung-common/types.js'
 import { ComponentPublicInstance, MaybeRefOrGetter, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -83,20 +86,36 @@ const { t } = useI18n()
 
 const tableRef = useTemplateRef('table')
 
-const selected = ref([])
+const selected = ref<ExpenseReportSimple<string>[]>([])
 const show = ref<null | ExpenseReportState.BOOKED>(null)
 const loading = ref(false)
 
-async function book(expenseReports: ExpenseReportSimple[]) {
+async function book(expenseReports: ExpenseReportSimple<string>[]) {
   loading.value = true
-  const result = await API.setter(
+  const result = await API.setter<{ status: 'fulfilled' | 'rejected' }[]>(
     'book/expenseReport/booked',
     expenseReports.map((e) => e._id)
   )
   loading.value = false
   if (result.ok) {
-    selected.value = []
+    selected.value = expenseReports.filter((_, index) => result.ok?.[index]?.status !== 'fulfilled')
     tableRef.value?.loadFromServer()
+  }
+}
+
+async function exportBookings(expenseReports: ExpenseReportSimple<string>[]) {
+  loading.value = true
+  const result = await API.setter<BookingExportRow<string>[]>(
+    'book/expenseReport/bookingExport',
+    expenseReports.map((expenseReport) => expenseReport._id),
+    {},
+    false
+  )
+  loading.value = false
+  if (result.ok) {
+    // Keep CSV formatting out of the report page bundle until the user requests an export.
+    const { downloadBookingExport } = await import('@/bookingCsv.js')
+    downloadBookingExport(result.ok, t)
   }
 }
 
