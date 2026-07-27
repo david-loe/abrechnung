@@ -60,6 +60,13 @@ test.serial('correct balance after report review completed', async (t) => {
   t.is(_advance.offsetAgainst[0].subject, expenseReport.name)
 })
 
+test.serial('cannot withdraw an advance used by a review-completed report', async (t) => {
+  await loginUser(agent, 'advance')
+  const res = await agent.post('/approve/advance/withdrawApproval').send({ _id: advance._id })
+  t.not(res.status, 200)
+  await loginUser(agent, 'expenseReport')
+})
+
 test.serial('correct balance after report booked', async (t) => {
   await agent.post('/book/expenseReport/booked').send([expenseReport._id])
 

@@ -9,6 +9,7 @@ export type IntegrationEvent =
   | { type: 'report.submitted'; report: ReportEventTarget }
   | { type: 'report.review_requested'; report: ReportEventTarget }
   | { type: 'report.rejected'; report: ReportEventTarget }
+  | { type: 'report.approval_withdrawn'; report: ReportEventTarget }
   | { type: 'report.back_to_in_work'; report: ReportEventTarget }
   | { type: 'report.review_completed'; report: ReviewableReportTarget }
   | { type: 'travel.directly_approved'; report: TravelEventTarget }

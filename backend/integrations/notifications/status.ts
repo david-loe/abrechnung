@@ -27,12 +27,14 @@ import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { enqueueMail, type MailRecipient } from './email.js'
 import { enqueuePushNotification } from './push.js'
+import { getOwnerReportRoute } from './statusLinks.js'
 
 class StatusNotificationIntegration extends Integration {
   override readonly events: Partial<IntegrationEventHandlerMap> = {
     'report.submitted': async ({ report }) => await sendStatusNotification(report),
     'report.review_requested': async ({ report }) => await sendStatusNotification(report),
     'report.rejected': async ({ report }) => await sendStatusNotification(report),
+    'report.approval_withdrawn': async ({ report }) => await sendStatusNotification(report, 'APPROVAL_WITHDRAWN', true),
     'report.back_to_in_work': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_IN_WORK'),
     'report.review_completed': async ({ report }) => await sendStatusNotification(report),
     'travel.approved': async ({ report }) => await sendStatusNotification(report),
@@ -100,7 +102,8 @@ export async function sendAdvanceDeletionNotification(
 
 export async function sendStatusNotification(
   report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance,
-  textState?: string
+  textState?: string,
+  notifyOwner = false
 ) {
   let recipients = []
   let reportType: ReportType
@@ -123,7 +126,10 @@ export async function sendStatusNotification(
   const supervisedProjectsFilter = { $or: [{ 'projects.supervised': [] }, { 'projects.supervised': report.project._id }] }
   const userFilter: QueryFilter<IUser<Types.ObjectId, mongo.Binary>> = {}
 
-  if (report.state === State.APPLIED_FOR) {
+  if (notifyOwner) {
+    userFilter._id = report.owner._id
+    button.link = `${ENV.VITE_FRONTEND_URL}${getOwnerReportRoute(reportType, report._id, report.state)}`
+  } else if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
     button.link = `${ENV.VITE_FRONTEND_URL}/approve/${reportType}/${report._id}`
@@ -133,8 +139,7 @@ export async function sendStatusNotification(
     button.link = `${ENV.VITE_FRONTEND_URL}/examine/${reportType}/${report._id}`
   } else {
     userFilter._id = report.owner._id
-    button.link =
-      report.state === State.REJECTED ? `${ENV.VITE_FRONTEND_URL}/${reportType}` : `${ENV.VITE_FRONTEND_URL}/${reportType}/${report._id}`
+    button.link = `${ENV.VITE_FRONTEND_URL}${getOwnerReportRoute(reportType, report._id, report.state)}`
   }
 
   recipients = await User.find(userFilter).lean()

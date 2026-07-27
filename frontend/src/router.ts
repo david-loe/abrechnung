@@ -118,6 +118,12 @@ const routes = [
   },
   { path: '/user', component: () => import('@/components/HomePage.vue'), meta: { requiresAuth: true, offlineCapable: true } },
   {
+    path: '/user/travel/:_id([0-9a-fA-F]{24})',
+    component: () => import('@/components/HomePage.vue'),
+    meta: { requiresAuth: true, offlineCapable: true },
+    props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'travel' })
+  },
+  {
     path: '/advance/:_id([0-9a-fA-F]{24})',
     component: () => import('@/components/HomePage.vue'),
     meta: { requiresAuth: true, offlineCapable: true },

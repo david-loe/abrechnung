@@ -25,6 +25,7 @@
     "areYouSureDelete": "Are you sure you want to delete this? This cannot be undone!",
     "areYouSureEdit": "Are you sure you want to edit this?",
     "areYouSureMerge": "Are you sure you want to merge these users? This cannot be undone.",
+    "areYouSureWithdrawApproval": "Are you sure you want to withdraw this approval?",
     "conflict": "Conflict!",
     "countryChangeBetweenStages": "Country change between consecutive stages",
     "departureAndArrivalOnDifferentDaysX": "Are you sure you were sitting in '{X}' for several days?",
@@ -595,6 +596,7 @@
     "weekly": "Weekly",
     "white": "White",
     "width": "Width",
+    "withdrawApproval": "Withdraw approval",
     "XDetails": "{X} details"
   },
   "languages": {
@@ -622,6 +624,11 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new advance request from {owner} just came in.",
         "subject": "🆕 New advance request"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "The approval of your advance was withdrawn.",
+        "subject": "↩️ Advance approval withdrawn"
       },
       "APPROVED": {
         "confirmationLine": "Once you have received the money, you can confirm it [here]({- confirmLink}).",
@@ -722,6 +729,11 @@
         "lastParagraph": "{commentator} wrote: '{comment}'",
         "paragraph": "A new travel application from {owner} just came in.",
         "subject": "🆕 New Travel"
+      },
+      "APPROVAL_WITHDRAWN": {
+        "lastParagraph": "{commentator} wrote: '{comment}'",
+        "paragraph": "The approval of your travel was withdrawn.",
+        "subject": "↩️ Travel approval withdrawn"
       },
       "APPROVED": {
         "lastParagraph": "{commentator} wrote: '{comment}'",

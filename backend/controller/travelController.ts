@@ -17,6 +17,7 @@ import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
+import ApprovedTravel from '../models/approvedTravel.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
@@ -337,6 +338,30 @@ export class TravelApproveController extends Controller {
         return false
       }
     })
+  }
+
+  @Post('withdrawApproval')
+  public async withdrawApproval(@Body() requestBody: { _id: string; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+    const extendedBody = Object.assign(requestBody, { state: TravelState.REJECTED, editor: request.user._id })
+
+    const result = await this.setter(Travel, {
+      requestBody: extendedBody,
+      allowNew: false,
+      async checkOldObject(oldObject: TravelDoc) {
+        if (oldObject.state !== TravelState.APPROVED || !checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          return false
+        }
+        await oldObject.saveToHistory()
+        oldObject.log[TravelState.REJECTED] = undefined
+        oldObject.log[TravelState.APPROVED] = undefined
+        oldObject.markModified('log')
+        return true
+      }
+    })
+
+    await ApprovedTravel.deleteOne({ reportId: result.result._id })
+    await emitIntegrationEvent({ type: 'report.approval_withdrawn', report: result.result })
+    return result
   }
 
   @Post('rejected')

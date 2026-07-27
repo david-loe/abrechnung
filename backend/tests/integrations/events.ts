@@ -26,7 +26,7 @@ function createTravelReport(overrides: Record<string, unknown> = {}) {
 function createIntegrations() {
   const calls = {
     webhooks: [] as IntegrationReport[],
-    notifications: [] as Array<{ report: unknown; textState?: string }>,
+    notifications: [] as Array<{ report: unknown; textState?: string; notifyOwner?: boolean }>,
     reportMails: [] as IntegrationReport[],
     a1: [] as IntegrationReport[]
   }
@@ -73,6 +73,9 @@ function createIntegrations() {
         },
         'report.rejected': async (event) => {
           calls.notifications.push({ report: event.report, textState: undefined })
+        },
+        'report.approval_withdrawn': async (event) => {
+          calls.notifications.push({ report: event.report, textState: 'APPROVAL_WITHDRAWN', notifyOwner: true })
         },
         'report.back_to_in_work': async (event) => {
           calls.notifications.push({ report: event.report, textState: 'BACK_TO_IN_WORK' })
@@ -136,6 +139,17 @@ test('report.review_completed fans out to report outbound integrations', async (
   t.deepEqual(calls.webhooks, [report])
   t.deepEqual(calls.notifications, [{ report, textState: undefined }])
   t.deepEqual(calls.reportMails, [report])
+})
+
+test('report.approval_withdrawn only triggers an owner notification', async (t) => {
+  const report = createReport()
+  const { calls, integrations } = createIntegrations()
+
+  await emitIntegrationEvent({ type: 'report.approval_withdrawn', report }, integrations)
+
+  t.deepEqual(calls.webhooks, [])
+  t.deepEqual(calls.notifications, [{ report, textState: 'APPROVAL_WITHDRAWN', notifyOwner: true }])
+  t.deepEqual(calls.reportMails, [])
 })
 
 test('travel.back_to_approved only triggers notification with custom state label', async (t) => {

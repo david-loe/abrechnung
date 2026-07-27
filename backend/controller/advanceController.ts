@@ -1,7 +1,7 @@
 import { Readable } from 'node:stream'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
-import { QueryFilter, Types } from 'mongoose'
+import { Document, model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
@@ -11,6 +11,7 @@ import { sendAdvanceDeletionNotification } from '../integrations/notifications/s
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
+import ReportUsage from '../models/reportUsage.js'
 import Travel from '../models/travel.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
@@ -23,6 +24,22 @@ interface AdvanceApplication {
   budget: MoneyPost
   reason: string
   comment?: string
+}
+
+async function unlinkAdvanceFromIncompleteReports(advanceId: Types.ObjectId) {
+  const filter = { advances: advanceId, historic: false, state: { $lt: State.BOOKABLE } }
+  const reports: Document[] = []
+  reports.push(...(await model('Travel').find(filter)))
+  reports.push(...(await model('ExpenseReport').find(filter)))
+  reports.push(...(await model('HealthCareCost').find(filter)))
+  for (const report of reports) {
+    const advances = report.get('advances') as IdDocument<Types.ObjectId>[]
+    report.set(
+      'advances',
+      advances.filter((advance) => !idDocumentToId(advance).equals(advanceId))
+    )
+    await report.save()
+  }
 }
 
 @Tags('Advance')
@@ -213,6 +230,36 @@ export class AdvanceApproveController extends Controller {
         return false
       }
     })
+  }
+
+  @Post('withdrawApproval')
+  public async withdrawApproval(@Body() requestBody: { _id: string; comment?: string }, @Request() request: AuthenticatedExpressRequest) {
+    const extendedBody = Object.assign(requestBody, { state: AdvanceState.REJECTED, editor: request.user._id, bookingRemark: null })
+
+    const result = await this.setter(Advance, {
+      requestBody: extendedBody,
+      allowNew: false,
+      async checkOldObject(oldObject: AdvanceDoc) {
+        if (
+          oldObject.state !== AdvanceState.APPROVED ||
+          oldObject.receivedOn ||
+          oldObject.offsetAgainst.length > 0 ||
+          !checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
+          return false
+        }
+        await unlinkAdvanceFromIncompleteReports(oldObject._id)
+        await oldObject.saveToHistory()
+        oldObject.log[AdvanceState.REJECTED] = undefined
+        oldObject.log[AdvanceState.APPROVED] = undefined
+        oldObject.markModified('log')
+        return true
+      }
+    })
+
+    await ReportUsage.deleteOne({ reportId: result.result._id })
+    await emitIntegrationEvent({ type: 'report.approval_withdrawn', report: result.result })
+    return result
   }
 
   @Post('rejected')

@@ -1,3 +1,4 @@
+import { AdvanceState } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import test from 'ava'
 import { type Queue } from 'bullmq'
@@ -59,6 +60,11 @@ async function createApprovedAdvanceByApprover(name: string, owner: string, adva
 async function deleteApprovedAdvance(_id: string) {
   await loginUser(agent, 'advance')
   return await agent.delete('/approve/advance').query({ _id })
+}
+
+async function withdrawAdvanceApproval(_id: string, comment?: string) {
+  await loginUser(agent, 'advance')
+  return await agent.post('/approve/advance/withdrawApproval').send({ _id, comment })
 }
 
 async function confirmAdvanceReceipt(_id: string, receivedOn = new Date('2024-05-05T00:00:00.000Z')) {
@@ -126,9 +132,12 @@ test.serial('DELETE /approve/advance rejects deletion after receipt was confirme
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.not(deleteResponse.status, 200)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.not(withdrawResponse.status, 200)
 })
 
-test.serial('DELETE /approve/advance rejects deletion when linked from expense report', async (t) => {
+test.serial('POST /approve/advance/withdrawApproval rejects the approval and unlinks unfinished reports', async (t) => {
   const createdResponse = await createAppliedAdvance('Expense report link')
   t.is(createdResponse.status, 200)
   const advance = createdResponse.body.result as { _id: string }
@@ -144,6 +153,36 @@ test.serial('DELETE /approve/advance rejects deletion when linked from expense r
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.is(deleteResponse.status, 409)
+
+  const comment = 'Approval is no longer valid'
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id, comment)
+  t.is(withdrawResponse.status, 200)
+  const withdrawnAdvance = withdrawResponse.body.result
+  t.is(withdrawnAdvance.state, AdvanceState.REJECTED)
+  t.falsy(withdrawnAdvance.log[AdvanceState.APPROVED])
+  t.truthy(withdrawnAdvance.log[AdvanceState.REJECTED])
+  t.like(withdrawnAdvance.comments.at(-1), { text: comment, toState: AdvanceState.REJECTED })
+  t.is(withdrawnAdvance.history.length, 2)
+
+  await loginUser(agent, 'user')
+  const unlinkedReportResponse = await agent.get('/expenseReport').query({ _id: reportResponse.body.result._id })
+  t.is(unlinkedReportResponse.status, 200)
+  t.deepEqual(unlinkedReportResponse.body.data.advances, [])
+
+  const resubmitResponse = await agent
+    .post('/advance/appliedFor')
+    .send({
+      _id: advance._id,
+      name: withdrawnAdvance.name,
+      reason: withdrawnAdvance.reason,
+      budget: withdrawnAdvance.budget,
+      project: withdrawnAdvance.project
+    })
+  t.is(resubmitResponse.status, 200)
+  const reapproveResponse = await approveAdvance(advance._id)
+  t.is(reapproveResponse.status, 200)
+  t.truthy(reapproveResponse.body.result.log[AdvanceState.APPROVED])
+  t.is(reapproveResponse.body.result.history.length, 3)
 })
 
 test.serial('DELETE /approve/advance rejects deletion when linked from health care cost', async (t) => {
@@ -162,6 +201,12 @@ test.serial('DELETE /approve/advance rejects deletion when linked from health ca
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.is(deleteResponse.status, 409)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.is(withdrawResponse.status, 200)
+  await loginUser(agent, 'user')
+  const unlinkedReportResponse = await agent.get('/healthCareCost').query({ _id: reportResponse.body.result._id })
+  t.deepEqual(unlinkedReportResponse.body.data.advances, [])
 })
 
 test.serial('DELETE /approve/advance rejects deletion when linked from travel', async (t) => {
@@ -188,6 +233,12 @@ test.serial('DELETE /approve/advance rejects deletion when linked from travel', 
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.is(deleteResponse.status, 409)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.is(withdrawResponse.status, 200)
+  await loginUser(agent, 'user')
+  const unlinkedReportResponse = await agent.get('/travel').query({ _id: reportResponse.body.result._id })
+  t.deepEqual(unlinkedReportResponse.body.data.advances, [])
 })
 
 test.serial('DELETE /approve/advance rejects booked advances', async (t) => {
@@ -204,6 +255,24 @@ test.serial('DELETE /approve/advance rejects booked advances', async (t) => {
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.not(deleteResponse.status, 200)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.not(withdrawResponse.status, 200)
+})
+
+test.serial('POST /approve/advance/withdrawApproval rejects manually offset advances', async (t) => {
+  const createdResponse = await createAppliedAdvance('Manually offset advance')
+  const advance = createdResponse.body.result as { _id: string }
+  const approvedResponse = await approveAdvance(advance._id)
+  t.is(approvedResponse.status, 200)
+
+  const offsetResponse = await agent
+    .post('/approve/advance/offset')
+    .send({ advanceId: advance._id, amount: 10, subject: 'Manual correction' })
+  t.is(offsetResponse.status, 200)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.not(withdrawResponse.status, 200)
 })
 
 test.serial('DELETE /approve/advance requires matching project permission', async (t) => {
@@ -253,6 +322,9 @@ test.serial('DELETE /approve/advance requires matching project permission', asyn
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.not(deleteResponse.status, 200)
+
+  const withdrawResponse = await withdrawAdvanceApproval(advance._id)
+  t.not(withdrawResponse.status, 200)
 })
 
 test.serial.after.always('Drop DB Connection', async () => {

@@ -507,6 +507,12 @@ test.serial('POST /examine/travel/reviewCompleted', async (t) => {
   t.is((res.body.result as Travel).comments.length, 2)
 })
 
+test.serial('POST /approve/travel/withdrawApproval rejects review-completed travel', async (t) => {
+  await loginUser(agent, 'travel')
+  const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
+  t.not(res.status, 200)
+})
+
 // REPORT
 
 test.serial('GET /travel/report', async (t) => {
@@ -533,6 +539,55 @@ test.serial('POST /book/travel/booked', async (t) => {
     t.fail()
   }
   t.is(res.body.result[0].status, 'fulfilled')
+})
+
+test.serial('POST /approve/travel/withdrawApproval rejects booked travel', async (t) => {
+  const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
+  t.not(res.status, 200)
+})
+
+test.serial('POST /approve/travel/withdrawApproval rejects approval and allows fresh reapproval', async (t) => {
+  await loginUser(agent, 'user')
+  const application = {
+    name: 'Withdrawable travel',
+    reason: 'Plans may change',
+    project: travel.project,
+    destinationPlace: { country: { _id: 'DE' }, place: 'Berlin' },
+    startDate: new Date('2030-05-01T00:00:00.000Z'),
+    endDate: new Date('2030-05-02T00:00:00.000Z'),
+    advances: []
+  }
+  const createdResponse = await agent.post('/travel/appliedFor').send(application)
+  t.is(createdResponse.status, 200)
+  const createdTravel = createdResponse.body.result as Travel
+
+  await loginUser(agent, 'travel')
+  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+  t.is(approvedResponse.status, 200)
+
+  const comment = 'The authorization was revoked'
+  const withdrawResponse = await agent.post('/approve/travel/withdrawApproval').send({ _id: createdTravel._id, comment })
+  t.is(withdrawResponse.status, 200)
+  const withdrawnTravel = withdrawResponse.body.result as Travel
+  t.is(withdrawnTravel.state, TravelState.REJECTED)
+  t.falsy(withdrawnTravel.log[TravelState.APPROVED])
+  t.truthy(withdrawnTravel.log[TravelState.REJECTED])
+  t.like(withdrawnTravel.comments.at(-1), { text: comment, toState: TravelState.REJECTED })
+  t.is(withdrawnTravel.history.length, 2)
+
+  const approvedTravelsResponse = await agent.get('/approvedTravel')
+  t.is(approvedTravelsResponse.status, 200)
+  t.false(approvedTravelsResponse.body.data.some((approvedTravel: { reportId: string }) => approvedTravel.reportId === createdTravel._id))
+
+  await loginUser(agent, 'user')
+  const resubmitResponse = await agent.post('/travel/appliedFor').send({ ...application, _id: createdTravel._id })
+  t.is(resubmitResponse.status, 200)
+
+  await loginUser(agent, 'travel')
+  const reapproveResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+  t.is(reapproveResponse.status, 200)
+  t.truthy(reapproveResponse.body.result.log[TravelState.APPROVED])
+  t.is(reapproveResponse.body.result.history.length, 3)
 })
 
 // test.after.always('DELETE /travel', async (t) => {
