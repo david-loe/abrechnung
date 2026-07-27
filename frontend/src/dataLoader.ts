@@ -77,7 +77,7 @@ class APP_LOADER {
   }
 
   async loadOptional<T>(endpoint: APP_DATA_OPTIONAL_ENDPOINTS) {
-    const res = await API.getter<T>(endpoint, {}, {}, false)
+    const res = await API.getter<T>(endpoint, {}, {}, { showAlert: false, handleAuthenticationError: false })
     if (res.ok) {
       if (this.data.value) {
         setData(this.data.value, endpoint, res.ok.data)

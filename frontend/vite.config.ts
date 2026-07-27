@@ -3,23 +3,23 @@ import vue from '@vitejs/plugin-vue'
 import { defineConfig, searchForWorkspaceRoot } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-function chunkName(moduleId: string) {
-  // Route metadata is intentionally part of the tiny application shell; putting
-  // it into the admin chunk would make every route import the whole admin graph.
-  if (moduleId.endsWith('/components/settings/adminSections.ts')) return
+function chunkCategory(moduleIds: readonly string[]) {
   if (
-    moduleId.includes('/components/settings/') ||
-    moduleId.includes('/components/elements/vueform/') ||
-    moduleId.includes('/vueform.config.') ||
-    /\/node_modules\/(?:@vueform|@codemirror|@lezer|json-editor-vue|simple-code-editor|vanilla-picker)\//.test(moduleId)
+    moduleIds.some(
+      (moduleId) =>
+        moduleId.includes('/components/settings/') ||
+        moduleId.includes('/components/elements/vueform/') ||
+        moduleId.includes('/vueform.config.') ||
+        /\/node_modules\/(?:@vueform|@codemirror|@lezer|json-editor-vue|simple-code-editor|vanilla-picker)\//.test(moduleId)
+    )
   )
     return 'admin'
-  if (moduleId.includes('/components/travel/')) return 'travel'
-  if (moduleId.includes('/components/expenseReport/')) return 'expense-report'
-  if (moduleId.includes('/components/healthCareCost/')) return 'health-care-cost'
-  if (moduleId.includes('/components/advance/')) return 'advance'
-  if (moduleId.endsWith('/components/HomePage.vue')) return 'user'
-  if (moduleId.endsWith('/components/LoginPage.vue')) return 'login'
+  if (moduleIds.some((moduleId) => moduleId.includes('/components/travel/'))) return 'travel'
+  if (moduleIds.some((moduleId) => moduleId.includes('/components/expenseReport/'))) return 'expense-report'
+  if (moduleIds.some((moduleId) => moduleId.includes('/components/healthCareCost/'))) return 'health-care-cost'
+  if (moduleIds.some((moduleId) => moduleId.includes('/components/advance/'))) return 'advance'
+  if (moduleIds.some((moduleId) => moduleId.endsWith('/components/HomePage.vue'))) return 'user'
+  if (moduleIds.some((moduleId) => moduleId.endsWith('/components/LoginPage.vue'))) return 'login'
 }
 
 // https://vitejs.dev/config/
@@ -47,7 +47,9 @@ export default defineConfig({
               return (
                 !filename.startsWith('admin-') &&
                 !filename.startsWith('AdminSettingsSection-') &&
+                !filename.startsWith('SettingsPage-') &&
                 !filename.startsWith('vueform.config-') &&
+                !filename.startsWith('vueform-') &&
                 !filename.startsWith('vanilla-picker-')
               )
             })
@@ -70,8 +72,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         entryFileNames: 'app-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js',
-        codeSplitting: { includeDependenciesRecursively: false, groups: [{ name: chunkName, minSize: 0 }] }
+        // Keep human-readable bundle categories without forcing modules into
+        // manual groups, which can introduce cycles between lazy route entries.
+        chunkFileNames: (chunk) => {
+          const category = chunk.facadeModuleId ? chunkCategory([chunk.facadeModuleId]) : chunkCategory(chunk.moduleIds)
+          return `assets/${category ?? '[name]'}-[hash].js`
+        }
       }
     }
   }

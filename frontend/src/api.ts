@@ -31,8 +31,9 @@ class API {
     endpoint: string,
     params: AxiosRequestConfig['params'] = {},
     config: AxiosRequestConfig = {},
-    showAlert = true
+    options: { showAlert?: boolean; handleAuthenticationError?: boolean } = {}
   ): Promise<{ ok?: GETResponse<T>; error?: unknown }> {
+    const { showAlert = true, handleAuthenticationError = true } = options
     try {
       const res = await axios.get(`${ENV.VITE_BACKEND_URL}/${endpoint}`, Object.assign({ params: params, withCredentials: true }, config))
       if (config.responseType === 'blob') {
@@ -49,7 +50,7 @@ class API {
       ) {
         error.response.data = JSON.parse(await error.response.data.text())
       }
-      return this.#handleError(error, showAlert)
+      return this.#handleError(error, showAlert, handleAuthenticationError)
     }
   }
   async setter<T>(
@@ -92,12 +93,12 @@ class API {
     return false
   }
 
-  async #handleError(error: unknown, showAlert: boolean) {
+  async #handleError(error: unknown, showAlert: boolean, handleAuthenticationError = true) {
     if (!axios.isAxiosError(error) || !error.response) {
       logger.error(error)
       return { error: error }
     }
-    if (error.response.status === 401 || error.response.status === 403) {
+    if (handleAuthenticationError && (error.response.status === 401 || error.response.status === 403)) {
       await purgeSession()
       if (showAlert) {
         this.redirectToLogin()

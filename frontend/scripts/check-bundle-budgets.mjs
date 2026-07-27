@@ -7,17 +7,65 @@ const manifest = JSON.parse(await readFile(new URL('.vite/manifest.json', output
 const budgets = [
   { label: 'initial JavaScript', entry: /^index\.html$/, extension: '.js', raw: 725 * 1024, gzip: 225 * 1024 },
   { label: 'initial CSS', entry: /^index\.html$/, extension: '.css', raw: 360 * 1024, gzip: 54 * 1024, allowEmpty: true },
-  { label: '/user lazy graph', file: /\/user-[^/]+\.js$/, raw: 305 * 1024, gzip: 96 * 1024 },
-  { label: 'travel lazy graph', file: /\/travel-[^/]+\.js$/, raw: 205 * 1024, gzip: 66 * 1024 },
-  { label: 'expense-report lazy graph', file: /\/expense-report-[^/]+\.js$/, raw: 159 * 1024, gzip: 56 * 1024 },
-  { label: 'health-care-cost lazy graph', file: /\/health-care-cost-[^/]+\.js$/, raw: 157 * 1024, gzip: 55 * 1024 },
-  { label: 'advance lazy graph', file: /\/advance-[^/]+\.js$/, raw: 59 * 1024, gzip: 21 * 1024 },
+  { label: '/user lazy graph', entry: /^src\/components\/HomePage\.vue$/, raw: 305 * 1024, gzip: 96 * 1024 },
+  {
+    label: 'travel lazy graph',
+    entry: /^src\/components\/travel\/(?:ApprovePage|BookPage|ExaminePage|TravelPage)\.vue$/,
+    raw: 205 * 1024,
+    gzip: 66 * 1024
+  },
+  {
+    label: 'expense-report lazy graph',
+    entry: /^src\/components\/expenseReport\/(?:BookPage|ExaminePage|ExpenseReportPage)\.vue$/,
+    raw: 159 * 1024,
+    gzip: 56 * 1024
+  },
+  {
+    label: 'health-care-cost lazy graph',
+    entry: /^src\/components\/healthCareCost\/(?:BookPage|ExaminePage|HealthCareCostPage)\.vue$/,
+    raw: 157 * 1024,
+    gzip: 55 * 1024
+  },
+  { label: 'advance lazy graph', entry: /^src\/components\/advance\/(?:ApprovePage|BookPage)\.vue$/, raw: 59 * 1024, gzip: 21 * 1024 },
   // Vueform 1.13 currently sits just above the original estimate. Keep this
   // threshold close to the measured graph so regressions still fail CI.
-  { label: 'admin/Vueform lazy graph', file: /\/admin-[^/]+\.js$/, raw: 4.62 * 1024 * 1024, gzip: 1.23 * 1024 * 1024 }
+  {
+    label: 'admin/Vueform lazy graph',
+    entry: /^src\/(?:components\/settings\/(?:SettingsPage|AdminSettingsSection)\.vue|vueform\.config\.ts)$/,
+    raw: 4.62 * 1024 * 1024,
+    gzip: 1.23 * 1024 * 1024
+  }
 ]
 
 const recordsByFile = new Map(Object.values(manifest).map((record) => [record.file, record]))
+
+function findImportCycle() {
+  const visited = new Set()
+  const active = new Set()
+  const path = []
+
+  function visit(key) {
+    if (active.has(key)) return [...path.slice(path.indexOf(key)), key]
+    if (visited.has(key)) return undefined
+    active.add(key)
+    path.push(key)
+    for (const dependency of manifest[key].imports ?? []) {
+      const cycle = visit(dependency)
+      if (cycle) return cycle
+    }
+    path.pop()
+    active.delete(key)
+    visited.add(key)
+  }
+
+  for (const key of Object.keys(manifest)) {
+    const cycle = visit(key)
+    if (cycle) return cycle
+  }
+}
+
+const importCycle = findImportCycle()
+if (importCycle) throw new Error(`Circular bundle imports: ${importCycle.join(' -> ')}`)
 
 function collectGraph(startFiles) {
   const files = new Set()
@@ -51,11 +99,13 @@ let failed = false
 const initialFiles = collectGraph([manifest['index.html'].file])
 for (const budget of budgets) {
   const startFiles = Object.entries(manifest)
-    .filter(([key, record]) => (budget.entry?.test(key) ?? false) || (budget.file?.test(record.file) ?? false))
+    .filter(([key]) => budget.entry.test(key))
     .map(([, record]) => record.file)
   if (startFiles.length === 0 && !budget.allowEmpty) throw new Error(`Could not locate the ${budget.label} bundle in the Vite manifest`)
   const graph = collectGraph(startFiles)
-  if (!budget.entry) for (const initialFile of initialFiles) graph.delete(initialFile)
+  if (budget.label !== 'initial JavaScript' && budget.label !== 'initial CSS') {
+    for (const initialFile of initialFiles) graph.delete(initialFile)
+  }
   const measured = await sizes(budget.extension ? [...graph].filter((file) => file.endsWith(budget.extension)) : graph)
   console.log(`${budget.label}: ${format(measured.raw)} raw / ${format(measured.gzip)} gzip`)
   if (measured.raw > budget.raw || measured.gzip > budget.gzip) {
