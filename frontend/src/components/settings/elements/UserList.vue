@@ -80,7 +80,7 @@
         ref="form$"
         @submit="(form$: any) => postUser(form$.data)"
         @reset="_showForm = false"
-        @mounted="(form$:any) => {form$.el$('fk.genApiKey').on('click', () => {($refs.modal as any).modal.show()})}" />
+        @mounted="setupForm" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.user') }) }}</button>
   </div>
@@ -98,6 +98,7 @@ import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
+import { getSyncedMagicLogin } from './userForm.js'
 
 const { t } = useI18n()
 
@@ -147,6 +148,7 @@ function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) 
 
 const userToEdit: Ref<User | undefined> = ref(undefined)
 const _showForm = ref(false)
+const modal = useTemplateRef<{ modal: { show: () => void } }>('modal')
 
 function showForm(user?: User) {
   // biome-ignore lint/suspicious/noExplicitAny: reduce arrays of objects to arrays of _ids for vueform select elements
@@ -179,6 +181,31 @@ async function deleteUser(user: User<string>) {
     loadFromServer()
     APP_LOADER.loadOptional('users')
   }
+}
+
+// biome-ignore lint/suspicious/noExplicitAny: Vueform does not expose the mounted form instance type through its component event
+function setupForm(form$: any) {
+  form$.el$('fk.genApiKey').on('click', () => {
+    modal.value?.modal.show()
+  })
+
+  const magicLoginEnabled = schema.fk?.schema?.magiclogin?.type !== 'hidden'
+  const emailElement = form$.el$('email')
+  const magicLoginElement = form$.el$('fk.magiclogin')
+
+  emailElement.on('change', (email: string | null | undefined, previousEmail: string | null | undefined) => {
+    const magicLogin = getSyncedMagicLogin({
+      email,
+      existingUser: Boolean(userToEdit.value?._id),
+      magicLogin: magicLoginElement.value,
+      magicLoginEnabled,
+      previousEmail
+    })
+
+    if (magicLogin !== magicLoginElement.value) {
+      magicLoginElement.update(magicLogin)
+    }
+  })
 }
 
 const buttons = {
