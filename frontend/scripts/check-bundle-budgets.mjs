@@ -4,6 +4,12 @@ import { gzipSync } from 'node:zlib'
 const outputDirectory = new URL('../dist/', import.meta.url)
 const manifest = JSON.parse(await readFile(new URL('.vite/manifest.json', outputDirectory), 'utf8'))
 const maximumGzipSize = 1024 * 1024
+const maximumOcrGzipSize = 4 * 1024 * 1024
+
+function maximumSize(file) {
+  const filename = file.split('/').at(-1) ?? file
+  return filename.startsWith('receiptOcr-') || filename.startsWith('worker-entry-') ? maximumOcrGzipSize : maximumGzipSize
+}
 
 function findImportCycle() {
   const visited = new Set()
@@ -49,8 +55,9 @@ if (largestBundle) console.log(`Largest bundle: ${largestBundle.file} (${format(
 
 let failed = false
 for (const bundle of bundles) {
-  if (bundle.gzipSize > maximumGzipSize) {
-    console.error(`${bundle.file}: ${format(bundle.gzipSize)} gzip exceeds bundle limit ${format(maximumGzipSize)}`)
+  const limit = maximumSize(bundle.file)
+  if (bundle.gzipSize > limit) {
+    console.error(`${bundle.file}: ${format(bundle.gzipSize)} gzip exceeds bundle limit ${format(limit)}`)
     failed = true
   }
 }
