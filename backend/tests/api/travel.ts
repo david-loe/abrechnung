@@ -16,6 +16,7 @@ import { objectToFormFields } from '../../helper.js'
 import TravelModel from '../../models/travel.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { uploadPendingReceipts } from '../_documentFile.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -213,15 +214,8 @@ test.serial('POST /travel/stage', async (t) => {
   t.plan(stages.length + 0)
   for (const stage of stages) {
     const stageBody = withCostPositions(stage, stage.transport.type)
-    let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(stageBody)) {
-      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-        req = req.attach(entry.field, entry.val)
-      } else {
-        req = req.field(entry.field, entry.val)
-      }
-    }
-    const res = await req
+    await uploadPendingReceipts(agent, stageBody)
+    const res = await agent.post('/travel/stage').query({ parentId: travel._id.toString() }).send(stageBody)
     if (res.status === 200) {
       travel = res.body.result
       t.pass()
@@ -249,15 +243,8 @@ test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
     const expenseBody = withCostPositions(expense, expense.description)
-    let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(expenseBody)) {
-      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-        req = req.attach(entry.field, entry.val)
-      } else {
-        req = req.field(entry.field, entry.val)
-      }
-    }
-    const res = await req
+    await uploadPendingReceipts(agent, expenseBody)
+    const res = await agent.post('/travel/expense').query({ parentId: travel._id.toString() }).send(expenseBody)
     if (res.status === 200) {
       travel = res.body.result
       t.pass()
@@ -307,15 +294,7 @@ test.serial('POST /travel/stage keeps invalid travel saveable in approved state'
     arrival: new Date('2023-08-24T22:00:00.000Z')
   }
 
-  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-  for (const entry of objectToFormFields(overlappingStage)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      req = req.attach(entry.field, entry.val)
-    } else {
-      req = req.field(entry.field, entry.val)
-    }
-  }
-  const res = await req
+  const res = await agent.post('/travel/stage').query({ parentId: travel._id.toString() }).send(overlappingStage)
   if (res.status === 200) {
     travel = res.body.result
     t.pass()
@@ -341,15 +320,7 @@ test.serial('POST /travel/stage fixes invalid travel again', async (t) => {
     arrival: new Date('2023-08-29T14:05:00.000Z')
   }
 
-  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-  for (const entry of objectToFormFields(fixedStage)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      req = req.attach(entry.field, entry.val)
-    } else {
-      req = req.field(entry.field, entry.val)
-    }
-  }
-  const res = await req
+  const res = await agent.post('/travel/stage').query({ parentId: travel._id.toString() }).send(fixedStage)
   if (res.status === 200) {
     travel = res.body.result
     t.pass()
@@ -425,11 +396,10 @@ test.serial('POST /travel/underExamination rejects ownCar without owner vehicle 
     purpose: 'professional'
   }
 
-  let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
-    stageRequest = stageRequest.field(entry.field, entry.val)
-  }
-  const stageResponse = await stageRequest
+  const stageResponse = await agent
+    .post('/travel/stage')
+    .query({ parentId: createdTravel._id.toString() })
+    .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
   t.is(stageResponse.status, 200)
 
   const blockedResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
@@ -503,11 +473,10 @@ test.serial('POST /travel/underExamination allows ownCar with owner vehicle regi
     purpose: 'professional'
   }
 
-  let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
-    stageRequest = stageRequest.field(entry.field, entry.val)
-  }
-  const stageResponse = await stageRequest
+  const stageResponse = await agent
+    .post('/travel/stage')
+    .query({ parentId: createdTravel._id.toString() })
+    .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
   t.is(stageResponse.status, 200)
 
   const reviewResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
