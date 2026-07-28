@@ -14,6 +14,7 @@ import {
 import { isValidBic, isValidIban, maskIban } from 'abrechnung-common/utils/bank.js'
 import { refNumberToString, roundAmount } from 'abrechnung-common/utils/scripts.js'
 import { Model, mongo, Types } from 'mongoose'
+import { calculateBookings } from '../models/booking.js'
 import Organisation from '../models/organisation.js'
 import { NotFoundError, ValidationClientError } from './error.js'
 import { createSepaDocument, SepaPayment } from './sepa.js'
@@ -36,6 +37,8 @@ interface ExportReport {
   })[]
 }
 
+type StoredBooking = Omit<Booking<Types.ObjectId>, 'ledgerAccount' | 'project'> & { ledgerAccount: Types.ObjectId; project: Types.ObjectId }
+
 interface ExportPayment extends SepaPayment {
   report: ExportReport
   organisation: IOrganisation<Types.ObjectId, mongo.Binary>
@@ -46,6 +49,7 @@ interface ExportContext {
   organisations: IOrganisation<Types.ObjectId, mongo.Binary>[]
   payments: ExportPayment[]
   bookings: BookingExportRow<Types.ObjectId>[]
+  storedBookingsByReport: Map<string, StoredBooking[]>
   errors: string[]
 }
 
@@ -95,13 +99,26 @@ async function loadExportContext(
 ) {
   const requestedIds = Array.from(new Set(requestedReports.map((report) => idDocumentToId(report).toString())))
   if (requestedIds.length === 0) {
-    return { organisations: [], payments: [], bookings: [], errors: [] } satisfies ExportContext
+    return { organisations: [], payments: [], bookings: [], storedBookingsByReport: new Map(), errors: [] } satisfies ExportContext
   }
 
   const filter = { _id: { $in: requestedIds }, historic: false, state: State.BOOKABLE } as Record<string, unknown>
   if (request.user.projects.supervised.length > 0) filter.project = { $in: request.user.projects.supervised }
 
-  const reports = (await reportModel.find(filter, { name: 1, reference: 1, owner: 1, bookings: 1 }).lean()) as ExportReport[]
+  const projection: Record<string, 1> = { name: 1, reference: 1, owner: 1, project: 1, log: 1 }
+  if (reportType === 'Advance') {
+    projection.budget = 1
+  } else {
+    projection.expenses = 1
+    projection.addUp = 1
+    projection.advances = 1
+  }
+  if (reportType === 'Travel') {
+    projection.stages = 1
+    projection.days = 1
+    projection.professionalShare = 1
+  }
+  const reports = (await reportModel.find(filter, projection).lean()) as ExportReport[]
   if (reports.length !== requestedIds.length) {
     throw new NotFoundError('At least one selected report was not found, is not bookable, or is not allowed')
   }
@@ -109,6 +126,22 @@ async function loadExportContext(
 
   const reportsById = new Map(reports.map((report) => [report._id.toString(), report]))
   const orderedReports = requestedIds.map((reportId) => reportsById.get(reportId) as ExportReport)
+  const calculatedBookings = await Promise.all(
+    orderedReports.map(
+      async (report) =>
+        (await calculateBookings(report as unknown as Parameters<typeof calculateBookings>[0], reportType)) as StoredBooking[]
+    )
+  )
+  const storedBookingsByReport = new Map<string, StoredBooking[]>()
+  for (const [index, report] of orderedReports.entries()) {
+    const reportBookings = calculatedBookings[index]
+    storedBookingsByReport.set(report._id.toString(), reportBookings)
+    report.bookings = reportBookings as unknown as ExportReport['bookings']
+  }
+  await reportModel.populate(orderedReports, [
+    { path: 'bookings.ledgerAccount' },
+    { path: 'bookings.project', select: { identifier: 1, organisation: 1 } }
+  ])
   const organisationIds = Array.from(
     new Set(orderedReports.flatMap(({ bookings }) => bookings.map(({ project }) => objectId(project.organisation))))
   ).filter((id): id is string => Boolean(id))
@@ -168,7 +201,7 @@ async function loadExportContext(
     }
   }
 
-  return { organisations, payments, bookings, errors: Array.from(errors) } satisfies ExportContext
+  return { organisations, payments, bookings, storedBookingsByReport, errors: Array.from(errors) } satisfies ExportContext
 }
 
 export async function getBookingExportPreview(
@@ -276,6 +309,17 @@ export async function createBookingExportPackage(
           )
         }
       }
+    }
+  }
+
+  if (context.storedBookingsByReport.size > 0) {
+    const result = await reportModel.bulkWrite(
+      Array.from(context.storedBookingsByReport, ([reportId, reportBookings]) => ({
+        updateOne: { filter: { _id: reportId, historic: false, state: State.BOOKABLE }, update: { $set: { bookings: reportBookings } } }
+      }))
+    )
+    if (result.matchedCount !== context.storedBookingsByReport.size) {
+      throw new ValidationClientError('At least one selected report is no longer bookable')
     }
   }
 

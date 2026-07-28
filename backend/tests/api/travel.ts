@@ -1,7 +1,19 @@
-import { BookingExportRow, Category, Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
+import {
+  BookingExportRow,
+  Category,
+  idDocumentToId,
+  Stage,
+  Travel,
+  TravelExpense,
+  TravelSimple,
+  TravelState,
+  User
+} from 'abrechnung-common/types.js'
 import test from 'ava'
+import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import TravelModel from '../../models/travel.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
@@ -554,10 +566,56 @@ test.serial('GET /travel/report', async (t) => {
 // BOOK
 
 test.serial('POST /book/travel/bookingExportPackage', async (t) => {
+  const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())
+  await TravelModel.collection.updateOne(
+    { _id: new Types.ObjectId(idDocumentToId(travel._id).toString()) },
+    {
+      $set: {
+        professionalShare: 0.5,
+        stages: [],
+        days: [],
+        addUp: [{ project: projectId, advance: { amount: 0 } }],
+        expenses: [
+          {
+            _id: new Types.ObjectId(),
+            description: 'Mixed cent expenses',
+            purpose: 'mixed',
+            cost: {
+              positions: [1, 2].map((position) => ({
+                _id: new Types.ObjectId(),
+                kind: 'manual',
+                description: `Mixed cent expense ${position}`,
+                grossAmount: 0.01,
+                vatRate: 0,
+                project: projectId,
+                category: new Types.ObjectId(idDocumentToId(category._id).toString())
+              })),
+              currency: 'EUR',
+              exchangeRate: null,
+              receipts: [],
+              date: new Date('2026-07-01T00:00:00.000Z')
+            }
+          }
+        ]
+      }
+    }
+  )
+
   await loginUser(agent, 'travel')
+  const preview = await agent.post('/book/travel/bookingExportPreview').send([travel._id])
+  t.is(preview.status, 200)
+  t.is(preview.body.result.organisations[0].amount, 0.01)
   const res = await requestBookingExport(agent, '/book/travel', [travel._id])
   t.is(res.status, 200)
-  assertBookingsBalanced(t, res.body.result.bookings as BookingExportRow[], 'Travel')
+  const bookings = res.body.result.bookings as BookingExportRow[]
+  assertBookingsBalanced(t, bookings, 'Travel')
+  t.deepEqual(
+    bookings.map(({ side, amount }) => ({ side, amount })),
+    [
+      { side: 'debit', amount: 0.01 },
+      { side: 'credit', amount: 0.01 }
+    ]
+  )
   t.is(res.body.result.sepaFiles.length, 1)
 })
 

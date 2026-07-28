@@ -1,7 +1,17 @@
-import { BookingExportRow, Category, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
+import {
+  BookingExportRow,
+  Category,
+  ExpenseReport,
+  ExpenseReportSimple,
+  ExpenseReportState,
+  idDocumentToId
+} from 'abrechnung-common/types.js'
 import test from 'ava'
+import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import LedgerAccount from '../../models/ledgerAccount.js'
+import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
@@ -459,6 +469,19 @@ test.serial('GET /expenseReport/report', async (t) => {
 // BOOK
 
 test.serial('POST /book/expenseReport/bookingExportPackage', async (t) => {
+  const organisation = await Organisation.findById(idDocumentToId(expenseReport.project.organisation)).lean()
+  t.truthy(organisation)
+  if (!organisation) return
+  const originalLiabilityAccount = idDocumentToId(organisation.accountingSettings.employeeLiabilitiesAccount)
+  const replacementLiabilityAccount = await LedgerAccount.create({
+    identifier: `liability-${new Types.ObjectId()}`,
+    name: 'Updated employee liabilities'
+  })
+  await Organisation.updateOne(
+    { _id: organisation._id },
+    { $set: { 'accountingSettings.employeeLiabilitiesAccount': replacementLiabilityAccount._id } }
+  )
+
   await User.updateOne({ _id: expenseReport.owner._id }, { $set: { employeeId: 'E-1' } })
   await loginUser(agent, 'expenseReport')
   const res = await requestBookingExport(agent, '/book/expenseReport', [expenseReport._id], { includeBankBookings: true })
@@ -472,9 +495,13 @@ test.serial('POST /book/expenseReport/bookingExportPackage', async (t) => {
   t.deepEqual(
     bankBookings.map(({ side, ledgerAccount }) => ({ side, account: ledgerAccount.identifier })),
     [
-      { side: 'debit', account: '1740' },
+      { side: 'debit', account: replacementLiabilityAccount.identifier },
       { side: 'credit', account: '1200' }
     ]
+  )
+  await Organisation.updateOne(
+    { _id: organisation._id },
+    { $set: { 'accountingSettings.employeeLiabilitiesAccount': originalLiabilityAccount } }
   )
 
   const validPreview = await agent.post('/book/expenseReport/bookingExportPreview').send([expenseReport._id])

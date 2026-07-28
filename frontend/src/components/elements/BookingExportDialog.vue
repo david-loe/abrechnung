@@ -87,6 +87,8 @@ function today() {
 
 async function open() {
   loadingPreview.value = true
+  preview.value = undefined
+  for (const key of Object.keys(selections)) delete selections[key]
   showBookingConfirmation.value = false
   exportedReportIds.value = []
   modal.value?.modal?.show()
@@ -99,7 +101,6 @@ async function open() {
   loadingPreview.value = false
   if (!result.ok) return
   preview.value = result.ok
-  for (const key of Object.keys(selections)) delete selections[key]
   for (const organisation of result.ok.organisations) {
     if (organisation.accounts.length === 1) selections[organisation._id] = organisation.accounts[0]._id
   }

@@ -16,7 +16,7 @@ import {
   getBaseCurrencyAmount,
   getCostPositionBaseCurrencyAmount,
   getCostPositionVatAmount,
-  multiplyAmountAndRound,
+  multiplyAmount,
   refNumberToString,
   roundAmount,
   subtractAmounts,
@@ -148,6 +148,7 @@ export async function calculateBookings(
   const remark = `${reportModelName} ${formatter.name(context.owner.name)} ${refNumberToString(report.reference, reportModelName)}`
   const accountAmounts = new Map<string, { project: Types.ObjectId; ledgerAccount: Types.ObjectId; amount: number }>()
   const projectTotals = new Map<string, number>()
+  const unroundedPositionTotals = new Map<string, number>()
 
   function projectContext(projectValue: unknown) {
     const key = idKey(projectValue, 'booking project')
@@ -173,6 +174,14 @@ export async function calculateBookings(
     projectTotals.set(key, roundAmount(sumAmounts(projectTotals.get(key) ?? 0, amount)))
   }
 
+  function allocateRoundedProjectAmount(project: ProjectAccountingContext, amount: number) {
+    const key = project.projectId.toString()
+    const previousTotal = unroundedPositionTotals.get(key) ?? 0
+    const total = sumAmounts(previousTotal, amount)
+    unroundedPositionTotals.set(key, total)
+    return subtractAmounts(roundAmount(total), roundAmount(previousTotal))
+  }
+
   function categoryAccount(position: CostPosition<Types.ObjectId>) {
     const categoryId = idKey(position.category, 'position category')
     const account = context.categoryAccounts.get(categoryId)
@@ -187,7 +196,7 @@ export async function calculateBookings(
     factor = 1
   ) {
     const project = projectContext(position.project)
-    const grossAmount = multiplyAmountAndRound(getCostPositionBaseCurrencyAmount(cost, position), factor)
+    const grossAmount = allocateRoundedProjectAmount(project, multiplyAmount(getCostPositionBaseCurrencyAmount(cost, position), factor))
     const vatAmount = getCostPositionVatAmount(
       { grossAmount, vatRate: position.vatRate },
       project.vatAccountingEnabled && position.kind !== 'ownCar'

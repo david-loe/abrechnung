@@ -1,6 +1,5 @@
-import displaySettings from 'abrechnung-common/data/displaySettings.js'
 import { Cost, State, travelExpenseItems } from 'abrechnung-common/types.js'
-import test, { type ExecutionContext } from 'ava'
+import test from 'ava'
 import mongoose, { Types } from 'mongoose'
 import settings from '../data/settings.js'
 import { initDB } from '../db.js'
@@ -23,16 +22,7 @@ test.serial.beforeEach(async () => {
   await mongoose.connection.dropDatabase()
 })
 
-function assertBalancedBookings(t: ExecutionContext, bookings: unknown[]) {
-  t.true(bookings.length > 0)
-  const balance = bookings.reduce<number>((sum, booking) => {
-    const { side, amount } = booking as { side: 'debit' | 'credit'; amount: number }
-    return sum + (side === 'debit' ? amount : -amount)
-  }, 0)
-  t.is(balance, 0)
-}
-
-test.serial('v2.6.4 migration initializes accounting settings and legacy categories before creating bookings', async (t) => {
+test.serial('v2.6.4 migration initializes accounting settings and legacy categories', async (t) => {
   const organisationId = new Types.ObjectId()
   const projectId = new Types.ObjectId()
   const categoryId = new Types.ObjectId()
@@ -48,7 +38,6 @@ test.serial('v2.6.4 migration initializes accounting settings and legacy categor
 
   await Promise.all([
     mongoose.connection.collection('settings').insertOne({ ...settings, migrateFrom: '2.6.4' }),
-    mongoose.connection.collection('displaysettings').insertOne(displaySettings),
     mongoose.connection.collection('organisations').insertOne({ _id: organisationId, name: 'Legacy organisation' }),
     mongoose.connection
       .collection('projects')
@@ -57,9 +46,6 @@ test.serial('v2.6.4 migration initializes accounting settings and legacy categor
       .collection('categories')
       .insertOne({ _id: categoryId, name: 'Legacy category', isDefault: true, style: { color: '#D8DCFF', text: 'black' } }),
     mongoose.connection.collection('users').insertOne({ _id: userId, name: { givenName: 'Philip', familyName: 'Fry' } }),
-    mongoose.connection
-      .collection('advances')
-      .insertOne({ _id: new Types.ObjectId(), ...reportBase, reference: 1, budget: { amount: 100, currency: 'EUR' } }),
     mongoose.connection
       .collection('expensereports')
       .insertOne({
@@ -118,12 +104,6 @@ test.serial('v2.6.4 migration initializes accounting settings and legacy categor
     await getCostPositionValidationIssues([expenseReport?.expenses[0].cost] as Cost<Types.ObjectId>[], 'ExpenseReport', true, false),
     []
   )
-
-  const advance = await mongoose.connection.collection('advances').findOne({ reference: 1 })
-  const travel = await mongoose.connection.collection('travels').findOne({ reference: 3 })
-  assertBalancedBookings(t, advance?.bookings ?? [])
-  assertBalancedBookings(t, expenseReport?.bookings ?? [])
-  assertBalancedBookings(t, travel?.bookings ?? [])
 })
 
 test.serial('fresh database seeds separate default categories for expense and travel reports', async (t) => {

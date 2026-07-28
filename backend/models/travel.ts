@@ -14,7 +14,6 @@ import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types }
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
 import ApprovedTravel from './approvedTravel.js'
-import { calculateBookings } from './booking.js'
 import DocumentFile from './documentFile.js'
 import {
   addHistoryEntry,
@@ -267,9 +266,7 @@ schema.pre('validate', async function () {
 schema.pre('save', async function () {
   setLog(this)
   await addReferenceOnNewDocs(this, 'Travel')
-  if (!this.historic && this.state === TravelState.REVIEW_COMPLETED) {
-    this.bookings = (await calculateBookings(this, 'Travel')) as unknown as typeof this.bookings
-  } else if (!this.historic && this.state < TravelState.REVIEW_COMPLETED) {
+  if (!this.historic && this.state < TravelState.REVIEW_COMPLETED) {
     this.bookings = []
   }
 })
