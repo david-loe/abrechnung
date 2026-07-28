@@ -125,6 +125,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', v: FileT[]): void
   (e: 'update:modelValue', v: FileT | null): void
   (e: 'processing', v: boolean): void
+  (e: 'receipts-changing'): void
   (e: 'receipts-ready'): void
 }>()
 
@@ -263,6 +264,7 @@ async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: num
 }
 async function deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
   if (confirm(t('alerts.areYouSureDelete'))) {
+    if (props.receiptProcessing) emit('receipts-changing')
     if (!file.data && file._id) {
       const result = await API.deleter(`${props.endpointPrefix}documentFile`, { _id: file._id, ...examinedReportContext() }, false)
       if (!result) {

@@ -20,6 +20,7 @@
         :suggestion-processing="suggestingFromReceipts"
         receipt-processing
         @processing="(processing: boolean) => (uploadingReceipts = processing)"
+        @receipts-changing="cancelReceiptSuggestion"
         @receipts-ready="suggestFromReceipts" />
     </div>
 
@@ -159,11 +160,14 @@ function defaultExpense() {
 }
 function clear() {
   fileUploadRef.value?.clear()
+  cancelReceiptSuggestion()
+  dirtyFields.clear()
+  formExpense.value = defaultExpense()
+}
+function cancelReceiptSuggestion() {
   suggestionGeneration += 1
   suggestingFromReceipts.value = false
   suggestionFailed.value = false
-  dirtyFields.clear()
-  formExpense.value = defaultExpense()
 }
 
 function input() {

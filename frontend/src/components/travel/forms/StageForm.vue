@@ -212,6 +212,7 @@
           :suggestion-processing="suggestingFromReceipts"
           receipt-processing
           @processing="(processing: boolean) => (uploadingReceipts = processing)"
+          @receipts-changing="cancelReceiptSuggestion"
           @receipts-ready="suggestFromReceipts"
           :showUploadFromPhone="props.showUploadFromPhone" />
       </div>
@@ -434,11 +435,14 @@ function getGoogleMapsLink() {
 }
 function clear() {
   fileUploadRef.value?.clear()
+  cancelReceiptSuggestion()
+  dirtyFields.clear()
+  formStage.value = defaultStage()
+}
+function cancelReceiptSuggestion() {
   suggestionGeneration += 1
   suggestingFromReceipts.value = false
   suggestionFailed.value = false
-  dirtyFields.clear()
-  formStage.value = defaultStage()
 }
 function output() {
   for (const position of formStage.value.cost.positions) {
