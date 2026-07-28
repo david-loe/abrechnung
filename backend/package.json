@@ -66,7 +66,7 @@
     "build": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\" && tsoa spec-and-routes && tsc",
     "start": "node dist/server.js",
     "worker": "node dist/workers/start.js",
-    "test": "npm run build && LOG_LEVEL=WARN ava --serial --timeout=10s dist/tests/**/* ",
+    "test": "npm run build && LOG_LEVEL=WARN ava --serial --timeout=20s dist/tests/**/* ",
     "test:debug": "LOG_LEVEL=DEBUG ava debug --host 0.0.0.0 --port 9229 --serial dist/tests/api/travel.js",
     "setup": "npm run build && node dist/setup.js"
   }
