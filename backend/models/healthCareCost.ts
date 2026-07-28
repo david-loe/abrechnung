@@ -2,6 +2,7 @@ import { AddUp, Comment, HealthCareCost, HealthCareCostState, healthCareCostStat
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { createOperationServices } from '../factory.js'
+import { calculateBookings } from './booking.js'
 import {
   addHistoryEntry,
   addReferenceOnNewDocs,
@@ -128,6 +129,11 @@ schema.pre('save', async function () {
   await populateAll(this, populates)
   setLog(this)
   await addReferenceOnNewDocs(this, 'HealthCareCost')
+  if (!this.historic && this.state === HealthCareCostState.REVIEW_COMPLETED) {
+    this.bookings = (await calculateBookings(this, 'HealthCareCost')) as unknown as typeof this.bookings
+  } else if (!this.historic && this.state < HealthCareCostState.REVIEW_COMPLETED) {
+    this.bookings = []
+  }
 })
 
 schema.post('save', async function () {

@@ -13,6 +13,7 @@ import { subtractAmounts } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { createOperationServices } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
+import { calculateBookings } from './booking.js'
 import { addHistoryEntry, addReferenceOnNewDocs, costObject, populateAll, populateSelected, requestBaseSchema, setLog } from './helper.js'
 import ReportUsage from './reportUsage.js'
 
@@ -165,6 +166,11 @@ schema.pre('save', async function () {
   await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
+  if (!this.historic && this.state === AdvanceState.APPROVED) {
+    this.bookings = (await calculateBookings(this, 'Advance')) as unknown as typeof this.bookings
+  } else if (!this.historic && this.state < AdvanceState.APPROVED) {
+    this.bookings = []
+  }
 })
 
 schema.post('save', async function () {

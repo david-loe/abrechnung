@@ -672,7 +672,10 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
+export type BookingSide = 'debit' | 'credit'
+
 export interface Booking<idType extends _id = _id> {
+  side: BookingSide
   ledgerAccount: LedgerAccount<idType>
   amount: number
   date: Date | string

@@ -22,8 +22,10 @@ export const organisationSchema = () => {
         vatRates: {
           type: [
             {
-              rate: { type: Number, min: 0, max: 100, required: true },
-              inputTaxAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+              type: {
+                rate: { type: Number, min: 0, max: 100, required: true },
+                inputTaxAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+              }
             }
           ],
           required: true,

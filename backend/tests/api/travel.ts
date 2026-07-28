@@ -1,8 +1,9 @@
-import { Category, Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
+import { BookingExportRow, Category, Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { assertBookingsBalanced } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -556,7 +557,7 @@ test.serial('POST /book/travel/bookingExport', async (t) => {
   await loginUser(agent, 'travel')
   const res = await agent.post('/book/travel/bookingExport').send([travel._id])
   t.is(res.status, 200)
-  t.deepEqual(res.body.result, [])
+  assertBookingsBalanced(t, res.body.result as BookingExportRow[], 'Travel')
 })
 
 test.serial('POST /book/travel/booked', async (t) => {

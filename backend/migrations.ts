@@ -1,9 +1,10 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
-import { ReportModelName } from 'abrechnung-common/types.js'
+import { NameDisplayFormat, ReportModelName, State } from 'abrechnung-common/types.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
+import { calculateBookings } from './models/booking.js'
 import Settings from './models/settings.js'
 
 const reportCollections: Record<ReportModelName, string> = {
@@ -317,6 +318,22 @@ export async function checkForMigrations() {
       await migrateReports('travels')
       await migrateReports('expensereports')
       await migrateReports('healthcarecosts')
+
+      logger.info('Apply migration from v2.6.4: create bookings for bookable reports')
+      const displaySettings = await mongoose.connection.collection<{ nameDisplayFormat: NameDisplayFormat }>('displaysettings').findOne({})
+      const nameDisplayFormat = displaySettings?.nameDisplayFormat ?? 'givenNameFirst'
+      for (const [reportModelName, collectionName] of Object.entries(reportCollections) as [ReportModelName, string][]) {
+        const collection = mongoose.connection.collection(collectionName)
+        const cursor = collection.find({ historic: false, state: State.BOOKABLE })
+        for await (const report of cursor) {
+          const bookings = await calculateBookings(
+            report as unknown as Parameters<typeof calculateBookings>[0],
+            reportModelName,
+            nameDisplayFormat
+          )
+          await collection.updateOne({ _id: report._id }, { $set: { bookings } })
+        }
+      }
     }
     settings.migrateFrom = undefined
     await settings.save()

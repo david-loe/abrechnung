@@ -1,10 +1,11 @@
-import { AdvanceState } from 'abrechnung-common/types.js'
+import { AdvanceState, BookingExportRow } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import test from 'ava'
 import { type Queue } from 'bullmq'
 import { shutdown } from '../../app.js'
 import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { assertBookingsBalanced } from '../_booking.js'
 
 const agent = await createAgent()
 
@@ -163,6 +164,7 @@ test.serial('POST /approve/advance/withdrawApproval rejects the approval and unl
   t.truthy(withdrawnAdvance.log[AdvanceState.REJECTED])
   t.like(withdrawnAdvance.comments.at(-1), { text: comment, toState: AdvanceState.REJECTED })
   t.is(withdrawnAdvance.history.length, 2)
+  t.deepEqual(withdrawnAdvance.bookings, [])
 
   await loginUser(agent, 'user')
   const unlinkedReportResponse = await agent.get('/expenseReport').query({ _id: reportResponse.body.result._id })
@@ -252,7 +254,9 @@ test.serial('DELETE /approve/advance rejects booked advances', async (t) => {
   await loginUser(agent, 'advance')
   const exportResponse = await agent.post('/book/advance/bookingExport').send([advance._id])
   t.is(exportResponse.status, 200)
-  t.deepEqual(exportResponse.body.result, [])
+  const bookings = exportResponse.body.result as BookingExportRow[]
+  assertBookingsBalanced(t, bookings, 'Advance')
+  t.is(bookings.length, 2)
 
   const bookedResponse = await agent.post('/book/advance/booked').send([advance._id])
   t.is(bookedResponse.status, 200)

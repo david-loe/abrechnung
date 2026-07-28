@@ -1,11 +1,10 @@
-import { Category, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
+import { BookingExportRow, Category, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
-import ExpenseReportModel from '../../models/expenseReport.js'
-import LedgerAccount from '../../models/ledgerAccount.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { assertBookingsBalanced } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -460,36 +459,55 @@ test.serial('GET /expenseReport/report', async (t) => {
 // BOOK
 
 test.serial('POST /book/expenseReport/bookingExport', async (t) => {
-  const ledgerAccount = await LedgerAccount.findOne().lean()
-  t.truthy(ledgerAccount)
   await User.updateOne({ _id: expenseReport.owner._id }, { $set: { employeeId: 'E-1' } })
-  await ExpenseReportModel.updateOne(
-    { _id: expenseReport._id },
-    {
-      $set: {
-        bookings: [
-          {
-            ledgerAccount: ledgerAccount?._id,
-            amount: 12.5,
-            date: new Date('2026-07-27T00:00:00.000Z'),
-            project: expenseReport.project._id,
-            remark: 'Booking export test'
-          }
-        ]
-      }
-    }
-  )
-
   await loginUser(agent, 'expenseReport')
   const res = await agent.post('/book/expenseReport/bookingExport').send([expenseReport._id])
   t.is(res.status, 200)
-  t.is(res.body.result.length, 1)
-  t.is(res.body.result[0].reportType, 'ExpenseReport')
-  t.is(res.body.result[0].report._id, expenseReport._id)
-  t.is(res.body.result[0].employee.employeeId, 'E-1')
-  t.is(res.body.result[0].ledgerAccount._id, ledgerAccount?._id.toString())
-  t.is(res.body.result[0].project._id, expenseReport.project._id)
-  t.is(res.body.result[0].amount, 12.5)
+  const bookings = res.body.result as BookingExportRow[]
+  assertBookingsBalanced(t, bookings, 'ExpenseReport')
+  t.true(bookings.every(({ employee }) => employee.employeeId === 'E-1'))
+})
+
+test.serial('bookable expense report reverses negative net and VAT totals', async (t) => {
+  await loginUser(agent, 'user')
+  const createResponse = await agent.post('/expenseReport/inWork').send({ name: 'Negative VAT report', project: expenseReport.project })
+  t.is(createResponse.status, 200)
+  const negativeReport = createResponse.body.result as ExpenseReportSimple
+
+  try {
+    const cost = createCost(-119, { _id: 'EUR' }, new Date('2026-07-01T00:00:00.000Z'), [
+      { name: 'Credit note.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
+    ])
+    cost.positions[0].vatRate = 19
+    const expenseResponse = await postMultipartExpense('/expenseReport/expense', negativeReport._id.toString(), {
+      description: 'Credit note',
+      cost
+    })
+    t.is(expenseResponse.status, 200)
+    t.is((await agent.post('/expenseReport/underExamination').send({ _id: negativeReport._id })).status, 200)
+
+    await loginUser(agent, 'expenseReport')
+    t.is((await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: negativeReport._id })).status, 200)
+    const exportResponse = await agent.post('/book/expenseReport/bookingExport').send([negativeReport._id])
+    t.is(exportResponse.status, 200)
+    const bookings = exportResponse.body.result as BookingExportRow[]
+    assertBookingsBalanced(t, bookings, 'ExpenseReport')
+    t.deepEqual(
+      bookings
+        .filter(({ side }) => side === 'credit')
+        .map(({ amount }) => amount)
+        .sort((left, right) => left - right),
+      [19, 100]
+    )
+    t.deepEqual(
+      bookings.filter(({ side }) => side === 'debit').map(({ amount }) => amount),
+      [119]
+    )
+  } finally {
+    await loginUser(agent, 'user')
+    const deleteResponse = await agent.delete('/expenseReport').query({ _id: negativeReport._id.toString() })
+    t.is(deleteResponse.status, 200)
+  }
 })
 
 test.serial('POST /book/expenseReport/booked', async (t) => {

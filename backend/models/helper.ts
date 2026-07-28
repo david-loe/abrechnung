@@ -19,6 +19,8 @@ import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 import { nextReference } from './referenceCounter.js'
 
+const bookingSides = ['debit', 'credit'] as const
+
 export function costObject(options: {
   exchangeRate: boolean
   receipts: boolean
@@ -230,6 +232,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
     bookings: {
       type: [
         {
+          side: { type: String, enum: bookingSides, required: true },
           ledgerAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
           amount: { type: Number, min: 0, required: true },
           date: { type: Date, required: true },
