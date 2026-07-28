@@ -20,5 +20,6 @@ export default {
     auth: { authType: 'Login', user: 'username', pass: 'password' },
     senderAddress: 'info@abrechnung.com'
   },
+  llm: { baseUrl: 'http://ollama:11434/v1', model: 'qwen3:0.6b', apiKey: 'ollama', reasoningEffort: 'none', timeoutSeconds: 180 },
   PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: false, locale: 'de' }
 } as const

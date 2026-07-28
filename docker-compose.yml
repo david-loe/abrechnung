@@ -6,8 +6,12 @@ services:
     user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
     restart: always
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_started
+      redis:
+        condition: service_started
+      ollama-smoke-test:
+        condition: service_completed_successfully
     volumes:
       - ./backend:/app
       - ./common:/common:ro
@@ -48,6 +52,42 @@ services:
     restart: unless-stopped
     volumes:
       - redis_data:/data
+
+  ollama:
+    image: ollama/ollama:0.32.5
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  ollama-model:
+    image: ollama/ollama:0.32.5
+    restart: "no"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    command: ["pull", "qwen3:0.6b"]
+    volumes:
+      - ollama_data:/root/.ollama
+
+  ollama-smoke-test:
+    image: node:24.14-alpine
+    restart: "no"
+    depends_on:
+      ollama-model:
+        condition: service_completed_successfully
+    environment:
+      OLLAMA_SMOKE_BASE_URL: http://ollama:11434/v1
+      OLLAMA_SMOKE_MODEL: qwen3:0.6b
+    command: ["node", "/smoke-tests/ollama.mjs"]
+    volumes:
+      - ./backend/smoke-tests:/smoke-tests:ro
 
   # Watch build in development mode
   common:
@@ -93,3 +133,4 @@ services:
 volumes:
   db_data:
   redis_data:
+  ollama_data:
