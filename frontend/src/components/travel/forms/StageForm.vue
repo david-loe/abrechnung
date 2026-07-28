@@ -14,6 +14,7 @@
             :min="minDate"
             :max="maxDate"
             :disabled="disabled"
+            @update:model-value="dirtyFields.add('departure')"
             required />
         </div>
         <div class="col">
@@ -28,6 +29,7 @@
             :min="formStage.departure ? formStage.departure : minDate"
             :max="maxDate"
             :disabled="disabled"
+            @update:model-value="dirtyFields.add('arrival')"
             required />
         </div>
       </div>
@@ -49,6 +51,7 @@
           v-model="formStage.startLocation"
           :disabled="disabled"
           :required="true"
+          @update:model-value="dirtyFields.add('startLocation')"
           :withSpecialLumpSumInput="true" />
       </div>
       <div class="col">
@@ -61,6 +64,7 @@
           v-model="formStage.endLocation"
           :disabled="disabled"
           :required="true"
+          @update:model-value="dirtyFields.add('endLocation')"
           :withSpecialLumpSumInput="true" />
       </div>
     </div>
@@ -69,7 +73,7 @@
       {{ t('labels.transport') }}
       <span class="text-danger">*</span>
     </label>
-    <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required>
+    <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required @change="dirtyFields.add('transport')">
       <option v-for="transport of transportTypes" :value="transport" :key="transport">{{ t('labels.' + transport) }}</option>
     </select>
 
@@ -152,7 +156,7 @@
       <div class="row mb-2">
         <div class="col">
           <label for="stageFormCurrency" class="form-label me-2">{{ t('labels.currency') }}</label>
-          <CurrencySelector id="stageFormCurrency" v-model="formStage.cost.currency" :disabled="disabled" :required="true" />
+          <CurrencySelector id="stageFormCurrency" v-model="formStage.cost.currency" :disabled="disabled" :required="true" @update:model-value="dirtyFields.add('currency')" />
         </div>
         <div class="col">
           <label for="invoiceDateInput" class="form-label">
@@ -162,7 +166,7 @@
           <DateInput
             id="invoiceDateInput"
             :model-value="formStage.cost.date || undefined"
-            @update:model-value="(date) => (formStage.cost.date = date)"
+            @update:model-value="(date) => { formStage.cost.date = date; dirtyFields.add('date') }"
             :required="hasCostAmount"
             :disabled="disabled"
             :max="new Date()" />
@@ -178,6 +182,7 @@
       :disabled="disabled"
       :required="true"
       :amount-required="false"
+      @user-change="dirtyFields.add('positions')"
       :own-car="formStage.transport.type === 'ownCar'" />
 
     <template
@@ -199,6 +204,10 @@
           :required="hasCostAmount"
           :endpointPrefix="endpointPrefix"
           :ownerId="ownerId"
+          :suggestion-processing="suggestingFromReceipts"
+          receipt-processing
+          @processing="(processing: boolean) => (uploadingReceipts = processing)"
+          @receipts-ready="suggestFromReceipts"
           :showUploadFromPhone="props.showUploadFromPhone" />
       </div>
     </template>
@@ -218,7 +227,7 @@
     </div>
 
     <div class="mb-1 d-flex align-items-center">
-      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading">
+      <button type="submit" class="btn btn-primary me-2" v-if="!disabled" :disabled="loading || uploadingReceipts">
         {{ mode === 'add' ? t('labels.addX', { X: t('labels.stage') }) : t('labels.save') }}
       </button>
       <button
@@ -267,7 +276,7 @@ import {
   transportTypes
 } from 'abrechnung-common/types.js'
 import { datetimeToDate, datetimeToDateString, getDayList, multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
-import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
+import { computed, nextTick, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../../formatter'
 import CountrySelector from '../../elements/CountrySelector.vue'
@@ -275,6 +284,8 @@ import CurrencySelector from '../../elements/CurrencySelector.vue'
 import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import DateInput from '../../elements/DateInput.vue'
 import FileUpload from '../../elements/FileUpload.vue'
+import APP_LOADER from '@/dataLoader.js'
+import { applySuggestedCost, receiptIds, requestReceiptSuggestion, suggestedPlace } from '@/receiptSuggestions.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
 import PlaceInput from '../../elements/PlaceInput.vue'
 import CTextArea from '../../elements/TextArea.vue'
@@ -307,9 +318,14 @@ const props = defineProps({
 })
 
 const { t } = useI18n()
+const APP_DATA = APP_LOADER.data
 
 const fileUploadRef = useTemplateRef('fileUpload')
 
+const dirtyFields = new Set<string>()
+const uploadingReceipts = ref(false)
+const suggestingFromReceipts = ref(false)
+let suggestionGeneration = 0
 const formStage = ref(input())
 const hasCostAmount = computed(() =>
   formStage.value.cost.positions.some(({ grossAmount }) => Number.isFinite(grossAmount) && grossAmount !== 0)
@@ -330,6 +346,8 @@ const maxDate = computed(() => {
 })
 
 const showDepartureAndArrivalOnDifferentDaysAlert = ref(false)
+
+protectExistingValues()
 
 function defaultCostPosition(position?: CostPosition<string>) {
   return {
@@ -409,6 +427,9 @@ function getGoogleMapsLink() {
 }
 function clear() {
   fileUploadRef.value?.clear()
+  suggestionGeneration += 1
+  suggestingFromReceipts.value = false
+  dirtyFields.clear()
   formStage.value = defaultStage()
 }
 function output() {
@@ -428,11 +449,67 @@ function input() {
   return stage
 }
 
+function protectExistingValues() {
+  dirtyFields.clear()
+  if (!props.stage?._id) return
+  if (props.stage.departure) dirtyFields.add('departure')
+  if (props.stage.arrival) dirtyFields.add('arrival')
+  if (props.stage.startLocation) dirtyFields.add('startLocation')
+  if (props.stage.endLocation) dirtyFields.add('endLocation')
+  if (props.stage.transport) dirtyFields.add('transport')
+  if (props.stage.cost?.currency) dirtyFields.add('currency')
+  if (props.stage.cost?.date) dirtyFields.add('date')
+  if (props.stage.cost?.positions?.length) dirtyFields.add('positions')
+}
+
+async function suggestFromReceipts() {
+  const generation = ++suggestionGeneration
+  suggestingFromReceipts.value = true
+  try {
+    const position = formStage.value.cost.positions[0]
+    const suggestion = await requestReceiptSuggestion({
+      type: 'stage',
+      reportType: 'Travel',
+      projectId: position?.project?._id ?? props.defaultProject._id,
+      documentFileIds: receiptIds(formStage.value.cost.receipts),
+      endpointPrefix: props.endpointPrefix
+    })
+    if (generation !== suggestionGeneration || suggestion?.type !== 'stage' || !APP_DATA.value) return
+    if (!dirtyFields.has('departure') && !formStage.value.departure && suggestion.departure) formStage.value.departure = suggestion.departure
+    if (!dirtyFields.has('arrival') && !formStage.value.arrival && suggestion.arrival) formStage.value.arrival = suggestion.arrival
+    if (!dirtyFields.has('startLocation') && !formStage.value.startLocation) {
+      formStage.value.startLocation = suggestedPlace(suggestion.startLocation, APP_DATA.value.countries)
+    }
+    if (!dirtyFields.has('endLocation') && !formStage.value.endLocation) {
+      formStage.value.endLocation = suggestedPlace(suggestion.endLocation, APP_DATA.value.countries)
+    }
+    if (!dirtyFields.has('transport') && formStage.value.transport.type === 'otherTransport' && suggestion.transportType) {
+      formStage.value.transport =
+        suggestion.transportType === 'ownCar'
+          ? { type: 'ownCar', distance: 0, distanceRefundType: distanceRefundTypes[0] }
+          : { type: suggestion.transportType }
+      await nextTick()
+    }
+    if (formStage.value.transport.type !== 'ownCar') {
+      applySuggestedCost(formStage.value.cost, suggestion.cost, {
+        categories: APP_DATA.value.categories,
+        currencies: APP_DATA.value.currencies,
+        defaultProject: props.defaultProject,
+        dirty: dirtyFields,
+        reportType: 'Travel'
+      })
+    }
+  } finally {
+    if (generation === suggestionGeneration) suggestingFromReceipts.value = false
+  }
+}
+
 watch(
   () => props.stage,
   () => {
     clear()
     formStage.value = input()
+    protectExistingValues()
   }
 )
 watch(

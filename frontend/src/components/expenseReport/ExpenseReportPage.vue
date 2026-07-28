@@ -457,15 +457,11 @@ async function completeReview() {
 }
 
 async function postExpense(expense: Partial<Expense>, closeModal = true, showAlert = true) {
-  let headers: Record<string, string> = {}
-  if (expense.cost?.receipts && expense.cost.receipts.length > 0) {
-    headers = { 'Content-Type': 'multipart/form-data' }
-  }
   modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport<string>>(
     `${props.endpointPrefix}expenseReport/expense`,
     expense,
-    { headers, params: { parentId: expenseReport.value._id } },
+    { params: { parentId: expenseReport.value._id } },
     showAlert
   )
   modalFormIsLoading.value = false

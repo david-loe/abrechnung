@@ -39,6 +39,17 @@ test.serial('GET /admin/connectionSettings hides secrets', async (t) => {
   assertSanitizedValue(t, data, existingSettings, ['auth', 'ldapauth', 'bindCredentials'])
   assertSanitizedValue(t, data, existingSettings, ['auth', 'microsoft', 'clientSecret'])
   assertSanitizedValue(t, data, existingSettings, ['auth', 'oidc', 'clientSecret'])
+  assertSanitizedValue(t, data, existingSettings, ['llm', 'apiKey'])
+})
+
+test.serial('GET /admin/connectionSettings/form exposes LLM timeout and reasoning controls', async (t) => {
+  const res = await agent.get('/admin/connectionSettings/form')
+  t.is(res.status, 200)
+
+  const llmSchema = res.body.data.llm.schema
+  t.like(llmSchema.timeoutSeconds, { type: 'text', inputType: 'number', default: 180 })
+  t.is(llmSchema.reasoningEffort.default, 'none')
+  t.deepEqual(Object.keys(llmSchema.reasoningEffort.items), ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'])
 })
 
 test.serial('POST /admin/connectionSettings keeps original secrets when placeholder is sent', async (t) => {
@@ -58,12 +69,14 @@ test.serial('POST /admin/connectionSettings keeps original secrets when placehol
   t.is(updatedSettings?.auth?.ldapauth?.bindCredentials, originalSettings?.auth?.ldapauth?.bindCredentials)
   t.is(updatedSettings?.auth?.microsoft?.clientSecret, originalSettings?.auth?.microsoft?.clientSecret)
   t.is(updatedSettings?.auth?.oidc?.clientSecret, originalSettings?.auth?.oidc?.clientSecret)
+  t.is(updatedSettings?.llm?.apiKey, originalSettings?.llm?.apiKey)
 
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['smtp', 'auth', 'pass'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['smtp', 'auth', 'clientSecret'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'ldapauth', 'bindCredentials'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'microsoft', 'clientSecret'])
   assertSanitizedValue(t, postRes.body.result, originalSettings, ['auth', 'oidc', 'clientSecret'])
+  assertSanitizedValue(t, postRes.body.result, originalSettings, ['llm', 'apiKey'])
 })
 
 test.serial('POST /admin/connectionSettings accepts new secret values', async (t) => {
