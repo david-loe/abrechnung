@@ -32,7 +32,13 @@ function createOcr() {
 }
 
 function getOcr() {
-  ocrPromise ??= createOcr()
+  if (!ocrPromise) {
+    const current = createOcr()
+    ocrPromise = current
+    void current.catch(() => {
+      if (ocrPromise === current) ocrPromise = undefined
+    })
+  }
   return ocrPromise
 }
 
@@ -68,5 +74,7 @@ export async function warmReceiptOcr() {
 export async function disposeReceiptOcr() {
   const current = ocrPromise
   ocrPromise = undefined
-  if (current) await (await current).dispose()
+  if (!current) return
+  const ocr = await current.catch(() => undefined)
+  await ocr?.dispose()
 }

@@ -1,6 +1,10 @@
+import { PaddleOCR } from '@paddleocr/paddleocr-js'
 import type { PDFPageProxy } from 'pdfjs-dist'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { textFromPdfPages } from '@/ocr/pdfText.js'
+
+vi.mock('@paddleocr/paddleocr-js', () => ({ PaddleOCR: { create: vi.fn() } }))
+vi.mock('pdfjs-dist', () => ({ GlobalWorkerOptions: { workerSrc: '' }, getDocument: vi.fn() }))
 
 function pdfPage(text: string) {
   return {
@@ -39,5 +43,29 @@ describe('receipt PDF text extraction', () => {
     expect(predict).toHaveBeenCalledOnce()
     expect(textPage.cleanup).toHaveBeenCalledOnce()
     expect(scannedPage.cleanup).toHaveBeenCalledOnce()
+  })
+})
+
+describe('receipt OCR lifecycle', () => {
+  beforeEach(() => {
+    vi.resetModules()
+    vi.mocked(PaddleOCR.create).mockReset()
+  })
+
+  it('disposes safely after failed initialization and retries the next warmup', async () => {
+    const initializationError = new Error('Unable to load OCR runtime')
+    const ocr = { dispose: vi.fn().mockResolvedValue(undefined) }
+    vi.mocked(PaddleOCR.create)
+      .mockRejectedValueOnce(initializationError)
+      .mockResolvedValueOnce(ocr as never)
+    const { disposeReceiptOcr, warmReceiptOcr } = await import('@/ocr/index.js')
+
+    await expect(warmReceiptOcr()).rejects.toBe(initializationError)
+    await expect(disposeReceiptOcr()).resolves.toBeUndefined()
+    await expect(warmReceiptOcr()).resolves.toBeUndefined()
+    await expect(disposeReceiptOcr()).resolves.toBeUndefined()
+
+    expect(PaddleOCR.create).toHaveBeenCalledTimes(2)
+    expect(ocr.dispose).toHaveBeenCalledOnce()
   })
 })
