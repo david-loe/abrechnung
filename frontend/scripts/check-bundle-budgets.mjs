@@ -5,7 +5,7 @@ const outputDirectory = new URL('../dist/', import.meta.url)
 const manifest = JSON.parse(await readFile(new URL('.vite/manifest.json', outputDirectory), 'utf8'))
 
 const budgets = [
-  { label: 'initial JavaScript', entry: /^index\.html$/, extension: '.js', raw: 725 * 1024, gzip: 226 * 1024 },
+  { label: 'initial JavaScript', entry: /^index\.html$/, extension: '.js', raw: 725 * 1024, gzip: 230 * 1024 },
   { label: 'initial CSS', entry: /^index\.html$/, extension: '.css', raw: 360 * 1024, gzip: 54 * 1024, allowEmpty: true },
   { label: '/user lazy graph', entry: /^src\/components\/HomePage\.vue$/, raw: 305 * 1024, gzip: 96 * 1024 },
   {
@@ -26,7 +26,7 @@ const budgets = [
     raw: 157 * 1024,
     gzip: 55 * 1024
   },
-  { label: 'advance lazy graph', entry: /^src\/components\/advance\/(?:ApprovePage|BookPage)\.vue$/, raw: 59 * 1024, gzip: 22 * 1024 },
+  { label: 'advance lazy graph', entry: /^src\/components\/advance\/(?:ApprovePage|BookPage)\.vue$/, raw: 60 * 1024, gzip: 24 * 1024 },
   {
     label: 'admin/Vueform lazy graph',
     entry: /^src\/(?:components\/settings\/(?:SettingsPage|AdminSettingsSection)\.vue|vueform\.config\.ts)$/,

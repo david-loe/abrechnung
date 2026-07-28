@@ -1,5 +1,6 @@
 import { emailRegex, Organisation, TravelExpenseItem, travelExpenseItems } from 'abrechnung-common/types.js'
 import { model, mongo, Query, Schema, Types } from 'mongoose'
+import { bankAccountSchema } from './bankAccount.js'
 import { populateSelected } from './helper.js'
 
 export const organisationSchema = () => {
@@ -19,6 +20,20 @@ export const organisationSchema = () => {
         employeeSpecificTemplate: { type: String, trim: true },
         accountMapping: { type: accountMapping, required: true },
         vatAccountingEnabled: { type: Boolean, required: true, default: true },
+        includeBankBookings: { type: Boolean, required: true, default: false },
+        payoutAccounts: {
+          type: [
+            {
+              type: {
+                name: { type: String, trim: true, required: true },
+                ...bankAccountSchema,
+                ledgerAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+              }
+            }
+          ],
+          required: true,
+          default: () => []
+        },
         vatRates: {
           type: [
             {
@@ -38,7 +53,12 @@ export const organisationSchema = () => {
           }
         }
       },
-      required: true
+      required: true,
+      validate: {
+        validator: (settings: Organisation<Types.ObjectId>['accountingSettings']) =>
+          !settings.includeBankBookings || settings.payoutAccounts.every(({ ledgerAccount }) => Boolean(ledgerAccount)),
+        message: 'missingBankLedgerAccount'
+      }
     },
     website: { type: String },
     logo: { type: Schema.Types.ObjectId, ref: 'DocumentFile' },
@@ -50,7 +70,10 @@ export const organisationSchema = () => {
 
 const schema = organisationSchema()
 
-const populates = { logo: [{ path: 'logo', select: { name: 1, type: 1 } }] }
+const populates = {
+  logo: [{ path: 'logo', select: { name: 1, type: 1 } }],
+  accountingSettings: [{ path: 'accountingSettings.payoutAccounts.ledgerAccount' }]
+}
 
 schema.pre(
   /^find((?!Update).)*$/,

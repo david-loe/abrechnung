@@ -3,7 +3,7 @@ import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { assertBookingsBalanced } from '../_booking.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -207,11 +207,12 @@ test.serial('GET /healthCareCost/report', async (t) => {
 
 // BOOK
 
-test.serial('POST /book/healthCareCost/bookingExport', async (t) => {
+test.serial('POST /book/healthCareCost/bookingExportPackage', async (t) => {
   await loginUser(agent, 'healthCareCost')
-  const res = await agent.post('/book/healthCareCost/bookingExport').send([healthCareCost._id])
+  const res = await requestBookingExport(agent, '/book/healthCareCost', [healthCareCost._id])
   t.is(res.status, 200)
-  assertBookingsBalanced(t, res.body.result as BookingExportRow[], 'HealthCareCost')
+  assertBookingsBalanced(t, res.body.result.bookings as BookingExportRow[], 'HealthCareCost')
+  t.is(res.body.result.sepaFiles.length, 1)
 })
 
 test.serial('POST /book/healthCareCost/booked', async (t) => {

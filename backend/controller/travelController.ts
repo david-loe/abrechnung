@@ -1,6 +1,7 @@
 import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import {
+  BookingExportPackageRequest,
   IdDocument,
   Travel as ITravel,
   User as IUser,
@@ -20,7 +21,7 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ApprovedTravel from '../models/approvedTravel.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
-import { getBookingExportRows } from './bookingExport.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -644,9 +645,17 @@ export class TravelBookableController extends Controller {
     return Readable.from([report])
   }
 
-  @Post('bookingExport')
-  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
-    return { result: await getBookingExportRows(Travel, 'Travel', requestBody, request) }
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(Travel, 'Travel', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(Travel, 'Travel', requestBody, request) }
   }
 
   @Post('booked')

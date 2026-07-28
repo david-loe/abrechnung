@@ -1,5 +1,6 @@
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import {
+  BankAccount,
   DocumentFile,
   IdDocument,
   Token as IToken,
@@ -26,6 +27,8 @@ import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller, GetterQuery, SetterBody } from './controller.js'
 import { NotAllowedError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, File } from './types.js'
+
+type UserSettingsBody = Omit<SetterBody<IUser['settings']>, 'bankAccount'> & { bankAccount?: BankAccount | null }
 
 @Tags('User')
 @Route('user')
@@ -57,7 +60,7 @@ export class UserController extends Controller {
   }
 
   @Post('settings')
-  public async postSettings(@Body() requestBody: SetterBody<IUser['settings']>, @Request() request: AuthenticatedExpressRequest) {
+  public async postSettings(@Body() requestBody: UserSettingsBody, @Request() request: AuthenticatedExpressRequest) {
     Object.assign(request.user.settings, requestBody)
     request.user.markModified('settings')
     const result = (await request.user.save()).toObject()

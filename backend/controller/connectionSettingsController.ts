@@ -1,10 +1,11 @@
 import { Body, Get, Post, Route, Security, Tags } from '@tsoa/runtime'
 import { ConnectionSettings as IConnectionSettings, locales } from 'abrechnung-common/types.js'
+import { maskValue } from 'abrechnung-common/utils/masking.js'
 import ConnectionSettings, { connectionSettingsSchema } from '../models/connectionSettings.js'
 import { mongooseSchemaToVueformSchema } from '../models/vueformGenerator.js'
 import { Controller } from './controller.js'
 
-export const SECRET_PLACEHOLDER = '********'
+export const SECRET_PLACEHOLDER = maskValue('', { maskedLength: 8 })
 const SECRET_PATHS = [
   'smtp.auth.pass',
   'smtp.auth.clientSecret',

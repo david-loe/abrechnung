@@ -22,6 +22,7 @@
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">{{ t('labels.addX', { X: 'API Key' }) }}</button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button
+        v-if="props.showCancel"
         type="button"
         class="btn btn-light"
         v-on:click="
@@ -46,7 +47,8 @@ const { t } = useI18n()
 const props = defineProps({
   user: { type: Object as PropType<User>, required: true },
   endpoint: { type: String, required: true },
-  includeUserIdInRequest: { type: Boolean, default: false }
+  includeUserIdInRequest: { type: Boolean, default: false },
+  showCancel: { type: Boolean, default: true }
 })
 
 const loading = ref(false)

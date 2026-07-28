@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Validator } from 'abrechnung-common/report/validator.js'
 import {
+  BookingExportPackageRequest,
   Expense,
   ExpenseReportState,
   IdDocument,
@@ -19,7 +20,7 @@ import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
-import { getBookingExportRows } from './bookingExport.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
@@ -512,9 +513,17 @@ export class ExpenseReportBookableController extends Controller {
     return Readable.from([report])
   }
 
-  @Post('bookingExport')
-  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
-    return { result: await getBookingExportRows(ExpenseReport, 'ExpenseReport', requestBody, request) }
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(ExpenseReport, 'ExpenseReport', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(ExpenseReport, 'ExpenseReport', requestBody, request) }
   }
 
   @Post('booked')

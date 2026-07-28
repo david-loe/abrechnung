@@ -54,6 +54,7 @@
     "@types/swagger-ui-express": "^4.1.8",
     "@types/web-push": "^3.6.4",
     "ava": "^8.0.1",
+    "fast-xml-parser": "^5.10.1",
     "nodemon": "^3.1.14",
     "supertest": "^7.2.2",
     "tsoa": "^6.6.0",

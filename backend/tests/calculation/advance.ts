@@ -3,7 +3,7 @@ import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { assertBookingsBalanced } from '../_booking.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 
@@ -64,9 +64,10 @@ test.serial('correct balance after report review completed', async (t) => {
 })
 
 test.serial('report bookings clear the applied advance instead of creating a liability', async (t) => {
-  const res = await agent.post('/book/expenseReport/bookingExport').send([expenseReport._id])
+  const res = await requestBookingExport(agent, '/book/expenseReport', [expenseReport._id])
   t.is(res.status, 200)
-  const bookings = res.body.result as BookingExportRow[]
+  const bookings = res.body.result.bookings as BookingExportRow[]
+  t.deepEqual(res.body.result.sepaFiles, [])
   assertBookingsBalanced(t, bookings, 'ExpenseReport')
   t.deepEqual(
     bookings.map(({ side, amount, ledgerAccount }) => ({ side, amount, account: ledgerAccount.identifier })),

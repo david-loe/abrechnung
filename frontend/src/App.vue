@@ -2,9 +2,6 @@
   <ReadOnlyBanner />
   <OfflineBanner ref="offlineBanner" />
   <template v-if="APP_DATA">
-    <ModalComponent header="API Key" ref="apiKeyModal" @afterClose=";($refs.apiKeyForm as any).resetForm()">
-      <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" @cancel=";($refs.apiKeyModal as any).hideModal()" ref="apiKeyForm" />
-    </ModalComponent>
     <ModalComponent :header="'🔍 ' +t('labels.search')+ ': ' + searchInput" ref="searchResultModal">
       <Suspense>
         <TableElement
@@ -83,10 +80,10 @@
         </a>
         <ul class="dropdown-menu dropdown-menu-end">
           <li>
-            <button @click=";($refs.apiKeyModal as any).modal.show()" class="d-flex align-items-center dropdown-item">
-              <i class="fs-4 bi bi-key"></i>
-              <span class="ms-1">API Key</span>
-            </button>
+            <router-link to="/user/settings" class="d-flex align-items-center dropdown-item">
+              <i class="fs-4 bi bi-gear"></i>
+              <span class="ms-1">{{ t('labels.userSettings') }}</span>
+            </router-link>
           </li>
           <template v-if="isMobile && !alreadyInstalled && !offlineBannerRef?.isOffline">
             <li>
@@ -161,7 +158,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import AlertComponent from '@/components/elements/AlertComponent.vue'
-import ApiKeyForm from '@/components/elements/ApiKeyForm.vue'
 import FooterComponent from '@/components/elements/FooterComponent.vue'
 import HeaderComponent from '@/components/elements/HeaderComponent.vue'
 import InstallationBanner from '@/components/elements/InstallationBanner.vue'

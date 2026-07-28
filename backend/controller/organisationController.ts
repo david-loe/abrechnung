@@ -1,5 +1,5 @@
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
-import { Organisation as IOrganisation, locales } from 'abrechnung-common/types.js'
+import { Organisation as IOrganisation, locales, OrganisationBankAccount } from 'abrechnung-common/types.js'
 import { mongo, Types } from 'mongoose'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
@@ -73,8 +73,16 @@ export class OrganisationAdminController extends Controller {
       requestBody.accountingSettings = {
         ...requestBody.accountingSettings,
         vatAccountingEnabled: true,
+        includeBankBookings: false,
+        payoutAccounts: [],
         vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account7?._id }, { rate: 19, inputTaxAccount: account19?._id }]
       } as IOrganisation<Types.ObjectId>['accountingSettings']
+    }
+    const payoutAccounts = requestBody.accountingSettings?.payoutAccounts as OrganisationBankAccount<Types.ObjectId>[] | undefined | null
+    if (requestBody.accountingSettings?.includeBankBookings && payoutAccounts?.some(({ ledgerAccount }) => !ledgerAccount)) {
+      throw new ValidationClientError('Every payout account needs a ledger account when bank bookings are enabled.', [
+        { path: 'accountingSettings.payoutAccounts', message: 'missingBankLedgerAccount' }
+      ])
     }
     return await this.setter(Organisation, { requestBody: requestBody as IOrganisation<Types.ObjectId, mongo.Binary>, allowNew: true })
   }

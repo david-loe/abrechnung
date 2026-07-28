@@ -334,6 +334,14 @@ export async function checkForMigrations() {
           await collection.updateOne({ _id: report._id }, { $set: { bookings } })
         }
       }
+
+      logger.info('Apply migration from v2.6.4: initialize SEPA payout settings')
+      await mongoose.connection
+        .collection('ledgeraccounts')
+        .updateOne({ identifier: '1200' }, { $setOnInsert: { identifier: '1200', name: 'Bank' } }, { upsert: true })
+      await mongoose.connection
+        .collection('organisations')
+        .updateMany({}, { $set: { 'accountingSettings.payoutAccounts': [], 'accountingSettings.includeBankBookings': false } })
     }
     settings.migrateFrom = undefined
     await settings.save()

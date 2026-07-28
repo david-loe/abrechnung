@@ -143,6 +143,7 @@ export async function initDB() {
   const ledgerAccounts = [
     { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' },
     { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' },
+    { identifier: '1200', name: 'Bank' },
     { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' },
     { identifier: '1576', name: 'Abziehbare Vorsteuer 19 %' },
     { identifier: '4660', name: 'Reisekosten Arbeitnehmer' },
@@ -161,6 +162,8 @@ export async function initDB() {
     accountingSettings: {
       employeeLiabilitiesAccount: account1740?._id,
       employeeClaimsAccount: account1530?._id,
+      includeBankBookings: false,
+      payoutAccounts: [],
       vatAccountingEnabled: true,
       vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account1571?._id }, { rate: 19, inputTaxAccount: account1576?._id }],
       accountMapping: {} as { [key in TravelExpenseItem]?: _id }

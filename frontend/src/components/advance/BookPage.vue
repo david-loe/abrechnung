@@ -1,5 +1,10 @@
 <template>
   <div class="container py-3">
+    <BookingExportDialog
+      ref="bookingExportDialog"
+      endpoint="book/advance"
+      :reports="selected"
+      @booked="handleBooked" />
     <div class="row justify-content-between">
       <div class="col-auto">
         <h2>{{ t('accesses.book/advance') }}</h2>
@@ -9,10 +14,10 @@
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
-      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="exportBookings(selected)">
-        <i class="bi bi-download me-1"></i>{{ t('csv.download') }}
+      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="bookingExportDialog?.open()">
+        <i class="bi bi-download me-1"></i>{{ t('labels.exportBookings') }}
       </button>
-      <button type="button" class="btn btn-success" :disabled="selected.length === 0 || loading" @click="book(selected)">
+      <button type="button" class="btn btn-light btn-sm" :disabled="selected.length === 0 || loading" @click="book(selected)">
         {{ t('labels.setSelectedToBooked') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1"></span>
@@ -64,13 +69,14 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, AdvanceState, BookingExportRow, State } from 'abrechnung-common/types.js'
+import { AdvanceSimple, AdvanceState, State } from 'abrechnung-common/types.js'
 import { ComponentPublicInstance, MaybeRefOrGetter, nextTick, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useVueToPrint } from 'vue-to-print'
 import API from '@/api'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
+import BookingExportDialog from '@/components/elements/BookingExportDialog.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol, showFile } from '@/helper'
 
@@ -80,6 +86,7 @@ const tableRef = useTemplateRef('table')
 const selected = ref<AdvanceSimple<string>[]>([])
 const show = ref<null | AdvanceState.BOOKED>(null)
 const loading = ref(false)
+const bookingExportDialog = useTemplateRef<{ open: () => Promise<void> }>('bookingExportDialog')
 
 async function book(advances: AdvanceSimple<string>[]) {
   loading.value = true
@@ -94,20 +101,10 @@ async function book(advances: AdvanceSimple<string>[]) {
   }
 }
 
-async function exportBookings(advances: AdvanceSimple<string>[]) {
-  loading.value = true
-  const result = await API.setter<BookingExportRow<string>[]>(
-    'book/advance/bookingExport',
-    advances.map((advance) => advance._id),
-    {},
-    false
-  )
-  loading.value = false
-  if (result.ok) {
-    // Keep CSV formatting out of the report page bundle until the user requests an export.
-    const { downloadBookingExport } = await import('@/bookingCsv.js')
-    downloadBookingExport(result.ok, t)
-  }
+function handleBooked(reportIds: string[]) {
+  const bookedReportIds = new Set(reportIds)
+  selected.value = selected.value.filter(({ _id }) => !bookedReportIds.has(_id))
+  tableRef.value?.loadFromServer()
 }
 
 let colDeleted = false

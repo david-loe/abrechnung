@@ -5,7 +5,7 @@ import { type Queue } from 'bullmq'
 import { shutdown } from '../../app.js'
 import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { assertBookingsBalanced } from '../_booking.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 
@@ -252,9 +252,11 @@ test.serial('DELETE /approve/advance rejects booked advances', async (t) => {
   t.is(approvedResponse.status, 200)
 
   await loginUser(agent, 'advance')
-  const exportResponse = await agent.post('/book/advance/bookingExport').send([advance._id])
+  const exportResponse = await requestBookingExport(agent, '/book/advance', [advance._id])
   t.is(exportResponse.status, 200)
-  const bookings = exportResponse.body.result as BookingExportRow[]
+  const bookings = exportResponse.body.result.bookings as BookingExportRow[]
+  t.is(exportResponse.body.result.sepaFiles.length, 1)
+  t.true(exportResponse.body.result.sepaFiles[0].xml.includes('<InstdAmt Ccy="EUR">'))
   assertBookingsBalanced(t, bookings, 'Advance')
   t.is(bookings.length, 2)
 

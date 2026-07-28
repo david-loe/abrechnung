@@ -360,6 +360,20 @@ export interface AccountingSettings<idType extends _id = _id> {
   accountMapping: { [key in TravelExpenseItem]: LedgerAccount<idType> }
   vatAccountingEnabled: boolean
   vatRates: VatRate<idType>[]
+  payoutAccounts: OrganisationBankAccount<idType>[]
+  includeBankBookings: boolean
+}
+
+export interface BankAccount {
+  accountHolder: string
+  iban: string
+  bic?: string | null
+}
+
+export interface OrganisationBankAccount<idType extends _id = _id> extends BankAccount {
+  _id: idType
+  name: string
+  ledgerAccount?: LedgerAccount<idType> | null
 }
 
 export interface VatRate<idType extends _id = _id> {
@@ -392,6 +406,7 @@ export interface User<idType extends _id = _id, dataType extends binary = binary
     lastCountries: CountrySimple[]
     insurance?: HealthInsurance<idType> | null
     organisation?: OrganisationSimple<idType> | null
+    bankAccount?: BankAccount | null
     showInstallBanner: boolean
   }
   loseAccessAt?: null | Date | string
@@ -688,6 +703,41 @@ export interface BookingExportRow<idType extends _id = _id> extends Booking<idTy
   report: { _id: idType; name: string; reference: number }
   reportType: ReportModelName
   employee: { _id: idType; name: User['name']; employeeId: User['employeeId'] }
+}
+
+export interface BookingExportAccount<idType extends _id = _id> {
+  _id: idType
+  name: string
+  maskedIban: string
+}
+
+export interface BookingExportOrganisation<idType extends _id = _id> {
+  _id: idType
+  name: string
+  amount: number
+  accounts: BookingExportAccount<idType>[]
+}
+
+export interface BookingExportPreview<idType extends _id = _id> {
+  organisations: BookingExportOrganisation<idType>[]
+  errors: string[]
+}
+
+export interface BookingExportPackageRequest<idType extends _id = _id> {
+  reports: IdDocument<idType>[]
+  executionDate: string
+  bankAccounts: { organisation: idType; account: idType }[]
+}
+
+export interface SepaExportFile {
+  organisation: { name: string }
+  account: { lastFour: string }
+  xml: string
+}
+
+export interface BookingExportPackage<idType extends _id = _id> {
+  bookings: BookingExportRow<idType>[]
+  sepaFiles: SepaExportFile[]
 }
 
 export interface LedgerAccount<idType extends _id = _id> {

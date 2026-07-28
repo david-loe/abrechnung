@@ -9,6 +9,7 @@ import {
 } from 'abrechnung-common/types.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
+import { bankAccountSchema } from './bankAccount.js'
 import { populateAll, populateSelected } from './helper.js'
 
 interface Methods {
@@ -122,6 +123,7 @@ function createUserSchema(useRuntimeMetadata: boolean) {
           meta: snapshot?.settings.disableReportType.healthCareCost ?? false
         },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
+        bankAccount: { type: bankAccountSchema },
         showInstallBanner: { type: Boolean, required: true, default: true, meta: true }
       },
       required: true,

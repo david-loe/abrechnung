@@ -31,18 +31,18 @@ import APP_LOADER from '@/dataLoader.js'
 const APP_DATA = APP_LOADER.data
 
 const props = defineProps({
-  modelValue: { type: Object as PropType<HealthInsurance<string>> },
+  modelValue: { type: Object as PropType<HealthInsurance<string> | null> },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   updateUserInsurance: { type: Boolean, default: false }
 })
-const emit = defineEmits<{ 'update:modelValue': [HealthInsurance<string>] }>()
+const emit = defineEmits<{ 'update:modelValue': [HealthInsurance<string> | null] }>()
 
 function filter(options: HealthInsurance<string>[], search: string): HealthInsurance<string>[] {
   return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
-function updateInsurance(insurance: HealthInsurance<string>) {
+function updateInsurance(insurance: HealthInsurance<string> | null) {
   if (props.updateUserInsurance && APP_DATA.value) {
     APP_DATA.value.user.settings.insurance = insurance
     API.setter('user/settings', { insurance } as Partial<User['settings']>, {}, false)

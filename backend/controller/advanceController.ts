@@ -1,6 +1,13 @@
 import { Readable } from 'node:stream'
 import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
-import { AdvanceState, Advance as IAdvance, IdDocument, idDocumentToId, State } from 'abrechnung-common/types.js'
+import {
+  AdvanceState,
+  BookingExportPackageRequest,
+  Advance as IAdvance,
+  IdDocument,
+  idDocumentToId,
+  State
+} from 'abrechnung-common/types.js'
 import { Document, model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
@@ -13,7 +20,7 @@ import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import ReportUsage from '../models/reportUsage.js'
 import Travel from '../models/travel.js'
-import { getBookingExportRows } from './bookingExport.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
 import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
@@ -364,9 +371,17 @@ export class AdvanceBookableController extends Controller {
     return Readable.from([report])
   }
 
-  @Post('bookingExport')
-  public async postBookingExport(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
-    return { result: await getBookingExportRows(Advance, 'Advance', requestBody, request) }
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(Advance, 'Advance', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(Advance, 'Advance', requestBody, request) }
   }
 
   @Post('booked')

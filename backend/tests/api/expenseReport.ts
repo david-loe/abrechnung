@@ -4,7 +4,7 @@ import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
-import { assertBookingsBalanced } from '../_booking.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -458,14 +458,48 @@ test.serial('GET /expenseReport/report', async (t) => {
 
 // BOOK
 
-test.serial('POST /book/expenseReport/bookingExport', async (t) => {
+test.serial('POST /book/expenseReport/bookingExportPackage', async (t) => {
   await User.updateOne({ _id: expenseReport.owner._id }, { $set: { employeeId: 'E-1' } })
   await loginUser(agent, 'expenseReport')
-  const res = await agent.post('/book/expenseReport/bookingExport').send([expenseReport._id])
+  const res = await requestBookingExport(agent, '/book/expenseReport', [expenseReport._id], { includeBankBookings: true })
   t.is(res.status, 200)
-  const bookings = res.body.result as BookingExportRow[]
+  const bookings = res.body.result.bookings as BookingExportRow[]
   assertBookingsBalanced(t, bookings, 'ExpenseReport')
   t.true(bookings.every(({ employee }) => employee.employeeId === 'E-1'))
+  t.is(res.body.result.sepaFiles.length, 1)
+  const bankBookings = bookings.filter(({ remark }) => remark?.startsWith('SEPA '))
+  t.is(bankBookings.length, 2)
+  t.deepEqual(
+    bankBookings.map(({ side, ledgerAccount }) => ({ side, account: ledgerAccount.identifier })),
+    [
+      { side: 'debit', account: '1740' },
+      { side: 'credit', account: '1200' }
+    ]
+  )
+
+  const validPreview = await agent.post('/book/expenseReport/bookingExportPreview').send([expenseReport._id])
+  const foreignAccountResponse = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({
+      reports: [expenseReport._id],
+      executionDate: '2026-08-01',
+      bankAccounts: [{ organisation: validPreview.body.result.organisations[0]._id, account: '507f1f77bcf86cd799439011' }]
+    })
+  t.is(foreignAccountResponse.status, 422)
+
+  const invalidDateResponse = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({ reports: [expenseReport._id], executionDate: '2026-02-30', bankAccounts: [] })
+  t.is(invalidDateResponse.status, 422)
+
+  await User.updateOne({ _id: expenseReport.owner._id }, { $unset: { 'settings.bankAccount': '' } })
+  const missingBankPreview = await agent.post('/book/expenseReport/bookingExportPreview').send([expenseReport._id])
+  t.is(missingBankPreview.status, 200)
+  t.true(missingBankPreview.body.result.errors.some((error: string) => error.startsWith('missingEmployeeBankAccount:')))
+  const incompletePackage = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({ reports: [expenseReport._id], executionDate: '2026-08-01', bankAccounts: [] })
+  t.is(incompletePackage.status, 422)
 })
 
 test.serial('bookable expense report reverses negative net and VAT totals', async (t) => {
@@ -488,9 +522,10 @@ test.serial('bookable expense report reverses negative net and VAT totals', asyn
 
     await loginUser(agent, 'expenseReport')
     t.is((await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: negativeReport._id })).status, 200)
-    const exportResponse = await agent.post('/book/expenseReport/bookingExport').send([negativeReport._id])
+    const exportResponse = await requestBookingExport(agent, '/book/expenseReport', [negativeReport._id])
     t.is(exportResponse.status, 200)
-    const bookings = exportResponse.body.result as BookingExportRow[]
+    const bookings = exportResponse.body.result.bookings as BookingExportRow[]
+    t.deepEqual(exportResponse.body.result.sepaFiles, [])
     assertBookingsBalanced(t, bookings, 'ExpenseReport')
     t.deepEqual(
       bookings
