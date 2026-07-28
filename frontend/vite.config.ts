@@ -37,7 +37,7 @@ export default defineConfig({
       injectManifest: {
         // Filtering happens after Workbox discovers assets, so this must also
         // accommodate excluded admin bundles.
-        maximumFileSizeToCacheInBytes: 5_000_000,
+        maximumFileSizeToCacheInBytes: 30_000_000,
         manifestTransforms: [
           (manifest) => ({
             manifest: manifest.filter(({ url }) => {
@@ -45,6 +45,10 @@ export default defineConfig({
               if (!url.endsWith('.js') && !url.endsWith('.css')) return false
               const filename = url.split('/').at(-1) ?? url
               return (
+                !filename.startsWith('receiptOcr-') &&
+                !filename.startsWith('worker-entry-') &&
+                !filename.startsWith('ort-wasm-') &&
+                !filename.startsWith('pdf.worker-') &&
                 !filename.startsWith('admin-') &&
                 !filename.startsWith('AdminSettingsSection-') &&
                 !filename.startsWith('SettingsPage-') &&
