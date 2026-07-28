@@ -49,6 +49,12 @@ Auswahl zwischen
 
 > ℹ You can change ports and URLs in the `.env` file
 
+### OCR and AI suggestions
+
+The frontend build downloads the pinned PP-OCRv6-small models (about 31 MB), verifies their SHA-256 checksums and serves the models, PDF worker and ONNX/WASM runtime locally. After login the browser initializes OCR in the background; receipt data is not sent to an external OCR service.
+
+The development Compose setup starts Ollama, pulls `qwen3:0.6b` into the persistent `ollama_data` volume and runs a structured-output smoke test before starting the backend. Fresh development databases use `http://ollama:11434/v1` for receipt suggestions. Existing development settings are only populated when the LLM section does not exist; setting it to `null` disables suggestions. Production instances must configure an OpenAI-compatible base URL and model under Connection Settings. The API key is optional, reasoning effort defaults to `none` and can be cleared to omit the provider parameter, and the request timeout defaults to 180 seconds. OCR text is sent to that configured LLM endpoint when suggestions are requested.
+
 ## Contributing
 
 Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</a> oder <a href="https://github.com/david-loe/abrechnung/pulls">PR's</a> ([Contributing Guidelines](./CONTRIBUTING.md))!

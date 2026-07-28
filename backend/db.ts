@@ -123,6 +123,12 @@ export async function initDB() {
     }
   }
 
+  if (ENV.NODE_ENV !== 'production') {
+    await mongoose.connection
+      .collection('connectionsettings')
+      .updateOne({ llm: { $exists: false } }, { $set: { llm: connectionSettingsDev.llm } })
+  }
+
   for (const defaultIntegrationSettings of integrationSettings) {
     if (
       (await mongoose.connection

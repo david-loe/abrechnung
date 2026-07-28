@@ -45,6 +45,11 @@ docker compose run backend npm run setup
 docker compose run backend npm run test
 ```
 
+For changes to the LLM suggestion integration, also run the real Ollama structured-output smoke test:
+```bash
+docker compose run --rm ollama-smoke-test
+```
+
 ### Frontend Package
 Use the same validation intent as CI production build:
 ```bash
