@@ -23,19 +23,14 @@ test.serial('GET /healthInsurance', async (t) => {
 })
 
 test.serial('GET /project', async (t) => {
-  const res = await agent.get('/project')
+  const [res, categoryResponse] = await Promise.all([agent.get('/project'), agent.get('/category')])
   healthCareCost.project = res.body.data[0]
+  category = categoryResponse.body.data.find(({ for: value }: Category) => value === 'ExpenseReport' || value === 'both')
   if (res.status === 200) {
     t.pass()
   } else {
     console.log(res.body)
   }
-})
-
-test.serial('GET /category', async (t) => {
-  const res = await agent.get('/category')
-  category = res.body.data.find(({ for: value }: Category) => value === 'ExpenseReport' || value === 'both')
-  t.is(res.status, 200)
 })
 
 test.serial('POST /healthCareCost/inWork', async (t) => {

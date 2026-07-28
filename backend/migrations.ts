@@ -306,14 +306,15 @@ export async function checkForMigrations() {
               const cost = { ...stage.cost }
               const project = stage.project ?? report.project
               if (!Array.isArray(cost.positions)) {
-                const hasCost = typeof cost.amount === 'number' && (cost.amount !== 0 || stage.transport?.type === 'ownCar')
+                const isOwnCar = stage.transport?.type === 'ownCar'
+                const hasCost = isOwnCar || (typeof cost.amount === 'number' && cost.amount !== 0)
                 cost.positions = hasCost
                   ? [
                       {
                         _id: new mongoose.Types.ObjectId(),
-                        kind: stage.transport?.type === 'ownCar' ? 'ownCar' : 'manual',
-                        ...(stage.transport?.type === 'ownCar' ? {} : { description: stage.transport?.type }),
-                        grossAmount: cost.amount,
+                        kind: isOwnCar ? 'ownCar' : 'manual',
+                        ...(isOwnCar ? {} : { description: stage.transport?.type }),
+                        grossAmount: typeof cost.amount === 'number' ? cost.amount : 0,
                         vatRate: 0,
                         project,
                         category: await categoryForTravelStage(project, stage.transport?.type)

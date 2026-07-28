@@ -59,20 +59,15 @@ async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwn
 }
 
 test.serial('GET /project', async (t) => {
-  const res = await agent.get('/project')
+  const [res, categoryResponse] = await Promise.all([agent.get('/project'), agent.get('/category')])
   travel.project = res.body.data[0]
+  category = categoryResponse.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
   if (res.status === 200) {
     t.pass()
   } else {
     console.log(res.body)
     t.fail()
   }
-})
-
-test.serial('GET /category', async (t) => {
-  const res = await agent.get('/category')
-  category = res.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
-  t.is(res.status, 200)
 })
 
 test.serial('POST /travel/appliedFor', async (t) => {
