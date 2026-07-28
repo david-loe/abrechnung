@@ -1,9 +1,9 @@
 import { Advance, BookingExportRow, ExpenseReport, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
-import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { uploadPendingReceipts } from '../_documentFile.js'
 
 const agent = await createAgent()
 
@@ -40,15 +40,8 @@ const expense = {
   }
 }
 
-let req = agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
-for (const entry of objectToFormFields(expense)) {
-  if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-    req = req.attach(entry.field, entry.val)
-  } else {
-    req = req.field(entry.field, entry.val)
-  }
-}
-await req
+await uploadPendingReceipts(agent, expense)
+await agent.post('/expenseReport/expense').query({ parentId: expenseReport._id.toString() }).send(expense)
 
 await agent.post('/expenseReport/underExamination').send({ _id: expenseReport._id })
 

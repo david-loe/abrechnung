@@ -9,12 +9,12 @@ import {
 import test from 'ava'
 import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
-import { objectToFormFields } from '../../helper.js'
 import LedgerAccount from '../../models/ledgerAccount.js'
 import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { uploadPendingReceipts } from '../_documentFile.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -48,16 +48,12 @@ function createBulkCost(amount: number, currency: string, date: Date) {
   }
 }
 
-async function postMultipartExpense(endpoint: string, parentId: string, expense: unknown) {
-  let req = agent.post(endpoint).query({ parentId })
-  for (const entry of objectToFormFields(expense)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      req = req.attach(entry.field, entry.val)
-    } else {
-      req = req.field(entry.field, entry.val)
-    }
-  }
-  return await req
+async function postExpense(endpoint: string, parentId: string, expense: unknown) {
+  await uploadPendingReceipts(agent, expense)
+  return await agent
+    .post(endpoint)
+    .query({ parentId })
+    .send(expense as object)
 }
 
 test.serial('GET /project', async (t) => {
@@ -201,7 +197,7 @@ test.serial('POST /expenseReport/expense/bulk strips foreign receipt references'
       ])
     }
 
-    const foreignExpenseResponse = await postMultipartExpense('/expenseReport/expense', foreignReport._id.toString(), foreignExpense)
+    const foreignExpenseResponse = await postExpense('/expenseReport/expense', foreignReport._id.toString(), foreignExpense)
     t.is(foreignExpenseResponse.status, 200)
 
     const foreignReceiptId = (foreignExpenseResponse.body.result as ExpenseReport).expenses[0].cost.receipts[0]._id
@@ -265,7 +261,7 @@ test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
       ])
     }
 
-    const expenseResponse = await postMultipartExpense('/expenseReport/expense', tempExpenseReport._id.toString(), initialExpense)
+    const expenseResponse = await postExpense('/expenseReport/expense', tempExpenseReport._id.toString(), initialExpense)
     t.is(expenseResponse.status, 200)
 
     const underExaminationResponse = await agent.post('/expenseReport/underExamination').send({ _id: tempExpenseReport._id.toString() })
@@ -302,7 +298,7 @@ test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
 test.serial('POST /expenseReport/expense requires descriptions for split positions', async (t) => {
   const cost = createCost(100, { _id: 'EUR' }, new Date('2023-09-14T00:00:00.000Z'))
   cost.positions.push({ ...cost.positions[0], grossAmount: 21 })
-  const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), { description: 'Split expense', cost })
+  const res = await postExpense('/expenseReport/expense', expenseReport._id.toString(), { description: 'Split expense', cost })
   t.is(res.status, 422)
 })
 
@@ -321,7 +317,7 @@ test.serial('POST /expenseReport/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const createExpense of expenses) {
     const expense = createExpense()
-    const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), expense)
+    const res = await postExpense('/expenseReport/expense', expenseReport._id.toString(), expense)
     if (res.status === 200) {
       expenseReport = res.body.result
       t.pass()
@@ -356,7 +352,7 @@ test.serial('POST /expenseReport/expense adds missing receipt', async (t) => {
     )
   }
 
-  const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), updatedExpense)
+  const res = await postExpense('/expenseReport/expense', expenseReport._id.toString(), updatedExpense)
   if (res.status === 200) {
     expenseReport = res.body.result
     t.pass()
@@ -427,11 +423,7 @@ test.serial('POST /examine/expenseReport/expense', async (t) => {
       expense.cost.receipts
     )
   }
-  let req = agent.post('/examine/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
-  for (const entry of objectToFormFields(expenseBody)) {
-    req = req.field(entry.field, entry.val)
-  }
-  const res = await req
+  const res = await agent.post('/examine/expenseReport/expense').query({ parentId: expenseReport._id.toString() }).send(expenseBody)
   if (res.status === 200) {
     t.pass()
   } else {
@@ -540,10 +532,7 @@ test.serial('bookable expense report reverses negative net and VAT totals', asyn
       { name: 'Credit note.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
     ])
     cost.positions[0].vatRate = 19
-    const expenseResponse = await postMultipartExpense('/expenseReport/expense', negativeReport._id.toString(), {
-      description: 'Credit note',
-      cost
-    })
+    const expenseResponse = await postExpense('/expenseReport/expense', negativeReport._id.toString(), { description: 'Credit note', cost })
     t.is(expenseResponse.status, 200)
     t.is((await agent.post('/expenseReport/underExamination').send({ _id: negativeReport._id })).status, 200)
 

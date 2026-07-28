@@ -16,6 +16,14 @@ import { logger } from './logger.js'
 import { checkForMigrations } from './migrations.js'
 import { initializeBackendRuntime, shutdownBackendRuntime } from './runtime.js'
 
+function redactRequestBody(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactRequestBody)
+  if (!value || typeof value !== 'object') return value
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => [key, key === 'ocr' || key === 'apiKey' ? '[REDACTED]' : redactRequestBody(child)])
+  )
+}
+
 export default async function () {
   await connectDB()
   await checkForMigrations()
@@ -76,7 +84,7 @@ export default async function () {
   app.use((req, _res, next) => {
     logger.debug(`${req.user?.email || 'Guest'} -> ${req.method} ${req.url}`)
     if (req.body && Object.keys(req.body).length > 0) {
-      logger.debug('Body:', req.body)
+      logger.debug('Body:', redactRequestBody(req.body))
     }
     next()
   })

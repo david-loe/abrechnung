@@ -4,13 +4,14 @@ import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
+import { temporaryDocumentFileExpiration } from './documentFiles.js'
 import ENV from './env.js'
 import DocumentFile from './models/documentFile.js'
 
 interface ReqDocument extends Omit<IDocumentFile, 'data'> {
   data?: Buffer<ArrayBufferLike>
 }
-type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean }
+type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean; temporary?: boolean }
 export function documentFileHandler(pathToFiles: string[], options: FileHandleOptions = {}) {
   const opts = { checkOwner: true, multiple: true, ...options }
   return async (req: Request, _res?: Response, next?: NextFunction) => {
@@ -59,6 +60,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           if (buffer) {
             reqDoc.owner = fileOwner
             reqDoc.data = buffer
+            if (opts.temporary) Object.assign(reqDoc, { expiresAt: temporaryDocumentFileExpiration() })
             const dbDoc = (await new DocumentFile(reqDoc).save()).toObject() as Partial<IDocumentFile>
             dbDoc.data = undefined
             reqDoc.data = undefined
