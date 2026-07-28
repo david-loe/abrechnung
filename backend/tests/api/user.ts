@@ -81,6 +81,22 @@ test.serial('POST /user/settings', async (t) => {
   t.like(res2.body.data.settings, settings)
 })
 
+test.serial('POST /user/settings normalizes and validates the current user bank account', async (t) => {
+  const res = await agent
+    .post('/user/settings')
+    .send({ bankAccount: { accountHolder: 'Philip J. Fry', iban: 'de89 3704 0044 0532 0130 00', bic: 'cobadeff' } })
+  t.is(res.status, 200)
+  t.is(res.body.result.bankAccount.iban, 'DE89370400440532013000')
+  t.is(res.body.result.bankAccount.bic, 'COBADEFF')
+  t.is(
+    (await agent.post('/user/settings').send({ bankAccount: { accountHolder: 'Philip J. Fry', iban: 'DE89370400440532013001' } })).status,
+    422
+  )
+  const removeResponse = await agent.post('/user/settings').send({ bankAccount: null })
+  t.is(removeResponse.status, 200)
+  t.is(removeResponse.body.result.bankAccount, null)
+})
+
 const vehicleRegistration = { vehicleRegistration: [{ name: 'dummy.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }] }
 
 test.serial('POST /user/vehicleRegistration', async (t) => {

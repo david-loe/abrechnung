@@ -117,6 +117,7 @@ const routes = [
     props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [{ link: '/', title: 'headlines.home' }] })
   },
   { path: '/user', component: () => import('@/components/HomePage.vue'), meta: { requiresAuth: true, offlineCapable: true } },
+  { path: '/user/settings', component: () => import('@/components/UserSettingsPage.vue'), meta: { requiresAuth: true } },
   {
     path: '/user/travel/:_id([0-9a-fA-F]{24})',
     component: () => import('@/components/HomePage.vue'),

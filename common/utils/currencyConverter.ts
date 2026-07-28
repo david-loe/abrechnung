@@ -1,4 +1,4 @@
-import { baseCurrency, CurrencyCode, ExchangeRateProviderName, IdDocument, idDocumentToId } from '../types.js'
+import { baseCurrency, Cost, CurrencyCode, ExchangeRateProviderName, IdDocument, idDocumentToId } from '../types.js'
 import { multiplyAmountAndRound } from './scripts.js'
 
 export type Rates = { currency: CurrencyCode; rate: number }[]
@@ -99,6 +99,12 @@ export class CurrencyConverter {
     }
     costObject.exchangeRate = exchangeRate
     return costObject
+  }
+
+  async addCostExchangeRate<M extends Pick<Cost, 'currency' | 'exchangeRate'>>(cost: M, date: string | number | Date) {
+    const conversion = await this.convert(date, 1, idDocumentToId(cost.currency))
+    cost.exchangeRate = conversion ? { date: conversion.date, rate: conversion.rate } : null
+    return cost
   }
 
   #getProvider(providerName: ExchangeRateProviderName) {

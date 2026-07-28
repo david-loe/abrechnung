@@ -86,9 +86,21 @@ export class ProjectAdminController extends Controller {
     return await this.deleter(Project, {
       _id: _id,
       referenceChecks: [
-        { model: ExpenseReport, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
-        { model: Travel, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } },
-        { model: HealthCareCost, paths: ['project', 'addUp.$elemMatch.project'], conditions: { historic: false } }
+        {
+          model: ExpenseReport,
+          paths: ['project', 'addUp.$elemMatch.project', 'expenses.cost.positions.project'],
+          conditions: { historic: false }
+        },
+        {
+          model: Travel,
+          paths: ['project', 'addUp.$elemMatch.project', 'expenses.cost.positions.project', 'stages.cost.positions.project'],
+          conditions: { historic: false }
+        },
+        {
+          model: HealthCareCost,
+          paths: ['project', 'addUp.$elemMatch.project', 'expenses.cost.positions.project'],
+          conditions: { historic: false }
+        }
       ],
       minDocumentCount: 1
     })

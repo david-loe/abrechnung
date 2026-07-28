@@ -1,5 +1,5 @@
-import { BaseCurrencyMoney, baseCurrency, idDocumentToId, Locale, Money, Name, NameDisplayFormat } from '../types.js'
-import { baseCurrencyMoneyToMoney, isValidDate } from './scripts.js'
+import { BaseCurrencyMoney, baseCurrency, Cost, idDocumentToId, Locale, Money, Name, NameDisplayFormat } from '../types.js'
+import { baseCurrencyMoneyToMoney, getCostBaseCurrencyAmount, getCostGrossAmount, isValidDate } from './scripts.js'
 
 type MoneyStringOptions = { locale?: Locale; useExchangeRate?: boolean; func?: (x: number) => number; warning?: boolean }
 
@@ -107,9 +107,17 @@ class Formatter {
     return this._floatFormat.format(number)
   }
 
-  money(baseMoney: BaseCurrencyMoney | Money, options?: MoneyStringOptions): string {
+  money(baseMoney: BaseCurrencyMoney | Money | Cost, options?: MoneyStringOptions): string {
     const opts = Object.assign({ useExchangeRate: true, warning: false, func: (x: number) => x }, options)
     this.setLocale(opts.locale)
+    if ('positions' in baseMoney) {
+      const currency = idDocumentToId(baseMoney.currency)
+      if (opts.useExchangeRate && currency !== baseCurrency._id) {
+        if (!baseMoney.exchangeRate) opts.warning = true
+        return this.currency(opts.func(getCostBaseCurrencyAmount(baseMoney)), baseCurrency._id) + (opts.warning ? ' ⚠' : '')
+      }
+      return this.currency(opts.func(getCostGrossAmount(baseMoney)), currency)
+    }
     let amount = 0
     const money = baseCurrencyMoneyToMoney(baseMoney)
     let currency = idDocumentToId(money.currency)
@@ -126,8 +134,17 @@ class Formatter {
     }
     return this.currency(opts.func(amount), currency) + (opts.warning ? ' ⚠' : '')
   }
-  detailedMoney(baseMoney: Money | BaseCurrencyMoney, printZero = false, locale?: Locale): string {
+  detailedMoney(baseMoney: Money | BaseCurrencyMoney | Cost, printZero = false, locale?: Locale): string {
     this.setLocale(locale)
+    if ('positions' in baseMoney) {
+      const amount = getCostGrossAmount(baseMoney)
+      if (!amount && !printZero) return ''
+      let str = this.currency(amount, idDocumentToId(baseMoney.currency))
+      if (baseMoney.exchangeRate?.rate) {
+        str = `${str} * ${this.float(baseMoney.exchangeRate.rate)} = ${this.baseCurrency(getCostBaseCurrencyAmount(baseMoney))}`
+      }
+      return str
+    }
     const money = baseCurrencyMoneyToMoney(baseMoney)
     if (money.amount === null || (!money.amount && !printZero)) {
       return ''

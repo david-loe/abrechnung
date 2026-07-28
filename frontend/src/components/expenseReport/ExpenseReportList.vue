@@ -54,18 +54,6 @@
         </div>
       </div>
     </template>
-    <template #header-category="header">
-      <div class="filter-column">
-        {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('category', e)">
-          <i v-if="showFilter.category" class="bi bi-funnel-fill"></i>
-          <i v-else class="bi bi-funnel"></i>
-        </span>
-        <div v-if="showFilter.category" @click.stop>
-          <CategorySelector v-model="(filter.category as any)" />
-        </div>
-      </div>
-    </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ t(header.text) }}
@@ -137,9 +125,6 @@
     <template #item-state="{ state }">
       <StateBadge :state="state" :StateEnum="ExpenseReportState" style="display: inline-block" />
     </template>
-    <template #item-category="{ category }">
-      <Badge :text="category.name" :style="category.style" />
-    </template>
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
@@ -186,8 +171,6 @@ import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
-import Badge from '@/components/elements/Badge.vue'
-import CategorySelector from '@/components/elements/CategorySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import ListElement, { Filter } from '@/components/elements/ListElement.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -233,9 +216,6 @@ const headers: Header[] = [
   { text: 'labels.label', value: 'name' },
   { text: 'labels.state', value: 'state' }
 ]
-if (APP_DATA.value && APP_DATA.value.categories.length > 1) {
-  headers.push({ text: 'labels.category', value: 'category' })
-}
 if (window.innerWidth > bp.md) {
   headers.push(
     { text: 'labels.project', value: 'project.identifier' },
@@ -264,7 +244,6 @@ const getEmptyFilter = () =>
     name: { $regex: undefined, $options: 'i' },
     owner: undefined,
     state: undefined,
-    category: undefined,
     project: { $in: [undefined] },
     updatedAt: { $gt: undefined }
   }) as Filter
@@ -280,7 +259,6 @@ const showFilter = ref({
   name: false,
   owner: false,
   state: false,
-  category: false,
   project: false,
   'project.organisation': false,
   updatedAt: false

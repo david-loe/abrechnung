@@ -55,6 +55,7 @@ const schema = advanceSchema()
 
 const populates = {
   budget: [{ path: 'budget.currency' }],
+  bookings: [{ path: 'bookings.ledgerAccount' }, { path: 'bookings.project', select: { identifier: 1, organisation: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1, additionalDetails: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -164,6 +165,9 @@ schema.pre('save', async function () {
   await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
+  if (!this.historic && this.state < AdvanceState.APPROVED) {
+    this.bookings = []
+  }
 })
 
 schema.post('save', async function () {

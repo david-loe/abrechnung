@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Validator } from 'abrechnung-common/report/validator.js'
 import {
+  BookingExportPackageRequest,
   Expense,
   ExpenseReportState,
   IdDocument,
@@ -19,6 +20,7 @@ import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
@@ -33,14 +35,6 @@ function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expense
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
       reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
     )
-  }
-}
-
-function normalizeExpenseProject(requestBody: ExpenseSetterBody) {
-  // multipart/form-data does not send null values
-  // so we need to set it to null if the value is an empty string
-  if (requestBody.project?.toString() === '') {
-    requestBody.project = null
   }
 }
 
@@ -59,7 +53,7 @@ function upsertExpense(expenses: Expense[], requestBody: ExpenseSetterBody) {
 
 async function postExpensesBulk(
   parentId: string,
-  requestBody: ExpenseSetterBody[],
+  requestBody: ExpenseBulkImportPost[],
   language: string,
   checkOldObject: (oldObject: ExpenseReportDoc) => Promise<boolean>
 ) {
@@ -77,11 +71,10 @@ async function postExpensesBulk(
 
   const expenses = parentObject.expenses as Expense[]
   for (const expense of requestBody) {
-    normalizeExpenseProject(expense)
-    upsertExpense(expenses, expense)
+    upsertExpense(expenses, expense as unknown as ExpenseSetterBody)
   }
 
-  expenses.sort((a, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf())
+  expenses.sort((a, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf())
   parentObject.markModified('expenses')
 
   return { message: 'alerts.successSaving', result: (await parentObject.save()).toObject() }
@@ -98,7 +91,7 @@ export class ExpenseReportController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
@@ -122,7 +115,6 @@ export class ExpenseReportController extends Controller {
     @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -137,7 +129,7 @@ export class ExpenseReportController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -176,13 +168,7 @@ export class ExpenseReportController extends Controller {
 
   @Post('inWork')
   public async postOwnInWork(
-    @Body() requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id?: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
-    },
+    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id?: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
@@ -283,7 +269,7 @@ export class ExpenseReportExamineController extends Controller {
     return await this.getter(ExpenseReport, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -307,7 +293,6 @@ export class ExpenseReportExamineController extends Controller {
     @Body() requestBody: ExpenseSetterBody,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    normalizeExpenseProject(requestBody)
     return await this.setterForArrayElement(ExpenseReport, {
       requestBody: requestBody as Expense,
       parentId,
@@ -326,7 +311,7 @@ export class ExpenseReportExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -373,13 +358,7 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post()
   public async postAny(
-    @Body() requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
-    },
+    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
@@ -402,7 +381,6 @@ export class ExpenseReportExamineController extends Controller {
       _id?: string
       name?: string
       advances?: IdDocument<Types.ObjectId>[]
-      category?: IdDocument<Types.ObjectId>
       owner?: IdDocument<Types.ObjectId>
       comment?: string
     },
@@ -510,7 +488,7 @@ export class ExpenseReportBookableController extends Controller {
     return await this.getter(ExpenseReport, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -533,6 +511,19 @@ export class ExpenseReportBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(ExpenseReport, 'ExpenseReport', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(ExpenseReport, 'ExpenseReport', requestBody, request) }
   }
 
   @Post('booked')

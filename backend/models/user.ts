@@ -9,6 +9,7 @@ import {
 } from 'abrechnung-common/types.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
+import { bankAccountSchema } from './bankAccount.js'
 import { populateAll, populateSelected } from './helper.js'
 
 interface Methods {
@@ -75,8 +76,9 @@ function createUserSchema(useRuntimeMetadata: boolean) {
       required: true
     },
     additionalDetails: { type: String, multiline: true, trim: true },
+    employeeId: { type: String, index: true, unique: true, sparse: true },
     access: { type: accessObject, default: () => ({}) },
-    loseAccessAt: { type: Date, info: 'info.loseAccessAt' },
+    loseAccessAt: { type: Date, description: 'info.loseAccessAt' },
     projects: {
       type: {
         assigned: { type: [{ type: Schema.Types.ObjectId, ref: 'Project' }], required: true, label: 'labels.assignedProjects' },
@@ -121,6 +123,7 @@ function createUserSchema(useRuntimeMetadata: boolean) {
           meta: snapshot?.settings.disableReportType.healthCareCost ?? false
         },
         organisation: { type: Schema.Types.ObjectId, ref: 'Organisation' },
+        bankAccount: { type: bankAccountSchema },
         showInstallBanner: { type: Boolean, required: true, default: true, meta: true }
       },
       required: true,

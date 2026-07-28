@@ -1,7 +1,7 @@
 <template>
   <v-select
     v-if="APP_DATA?.categories"
-    :options="APP_DATA.categories"
+    :options="categories"
     :modelValue="props.modelValue"
     :placeholder="props.placeholder"
     @update:modelValue="(c: Category) => emit('update:modelValue', c)"
@@ -24,7 +24,7 @@
 
 <script lang="ts" setup>
 import { Category } from 'abrechnung-common/types.js'
-import { PropType } from 'vue'
+import { computed, PropType } from 'vue'
 import Badge from '@/components/elements/Badge.vue'
 import APP_LOADER from '@/dataLoader.js'
 
@@ -34,13 +34,18 @@ const props = defineProps({
   modelValue: { type: Object as PropType<Category> },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
-  placeholder: { type: String, default: '' }
+  placeholder: { type: String, default: '' },
+  reportType: { type: String as PropType<'Travel' | 'ExpenseReport'> }
 })
 const emit = defineEmits<{ 'update:modelValue': [Category] }>()
 
 function filter(options: Category[], search: string): Category[] {
   return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
+
+const categories = computed(() =>
+  props.reportType ? APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? [] : APP_DATA.value?.categories ?? []
+)
 
 await APP_LOADER.loadData()
 </script>

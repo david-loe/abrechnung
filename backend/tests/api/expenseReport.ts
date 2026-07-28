@@ -1,14 +1,52 @@
-import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types.js'
+import {
+  BookingExportRow,
+  Category,
+  ExpenseReport,
+  ExpenseReportSimple,
+  ExpenseReportState,
+  idDocumentToId
+} from 'abrechnung-common/types.js'
 import test from 'ava'
+import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import LedgerAccount from '../../models/ledgerAccount.js'
+import Organisation from '../../models/organisation.js'
+import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
 
 //@ts-expect-error
 let expenseReport: ExpenseReportSimple = { name: 'Expenses from last Month' }
+let category: Category
+
+function createCost(amount: number, currency: unknown, date: Date, receipts: unknown[] = []) {
+  return {
+    positions: [{ kind: 'manual', grossAmount: amount, vatRate: 0, project: expenseReport.project, category }],
+    currency,
+    receipts,
+    date
+  }
+}
+
+function createBulkCost(amount: number, currency: string, date: Date) {
+  return {
+    positions: [
+      {
+        kind: 'manual' as const,
+        grossAmount: amount,
+        vatRate: 0,
+        project: expenseReport.project._id.toString(),
+        category: category._id.toString()
+      }
+    ],
+    currency,
+    date
+  }
+}
 
 async function postMultipartExpense(endpoint: string, parentId: string, expense: unknown) {
   let req = agent.post(endpoint).query({ parentId })
@@ -34,7 +72,7 @@ test.serial('GET /project', async (t) => {
 
 test.serial('GET /category', async (t) => {
   const res = await agent.get('/category')
-  expenseReport.category = res.body.data[0]
+  category = res.body.data.find(({ for: value }: Category) => value === 'ExpenseReport' || value === 'both')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -72,42 +110,13 @@ test.serial('POST /expenseReport/expense/bulk', async (t) => {
   let tempExpenseReport: ExpenseReportSimple | undefined
 
   try {
-    const tempReportResponse = await agent
-      .post('/expenseReport/inWork')
-      .send({ name: 'Bulk Import Test', project: expenseReport.project, category: expenseReport.category })
+    const tempReportResponse = await agent.post('/expenseReport/inWork').send({ name: 'Bulk Import Test', project: expenseReport.project })
     t.is(tempReportResponse.status, 200)
 
     tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
-    const bulkExpenses: Partial<Expense>[] = [
-      {
-        description: 'Imported Taxi',
-        cost: {
-          amount: 28.4,
-          currency: { _id: 'EUR', name: { de: 'Euro', en: 'Euro', fr: 'Euro', ru: 'Euro', es: 'Euro', kk: 'Euro' } },
-          receipts: [],
-          date: new Date('2023-09-10T00:00:00.000Z')
-        }
-      },
-      {
-        description: 'Imported Meal',
-        cost: {
-          amount: 16.9,
-          currency: {
-            _id: 'USD',
-            name: {
-              de: 'US-Dollar',
-              en: 'US Dollar',
-              fr: 'Dollar americain',
-              ru: 'Доллар США',
-              es: 'Dolar estadounidense',
-              kk: 'АКШ доллары'
-            }
-          },
-          receipts: [],
-          date: new Date('2023-09-11T00:00:00.000Z')
-        },
-        note: 'Imported from CSV'
-      }
+    const bulkExpenses = [
+      { description: 'Imported Taxi', cost: createBulkCost(28.4, 'EUR', new Date('2023-09-10T00:00:00.000Z')) },
+      { description: 'Imported Meal', cost: createBulkCost(16.9, 'USD', new Date('2023-09-11T00:00:00.000Z')), note: 'Imported from CSV' }
     ]
 
     const bulkResponse = await agent
@@ -128,9 +137,7 @@ test.serial('POST /expenseReport/expense/bulk is atomic', async (t) => {
   let tempExpenseReport: ExpenseReportSimple | undefined
 
   try {
-    const tempReportResponse = await agent
-      .post('/expenseReport/inWork')
-      .send({ name: 'Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
+    const tempReportResponse = await agent.post('/expenseReport/inWork').send({ name: 'Bulk Atomic Test', project: expenseReport.project })
     t.is(tempReportResponse.status, 200)
 
     tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
@@ -138,8 +145,8 @@ test.serial('POST /expenseReport/expense/bulk is atomic', async (t) => {
       .post('/expenseReport/expense/bulk')
       .query({ parentId: tempExpenseReport._id.toString() })
       .send([
-        { description: 'Imported Taxi', cost: { amount: 28.4, currency: { _id: 'EUR' }, date: new Date('2023-09-10T00:00:00.000Z') } },
-        { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-11T00:00:00.000Z') }, note: 'Imported from CSV' }
+        { description: 'Imported Taxi', cost: createBulkCost(28.4, 'EUR', new Date('2023-09-10T00:00:00.000Z')) },
+        { cost: createBulkCost(16.9, 'USD', new Date('2023-09-11T00:00:00.000Z')), note: 'Imported from CSV' }
       ])
     t.is(bulkResponse.status, 422)
 
@@ -183,18 +190,15 @@ test.serial('POST /expenseReport/expense/bulk strips foreign receipt references'
     await loginUser(agent, 'expenseReport')
     const foreignReportResponse = await agent
       .post('/expenseReport/inWork')
-      .send({ name: 'Foreign Receipt Source', project: expenseReport.project, category: expenseReport.category })
+      .send({ name: 'Foreign Receipt Source', project: expenseReport.project })
     t.is(foreignReportResponse.status, 200)
 
     foreignReport = foreignReportResponse.body.result as ExpenseReportSimple
     const foreignExpense = {
       description: 'Foreign Receipt Expense',
-      cost: {
-        amount: 12,
-        currency: { _id: 'EUR' },
-        receipts: [{ name: 'Foreign Receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-        date: new Date('2023-09-12T00:00:00.000Z')
-      }
+      cost: createCost(12, { _id: 'EUR' }, new Date('2023-09-12T00:00:00.000Z'), [
+        { name: 'Foreign Receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
+      ])
     }
 
     const foreignExpenseResponse = await postMultipartExpense('/expenseReport/expense', foreignReport._id.toString(), foreignExpense)
@@ -205,7 +209,7 @@ test.serial('POST /expenseReport/expense/bulk strips foreign receipt references'
     await loginUser(agent, 'user')
     const targetReportResponse = await agent
       .post('/expenseReport/inWork')
-      .send({ name: 'Bulk Receipt Target', project: expenseReport.project, category: expenseReport.category })
+      .send({ name: 'Bulk Receipt Target', project: expenseReport.project })
     t.is(targetReportResponse.status, 200)
 
     targetReport = targetReportResponse.body.result as ExpenseReportSimple
@@ -215,7 +219,7 @@ test.serial('POST /expenseReport/expense/bulk strips foreign receipt references'
       .send([
         {
           description: 'Imported Expense',
-          cost: { amount: 42, currency: { _id: 'EUR' }, receipts: [{ _id: foreignReceiptId }], date: new Date('2023-09-13T00:00:00.000Z') }
+          cost: { ...createBulkCost(42, 'EUR', new Date('2023-09-13T00:00:00.000Z')), receipts: [{ _id: foreignReceiptId }] }
         }
       ])
     t.is(bulkResponse.status, 200)
@@ -250,18 +254,15 @@ test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
     await loginUser(agent, 'user')
     const tempReportResponse = await agent
       .post('/expenseReport/inWork')
-      .send({ name: 'Examine Bulk Atomic Test', project: expenseReport.project, category: expenseReport.category })
+      .send({ name: 'Examine Bulk Atomic Test', project: expenseReport.project })
     t.is(tempReportResponse.status, 200)
 
     tempExpenseReport = tempReportResponse.body.result as ExpenseReportSimple
     const initialExpense = {
       description: 'Initial Expense',
-      cost: {
-        amount: 82,
-        currency: { _id: 'GBP' },
-        receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-        date: new Date('2023-09-14T00:00:00.000Z')
-      }
+      cost: createCost(82, { _id: 'GBP' }, new Date('2023-09-14T00:00:00.000Z'), [
+        { name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
+      ])
     }
 
     const expenseResponse = await postMultipartExpense('/expenseReport/expense', tempExpenseReport._id.toString(), initialExpense)
@@ -275,8 +276,8 @@ test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
       .post('/examine/expenseReport/expense/bulk')
       .query({ parentId: tempExpenseReport._id.toString() })
       .send([
-        { description: 'Imported Hotel', cost: { amount: 100, currency: { _id: 'EUR' }, date: new Date('2023-09-15T00:00:00.000Z') } },
-        { cost: { amount: 16.9, currency: { _id: 'USD' }, date: new Date('2023-09-16T00:00:00.000Z') } }
+        { description: 'Imported Hotel', cost: createBulkCost(100, 'EUR', new Date('2023-09-15T00:00:00.000Z')) },
+        { cost: createBulkCost(16.9, 'USD', new Date('2023-09-16T00:00:00.000Z')) }
       ])
     t.is(bulkResponse.status, 422)
 
@@ -298,34 +299,28 @@ test.serial('POST /examine/expenseReport/expense/bulk is atomic', async (t) => {
 
 // FILL OUT
 
-const expenses: Expense[] = [
-  {
-    description: 'English Course',
-    cost: {
-      amount: 82, //@ts-ignore
-      currency: { _id: 'GBP' }, //@ts-ignore
-      receipts: [],
-      date: new Date('2023-09-14T00:00:00.000Z')
-    }
-  },
-  {
+test.serial('POST /expenseReport/expense requires descriptions for split positions', async (t) => {
+  const cost = createCost(100, { _id: 'EUR' }, new Date('2023-09-14T00:00:00.000Z'))
+  cost.positions.push({ ...cost.positions[0], grossAmount: 21 })
+  const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), { description: 'Split expense', cost })
+  t.is(res.status, 422)
+})
+
+const expenses = [
+  () => ({ description: 'English Course', cost: createCost(82, { _id: 'GBP' }, new Date('2023-09-14T00:00:00.000Z')) }),
+  () => ({
     description: 'Dinner with customer',
-    cost: {
-      amount: 700, //@ts-ignore
-      currency: { _id: 'CNY' },
-      receipts: [
-        //@ts-expect-error
-        { name: 'Photo.jpg', type: 'image/jpeg', data: 'tests/files/dummy.jpg' }, //@ts-ignore
-        { name: 'Photo2.jpg', type: 'image/jpeg', data: 'tests/files/small-dummy.jpg' }
-      ],
-      date: new Date('2023-09-13T00:00:00.000Z')
-    }
-  }
+    cost: createCost(700, { _id: 'CNY' }, new Date('2023-09-13T00:00:00.000Z'), [
+      { name: 'Photo.jpg', type: 'image/jpeg', data: 'tests/files/dummy.jpg' },
+      { name: 'Photo2.jpg', type: 'image/jpeg', data: 'tests/files/small-dummy.jpg' }
+    ])
+  })
 ]
 
 test.serial('POST /expenseReport/expense', async (t) => {
   t.plan(expenses.length + 0)
-  for (const expense of expenses) {
+  for (const createExpense of expenses) {
+    const expense = createExpense()
     const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), expense)
     if (res.status === 200) {
       expenseReport = res.body.result
@@ -350,11 +345,15 @@ test.serial('POST /expenseReport/expense adds missing receipt', async (t) => {
   }
 
   const updatedExpense = {
-    ...expenseWithoutReceipt,
-    cost: {
-      ...expenseWithoutReceipt.cost,
-      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
-    }
+    _id: expenseWithoutReceipt._id,
+    description: expenseWithoutReceipt.description,
+    note: expenseWithoutReceipt.note,
+    cost: createCost(
+      expenseWithoutReceipt.cost.positions[0].grossAmount,
+      { _id: expenseWithoutReceipt.cost.currency._id },
+      new Date(expenseWithoutReceipt.cost.date || 0),
+      [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
+    )
   }
 
   const res = await postMultipartExpense('/expenseReport/expense', expenseReport._id.toString(), updatedExpense)
@@ -416,8 +415,20 @@ test.serial('POST /expenseReport/underExamination AGAIN', async (t) => {
 test.serial('POST /examine/expenseReport/expense', async (t) => {
   await loginUser(agent, 'expenseReport')
   t.plan(2)
+  const expense = (expenseReport as ExpenseReport).expenses[0]
+  const expenseBody = {
+    _id: expense._id,
+    description: expense.description,
+    note: expense.note,
+    cost: createCost(
+      expense.cost.positions[0].grossAmount,
+      { _id: expense.cost.currency._id },
+      new Date(expense.cost.date || 0),
+      expense.cost.receipts
+    )
+  }
   let req = agent.post('/examine/expenseReport/expense').query({ parentId: expenseReport._id.toString() })
-  for (const entry of objectToFormFields((expenseReport as ExpenseReport).expenses[0])) {
+  for (const entry of objectToFormFields(expenseBody)) {
     req = req.field(entry.field, entry.val)
   }
   const res = await req
@@ -456,6 +467,110 @@ test.serial('GET /expenseReport/report', async (t) => {
 })
 
 // BOOK
+
+test.serial('POST /book/expenseReport/bookingExportPackage', async (t) => {
+  const organisation = await Organisation.findById(idDocumentToId(expenseReport.project.organisation)).lean()
+  t.truthy(organisation)
+  if (!organisation) return
+  const originalLiabilityAccount = idDocumentToId(organisation.accountingSettings.employeeLiabilitiesAccount)
+  const replacementLiabilityAccount = await LedgerAccount.create({
+    identifier: `liability-${new Types.ObjectId()}`,
+    name: 'Updated employee liabilities'
+  })
+  await Organisation.updateOne(
+    { _id: organisation._id },
+    { $set: { 'accountingSettings.employeeLiabilitiesAccount': replacementLiabilityAccount._id } }
+  )
+
+  await User.updateOne({ _id: expenseReport.owner._id }, { $set: { employeeId: 'E-1' } })
+  await loginUser(agent, 'expenseReport')
+  const res = await requestBookingExport(agent, '/book/expenseReport', [expenseReport._id], { includeBankBookings: true })
+  t.is(res.status, 200)
+  const bookings = res.body.result.bookings as BookingExportRow[]
+  assertBookingsBalanced(t, bookings, 'ExpenseReport')
+  t.true(bookings.every(({ employee }) => employee.employeeId === 'E-1'))
+  t.is(res.body.result.sepaFiles.length, 1)
+  const bankBookings = bookings.filter(({ remark }) => remark?.startsWith('SEPA '))
+  t.is(bankBookings.length, 2)
+  t.deepEqual(
+    bankBookings.map(({ side, ledgerAccount }) => ({ side, account: ledgerAccount.identifier })),
+    [
+      { side: 'debit', account: replacementLiabilityAccount.identifier },
+      { side: 'credit', account: '1200' }
+    ]
+  )
+  await Organisation.updateOne(
+    { _id: organisation._id },
+    { $set: { 'accountingSettings.employeeLiabilitiesAccount': originalLiabilityAccount } }
+  )
+
+  const validPreview = await agent.post('/book/expenseReport/bookingExportPreview').send([expenseReport._id])
+  const foreignAccountResponse = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({
+      reports: [expenseReport._id],
+      executionDate: '2026-08-01',
+      bankAccounts: [{ organisation: validPreview.body.result.organisations[0]._id, account: '507f1f77bcf86cd799439011' }]
+    })
+  t.is(foreignAccountResponse.status, 422)
+
+  const invalidDateResponse = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({ reports: [expenseReport._id], executionDate: '2026-02-30', bankAccounts: [] })
+  t.is(invalidDateResponse.status, 422)
+
+  await User.updateOne({ _id: expenseReport.owner._id }, { $unset: { 'settings.bankAccount': '' } })
+  const missingBankPreview = await agent.post('/book/expenseReport/bookingExportPreview').send([expenseReport._id])
+  t.is(missingBankPreview.status, 200)
+  t.true(missingBankPreview.body.result.errors.some((error: string) => error.startsWith('missingEmployeeBankAccount:')))
+  const incompletePackage = await agent
+    .post('/book/expenseReport/bookingExportPackage')
+    .send({ reports: [expenseReport._id], executionDate: '2026-08-01', bankAccounts: [] })
+  t.is(incompletePackage.status, 422)
+})
+
+test.serial('bookable expense report reverses negative net and VAT totals', async (t) => {
+  await loginUser(agent, 'user')
+  const createResponse = await agent.post('/expenseReport/inWork').send({ name: 'Negative VAT report', project: expenseReport.project })
+  t.is(createResponse.status, 200)
+  const negativeReport = createResponse.body.result as ExpenseReportSimple
+
+  try {
+    const cost = createCost(-119, { _id: 'EUR' }, new Date('2026-07-01T00:00:00.000Z'), [
+      { name: 'Credit note.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
+    ])
+    cost.positions[0].vatRate = 19
+    const expenseResponse = await postMultipartExpense('/expenseReport/expense', negativeReport._id.toString(), {
+      description: 'Credit note',
+      cost
+    })
+    t.is(expenseResponse.status, 200)
+    t.is((await agent.post('/expenseReport/underExamination').send({ _id: negativeReport._id })).status, 200)
+
+    await loginUser(agent, 'expenseReport')
+    t.is((await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: negativeReport._id })).status, 200)
+    const exportResponse = await requestBookingExport(agent, '/book/expenseReport', [negativeReport._id])
+    t.is(exportResponse.status, 200)
+    const bookings = exportResponse.body.result.bookings as BookingExportRow[]
+    t.deepEqual(exportResponse.body.result.sepaFiles, [])
+    assertBookingsBalanced(t, bookings, 'ExpenseReport')
+    t.deepEqual(
+      bookings
+        .filter(({ side }) => side === 'credit')
+        .map(({ amount }) => amount)
+        .sort((left, right) => left - right),
+      [19, 100]
+    )
+    t.deepEqual(
+      bookings.filter(({ side }) => side === 'debit').map(({ amount }) => amount),
+      [119]
+    )
+  } finally {
+    await loginUser(agent, 'user')
+    const deleteResponse = await agent.delete('/expenseReport').query({ _id: negativeReport._id.toString() })
+    t.is(deleteResponse.status, 200)
+  }
+})
 
 test.serial('POST /book/expenseReport/booked', async (t) => {
   await loginUser(agent, 'expenseReport')

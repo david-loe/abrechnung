@@ -1,4 +1,5 @@
 import {
+  CostPosition,
   Currency,
   CurrencyCode,
   DocumentFileType,
@@ -38,8 +39,15 @@ export interface MoneyPlusPost extends MoneyPost {
   date?: Date
 }
 
-export interface ExpenseBulkImportCostPost extends Omit<MoneyPlusPost, 'exchangeRate' | 'receipts'> {
-  exchangeRate?: Money['exchangeRate']
+interface ExpenseBulkImportPositionPost extends Omit<CostPosition<Types.ObjectId>, '_id' | 'project' | 'category'> {
+  _id?: string
+  project: string
+  category: string
+}
+
+export interface ExpenseBulkImportCostPost {
+  positions: ExpenseBulkImportPositionPost[]
+  currency: CurrencyCode
   date: Date
 }
 

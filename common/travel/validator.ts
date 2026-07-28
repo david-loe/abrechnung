@@ -1,5 +1,6 @@
 import { type ValidationReference, type ValidationResult, Validator, type ValidatorSettings } from '../report/validator.js'
 import { _id, binary, Travel, TravelSettings } from '../types.js'
+import { getCostGrossAmount } from '../utils/scripts.js'
 import { getStagesOutOfBounds } from './utils.js'
 
 type ValidatableTravel = Pick<Travel<_id, binary>, 'stages' | 'expenses' | 'startDate' | 'endDate' | 'professionalShare'>
@@ -106,7 +107,7 @@ export class TravelValidator extends Validator<ValidatableTravel, TravelValidato
     settings: Required<TravelValidatorSettings>,
     context?: TravelValidationContext
   ) {
-    if (!stage.cost?.amount) {
+    if (!stage.cost || !getCostGrossAmount(stage.cost)) {
       return false
     }
 

@@ -1,8 +1,21 @@
-import { Stage, Travel, TravelExpense, TravelSimple, TravelState, User } from 'abrechnung-common/types.js'
+import {
+  BookingExportRow,
+  Category,
+  idDocumentToId,
+  Stage,
+  Travel,
+  TravelExpense,
+  TravelSimple,
+  TravelState,
+  User
+} from 'abrechnung-common/types.js'
 import test from 'ava'
+import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import TravelModel from '../../models/travel.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -20,6 +33,22 @@ let travel: TravelSimple = {
 }
 
 let originalVehicleRegistrationSetting: 'required' | 'optional' | 'none' | undefined
+let category: Category
+
+function withCostPositions<T>(record: T, description: string, kind: 'manual' | 'ownCar' = 'manual') {
+  const input = record as T & { cost: { amount?: number | null } }
+  const { amount, ...cost } = input.cost
+  return {
+    ...record,
+    cost: {
+      ...cost,
+      positions:
+        typeof amount === 'number'
+          ? [{ kind, ...(kind === 'manual' ? { description } : {}), grossAmount: amount, vatRate: 0, project: travel.project, category }]
+          : []
+    }
+  }
+}
 
 async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none') {
   await loginUser(agent, 'admin')
@@ -30,8 +59,9 @@ async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwn
 }
 
 test.serial('GET /project', async (t) => {
-  const res = await agent.get('/project')
+  const [res, categoryResponse] = await Promise.all([agent.get('/project'), agent.get('/category')])
   travel.project = res.body.data[0]
+  category = categoryResponse.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
   if (res.status === 200) {
     t.pass()
   } else {
@@ -171,7 +201,7 @@ const stages: Stage[] = [
     midnightCountries: [],
     transport: { type: 'airplane' }, //@ts-ignore
     cost: {
-      amount: null, //@ts-ignore
+      amount: 0, //@ts-ignore
       currency: { _id: 'EUR' }
     },
     purpose: 'professional'
@@ -182,8 +212,9 @@ test.serial('POST /travel/stage', async (t) => {
   await loginUser(agent, 'user')
   t.plan(stages.length + 0)
   for (const stage of stages) {
+    const stageBody = withCostPositions(stage, stage.transport.type)
     let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(stage)) {
+    for (const entry of objectToFormFields(stageBody)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -217,8 +248,9 @@ const expenses: TravelExpense[] = [
 test.serial('POST /travel/expense', async (t) => {
   t.plan(expenses.length + 0)
   for (const expense of expenses) {
+    const expenseBody = withCostPositions(expense, expense.description)
     let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(expense)) {
+    for (const entry of objectToFormFields(expenseBody)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -394,7 +426,7 @@ test.serial('POST /travel/underExamination rejects ownCar without owner vehicle 
   }
 
   let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(ownCarStage)) {
+  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
     stageRequest = stageRequest.field(entry.field, entry.val)
   }
   const stageResponse = await stageRequest
@@ -472,7 +504,7 @@ test.serial('POST /travel/underExamination allows ownCar with owner vehicle regi
   }
 
   let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(ownCarStage)) {
+  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
     stageRequest = stageRequest.field(entry.field, entry.val)
   }
   const stageResponse = await stageRequest
@@ -527,6 +559,60 @@ test.serial('GET /travel/report', async (t) => {
 })
 
 // BOOK
+
+test.serial('POST /book/travel/bookingExportPackage', async (t) => {
+  const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())
+  await TravelModel.collection.updateOne(
+    { _id: new Types.ObjectId(idDocumentToId(travel._id).toString()) },
+    {
+      $set: {
+        professionalShare: 0.5,
+        stages: [],
+        days: [],
+        addUp: [{ project: projectId, advance: { amount: 0 } }],
+        expenses: [
+          {
+            _id: new Types.ObjectId(),
+            description: 'Mixed cent expenses',
+            purpose: 'mixed',
+            cost: {
+              positions: [1, 2].map((position) => ({
+                _id: new Types.ObjectId(),
+                kind: 'manual',
+                description: `Mixed cent expense ${position}`,
+                grossAmount: 0.01,
+                vatRate: 0,
+                project: projectId,
+                category: new Types.ObjectId(idDocumentToId(category._id).toString())
+              })),
+              currency: 'EUR',
+              exchangeRate: null,
+              receipts: [],
+              date: new Date('2026-07-01T00:00:00.000Z')
+            }
+          }
+        ]
+      }
+    }
+  )
+
+  await loginUser(agent, 'travel')
+  const preview = await agent.post('/book/travel/bookingExportPreview').send([travel._id])
+  t.is(preview.status, 200)
+  t.is(preview.body.result.organisations[0].amount, 0.01)
+  const res = await requestBookingExport(agent, '/book/travel', [travel._id])
+  t.is(res.status, 200)
+  const bookings = res.body.result.bookings as BookingExportRow[]
+  assertBookingsBalanced(t, bookings, 'Travel')
+  t.deepEqual(
+    bookings.map(({ side, amount }) => ({ side, amount })),
+    [
+      { side: 'debit', amount: 0.01 },
+      { side: 'credit', amount: 0.01 }
+    ]
+  )
+  t.is(res.body.result.sepaFiles.length, 1)
+})
 
 test.serial('POST /book/travel/booked', async (t) => {
   await loginUser(agent, 'travel')

@@ -39,6 +39,10 @@ export class Validator<
 > {
   protected settings: Required<TSettings>
   protected expenseValidators: ExpenseValidatorFn[] = [
+    (expense, settings) =>
+      !expense.cost?.positions || expense.cost.positions.length < 1
+        ? [{ code: 'required', severity: 'error', path: `${settings.pathPrefix}cost.positions`, reference: settings.reference }]
+        : [],
     (expense, settings) => {
       if (!settings.requireReceipts) {
         return []

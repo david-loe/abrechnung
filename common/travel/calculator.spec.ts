@@ -5,6 +5,21 @@ import travelSettings from './travelSettings.js'
 import { combineTravelValidationResults } from './validator.js'
 
 function createSetup() {
+  const project = { _id: 'p1', name: 'P', identifier: '1', organisation: 'o1', balance: { amount: 0 } }
+  const category = {
+    _id: 'c1',
+    name: 'Travel',
+    ledgerAccount: { _id: 'l1', identifier: '1', name: 'Travel' },
+    style: { color: '#fff' as const, text: 'black' as const },
+    isDefault: true,
+    for: 'Travel' as const
+  }
+  const ownCarCost = (date: Date) => ({
+    positions: [{ _id: `p-${date.toISOString()}`, kind: 'ownCar' as const, grossAmount: 0, vatRate: 0, project, category }],
+    currency: baseCurrency,
+    date,
+    receipts: []
+  })
   const countryDE: Country = {
     _id: 'DE',
     name: { de: 'Deutschland', en: '', fr: '', es: '', ru: '', kk: '' },
@@ -35,7 +50,7 @@ function createSetup() {
       startLocation: { place: 'Berlin', country: countryDE },
       endLocation: { place: 'Paris', country: countryFR },
       transport: { type: 'ownCar' as const, distance: 100, distanceRefundType: 'car' as const },
-      cost: { amount: 0, currency: baseCurrency, date: new Date('2023-01-01'), receipts: [] },
+      cost: ownCarCost(new Date('2023-01-01')),
       purpose: 'professional' as const,
       _id: 's1'
     },
@@ -45,7 +60,7 @@ function createSetup() {
       startLocation: { place: 'Paris', country: countryFR },
       endLocation: { place: 'Berlin', country: countryDE },
       transport: { type: 'ownCar' as const, distance: 200, distanceRefundType: 'car' as const },
-      cost: { amount: 0, currency: baseCurrency, date: new Date('2023-01-02'), receipts: [] },
+      cost: ownCarCost(new Date('2023-01-02')),
       purpose: 'professional' as const,
       _id: 's2'
     }
@@ -81,7 +96,7 @@ function createSetup() {
     name: 'Trip',
     owner: { _id: 'u1', name: { familyName: '1', givenName: 'User' }, email: 'user1@email.com' },
     editor: { _id: 'u1', name: { familyName: '1', givenName: 'User' }, email: 'user1@email.com' },
-    project: { _id: 'p1', name: 'P', identifier: '1', organisation: 'o1', balance: { amount: 0 } },
+    project,
     comments: [],
     state: TravelState.APPROVED,
     log: {},
@@ -89,6 +104,7 @@ function createSetup() {
     updatedAt: new Date(),
     addUp: [],
     advances: [],
+    bookings: [],
     reason: 'Reason',
     history: [],
     historic: false,
@@ -135,8 +151,8 @@ test('calc computes refunds and costs', async (t) => {
   const { tc, travel } = createSetup()
   const { result, conflicts } = await tc.calc(travel)
   t.is(conflicts.length, 0)
-  t.is(result?.stages[0].cost.amount, 30)
-  t.is(result?.stages[1].cost.amount, 60)
+  t.is(result?.stages[0].cost.positions[0].grossAmount, 30)
+  t.is(result?.stages[1].cost.positions[0].grossAmount, 60)
   t.is(result?.days[0].lumpSums.catering.refund.amount, 2.4)
   t.is(result?.days[1].lumpSums.catering.refund.amount, 0)
   t.is(result?.days[0].lumpSums.overnight.refund.amount, 40)
@@ -192,7 +208,14 @@ test('validator requires receipts for non-own-car travel stages with a cost amou
   const { tc, stages, travel } = createSetup()
   const results = tc.validator.getValidationResults({
     ...travel,
-    stages: [{ ...stages[0], transport: { type: 'airplane' }, cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+    stages: [
+      {
+        ...stages[0],
+        transport: { type: 'airplane' },
+        cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], kind: 'manual', grossAmount: 10 }], receipts: [] }
+      },
+      stages[1]
+    ]
   })
 
   t.true(
@@ -212,7 +235,10 @@ test('validator requires own car proof when vehicle registration is required and
 
   const results = tc.validator.getValidationResults({
     ...travel,
-    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+    stages: [
+      { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
+      stages[1]
+    ]
   })
 
   t.true(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
@@ -226,7 +252,13 @@ test('validator accepts vehicle registration context for own car when required',
   ]
 
   const results = tc.validator.getValidationResults(
-    { ...travel, stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]] },
+    {
+      ...travel,
+      stages: [
+        { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
+        stages[1]
+      ]
+    },
     { vehicleRegistration }
   )
 
@@ -239,7 +271,10 @@ test('validator does not require own car receipts when vehicle registration is o
 
   const results = tc.validator.getValidationResults({
     ...travel,
-    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+    stages: [
+      { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
+      stages[1]
+    ]
   })
 
   t.false(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))
@@ -251,7 +286,10 @@ test('validator does not require own car receipts when vehicle registration is d
 
   const results = tc.validator.getValidationResults({
     ...travel,
-    stages: [{ ...stages[0], cost: { ...stages[0].cost, amount: 10, receipts: [] } }, stages[1]]
+    stages: [
+      { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
+      stages[1]
+    ]
   })
 
   t.false(results.some((result) => result.code === 'requiredForReview' && result.path === 'stages.0.cost.receipts'))

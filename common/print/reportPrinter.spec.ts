@@ -20,6 +20,7 @@ const advance: Advance<string> = {
   log: {},
   createdAt: new Date('2026-01-01'),
   updatedAt: new Date('2026-01-01'),
+  bookings: [],
   history: [],
   historic: false,
   budget: { amount: 100, currency: baseCurrency },

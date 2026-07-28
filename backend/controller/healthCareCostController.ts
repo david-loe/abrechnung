@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Validator } from 'abrechnung-common/report/validator.js'
 import {
+  BookingExportPackageRequest,
   Expense,
   HealthCareCostState,
   IdDocument,
@@ -21,6 +22,7 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
@@ -48,7 +50,7 @@ export class HealthCareCostController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { createdAt: -1 }
     })
@@ -73,11 +75,6 @@ export class HealthCareCostController extends Controller {
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
@@ -92,7 +89,7 @@ export class HealthCareCostController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -223,7 +220,7 @@ export class HealthCareCostExamineController extends Controller {
     return await this.getter(HealthCareCost, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -247,11 +244,6 @@ export class HealthCareCostExamineController extends Controller {
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
@@ -270,7 +262,7 @@ export class HealthCareCostExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: Expense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -442,7 +434,7 @@ export class HealthCareCostBookableController extends Controller {
     return await this.getter(HealthCareCost, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -466,6 +458,19 @@ export class HealthCareCostBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(HealthCareCost, 'HealthCareCost', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(HealthCareCost, 'HealthCareCost', requestBody, request) }
   }
 
   @Post('booked')

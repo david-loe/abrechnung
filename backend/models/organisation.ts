@@ -1,22 +1,79 @@
-import { emailRegex, Organisation } from 'abrechnung-common/types.js'
+import { emailRegex, Organisation, TravelExpenseItem, travelExpenseItems } from 'abrechnung-common/types.js'
 import { model, mongo, Query, Schema, Types } from 'mongoose'
+import { bankAccountSchema } from './bankAccount.js'
 import { populateSelected } from './helper.js'
 
-export const organisationSchema = () =>
-  new Schema<Organisation<Types.ObjectId, mongo.Binary>>({
+export const organisationSchema = () => {
+  const accountMapping = {} as { [key in TravelExpenseItem]: { type: typeof Schema.Types.ObjectId; required: true; ref: 'LedgerAccount' } }
+  for (const item of travelExpenseItems) {
+    accountMapping[item] = { type: Schema.Types.ObjectId, required: true, ref: 'LedgerAccount' }
+  }
+
+  return new Schema<Organisation<Types.ObjectId, mongo.Binary>>({
     name: { type: String, trim: true, required: true },
     reportEmail: { type: String, validate: emailRegex },
     a1CertificateEmail: { type: String, validate: emailRegex },
+    accountingSettings: {
+      type: {
+        employeeLiabilitiesAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
+        employeeClaimsAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
+        employeeSpecificTemplate: { type: String, trim: true },
+        accountMapping: { type: accountMapping, required: true },
+        vatAccountingEnabled: { type: Boolean, required: true, default: true },
+        includeBankBookings: { type: Boolean, required: true, default: false },
+        payoutAccounts: {
+          type: [
+            {
+              type: {
+                name: { type: String, trim: true, required: true },
+                ...bankAccountSchema,
+                ledgerAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+              }
+            }
+          ],
+          required: true,
+          default: () => []
+        },
+        vatRates: {
+          type: [
+            {
+              type: {
+                rate: { type: Number, min: 0, max: 100, required: true },
+                inputTaxAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount' }
+              }
+            }
+          ],
+          required: true,
+          validate: {
+            validator: (rates: { rate: number; inputTaxAccount?: Types.ObjectId }[]) =>
+              rates.some(({ rate }) => rate === 0) &&
+              new Set(rates.map(({ rate }) => rate)).size === rates.length &&
+              rates.every(({ rate, inputTaxAccount }) => rate === 0 || Boolean(inputTaxAccount)),
+            message: 'invalidVatRates'
+          }
+        }
+      },
+      required: true,
+      validate: {
+        validator: (settings: Organisation<Types.ObjectId>['accountingSettings']) =>
+          !settings.includeBankBookings || settings.payoutAccounts.every(({ ledgerAccount }) => Boolean(ledgerAccount)),
+        message: 'missingBankLedgerAccount'
+      }
+    },
     website: { type: String },
-    bankDetails: { type: String, multiline: true },
-    companyNumber: { type: String, trim: true },
     logo: { type: Schema.Types.ObjectId, ref: 'DocumentFile' },
-    subfolderPath: { type: String, trim: true, default: '' }
+    subfolderPath: { type: String, trim: true, default: '' },
+    bankDetails: { type: String, multiline: true },
+    companyNumber: { type: String, trim: true }
   })
+}
 
 const schema = organisationSchema()
 
-const populates = { logo: [{ path: 'logo', select: { name: 1, type: 1 } }] }
+const populates = {
+  logo: [{ path: 'logo', select: { name: 1, type: 1 } }],
+  accountingSettings: [{ path: 'accountingSettings.payoutAccounts.ledgerAccount' }]
+}
 
 schema.pre(
   /^find((?!Update).)*$/,

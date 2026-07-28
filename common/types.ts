@@ -228,7 +228,9 @@ export interface BadgeStyle {
 export interface Category<idType extends _id = _id> {
   name: string
   style: BadgeStyle
+  ledgerAccount: LedgerAccount<idType>
   isDefault: boolean
+  for: 'Travel' | 'ExpenseReport' | 'both'
   _id: idType
 }
 
@@ -325,6 +327,10 @@ export interface OrganisationSimple<idType extends _id = _id> {
   _id: idType
 }
 
+export interface OrganisationWithVatSettings<idType extends _id = _id> extends OrganisationSimple<idType> {
+  accountingSettings: { vatAccountingEnabled: boolean; vatRates: Pick<VatRate<idType>, 'rate'>[] }
+}
+
 export interface ProjectSimple<idType extends _id = _id> {
   identifier: string
   organisation: idType
@@ -347,8 +353,37 @@ export interface ProjectUsers<idType extends _id = _id> {
 
 export interface ProjectWithUsers<idType extends _id = _id> extends Project<idType>, ProjectUsers<idType> {}
 
+export interface AccountingSettings<idType extends _id = _id> {
+  employeeLiabilitiesAccount: LedgerAccount<idType>
+  employeeClaimsAccount: LedgerAccount<idType>
+  employeeSpecificTemplate?: string | null
+  accountMapping: { [key in TravelExpenseItem]: LedgerAccount<idType> }
+  vatAccountingEnabled: boolean
+  vatRates: VatRate<idType>[]
+  payoutAccounts: OrganisationBankAccount<idType>[]
+  includeBankBookings: boolean
+}
+
+export interface BankAccount {
+  accountHolder: string
+  iban: string
+  bic?: string | null
+}
+
+export interface OrganisationBankAccount<idType extends _id = _id> extends BankAccount {
+  _id: idType
+  name: string
+  ledgerAccount?: LedgerAccount<idType> | null
+}
+
+export interface VatRate<idType extends _id = _id> {
+  rate: number
+  inputTaxAccount?: LedgerAccount<idType> | null
+}
+
 export interface Organisation<idType extends _id = _id, dataType extends binary = binary> extends OrganisationSimple<idType> {
   subfolderPath: string
+  accountingSettings: AccountingSettings<idType>
   reportEmail?: string | null
   a1CertificateEmail?: string | null
   bankDetails?: string | null
@@ -358,6 +393,7 @@ export interface Organisation<idType extends _id = _id, dataType extends binary 
 }
 
 export interface User<idType extends _id = _id, dataType extends binary = binary> extends UserSimple<idType> {
+  employeeId?: string | null
   fk: { microsoft?: string | null; ldapauth?: string | null; magiclogin?: string | null; oidc?: string | null; httpBearer?: string | null }
   access: {
     [key in Access]: boolean
@@ -370,6 +406,7 @@ export interface User<idType extends _id = _id, dataType extends binary = binary
     lastCountries: CountrySimple[]
     insurance?: HealthInsurance<idType> | null
     organisation?: OrganisationSimple<idType> | null
+    bankAccount?: BankAccount | null
     showInstallBanner: boolean
   }
   loseAccessAt?: null | Date | string
@@ -420,9 +457,22 @@ export interface MoneyPlus<idType extends _id = _id, dataType extends binary = b
   date?: Date | string | null
 }
 
-export interface Cost<idType extends _id = _id, dataType extends binary = binary> extends MoneyPlus<idType, dataType> {
+export interface CostPosition<idType extends _id = _id> {
+  kind: 'manual' | 'ownCar'
+  description?: string | null
+  grossAmount: number
+  vatRate: number
+  project: ProjectSimple<idType>
+  category: Category<idType>
+  _id?: idType
+}
+
+export interface Cost<idType extends _id = _id, dataType extends binary = binary> {
+  positions: CostPosition<idType>[]
+  currency: Currency
+  exchangeRate?: { date: Date | string; rate: number } | null
   receipts: DocumentFile<idType, dataType>[]
-  date: Date | string
+  date?: Date | string | null
 }
 
 export interface Stage<idType extends _id = _id, dataType extends binary = binary> {
@@ -434,7 +484,6 @@ export interface Stage<idType extends _id = _id, dataType extends binary = binar
   transport: Transport
   cost: Cost<idType, dataType>
   purpose: Purpose
-  project?: ProjectSimple<idType> | null
   note?: string | null
   _id: idType
 }
@@ -442,7 +491,6 @@ export interface Stage<idType extends _id = _id, dataType extends binary = binar
 export interface Expense<idType extends _id = _id, dataType extends binary = binary> {
   description: string
   cost: Cost<idType, dataType>
-  project?: ProjectSimple<idType> | null
   note?: string | null
   _id: idType
 }
@@ -508,6 +556,7 @@ export interface ReportSimple<idType extends _id = _id, S extends AnyState = Any
 }
 
 export interface Report<idType extends _id = _id, S extends AnyState = AnyState> extends ReportSimple<idType, S> {
+  bookings: Booking<idType>[]
   history: idType[]
   historic: boolean
 }
@@ -560,7 +609,6 @@ export interface Travel<idType extends _id = _id, dataType extends binary = bina
 export interface ExpenseReportSimple<idType extends _id = _id> extends ReportSimple<idType, ExpenseReportState> {
   addUp: AddUp<idType, ExpenseReport<_id, binary>>[]
   advances: AdvanceBase<idType>[]
-  category: Category<idType>
 }
 export interface ExpenseReport<idType extends _id = _id, dataType extends binary = binary>
   extends ExpenseReportSimple<idType>,
@@ -639,6 +687,65 @@ export enum HealthCareCostState {
 export type HealthCareCostStateStrings = keyof typeof HealthCareCostState
 export const healthCareCostStates = Object.values(HealthCareCostState).filter((v) => typeof v === 'number')
 
+export type BookingSide = 'debit' | 'credit'
+
+export interface Booking<idType extends _id = _id> {
+  side: BookingSide
+  ledgerAccount: LedgerAccount<idType>
+  amount: number
+  date: Date | string
+  project: ProjectSimple<idType>
+  remark?: string | null
+  _id: idType
+}
+
+export interface BookingExportRow<idType extends _id = _id> extends Booking<idType> {
+  report: { _id: idType; name: string; reference: number }
+  reportType: ReportModelName
+  employee: { _id: idType; name: User['name']; employeeId: User['employeeId'] }
+}
+
+export interface BookingExportAccount<idType extends _id = _id> {
+  _id: idType
+  name: string
+  maskedIban: string
+}
+
+export interface BookingExportOrganisation<idType extends _id = _id> {
+  _id: idType
+  name: string
+  amount: number
+  accounts: BookingExportAccount<idType>[]
+}
+
+export interface BookingExportPreview<idType extends _id = _id> {
+  organisations: BookingExportOrganisation<idType>[]
+  errors: string[]
+}
+
+export interface BookingExportPackageRequest<idType extends _id = _id> {
+  reports: IdDocument<idType>[]
+  executionDate: string
+  bankAccounts: { organisation: idType; account: idType }[]
+}
+
+export interface SepaExportFile {
+  organisation: { name: string }
+  account: { lastFour: string }
+  xml: string
+}
+
+export interface BookingExportPackage<idType extends _id = _id> {
+  bookings: BookingExportRow<idType>[]
+  sepaFiles: SepaExportFile[]
+}
+
+export interface LedgerAccount<idType extends _id = _id> {
+  identifier: string
+  name: string
+  _id: idType
+}
+
 export const locales = ['de', 'en', 'fr', 'ru', 'es', 'kk'] as const
 export type Locale = (typeof locales)[number]
 
@@ -667,6 +774,9 @@ export type NameDisplayFormat = (typeof nameDisplayFormats)[number]
 
 export const defaultLastPlaceOfWorkSettings = ['destinationPlace', 'lastEndLocation'] as const
 export type DefaultLastPlaceOfWorkSetting = (typeof defaultLastPlaceOfWorkSettings)[number]
+
+export const travelExpenseItems = ['cateringLumpSum', 'overnightLumpSum', 'airplane', 'shipOrFerry', 'otherTransport', 'ownCar'] as const
+export type TravelExpenseItem = (typeof travelExpenseItems)[number]
 
 export function getReportTypeFromModelName(modelName: ReportModelName): ReportType {
   switch (modelName) {

@@ -1,6 +1,7 @@
 import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import {
+  BookingExportPackageRequest,
   IdDocument,
   Travel as ITravel,
   User as IUser,
@@ -20,6 +21,7 @@ import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ApprovedTravel from '../models/approvedTravel.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
+import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
@@ -48,7 +50,7 @@ export class TravelController extends Controller {
       query,
       // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
       filter: { owner: request.user._id as any, historic: false },
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0, bookingRemark: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0, bookingRemark: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { startDate: -1 }
     })
@@ -86,11 +88,6 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as TravelExpense,
       parentId,
@@ -105,7 +102,7 @@ export class TravelController extends Controller {
         }
         return false
       },
-      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -117,11 +114,6 @@ export class TravelController extends Controller {
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as Stage,
       parentId,
@@ -307,7 +299,7 @@ export class TravelApproveController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0 },
       sort: { updatedAt: -1 }
     })
   }
@@ -393,7 +385,7 @@ export class TravelExamineController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0, stages: 0, days: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0 },
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { updatedAt: -1 }
     })
@@ -431,11 +423,6 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<TravelExpense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as TravelExpense,
       parentId,
@@ -454,7 +441,7 @@ export class TravelExamineController extends Controller {
         }
         return false
       },
-      sortFn: (a: TravelExpense, b) => new Date(a.cost.date).valueOf() - new Date(b.cost.date).valueOf()
+      sortFn: (a: TravelExpense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
   }
 
@@ -466,11 +453,6 @@ export class TravelExamineController extends Controller {
     @Body() requestBody: SetterBody<Stage<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    // multipart/form-data does not send null values
-    // so we need to set it to null if the value is an empty string
-    if (requestBody.project?.toString() === '') {
-      requestBody.project = null
-    }
     return await this.setterForArrayElement(Travel, {
       requestBody: requestBody as Stage,
       parentId,
@@ -638,7 +620,7 @@ export class TravelBookableController extends Controller {
     return await this.getter(Travel, {
       query,
       filter,
-      projection: { history: 0, historic: 0, expenses: 0 },
+      projection: { history: 0, historic: 0, bookings: 0, expenses: 0 },
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
@@ -661,6 +643,19 @@ export class TravelBookableController extends Controller {
     this.setHeader('Content-Type', 'application/pdf')
     this.setHeader('Content-Length', report.length)
     return Readable.from([report])
+  }
+
+  @Post('bookingExportPreview')
+  public async postBookingExportPreview(@Body() requestBody: IdDocument<string>[], @Request() request: AuthenticatedExpressRequest) {
+    return { result: await getBookingExportPreview(Travel, 'Travel', requestBody, request) }
+  }
+
+  @Post('bookingExportPackage')
+  public async postBookingExportPackage(
+    @Body() requestBody: BookingExportPackageRequest<string>,
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    return { result: await createBookingExportPackage(Travel, 'Travel', requestBody, request) }
   }
 
   @Post('booked')

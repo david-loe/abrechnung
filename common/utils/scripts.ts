@@ -7,6 +7,8 @@ import {
   BaseCurrencyMoney,
   baseCurrency,
   binary,
+  Cost,
+  CostPosition,
   ExpenseReport,
   FlatAddUp,
   HealthCareCost,
@@ -278,6 +280,36 @@ export function getBaseCurrencyAmount(a: Money): number {
   return amount
 }
 
+export function getCostGrossAmount(cost: Pick<Cost, 'positions'>) {
+  return roundAmount(cost.positions.reduce((sum, position) => sumAmounts(sum, position.grossAmount), 0))
+}
+
+export function getEffectiveCostPositionVatRate(position: Pick<CostPosition, 'vatRate'>, vatAccountingEnabled: boolean) {
+  return vatAccountingEnabled ? position.vatRate : 0
+}
+
+export function getCostPositionVatAmount(position: Pick<CostPosition, 'grossAmount' | 'vatRate'>, vatAccountingEnabled: boolean) {
+  const vatRate = getEffectiveCostPositionVatRate(position, vatAccountingEnabled)
+  if (vatRate === 0) return 0
+  return roundAmount(new Big(position.grossAmount).times(vatRate).div(new Big(100).plus(vatRate)).toNumber())
+}
+
+export function getCostPositionNetAmount(position: Pick<CostPosition, 'grossAmount' | 'vatRate'>, vatAccountingEnabled: boolean) {
+  return roundAmount(subtractAmounts(position.grossAmount, getCostPositionVatAmount(position, vatAccountingEnabled)))
+}
+
+export function getCostPositionBaseCurrencyAmount(
+  cost: Pick<Cost, 'currency' | 'exchangeRate'>,
+  position: Pick<CostPosition, 'grossAmount'>
+) {
+  if (idDocumentToId(cost.currency) === baseCurrency._id) return position.grossAmount
+  return cost.exchangeRate ? multiplyAmountAndRound(position.grossAmount, cost.exchangeRate.rate) : 0
+}
+
+export function getCostBaseCurrencyAmount(cost: Pick<Cost, 'currency' | 'exchangeRate' | 'positions'>) {
+  return roundAmount(cost.positions.reduce((sum, position) => sumAmounts(sum, getCostPositionBaseCurrencyAmount(cost, position)), 0))
+}
+
 function defaultAddUp<idType extends _id>(projectId: idType, withLumpSums: true): FlatAddUp<idType, Travel<idType, binary>>
 function defaultAddUp<idType extends _id>(
   projectId: idType,
@@ -336,21 +368,21 @@ function addToAddUps<idType extends _id>(
 
 function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: FlatAddUp<idType, AddUpTravel>[]) {
   for (const stage of travel.stages) {
-    if (stage.cost && stage.cost.amount !== null) {
-      let add = getBaseCurrencyAmount(stage.cost)
+    for (const position of stage.cost.positions) {
+      let add = getCostPositionBaseCurrencyAmount(stage.cost, position)
       if (stage.purpose === 'mixed' && travel.professionalShare) {
         add = multiplyAmount(add, travel.professionalShare)
       }
-      addToAddUps(addUps, add, 'expenses', stage.project, true)
+      addToAddUps(addUps, add, 'expenses', position.project, true)
     }
   }
   for (const expense of travel.expenses) {
-    if (expense.cost && expense.cost.amount !== null) {
-      let add = getBaseCurrencyAmount(expense.cost)
+    for (const position of expense.cost.positions) {
+      let add = getCostPositionBaseCurrencyAmount(expense.cost, position)
       if (expense.purpose === 'mixed' && travel.professionalShare) {
         add = multiplyAmount(add, travel.professionalShare)
       }
-      addToAddUps(addUps, add, 'expenses', expense.project, true)
+      addToAddUps(addUps, add, 'expenses', position.project, true)
     }
   }
 }
@@ -363,7 +395,9 @@ export function addUp<idType extends _id, T extends AddUpTravel | AddUpReport>(r
     addTravelExpensesSum(report, addUps as FlatAddUp<idType, Travel<_id, binary>>[])
   } else {
     for (const expense of report.expenses) {
-      addToAddUps(addUps, getBaseCurrencyAmount(expense.cost), 'expenses', expense.project, isTravel)
+      for (const position of expense.cost.positions) {
+        addToAddUps(addUps, getCostPositionBaseCurrencyAmount(expense.cost, position), 'expenses', position.project, isTravel)
+      }
     }
   }
   for (const approvedAdvance of report.advances) {

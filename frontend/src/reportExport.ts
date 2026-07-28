@@ -1,11 +1,13 @@
 import {
-  baseCurrency,
   type Cost,
+  type CostPosition,
   type CountrySimple,
   type Expense,
   type ExpenseReport,
   type HealthCareCost,
+  idDocumentToId,
   type Locale,
+  type OrganisationWithVatSettings,
   type Place,
   type ProjectSimple,
   reportIsHealthCareCost,
@@ -18,10 +20,15 @@ import {
   datetimeToDateString,
   datetimeToDatetimeString,
   download,
+  getCostPositionBaseCurrencyAmount,
+  getCostPositionNetAmount,
+  getCostPositionVatAmount,
+  getEffectiveCostPositionVatRate,
   refNumberToString,
   rowsToCSV,
   sanitizeFilename
 } from 'abrechnung-common/utils/scripts.js'
+import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 
 type CsvCell = string | number | null | undefined
@@ -49,13 +56,22 @@ function projectIdentifier(project: ProjectSimple<string> | null | undefined) {
   return project?.identifier || ''
 }
 
-function costCells(cost: Cost<string>): CsvCell[] {
+function vatAccountingEnabled(position: CostPosition<string>, organisations: OrganisationWithVatSettings<string>[]) {
+  const organisationId = idDocumentToId(position.project.organisation).toString()
+  return Boolean(organisations.find(({ _id }) => _id === organisationId)?.accountingSettings.vatAccountingEnabled)
+}
+
+function costCells(cost: Cost<string>, position: CostPosition<string>, organisations: OrganisationWithVatSettings<string>[]): CsvCell[] {
+  const vatEnabled = vatAccountingEnabled(position, organisations)
   return [
-    cost.amount,
+    position.grossAmount,
+    getCostPositionNetAmount(position, vatEnabled),
+    getCostPositionVatAmount(position, vatEnabled),
+    getEffectiveCostPositionVatRate(position, vatEnabled),
     cost.currency._id,
     date(cost.exchangeRate?.date),
     cost.exchangeRate?.rate,
-    cost.exchangeRate?.amount ?? (cost.currency._id === baseCurrency._id ? cost.amount : '')
+    getCostPositionBaseCurrencyAmount(cost, position)
   ]
 }
 
@@ -98,16 +114,26 @@ function placeDetailRows(prefix: string, place: Omit<Place, 'place'> | Place | n
   return rows
 }
 
-function expenseRows(expenses: Expense<string>[], t: Translate, includePurpose = false) {
+function expenseRows(
+  expenses: Expense<string>[],
+  organisations: OrganisationWithVatSettings<string>[],
+  t: Translate,
+  includePurpose = false
+) {
   const headers = [
     t('labels.description'),
+    t('labels.position'),
     t('labels.invoiceDate'),
     t('csv.originalAmount'),
+    t('labels.netAmount'),
+    t('labels.vatAmount'),
+    t('labels.vatRate'),
     t('labels.currency'),
     t('csv.exchangeRateDate'),
     t('csv.exchangeRate'),
     t('csv.euroAmount'),
     t('csv.differentProject'),
+    t('labels.category'),
     t('labels.note')
   ]
   if (includePurpose) {
@@ -116,19 +142,23 @@ function expenseRows(expenses: Expense<string>[], t: Translate, includePurpose =
 
   return [
     headers,
-    ...expenses.map((expense) => {
-      const row: CsvRow = [
-        expense.description,
-        date(expense.cost.date),
-        ...costCells(expense.cost),
-        projectIdentifier(expense.project),
-        expense.note
-      ]
-      if (includePurpose && 'purpose' in expense) {
-        row.splice(1, 0, t(`labels.${expense.purpose}`))
-      }
-      return row
-    })
+    ...expenses.flatMap((expense) =>
+      expense.cost.positions.map((position) => {
+        const row: CsvRow = [
+          expense.description,
+          position.kind === 'ownCar' ? t('labels.ownCar') : position.description,
+          date(expense.cost.date),
+          ...costCells(expense.cost, position, organisations),
+          projectIdentifier(position.project),
+          position.category.name,
+          expense.note
+        ]
+        if (includePurpose && 'purpose' in expense) {
+          row.splice(1, 0, t(`labels.${expense.purpose}`))
+        }
+        return row
+      })
+    )
   ]
 }
 
@@ -136,7 +166,7 @@ function midnightCountries(stage: Stage<string>, locale: Locale) {
   return stage.midnightCountries?.map((entry) => `${date(entry.date)}: ${countryName(entry.country, locale)}`).join(', ') || ''
 }
 
-function stageRows(stages: Stage<string>[], locale: Locale, t: Translate): CsvRow[] {
+function stageRows(stages: Stage<string>[], organisations: OrganisationWithVatSettings<string>[], locale: Locale, t: Translate): CsvRow[] {
   return [
     [
       t('labels.departure'),
@@ -152,32 +182,41 @@ function stageRows(stages: Stage<string>[], locale: Locale, t: Translate): CsvRo
       t('labels.distanceRefundType'),
       t('labels.distance'),
       t('labels.purpose'),
+      t('labels.position'),
       t('csv.originalAmount'),
+      t('labels.netAmount'),
+      t('labels.vatAmount'),
+      t('labels.vatRate'),
       t('labels.currency'),
       t('csv.exchangeRateDate'),
       t('csv.exchangeRate'),
       t('csv.euroAmount'),
       t('csv.differentProject'),
+      t('labels.category'),
       t('labels.note')
     ],
-    ...stages.map((stage) => [
-      timestamp(stage.departure),
-      timestamp(stage.arrival),
-      stage.startLocation.place,
-      countryName(stage.startLocation.country, locale),
-      stage.startLocation.special,
-      stage.endLocation.place,
-      countryName(stage.endLocation.country, locale),
-      stage.endLocation.special,
-      midnightCountries(stage, locale),
-      t(`labels.${stage.transport.type}`),
-      stage.transport.type === 'ownCar' ? t(`distanceRefundTypes.${stage.transport.distanceRefundType}`) : '',
-      stage.transport.type === 'ownCar' ? stage.transport.distance : '',
-      t(`labels.${stage.purpose}`),
-      ...costCells(stage.cost),
-      projectIdentifier(stage.project),
-      stage.note
-    ])
+    ...stages.flatMap((stage) =>
+      (stage.cost.positions.length ? stage.cost.positions : [undefined]).map((position) => [
+        timestamp(stage.departure),
+        timestamp(stage.arrival),
+        stage.startLocation.place,
+        countryName(stage.startLocation.country, locale),
+        stage.startLocation.special,
+        stage.endLocation.place,
+        countryName(stage.endLocation.country, locale),
+        stage.endLocation.special,
+        midnightCountries(stage, locale),
+        t(`labels.${stage.transport.type}`),
+        stage.transport.type === 'ownCar' ? t(`distanceRefundTypes.${stage.transport.distanceRefundType}`) : '',
+        stage.transport.type === 'ownCar' ? stage.transport.distance : '',
+        t(`labels.${stage.purpose}`),
+        position ? (position.kind === 'ownCar' ? t('labels.ownCar') : position.description) : '',
+        ...(position ? costCells(stage.cost, position, organisations) : ['', '', '', '', stage.cost.currency?._id, '', '', '']),
+        projectIdentifier(position?.project),
+        position?.category.name,
+        stage.note
+      ])
+    )
   ]
 }
 
@@ -210,7 +249,7 @@ function lumpSumRows(days: TravelDay<string>[], locale: Locale, t: Translate): C
   ]
 }
 
-export function reportToCSV(report: ExportReport, locale: Locale, t: Translate) {
+export function reportToCSV(report: ExportReport, organisations: OrganisationWithVatSettings<string>[], locale: Locale, t: Translate) {
   const rows: CsvRow[] = []
   const details = projectDetailRows(report, t)
 
@@ -235,15 +274,13 @@ export function reportToCSV(report: ExportReport, locale: Locale, t: Translate) 
       [`${t('labels.insurance')} - ${t('labels.name')}`, report.insurance.name],
       [`${t('labels.insurance')} - ${t('labels.email')}`, report.insurance.email]
     )
-  } else {
-    details.push([t('labels.category'), report.category.name])
   }
 
   addSection(rows, t('csv.sections.details'), details)
-  addSection(rows, t('csv.sections.expenses'), expenseRows(report.expenses, t, reportIsTravel(report)))
+  addSection(rows, t('csv.sections.expenses'), expenseRows(report.expenses, organisations, t, reportIsTravel(report)))
 
   if (reportIsTravel(report)) {
-    addSection(rows, t('csv.sections.stages'), stageRows(report.stages, locale, t))
+    addSection(rows, t('csv.sections.stages'), stageRows(report.stages, organisations, locale, t))
     addSection(rows, t('csv.sections.lumpSums'), lumpSumRows(report.days, locale, t))
   }
 
@@ -255,5 +292,9 @@ export function downloadReportCSV(report: ExportReport, locale: Locale, t: Trans
   const reportName =
     report.name.trim() ||
     `${t(`labels.${modelName === 'Travel' ? 'travel' : modelName === 'HealthCareCost' ? 'healthCareCost' : 'expenseReport'}`)}-${refNumberToString(report.reference, modelName)}`
-  download(new File([reportToCSV(report, locale, t)], `${sanitizeFilename(reportName)}.csv`, { type: 'text/csv;charset=utf-8' }))
+  download(
+    new File([reportToCSV(report, APP_LOADER.data.value?.organisations ?? [], locale, t)], `${sanitizeFilename(reportName)}.csv`, {
+      type: 'text/csv;charset=utf-8'
+    })
+  )
 }

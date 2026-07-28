@@ -9,7 +9,7 @@ import {
   transportTypes,
   travelStates
 } from 'abrechnung-common/types.js'
-import { addUp } from 'abrechnung-common/utils/scripts.js'
+import { addUp, getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
@@ -20,10 +20,12 @@ import {
   addReferenceOnNewDocs,
   addToProjectBalance,
   costObject,
+  getCostPositionValidationIssues,
   offsetAdvance,
   place,
   populateAll,
   populateSelected,
+  positionedCostObject,
   requestBaseSchema,
   setLog,
   travelBaseSchema
@@ -57,18 +59,16 @@ const travelSchema = () =>
             distanceRefundType: { type: String, enum: distanceRefundTypes, default: distanceRefundTypes[0] },
             type: { type: String, enum: transportTypes, required: true }
           },
-          cost: costObject({ exchangeRate: true, receipts: true, required: false, min: 0, receiptsRequired: false }),
+          cost: positionedCostObject({ required: false, min: 0, receiptsRequired: false }),
           purpose: { type: String, enum: ['professional', 'mixed', 'private'], required: true, default: 'professional' },
-          project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }
       ],
       expenses: [
         {
           description: { type: String, required: true },
-          cost: costObject({ exchangeRate: true, receipts: true, required: true, receiptsRequired: false }),
+          cost: positionedCostObject({ required: true, receiptsRequired: false }),
           purpose: { type: String, enum: ['professional', 'mixed'], required: true, default: 'professional' },
-          project: { type: Schema.Types.ObjectId, ref: 'Project' },
           note: { type: String }
         }
       ],
@@ -109,15 +109,18 @@ const populates = {
     { path: 'stages.startLocation.country', select: { name: 1, flag: 1, currency: 1 } },
     { path: 'stages.endLocation.country', select: { name: 1, flag: 1, currency: 1 } },
     { path: 'stages.midnightCountries.country', select: { name: 1, flag: 1, currency: 1 } },
-    { path: 'stages.project', select: { identifier: 1, organisation: 1 } }
+    { path: 'stages.cost.positions.project', select: { identifier: 1, organisation: 1 } },
+    { path: 'stages.cost.positions.category' }
   ],
   expenses: [
     { path: 'expenses.cost.currency' },
     { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } },
-    { path: 'expenses.project', select: { identifier: 1, organisation: 1 } }
+    { path: 'expenses.cost.positions.project', select: { identifier: 1, organisation: 1 } },
+    { path: 'expenses.cost.positions.category' }
   ],
   addUp: [{ path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
   advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
+  bookings: [{ path: 'bookings.ledgerAccount' }, { path: 'bookings.project', select: { identifier: 1, organisation: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1, additionalDetails: 1 } }],
   editor: [{ path: 'editor', select: { name: 1, email: 1 } }],
@@ -183,10 +186,12 @@ schema.methods.calculateExchangeRates = async function () {
   const { currencyConverter } = createOperationServices()
   const promiseList = []
   for (const stage of this.stages) {
-    promiseList.push(currencyConverter.addExchangeRate(stage.cost, stage.cost.date))
+    if (stage.cost.positions.length > 0 && stage.cost.date) {
+      promiseList.push(currencyConverter.addCostExchangeRate(stage.cost, stage.cost.date))
+    }
   }
   for (const expense of this.expenses) {
-    promiseList.push(currencyConverter.addExchangeRate(expense.cost, expense.cost.date))
+    promiseList.push(currencyConverter.addCostExchangeRate(expense.cost, expense.cost.date as Date))
   }
   await Promise.all(promiseList)
 }
@@ -199,12 +204,50 @@ schema.methods.addComment = function () {
 }
 
 schema.pre('validate', async function () {
+  const validateExpensePositions = this.isNew || this.isModified('expenses')
+  const validateStagePositions = this.isNew || this.isModified('stages')
   this.addComment()
 
   await populateAll(this, populates)
 
   const { travelCalculator } = createOperationServices()
   const { conflicts } = await travelCalculator.calc(this)
+  const [expenseIssues, stageIssues] = await Promise.all([
+    validateExpensePositions
+      ? getCostPositionValidationIssues(
+          this.expenses.map(({ cost }) => cost),
+          'Travel',
+          true,
+          false
+        )
+      : [],
+    validateStagePositions
+      ? getCostPositionValidationIssues(
+          this.stages.map(({ cost }) => cost),
+          'Travel',
+          false,
+          true
+        )
+      : []
+  ])
+  for (const issue of expenseIssues) {
+    this.invalidate(`expenses.${issue.path.replace(/^(\d+)\./, '$1.cost.')}`, issue.message)
+  }
+  for (const issue of stageIssues) {
+    this.invalidate(`stages.${issue.path.replace(/^(\d+)\./, '$1.cost.')}`, issue.message)
+  }
+  for (const [index, stage] of this.stages.entries()) {
+    const ownCarPositions = stage.cost.positions.filter(({ kind }) => kind === 'ownCar')
+    if (stage.transport.type === 'ownCar' && (stage.cost.positions.length !== 1 || ownCarPositions.length !== 1)) {
+      this.invalidate(`stages.${index}.cost.positions`, 'invalidOwnCarPosition')
+    }
+    if (stage.transport.type !== 'ownCar' && ownCarPositions.length > 0) {
+      this.invalidate(`stages.${index}.cost.positions`, 'invalidOwnCarPosition')
+    }
+    if (getCostGrossAmount(stage.cost) !== 0 && stage.transport.type !== 'ownCar' && !stage.cost.date) {
+      this.invalidate(`stages.${index}.cost.date`, 'required')
+    }
+  }
   const shouldInvalidateConflicts = this.state >= TravelState.IN_REVIEW
 
   if (shouldInvalidateConflicts) {
@@ -223,6 +266,9 @@ schema.pre('validate', async function () {
 schema.pre('save', async function () {
   setLog(this)
   await addReferenceOnNewDocs(this, 'Travel')
+  if (!this.historic && this.state < TravelState.REVIEW_COMPLETED) {
+    this.bookings = []
+  }
 })
 
 schema.post('save', async function () {

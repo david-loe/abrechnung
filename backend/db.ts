@@ -4,6 +4,7 @@ import displaySettings from 'abrechnung-common/data/displaySettings.js'
 import printerSettings from 'abrechnung-common/print/printerSettings.js'
 import travelSettings from 'abrechnung-common/travel/travelSettings.js'
 import {
+  _id,
   accesses,
   ConnectionSettings as IConnectionSettings,
   DisplaySettings as IDisplaySettings,
@@ -13,7 +14,9 @@ import {
   User as IUser,
   LumpSumIntegrationSettings,
   RetentionIntegrationSettings,
-  tokenAdminUser
+  TravelExpenseItem,
+  tokenAdminUser,
+  travelExpenseItems
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import MongoStore from 'connect-mongo'
@@ -32,6 +35,7 @@ import Category from './models/category.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
 import HealthInsurance from './models/healthInsurance.js'
+import LedgerAccount from './models/ledgerAccount.js'
 import Organisation from './models/organisation.js'
 import Project from './models/project.js'
 
@@ -136,12 +140,60 @@ export async function initDB() {
   await syncLumpSums()
   await initer(HealthInsurance, 'health insurances', healthInsurances)
 
-  const organisations = [{ name: 'My Organisation' }]
-  await initer(Organisation, 'organisation', organisations)
-  const org = await Organisation.findOne()
+  const ledgerAccounts = [
+    { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' },
+    { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' },
+    { identifier: '1200', name: 'Bank' },
+    { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' },
+    { identifier: '1576', name: 'Abziehbare Vorsteuer 19 %' },
+    { identifier: '4660', name: 'Reisekosten Arbeitnehmer' },
+    { identifier: '4900', name: 'Sonstige betriebliche Aufwendungen' }
+  ]
+  await initer(LedgerAccount, 'ledger accounts', ledgerAccounts)
+
+  const account1530 = await LedgerAccount.findOne({ identifier: '1530' }).lean()
+  const account1740 = await LedgerAccount.findOne({ identifier: '1740' }).lean()
+  const account1571 = await LedgerAccount.findOne({ identifier: '1571' }).lean()
+  const account1576 = await LedgerAccount.findOne({ identifier: '1576' }).lean()
+  const account4660 = await LedgerAccount.findOne({ identifier: '4660' }).lean()
+  const account4900 = await LedgerAccount.findOne({ identifier: '4900' }).lean()
+  const organisation = {
+    name: 'My Organisation',
+    accountingSettings: {
+      employeeLiabilitiesAccount: account1740?._id,
+      employeeClaimsAccount: account1530?._id,
+      includeBankBookings: false,
+      payoutAccounts: [],
+      vatAccountingEnabled: true,
+      vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account1571?._id }, { rate: 19, inputTaxAccount: account1576?._id }],
+      accountMapping: {} as { [key in TravelExpenseItem]?: _id }
+    }
+  }
+  for (const item of travelExpenseItems) {
+    organisation.accountingSettings.accountMapping[item] = account4660?._id
+  }
+
+  // biome-ignore lint/suspicious/noExplicitAny: id instead of full leaderAccount
+  await initer(Organisation, 'organisation', [organisation as any])
+  const org = await Organisation.findOne().lean()
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
-  const categories = [{ name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true }]
+  const categories = [
+    {
+      name: 'General',
+      style: { color: '#D8DCFF', text: 'black' as const },
+      isDefault: true,
+      ledgerAccount: account4900 ?? undefined,
+      for: 'ExpenseReport' as const
+    },
+    {
+      name: 'Travel expenses',
+      style: { color: '#D8DCFF', text: 'black' as const },
+      isDefault: true,
+      ledgerAccount: account4660 ?? undefined,
+      for: 'Travel' as const
+    }
+  ]
   await initer(Category, 'category', categories)
 
   if (ENV.NODE_ENV === 'production' && ENV.PROD_INIT_ADMIN_USER && (await mongoose.connection.collection('users').countDocuments()) === 0) {

@@ -15,6 +15,7 @@
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :mode="modalMode"
+          :default-project="expenseReport.project"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
@@ -60,13 +61,6 @@
         <div class="row justify-content-between align-items-end">
           <div class="col-auto d-flex align-items-center">
             <h2 class="m-0">{{ expenseReport.name }}</h2>
-            <div>
-              <Badge
-                v-if="APP_DATA?.categories && APP_DATA?.categories.length > 1"
-                class="ms-2 fs-6"
-                :text="expenseReport.category.name"
-                :style="expenseReport.category.style" />
-            </div>
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -143,11 +137,27 @@
               <CSVImport
                 :endpoint="`${endpointPrefix}expenseReport/expense/bulk?parentId=${expenseReport._id}`"
                 button-style="outline-secondary btn-sm"
-                :template-fields="['cost.date', 'description', 'cost.amount', 'cost.currency', 'note']"
+                :template-fields="[
+                  'cost.date',
+                  'description',
+                  'cost.positions.0.description',
+                  'cost.positions.0.grossAmount',
+                  'cost.currency',
+                  'cost.positions.0.project',
+                  'cost.positions.0.category',
+                  'cost.positions.0.vatRate',
+                  'note'
+                ]"
                 :transformers="[
                   { path: 'cost.date', fn: convertGermanDateToHTMLDate },
-                  { path: 'cost.currency', fn: (v) => (v ? getById(v, APP_DATA?.currencies || []) : v) },
-                  { path: 'cost.amount', fn: (v) => (v ? Number.parseFloat(v) : null) }
+                  { path: 'cost.currency', fn: (v) => v },
+                  { path: 'cost.positions.0.grossAmount', fn: (v) => Number.parseFloat(v || '0') },
+                  { path: 'cost.positions.0.vatRate', fn: (v) => Number.parseFloat(v || '0') },
+                  {
+                    path: 'cost.positions.0.project',
+                    fn: (v) => (v ? getById(v as string, APP_DATA?.projects || [])?._id : expenseReport.project._id)
+                  },
+                  { path: 'cost.positions.0.category', fn: (v) => (v ? getById(v as string, APP_DATA?.categories || [])?._id : v) }
                 ]"
                 @submitted="() => (isReadOnly ? null : getExpenseReport())" />
             </div>
@@ -168,9 +178,9 @@
               @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)"
               @update-sort="updateExpenseSorting">
               <template #item-cost.date="{ cost }: Expense">
-                {{ new Date(cost.date).getUTCFullYear() === new Date().getUTCFullYear()
-                    ? formatter.simpleDate(cost.date)
-                    : formatter.date(cost.date) }}
+                {{ new Date(cost.date || 0).getUTCFullYear() === new Date().getUTCFullYear()
+                    ? formatter.simpleDate(cost.date || '')
+                    : formatter.date(cost.date || '') }}
               </template>
               <template #item-cost="{ cost }: Expense">
                 <div class="text-end tnum">{{ formatter.money(cost) }}</div>
@@ -288,7 +298,6 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
-import Badge from '@/components/elements/Badge.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
