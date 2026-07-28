@@ -663,6 +663,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"BankAccount": {
+				"properties": {
+					"accountHolder": {
+						"type": "string"
+					},
+					"iban": {
+						"type": "string"
+					},
+					"bic": {
+						"type": "string",
+						"nullable": true
+					}
+				},
+				"required": [
+					"accountHolder",
+					"iban"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Binary": {
 				"type": "string",
 				"description": "A class representation of the BSON Binary type."
@@ -777,6 +797,10 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"employeeId": {
+						"type": "string",
+						"nullable": true
+					},
 					"fk": {
 						"properties": {
 							"httpBearer": {
@@ -880,6 +904,14 @@
 						"properties": {
 							"showInstallBanner": {
 								"type": "boolean"
+							},
+							"bankAccount": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/BankAccount"
+									}
+								],
+								"nullable": true
 							},
 							"organisation": {
 								"allOf": [
@@ -1023,28 +1055,72 @@
 					}
 				]
 			},
-			"SetterPartial_IUser-at-settings.NoPost_": {
+			"Pick_SetterBody_IUser-at-settings_.Exclude_keyofSetterBody_IUser-at-settings_.bankAccount__": {
 				"properties": {
-					"showInstallBanner": {
-						"type": "boolean"
-					},
-					"organisation": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/IdDocument__id_"
-							},
-							{
-								"$ref": "#/components/schemas/OrganisationSimple__id_"
-							}
+					"language": {
+						"type": "string",
+						"enum": [
+							"de",
+							"en",
+							"fr",
+							"ru",
+							"es",
+							"kk"
 						]
 					},
-					"insurance": {
+					"hasUserSetLanguage": {
+						"type": "boolean"
+					},
+					"lastCurrencies": {
 						"anyOf": [
 							{
-								"$ref": "#/components/schemas/HealthInsurance__id_"
+								"items": {
+									"properties": {
+										"flag": {
+											"type": "string"
+										},
+										"subunit": {
+											"type": "string"
+										},
+										"name": {
+											"properties": {
+												"kk": {
+													"type": "string"
+												},
+												"es": {
+													"type": "string"
+												},
+												"ru": {
+													"type": "string"
+												},
+												"fr": {
+													"type": "string"
+												},
+												"en": {
+													"type": "string"
+												},
+												"de": {
+													"type": "string"
+												}
+											},
+											"type": "object"
+										},
+										"_id": {
+											"type": "string"
+										},
+										"symbol": {
+											"type": "string"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							{
-								"$ref": "#/components/schemas/IdDocument__id_"
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_string_"
+								},
+								"type": "array"
 							}
 						]
 					},
@@ -1142,78 +1218,56 @@
 							}
 						]
 					},
-					"lastCurrencies": {
+					"insurance": {
 						"anyOf": [
 							{
-								"items": {
-									"properties": {
-										"flag": {
-											"type": "string"
-										},
-										"subunit": {
-											"type": "string"
-										},
-										"name": {
-											"properties": {
-												"kk": {
-													"type": "string"
-												},
-												"es": {
-													"type": "string"
-												},
-												"ru": {
-													"type": "string"
-												},
-												"fr": {
-													"type": "string"
-												},
-												"en": {
-													"type": "string"
-												},
-												"de": {
-													"type": "string"
-												}
-											},
-											"type": "object"
-										},
-										"_id": {
-											"type": "string"
-										},
-										"symbol": {
-											"type": "string"
-										}
-									},
-									"type": "object"
-								},
-								"type": "array"
+								"$ref": "#/components/schemas/HealthInsurance__id_"
 							},
 							{
-								"items": {
-									"$ref": "#/components/schemas/IdDocument_string_"
-								},
-								"type": "array"
+								"$ref": "#/components/schemas/IdDocument__id_"
 							}
 						]
 					},
-					"hasUserSetLanguage": {
-						"type": "boolean"
-					},
-					"language": {
-						"type": "string",
-						"enum": [
-							"de",
-							"en",
-							"fr",
-							"ru",
-							"es",
-							"kk"
+					"organisation": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument__id_"
+							},
+							{
+								"$ref": "#/components/schemas/OrganisationSimple__id_"
+							}
 						]
+					},
+					"showInstallBanner": {
+						"type": "boolean"
 					}
 				},
-				"type": "object"
+				"type": "object",
+				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
-			"SetterBody_IUser-at-settings_": {
-				"$ref": "#/components/schemas/SetterPartial_IUser-at-settings.NoPost_"
+			"Omit_SetterBody_IUser-at-settings_.bankAccount_": {
+				"$ref": "#/components/schemas/Pick_SetterBody_IUser-at-settings_.Exclude_keyofSetterBody_IUser-at-settings_.bankAccount__",
+				"description": "Construct a type with the properties of T except for those in type K."
+			},
+			"UserSettingsBody": {
+				"allOf": [
+					{
+						"$ref": "#/components/schemas/Omit_SetterBody_IUser-at-settings_.bankAccount_"
+					},
+					{
+						"properties": {
+							"bankAccount": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/BankAccount"
+									}
+								],
+								"nullable": true
+							}
+						},
+						"type": "object"
+					}
+				]
 			},
 			"File": {
 				"properties": {
@@ -1308,6 +1362,10 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
+					},
+					"employeeId": {
+						"type": "string",
+						"nullable": true
 					},
 					"fk": {
 						"properties": {
@@ -1412,6 +1470,14 @@
 						"properties": {
 							"showInstallBanner": {
 								"type": "boolean"
+							},
+							"bankAccount": {
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/BankAccount"
+									}
+								],
+								"nullable": true
 							},
 							"organisation": {
 								"allOf": [
@@ -1525,6 +1591,7 @@
 								"email",
 								"name",
 								"_id",
+								"employeeId",
 								"fk",
 								"access",
 								"projects",
@@ -1884,6 +1951,9 @@
 						},
 						"type": "object"
 					},
+					"employeeId": {
+						"type": "string"
+					},
 					"email": {
 						"type": "string"
 					},
@@ -1891,6 +1961,20 @@
 						"properties": {
 							"showInstallBanner": {
 								"type": "boolean"
+							},
+							"bankAccount": {
+								"properties": {
+									"bic": {
+										"type": "string"
+									},
+									"iban": {
+										"type": "string"
+									},
+									"accountHolder": {
+										"type": "string"
+									}
+								},
+								"type": "object"
 							},
 							"organisation": {
 								"anyOf": [
@@ -2325,6 +2409,9 @@
 						},
 						"type": "object"
 					},
+					"employeeId": {
+						"type": "string"
+					},
 					"email": {
 						"type": "string"
 					},
@@ -2332,6 +2419,20 @@
 						"properties": {
 							"showInstallBanner": {
 								"type": "boolean"
+							},
+							"bankAccount": {
+								"properties": {
+									"bic": {
+										"type": "string"
+									},
+									"iban": {
+										"type": "string"
+									},
+									"accountHolder": {
+										"type": "string"
+									}
+								},
+								"type": "object"
 							},
 							"organisation": {
 								"anyOf": [
@@ -3145,22 +3246,164 @@
 					}
 				]
 			},
+			"ProjectSimple__id_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"HexColor": {
+				"type": "string",
+				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
+			},
+			"TextColor": {
+				"type": "string",
+				"enum": [
+					"black",
+					"white"
+				]
+			},
+			"BadgeStyle": {
+				"properties": {
+					"color": {
+						"$ref": "#/components/schemas/HexColor"
+					},
+					"text": {
+						"$ref": "#/components/schemas/TextColor"
+					}
+				},
+				"required": [
+					"color",
+					"text"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LedgerAccount__id_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Category__id_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"ledgerAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"for": {
+						"type": "string",
+						"enum": [
+							"Travel",
+							"ExpenseReport",
+							"both"
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"ledgerAccount",
+					"isDefault",
+					"for",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CostPosition__id_": {
+				"properties": {
+					"kind": {
+						"type": "string",
+						"enum": [
+							"manual",
+							"ownCar"
+						]
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"grossAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"vatRate": {
+						"type": "number",
+						"format": "double"
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple__id_"
+					},
+					"category": {
+						"$ref": "#/components/schemas/Category__id_"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"kind",
+					"grossAmount",
+					"vatRate",
+					"project",
+					"category"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Cost__id.binary_": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
+					"positions": {
+						"items": {
+							"$ref": "#/components/schemas/CostPosition__id_"
+						},
+						"type": "array"
 					},
 					"currency": {
 						"$ref": "#/components/schemas/Currency"
 					},
 					"exchangeRate": {
 						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
 							"rate": {
 								"type": "number",
 								"format": "double"
@@ -3178,7 +3421,6 @@
 							}
 						},
 						"required": [
-							"amount",
 							"rate",
 							"date"
 						],
@@ -3200,14 +3442,14 @@
 							{
 								"type": "string"
 							}
-						]
+						],
+						"nullable": true
 					}
 				},
 				"required": [
-					"amount",
+					"positions",
 					"currency",
-					"receipts",
-					"date"
+					"receipts"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -3231,26 +3473,6 @@
 						]
 					}
 				]
-			},
-			"ProjectSimple__id_": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/_id"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"Stage__id.binary_": {
 				"properties": {
@@ -3318,14 +3540,6 @@
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple__id_"
-							}
-						],
-						"nullable": true
-					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -3354,14 +3568,6 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost__id.binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple__id_"
-							}
-						],
-						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -3741,6 +3947,58 @@
 				"properties": {},
 				"type": "object"
 			},
+			"BookingSide": {
+				"type": "string",
+				"enum": [
+					"debit",
+					"credit"
+				]
+			},
+			"Booking__id_": {
+				"properties": {
+					"side": {
+						"$ref": "#/components/schemas/BookingSide"
+					},
+					"ledgerAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple__id_"
+					},
+					"remark": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"side",
+					"ledgerAccount",
+					"amount",
+					"date",
+					"project",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Travel__id.binary_": {
 				"properties": {
 					"reason": {
@@ -3876,6 +4134,12 @@
 						"type": "object",
 						"nullable": true
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -3936,6 +4200,7 @@
 					"progress",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"professionalShare",
@@ -4107,6 +4372,12 @@
 						"type": "object",
 						"nullable": true
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -4167,6 +4438,7 @@
 					"progress",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"professionalShare",
@@ -4235,6 +4507,7 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"bookings",
 								"history",
 								"historic",
 								"lastPlaceOfWork",
@@ -4259,22 +4532,137 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"ProjectSimple_mongoose.Types.ObjectId_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"LedgerAccount_mongoose.Types.ObjectId_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"identifier",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Category_mongoose.Types.ObjectId_": {
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"style": {
+						"$ref": "#/components/schemas/BadgeStyle"
+					},
+					"ledgerAccount": {
+						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+					},
+					"isDefault": {
+						"type": "boolean"
+					},
+					"for": {
+						"type": "string",
+						"enum": [
+							"Travel",
+							"ExpenseReport",
+							"both"
+						]
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"name",
+					"style",
+					"ledgerAccount",
+					"isDefault",
+					"for",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CostPosition_mongoose.Types.ObjectId_": {
+				"properties": {
+					"kind": {
+						"type": "string",
+						"enum": [
+							"manual",
+							"ownCar"
+						]
+					},
+					"description": {
+						"type": "string",
+						"nullable": true
+					},
+					"grossAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"vatRate": {
+						"type": "number",
+						"format": "double"
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+					},
+					"category": {
+						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"kind",
+					"grossAmount",
+					"vatRate",
+					"project",
+					"category"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Cost_mongoose.Types.ObjectId.Binary_": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
+					"positions": {
+						"items": {
+							"$ref": "#/components/schemas/CostPosition_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
 					},
 					"currency": {
 						"$ref": "#/components/schemas/Currency"
 					},
 					"exchangeRate": {
 						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
 							"rate": {
 								"type": "number",
 								"format": "double"
@@ -4292,7 +4680,6 @@
 							}
 						},
 						"required": [
-							"amount",
 							"rate",
 							"date"
 						],
@@ -4314,34 +4701,14 @@
 							{
 								"type": "string"
 							}
-						]
+						],
+						"nullable": true
 					}
 				},
 				"required": [
-					"amount",
+					"positions",
 					"currency",
-					"receipts",
-					"date"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"ProjectSimple_mongoose.Types.ObjectId_": {
-				"properties": {
-					"identifier": {
-						"type": "string"
-					},
-					"organisation": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"identifier",
-					"organisation",
-					"_id"
+					"receipts"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -4412,14 +4779,6 @@
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -4448,14 +4807,6 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -4791,6 +5142,51 @@
 				"properties": {},
 				"type": "object"
 			},
+			"Booking_mongoose.Types.ObjectId_": {
+				"properties": {
+					"side": {
+						"$ref": "#/components/schemas/BookingSide"
+					},
+					"ledgerAccount": {
+						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+					},
+					"amount": {
+						"type": "number",
+						"format": "double"
+					},
+					"date": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"project": {
+						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+					},
+					"remark": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					}
+				},
+				"required": [
+					"side",
+					"ledgerAccount",
+					"amount",
+					"date",
+					"project",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Travel_mongoose.Types.ObjectId.Binary_": {
 				"properties": {
 					"reason": {
@@ -4926,6 +5322,12 @@
 						"type": "object",
 						"nullable": true
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -4986,6 +5388,7 @@
 					"progress",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"professionalShare",
@@ -5127,9 +5530,61 @@
 									}
 								]
 							},
-							"amount": {
-								"type": "number",
-								"format": "double"
+							"positions": {
+								"items": {
+									"properties": {
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"vatRate": {
+											"type": "number",
+											"format": "double"
+										},
+										"grossAmount": {
+											"type": "number",
+											"format": "double"
+										},
+										"kind": {
+											"type": "string",
+											"enum": [
+												"ownCar",
+												"manual"
+											]
+										},
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"description": {
+											"type": "string"
+										},
+										"_id": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											]
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							"currency": {
 								"anyOf": [
@@ -5154,16 +5609,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"description": {
 						"type": "string"
@@ -5243,9 +5688,61 @@
 									}
 								]
 							},
-							"amount": {
-								"type": "number",
-								"format": "double"
+							"positions": {
+								"items": {
+									"properties": {
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"vatRate": {
+											"type": "number",
+											"format": "double"
+										},
+										"grossAmount": {
+											"type": "number",
+											"format": "double"
+										},
+										"kind": {
+											"type": "string",
+											"enum": [
+												"ownCar",
+												"manual"
+											]
+										},
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"description": {
+											"type": "string"
+										},
+										"_id": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											]
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							"currency": {
 								"anyOf": [
@@ -5405,16 +5902,6 @@
 							}
 						]
 					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -5461,20 +5948,17 @@
 			},
 			"Cost_mongoose.Types.ObjectId.binary_": {
 				"properties": {
-					"amount": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
+					"positions": {
+						"items": {
+							"$ref": "#/components/schemas/CostPosition_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
 					},
 					"currency": {
 						"$ref": "#/components/schemas/Currency"
 					},
 					"exchangeRate": {
 						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
 							"rate": {
 								"type": "number",
 								"format": "double"
@@ -5492,7 +5976,6 @@
 							}
 						},
 						"required": [
-							"amount",
 							"rate",
 							"date"
 						],
@@ -5514,14 +5997,14 @@
 							{
 								"type": "string"
 							}
-						]
+						],
+						"nullable": true
 					}
 				},
 				"required": [
-					"amount",
+					"positions",
 					"currency",
-					"receipts",
-					"date"
+					"receipts"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -5592,14 +6075,6 @@
 					"purpose": {
 						"$ref": "#/components/schemas/Purpose"
 					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
-					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -5628,14 +6103,6 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -5796,6 +6263,12 @@
 						"type": "object",
 						"nullable": true
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -5856,6 +6329,7 @@
 					"progress",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"professionalShare",
@@ -6655,6 +7129,80 @@
 			},
 			"SetterBody_TravelPost_": {
 				"$ref": "#/components/schemas/SetterPartial_TravelPost.NoPost_"
+			},
+			"SepaExportFile": {
+				"properties": {
+					"organisation": {
+						"properties": {
+							"name": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"name"
+						],
+						"type": "object"
+					},
+					"account": {
+						"properties": {
+							"lastFour": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"lastFour"
+						],
+						"type": "object"
+					},
+					"xml": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"organisation",
+					"account",
+					"xml"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"BookingExportPackageRequest_string_": {
+				"properties": {
+					"reports": {
+						"items": {
+							"$ref": "#/components/schemas/IdDocument_string_"
+						},
+						"type": "array"
+					},
+					"executionDate": {
+						"type": "string"
+					},
+					"bankAccounts": {
+						"items": {
+							"properties": {
+								"account": {
+									"type": "string"
+								},
+								"organisation": {
+									"type": "string"
+								}
+							},
+							"required": [
+								"account",
+								"organisation"
+							],
+							"type": "object"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"reports",
+					"executionDate",
+					"bankAccounts"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"ReportUsageQuery": {
 				"properties": {
@@ -7468,10 +8016,6 @@
 					"Inter"
 				]
 			},
-			"HexColor": {
-				"type": "string",
-				"pattern": "/^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/"
-			},
 			"PrintOptions": {
 				"properties": {
 					"reviewDates": {
@@ -7933,6 +8477,137 @@
 			"SetterBody_IPrinterSettings_mongoose.Types.ObjectId__": {
 				"$ref": "#/components/schemas/SetterPartial_IPrinterSettings_mongoose.Types.ObjectId_.NoPost_"
 			},
+			"VatRate__id_": {
+				"properties": {
+					"rate": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputTaxAccount": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"rate"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"OrganisationBankAccount__id_": {
+				"properties": {
+					"accountHolder": {
+						"type": "string"
+					},
+					"iban": {
+						"type": "string"
+					},
+					"bic": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					},
+					"name": {
+						"type": "string"
+					},
+					"ledgerAccount": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"accountHolder",
+					"iban",
+					"_id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountingSettings__id_": {
+				"properties": {
+					"employeeLiabilitiesAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
+					"employeeClaimsAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
+					"employeeSpecificTemplate": {
+						"type": "string",
+						"nullable": true
+					},
+					"accountMapping": {
+						"properties": {
+							"ownCar": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							"airplane": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							"shipOrFerry": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							"otherTransport": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							"cateringLumpSum": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							"overnightLumpSum": {
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							}
+						},
+						"required": [
+							"ownCar",
+							"airplane",
+							"shipOrFerry",
+							"otherTransport",
+							"cateringLumpSum",
+							"overnightLumpSum"
+						],
+						"type": "object"
+					},
+					"vatAccountingEnabled": {
+						"type": "boolean"
+					},
+					"vatRates": {
+						"items": {
+							"$ref": "#/components/schemas/VatRate__id_"
+						},
+						"type": "array"
+					},
+					"payoutAccounts": {
+						"items": {
+							"$ref": "#/components/schemas/OrganisationBankAccount__id_"
+						},
+						"type": "array"
+					},
+					"includeBankBookings": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"employeeLiabilitiesAccount",
+					"employeeClaimsAccount",
+					"accountMapping",
+					"vatAccountingEnabled",
+					"vatRates",
+					"payoutAccounts",
+					"includeBankBookings"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ImageType": {
 				"type": "string",
 				"enum": [
@@ -7979,6 +8654,9 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"accountingSettings": {
+						"$ref": "#/components/schemas/AccountingSettings__id_"
+					},
 					"reportEmail": {
 						"type": "string",
 						"nullable": true
@@ -8011,7 +8689,8 @@
 				"required": [
 					"name",
 					"_id",
-					"subfolderPath"
+					"subfolderPath",
+					"accountingSettings"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -8053,6 +8732,9 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"accountingSettings": {
+						"$ref": "#/components/schemas/AccountingSettings__id_"
+					},
 					"reportEmail": {
 						"type": "string",
 						"nullable": true
@@ -8085,7 +8767,8 @@
 				"required": [
 					"name",
 					"_id",
-					"subfolderPath"
+					"subfolderPath",
+					"accountingSettings"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -8114,6 +8797,7 @@
 								"name",
 								"_id",
 								"subfolderPath",
+								"accountingSettings",
 								"reportEmail",
 								"a1CertificateEmail",
 								"bankDetails",
@@ -8134,6 +8818,137 @@
 						"format": "byte"
 					}
 				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"VatRate_mongoose.Types.ObjectId_": {
+				"properties": {
+					"rate": {
+						"type": "number",
+						"format": "double"
+					},
+					"inputTaxAccount": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"rate"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"OrganisationBankAccount_mongoose.Types.ObjectId_": {
+				"properties": {
+					"accountHolder": {
+						"type": "string"
+					},
+					"iban": {
+						"type": "string"
+					},
+					"bic": {
+						"type": "string",
+						"nullable": true
+					},
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"name": {
+						"type": "string"
+					},
+					"ledgerAccount": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"required": [
+					"accountHolder",
+					"iban",
+					"_id",
+					"name"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"AccountingSettings_mongoose.Types.ObjectId_": {
+				"properties": {
+					"employeeLiabilitiesAccount": {
+						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+					},
+					"employeeClaimsAccount": {
+						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+					},
+					"employeeSpecificTemplate": {
+						"type": "string",
+						"nullable": true
+					},
+					"accountMapping": {
+						"properties": {
+							"ownCar": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							},
+							"airplane": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							},
+							"shipOrFerry": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							},
+							"otherTransport": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							},
+							"cateringLumpSum": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							},
+							"overnightLumpSum": {
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							}
+						},
+						"required": [
+							"ownCar",
+							"airplane",
+							"shipOrFerry",
+							"otherTransport",
+							"cateringLumpSum",
+							"overnightLumpSum"
+						],
+						"type": "object"
+					},
+					"vatAccountingEnabled": {
+						"type": "boolean"
+					},
+					"vatRates": {
+						"items": {
+							"$ref": "#/components/schemas/VatRate_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"payoutAccounts": {
+						"items": {
+							"$ref": "#/components/schemas/OrganisationBankAccount_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"includeBankBookings": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"employeeLiabilitiesAccount",
+					"employeeClaimsAccount",
+					"accountMapping",
+					"vatAccountingEnabled",
+					"vatRates",
+					"payoutAccounts",
+					"includeBankBookings"
+				],
 				"type": "object",
 				"additionalProperties": false
 			},
@@ -8176,6 +8991,9 @@
 					"subfolderPath": {
 						"type": "string"
 					},
+					"accountingSettings": {
+						"$ref": "#/components/schemas/AccountingSettings_mongoose.Types.ObjectId_"
+					},
 					"reportEmail": {
 						"type": "string",
 						"nullable": true
@@ -8208,7 +9026,8 @@
 				"required": [
 					"name",
 					"_id",
-					"subfolderPath"
+					"subfolderPath",
+					"accountingSettings"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -8252,6 +9071,177 @@
 					"reportEmail": {
 						"type": "string"
 					},
+					"accountingSettings": {
+						"properties": {
+							"includeBankBookings": {
+								"type": "boolean"
+							},
+							"payoutAccounts": {
+								"anyOf": [
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"properties": {
+												"ledgerAccount": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+														}
+													]
+												},
+												"bic": {
+													"type": "string"
+												},
+												"iban": {
+													"type": "string"
+												},
+												"accountHolder": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"type": "array"
+									}
+								]
+							},
+							"vatRates": {
+								"items": {
+									"properties": {
+										"inputTaxAccount": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"rate": {
+											"type": "number",
+											"format": "double"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"vatAccountingEnabled": {
+								"type": "boolean"
+							},
+							"accountMapping": {
+								"properties": {
+									"overnightLumpSum": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"cateringLumpSum": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"otherTransport": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"shipOrFerry": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"airplane": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"ownCar": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
+							"employeeSpecificTemplate": {
+								"type": "string"
+							},
+							"employeeClaimsAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
+							},
+							"employeeLiabilitiesAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
+							}
+						},
+						"type": "object"
+					},
 					"subfolderPath": {
 						"type": "string"
 					},
@@ -8290,6 +9280,177 @@
 					},
 					"reportEmail": {
 						"type": "string"
+					},
+					"accountingSettings": {
+						"properties": {
+							"includeBankBookings": {
+								"type": "boolean"
+							},
+							"payoutAccounts": {
+								"anyOf": [
+									{
+										"items": {
+											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										},
+										"type": "array"
+									},
+									{
+										"items": {
+											"properties": {
+												"ledgerAccount": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+														}
+													]
+												},
+												"bic": {
+													"type": "string"
+												},
+												"iban": {
+													"type": "string"
+												},
+												"accountHolder": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+														}
+													]
+												}
+											},
+											"type": "object"
+										},
+										"type": "array"
+									}
+								]
+							},
+							"vatRates": {
+								"items": {
+									"properties": {
+										"inputTaxAccount": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"rate": {
+											"type": "number",
+											"format": "double"
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"vatAccountingEnabled": {
+								"type": "boolean"
+							},
+							"accountMapping": {
+								"properties": {
+									"overnightLumpSum": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"cateringLumpSum": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"otherTransport": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"shipOrFerry": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"airplane": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									},
+									"ownCar": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											},
+											{
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											}
+										]
+									}
+								},
+								"type": "object"
+							},
+							"employeeSpecificTemplate": {
+								"type": "string"
+							},
+							"employeeClaimsAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
+							},
+							"employeeLiabilitiesAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
+							}
+						},
+						"type": "object"
 					},
 					"subfolderPath": {
 						"type": "string"
@@ -8566,14 +9727,6 @@
 					"cost": {
 						"$ref": "#/components/schemas/Cost__id.binary_"
 					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple__id_"
-							}
-						],
-						"nullable": true
-					},
 					"note": {
 						"type": "string",
 						"nullable": true
@@ -8702,6 +9855,12 @@
 						},
 						"type": "array"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -8734,6 +9893,7 @@
 					"insurance",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -8848,6 +10008,12 @@
 						},
 						"type": "array"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -8880,6 +10046,7 @@
 					"insurance",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -8938,6 +10105,7 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"bookings",
 								"history",
 								"historic",
 								"expenses"
@@ -8965,14 +10133,6 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.Binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -9102,6 +10262,12 @@
 						},
 						"type": "array"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -9134,6 +10300,7 @@
 					"insurance",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -9197,9 +10364,61 @@
 									}
 								]
 							},
-							"amount": {
-								"type": "number",
-								"format": "double"
+							"positions": {
+								"items": {
+									"properties": {
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"vatRate": {
+											"type": "number",
+											"format": "double"
+										},
+										"grossAmount": {
+											"type": "number",
+											"format": "double"
+										},
+										"kind": {
+											"type": "string",
+											"enum": [
+												"ownCar",
+												"manual"
+											]
+										},
+										"project": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												}
+											]
+										},
+										"description": {
+											"type": "string"
+										},
+										"_id": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											]
+										}
+									},
+									"type": "object"
+								},
+								"type": "array"
 							},
 							"currency": {
 								"anyOf": [
@@ -9224,16 +10443,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"description": {
 						"type": "string"
@@ -9261,14 +10470,6 @@
 					},
 					"cost": {
 						"$ref": "#/components/schemas/Cost_mongoose.Types.ObjectId.binary_"
-					},
-					"project": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							}
-						],
-						"nullable": true
 					},
 					"note": {
 						"type": "string",
@@ -9367,6 +10568,12 @@
 						},
 						"type": "array"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -9399,6 +10606,7 @@
 					"insurance",
 					"addUp",
 					"advances",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -9408,53 +10616,6 @@
 			},
 			"AddUp__id.ExpenseReport__id.binary__": {
 				"$ref": "#/components/schemas/AddUpBase__id_"
-			},
-			"TextColor": {
-				"type": "string",
-				"enum": [
-					"black",
-					"white"
-				]
-			},
-			"BadgeStyle": {
-				"properties": {
-					"color": {
-						"$ref": "#/components/schemas/HexColor"
-					},
-					"text": {
-						"$ref": "#/components/schemas/TextColor"
-					}
-				},
-				"required": [
-					"color",
-					"text"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Category__id_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"style": {
-						"$ref": "#/components/schemas/BadgeStyle"
-					},
-					"isDefault": {
-						"type": "boolean"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/_id"
-					}
-				},
-				"required": [
-					"name",
-					"style",
-					"isDefault",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"Comment__id.ExpenseReportState_": {
 				"properties": {
@@ -9559,8 +10720,11 @@
 						},
 						"type": "array"
 					},
-					"category": {
-						"$ref": "#/components/schemas/Category__id_"
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -9592,7 +10756,7 @@
 					"_id",
 					"addUp",
 					"advances",
-					"category",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -9701,8 +10865,11 @@
 						},
 						"type": "array"
 					},
-					"category": {
-						"$ref": "#/components/schemas/Category__id_"
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -9734,7 +10901,7 @@
 					"_id",
 					"addUp",
 					"advances",
-					"category",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -9778,7 +10945,6 @@
 								"_id",
 								"addUp",
 								"advances",
-								"category",
 								"name",
 								"reference",
 								"owner",
@@ -9792,6 +10958,7 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"bookings",
 								"history",
 								"historic",
 								"expenses"
@@ -9814,30 +10981,6 @@
 			},
 			"AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__": {
 				"$ref": "#/components/schemas/AddUpBase_mongoose.Types.ObjectId_"
-			},
-			"Category_mongoose.Types.ObjectId_": {
-				"properties": {
-					"name": {
-						"type": "string"
-					},
-					"style": {
-						"$ref": "#/components/schemas/BadgeStyle"
-					},
-					"isDefault": {
-						"type": "boolean"
-					},
-					"_id": {
-						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-					}
-				},
-				"required": [
-					"name",
-					"style",
-					"isDefault",
-					"_id"
-				],
-				"type": "object",
-				"additionalProperties": false
 			},
 			"Comment_mongoose.Types.ObjectId.ExpenseReportState_": {
 				"properties": {
@@ -9942,8 +11085,11 @@
 						},
 						"type": "array"
 					},
-					"category": {
-						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -9975,7 +11121,7 @@
 					"_id",
 					"addUp",
 					"advances",
-					"category",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -9991,88 +11137,94 @@
 				"type": "object",
 				"description": "Make all properties in T required"
 			},
-			"Pick_MoneyPlusPost.Exclude_keyofMoneyPlusPost.exchangeRate-or-receipts__": {
+			"Pick_CostPosition_mongoose.Types.ObjectId_.Exclude_keyofCostPosition_mongoose.Types.ObjectId_._id-or-project-or-category__": {
 				"properties": {
-					"date": {
-						"type": "string",
-						"format": "date-time"
+					"description": {
+						"type": "string"
 					},
-					"currency": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Currency"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_string_"
-							}
+					"kind": {
+						"type": "string",
+						"enum": [
+							"ownCar",
+							"manual"
 						]
 					},
-					"amount": {
+					"grossAmount": {
+						"type": "number",
+						"format": "double"
+					},
+					"vatRate": {
 						"type": "number",
 						"format": "double"
 					}
 				},
 				"required": [
-					"currency",
-					"amount"
+					"kind",
+					"grossAmount",
+					"vatRate"
 				],
 				"type": "object",
 				"description": "From T, pick a set of properties whose keys are in the union K"
 			},
-			"ExpenseBulkImportCostPost": {
+			"ExpenseBulkImportPositionPost": {
 				"properties": {
-					"date": {
-						"type": "string",
-						"format": "date-time"
+					"description": {
+						"type": "string"
 					},
-					"currency": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/Currency"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_string_"
-							}
+					"kind": {
+						"type": "string",
+						"enum": [
+							"ownCar",
+							"manual"
 						]
 					},
-					"amount": {
+					"grossAmount": {
 						"type": "number",
 						"format": "double"
 					},
-					"exchangeRate": {
-						"properties": {
-							"amount": {
-								"type": "number",
-								"format": "double"
-							},
-							"rate": {
-								"type": "number",
-								"format": "double"
-							},
-							"date": {
-								"anyOf": [
-									{
-										"type": "string",
-										"format": "date-time"
-									},
-									{
-										"type": "string"
-									}
-								]
-							}
-						},
-						"required": [
-							"amount",
-							"rate",
-							"date"
-						],
-						"type": "object",
-						"nullable": true
+					"vatRate": {
+						"type": "number",
+						"format": "double"
+					},
+					"_id": {
+						"type": "string"
+					},
+					"project": {
+						"type": "string"
+					},
+					"category": {
+						"type": "string"
 					}
 				},
 				"required": [
+					"kind",
+					"grossAmount",
+					"vatRate",
+					"project",
+					"category"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ExpenseBulkImportCostPost": {
+				"properties": {
+					"positions": {
+						"items": {
+							"$ref": "#/components/schemas/ExpenseBulkImportPositionPost"
+						},
+						"type": "array"
+					},
+					"currency": {
+						"$ref": "#/components/schemas/CurrencyCode"
+					},
+					"date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				},
+				"required": [
+					"positions",
 					"currency",
-					"amount",
 					"date"
 				],
 				"type": "object",
@@ -10092,16 +11244,6 @@
 					},
 					"description": {
 						"type": "string"
-					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"note": {
 						"type": "string"
@@ -10124,16 +11266,6 @@
 					},
 					"description": {
 						"type": "string"
-					},
-					"project": {
-						"anyOf": [
-							{
-								"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
-							},
-							{
-								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-							}
-						]
 					},
 					"note": {
 						"type": "string"
@@ -10223,8 +11355,11 @@
 						},
 						"type": "array"
 					},
-					"category": {
-						"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
 					},
 					"history": {
 						"items": {
@@ -10256,7 +11391,7 @@
 					"_id",
 					"addUp",
 					"advances",
-					"category",
+					"bookings",
 					"history",
 					"historic",
 					"expenses"
@@ -12441,8 +13576,19 @@
 					"style": {
 						"$ref": "#/components/schemas/BadgeStyle"
 					},
+					"ledgerAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
 					"isDefault": {
 						"type": "boolean"
+					},
+					"for": {
+						"type": "string",
+						"enum": [
+							"Travel",
+							"ExpenseReport",
+							"both"
+						]
 					},
 					"_id": {
 						"$ref": "#/components/schemas/_id"
@@ -12451,7 +13597,9 @@
 				"required": [
 					"name",
 					"style",
+					"ledgerAccount",
 					"isDefault",
+					"for",
 					"_id"
 				],
 				"type": "object",
@@ -12480,7 +13628,9 @@
 							"enum": [
 								"name",
 								"style",
+								"ledgerAccount",
 								"isDefault",
+								"for",
 								"_id"
 							],
 							"nullable": false
@@ -12501,6 +13651,14 @@
 			},
 			"SetterPartial_ICategory_mongoose.Types.ObjectId_.NoPost_": {
 				"properties": {
+					"for": {
+						"type": "string",
+						"enum": [
+							"Travel",
+							"ExpenseReport",
+							"both"
+						]
+					},
 					"isDefault": {
 						"type": "boolean"
 					},
@@ -12518,6 +13676,16 @@
 							}
 						},
 						"type": "object"
+					},
+					"ledgerAccount": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							},
+							{
+								"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+							}
+						]
 					},
 					"name": {
 						"type": "string"
@@ -12966,6 +14134,12 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -13062,6 +14236,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"bookings",
 					"history",
 					"historic",
 					"budget",
@@ -13161,6 +14336,12 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking__id_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/_id"
@@ -13257,6 +14438,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"bookings",
 					"history",
 					"historic",
 					"budget",
@@ -13301,6 +14483,7 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"bookings",
 								"history",
 								"historic",
 								"name",
@@ -13434,6 +14617,12 @@
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					},
+					"bookings": {
+						"items": {
+							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
 					"history": {
 						"items": {
 							"$ref": "#/components/schemas/mongoose.Types.ObjectId"
@@ -13530,6 +14719,7 @@
 					"createdAt",
 					"updatedAt",
 					"_id",
+					"bookings",
 					"history",
 					"historic",
 					"budget",
@@ -13582,6 +14772,117 @@
 				},
 				"type": "object",
 				"description": "Make all properties in T optional"
+			},
+			"GETResponse_LedgerAccount__id_-or-LedgerAccount__id_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/LedgerAccount__id_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/LedgerAccount__id_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"ILedgerAccount": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"$ref": "#/components/schemas/_id"
+					}
+				},
+				"required": [
+					"identifier",
+					"name",
+					"_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GetterQuery_ILedgerAccount_": {
+				"properties": {
+					"limit": {
+						"type": "integer",
+						"format": "int32",
+						"default": 0,
+						"minimum": 0
+					},
+					"page": {
+						"type": "integer",
+						"format": "int32",
+						"default": 1,
+						"minimum": 1
+					},
+					"_id": {
+						"type": "string"
+					},
+					"additionalFields": {
+						"items": {
+							"type": "string",
+							"enum": [
+								"identifier",
+								"name",
+								"_id"
+							],
+							"nullable": false
+						},
+						"type": "array"
+					},
+					"filterJSON": {
+						"type": "string",
+						"format": "byte"
+					},
+					"sortJSON": {
+						"type": "string",
+						"format": "byte"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"SetterPartial_ILedgerAccount_mongoose.Types.ObjectId_.NoPost_": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					}
+				},
+				"type": "object"
+			},
+			"SetterBody_ILedgerAccount_mongoose.Types.ObjectId__": {
+				"$ref": "#/components/schemas/SetterPartial_ILedgerAccount_mongoose.Types.ObjectId_.NoPost_"
 			}
 		},
 		"securitySchemes": {
@@ -14070,7 +15371,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/SetterBody_IUser-at-settings_"
+								"$ref": "#/components/schemas/UserSettingsBody"
 							}
 						}
 					}
@@ -14421,6 +15722,7 @@
 									"email",
 									"name",
 									"_id",
+									"employeeId",
 									"fk",
 									"access",
 									"projects",
@@ -14526,6 +15828,7 @@
 									"email",
 									"name",
 									"_id",
+									"employeeId",
 									"fk",
 									"access",
 									"projects",
@@ -15247,6 +16550,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"lastPlaceOfWork",
@@ -15978,6 +17282,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"lastPlaceOfWork",
@@ -16100,6 +17405,72 @@
 										"type": "object"
 									}
 								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/approve/travel/withdrawApproval": {
+			"post": {
+				"operationId": "WithdrawApproval",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
 							}
 						}
 					}
@@ -16279,6 +17650,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"lastPlaceOfWork",
@@ -17003,6 +18375,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"lastPlaceOfWork",
@@ -17075,6 +18448,168 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/travel/bookingExportPreview": {
+			"post": {
+				"operationId": "PostBookingExportPreview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"errors": {
+													"anyOf": [
+														{
+															"items": {},
+															"type": "array"
+														},
+														{
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														}
+													]
+												},
+												"organisations": {
+													"items": {
+														"properties": {
+															"accounts": {},
+															"amount": {
+																"type": "number",
+																"format": "double"
+															},
+															"name": {},
+															"_id": {}
+														},
+														"required": [
+															"accounts",
+															"amount",
+															"name",
+															"_id"
+														],
+														"type": "object"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"errors",
+												"organisations"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_string_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/book/travel/bookingExportPackage": {
+			"post": {
+				"operationId": "PostBookingExportPackage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"sepaFiles": {
+													"items": {
+														"$ref": "#/components/schemas/SepaExportFile"
+													},
+													"type": "array"
+												},
+												"bookings": {
+													"items": {},
+													"type": "array"
+												}
+											},
+											"required": [
+												"sepaFiles",
+												"bookings"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BookingExportPackageRequest_string_"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/book/travel/booked": {
@@ -18456,6 +19991,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"accountingSettings",
 									"reportEmail",
 									"a1CertificateEmail",
 									"bankDetails",
@@ -18559,6 +20095,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"accountingSettings",
 									"reportEmail",
 									"a1CertificateEmail",
 									"bankDetails",
@@ -19336,6 +20873,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -19847,6 +21385,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -20453,6 +21992,7 @@
 									"name",
 									"_id",
 									"subfolderPath",
+									"accountingSettings",
 									"reportEmail",
 									"a1CertificateEmail",
 									"bankDetails",
@@ -20583,6 +22123,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -20651,6 +22192,168 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/healthCareCost/bookingExportPreview": {
+			"post": {
+				"operationId": "PostBookingExportPreview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"errors": {
+													"anyOf": [
+														{
+															"items": {},
+															"type": "array"
+														},
+														{
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														}
+													]
+												},
+												"organisations": {
+													"items": {
+														"properties": {
+															"accounts": {},
+															"amount": {
+																"type": "number",
+																"format": "double"
+															},
+															"name": {},
+															"_id": {}
+														},
+														"required": [
+															"accounts",
+															"amount",
+															"name",
+															"_id"
+														],
+														"type": "object"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"errors",
+												"organisations"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_string_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/book/healthCareCost/bookingExportPackage": {
+			"post": {
+				"operationId": "PostBookingExportPackage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"sepaFiles": {
+													"items": {
+														"$ref": "#/components/schemas/SepaExportFile"
+													},
+													"type": "array"
+												},
+												"bookings": {
+													"items": {},
+													"type": "array"
+												}
+											},
+											"required": [
+												"sepaFiles",
+												"bookings"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/healthCareCost"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/healthCareCost"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BookingExportPackageRequest_string_"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/book/healthCareCost/booked": {
@@ -20813,7 +22516,6 @@
 									"_id",
 									"addUp",
 									"advances",
-									"category",
 									"name",
 									"reference",
 									"owner",
@@ -20827,6 +22529,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -21153,9 +22856,6 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"category": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									},
 									"advances": {
 										"items": {
 											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -21406,7 +23106,6 @@
 									"_id",
 									"addUp",
 									"advances",
-									"category",
 									"name",
 									"reference",
 									"owner",
@@ -21420,6 +23119,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -21534,9 +23234,6 @@
 						"application/json": {
 							"schema": {
 								"properties": {
-									"category": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									},
 									"advances": {
 										"items": {
 											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -21828,9 +23525,6 @@
 									"owner": {
 										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
 									},
-									"category": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									},
 									"advances": {
 										"items": {
 											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
@@ -22118,7 +23812,6 @@
 									"_id",
 									"addUp",
 									"advances",
-									"category",
 									"name",
 									"reference",
 									"owner",
@@ -22132,6 +23825,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"expenses"
@@ -22200,6 +23894,168 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/expenseReport/bookingExportPreview": {
+			"post": {
+				"operationId": "PostBookingExportPreview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"errors": {
+													"anyOf": [
+														{
+															"items": {},
+															"type": "array"
+														},
+														{
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														}
+													]
+												},
+												"organisations": {
+													"items": {
+														"properties": {
+															"accounts": {},
+															"amount": {
+																"type": "number",
+																"format": "double"
+															},
+															"name": {},
+															"_id": {}
+														},
+														"required": [
+															"accounts",
+															"amount",
+															"name",
+															"_id"
+														],
+														"type": "object"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"errors",
+												"organisations"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_string_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/book/expenseReport/bookingExportPackage": {
+			"post": {
+				"operationId": "PostBookingExportPackage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"sepaFiles": {
+													"items": {
+														"$ref": "#/components/schemas/SepaExportFile"
+													},
+													"type": "array"
+												},
+												"bookings": {
+													"items": {},
+													"type": "array"
+												}
+											},
+											"required": [
+												"sepaFiles",
+												"bookings"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BookingExportPackageRequest_string_"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/book/expenseReport/booked": {
@@ -23457,7 +25313,9 @@
 								"enum": [
 									"name",
 									"style",
+									"ledgerAccount",
 									"isDefault",
+									"for",
 									"_id"
 								],
 								"nullable": false
@@ -24191,6 +26049,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"name",
@@ -24574,6 +26433,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"name",
@@ -24706,6 +26566,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"name",
@@ -24885,6 +26746,72 @@
 										"type": "object"
 									}
 								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/approve/advance/withdrawApproval": {
+			"post": {
+				"operationId": "WithdrawApproval",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"comment": {
+										"type": "string"
+									},
+									"_id": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"_id"
+								],
+								"type": "object"
 							}
 						}
 					}
@@ -25155,6 +27082,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"bookings",
 									"history",
 									"historic",
 									"name",
@@ -25245,6 +27173,168 @@
 						}
 					}
 				]
+			}
+		},
+		"/book/advance/bookingExportPreview": {
+			"post": {
+				"operationId": "PostBookingExportPreview",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"errors": {
+													"anyOf": [
+														{
+															"items": {},
+															"type": "array"
+														},
+														{
+															"items": {
+																"type": "string"
+															},
+															"type": "array"
+														}
+													]
+												},
+												"organisations": {
+													"items": {
+														"properties": {
+															"accounts": {},
+															"amount": {
+																"type": "number",
+																"format": "double"
+															},
+															"name": {},
+															"_id": {}
+														},
+														"required": [
+															"accounts",
+															"amount",
+															"name",
+															"_id"
+														],
+														"type": "object"
+													},
+													"type": "array"
+												}
+											},
+											"required": [
+												"errors",
+												"organisations"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/IdDocument_string_"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/book/advance/bookingExportPackage": {
+			"post": {
+				"operationId": "PostBookingExportPackage",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"sepaFiles": {
+													"items": {
+														"$ref": "#/components/schemas/SepaExportFile"
+													},
+													"type": "array"
+												},
+												"bookings": {
+													"items": {},
+													"type": "array"
+												}
+											},
+											"required": [
+												"sepaFiles",
+												"bookings"
+											],
+											"type": "object"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"book/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"book/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/BookingExportPackageRequest_string_"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/book/advance/booked": {
@@ -25596,6 +27686,296 @@
 						}
 					}
 				]
+			}
+		},
+		"/admin/ledgerAccount": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_LedgerAccount__id_-or-LedgerAccount__id_-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"LedgerAccount"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"identifier",
+									"name",
+									"_id"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"LedgerAccount"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SetterBody_ILedgerAccount_mongoose.Types.ObjectId__"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Delete",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/DeleteResult"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"LedgerAccount"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/ledgerAccount/bulk": {
+			"post": {
+				"operationId": "PostMany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"LedgerAccount"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/SetterBody_ILedgerAccount_mongoose.Types.ObjectId__"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/admin/ledgerAccount/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"LedgerAccount"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": []
 			}
 		}
 	},
