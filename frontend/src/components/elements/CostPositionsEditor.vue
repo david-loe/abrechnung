@@ -92,7 +92,7 @@ const props = defineProps({
   amountRequired: { type: Boolean, default: true },
   requireSinglePositionDescription: { type: Boolean, default: true }
 })
-const emit = defineEmits<{ 'update:modelValue': [CostPosition<string>[]] }>()
+const emit = defineEmits<{ 'update:modelValue': [CostPosition<string>[]]; 'user-change': [] }>()
 
 function defaultCategory() {
   const categories = APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? []
@@ -128,6 +128,7 @@ function ensurePosition() {
 
 function changed() {
   emit('update:modelValue', [...props.modelValue])
+  emit('user-change')
 }
 function amountChanged(position: CostPosition<string>) {
   if (!props.amountRequired && !Number.isFinite(position.grossAmount)) position.grossAmount = 0
@@ -135,9 +136,11 @@ function amountChanged(position: CostPosition<string>) {
 }
 function addPosition() {
   emit('update:modelValue', [...props.modelValue, createPosition()])
+  emit('user-change')
 }
 function removePosition(index: number) {
   emit('update:modelValue', props.modelValue.filter((_, positionIndex) => positionIndex !== index))
+  emit('user-change')
 }
 function canRemovePosition(position: CostPosition<string>) {
   return !props.disabled && position.kind === 'manual' && (props.modelValue.length > 1 || !props.required)

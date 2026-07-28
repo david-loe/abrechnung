@@ -141,9 +141,23 @@ export interface oidcSettings {
   clientSecret: string // Client Secret
 }
 
+export const llmReasoningEfforts = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'] as const
+export type LlmReasoningEffort = (typeof llmReasoningEfforts)[number]
+export const defaultLlmReasoningEffort: LlmReasoningEffort = 'none'
+export const defaultLlmRequestTimeoutSeconds = 180
+
+export interface LlmConnectionSettings {
+  baseUrl: string
+  model: string
+  apiKey?: string | null
+  reasoningEffort?: LlmReasoningEffort | null
+  timeoutSeconds?: number
+}
+
 export interface ConnectionSettings<idType extends _id = _id> {
   PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: boolean; locale: Locale }
   auth: { microsoft?: microsoftSettings | null; ldapauth?: ldapauthSettings | null; oidc?: oidcSettings | null }
+  llm?: LlmConnectionSettings | null
   smtp?: smtpSettings | null
 
   _id: idType
@@ -295,6 +309,39 @@ export interface DocumentFile<idType extends _id = _id, dataType extends binary 
   name: string
   _id: idType
 }
+
+export type SuggestionReportType = 'Travel' | 'ExpenseReport'
+
+export interface SuggestedCostPosition {
+  description?: string
+  grossAmount: number
+  vatRate: number
+  categoryId?: string
+}
+
+export interface SuggestedCost {
+  date?: string
+  currencyCode?: CurrencyCode
+  positions?: SuggestedCostPosition[]
+}
+
+export interface ExpenseSuggestion {
+  type: 'expense'
+  description?: string
+  cost?: SuggestedCost
+}
+
+export interface StageSuggestion {
+  type: 'stage'
+  departure?: string
+  arrival?: string
+  startLocation?: { place: string; countryCode: CountryCode }
+  endLocation?: { place: string; countryCode: CountryCode }
+  transportType?: TransportType
+  cost?: SuggestedCost
+}
+
+export type ReceiptSuggestion = ExpenseSuggestion | StageSuggestion
 
 export interface Token<idType extends _id = _id, dataType extends binary = binary> {
   _id: idType

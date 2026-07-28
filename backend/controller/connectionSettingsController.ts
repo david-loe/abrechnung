@@ -14,7 +14,8 @@ const SECRET_PATHS = [
   'smtp.auth.accessToken',
   'auth.microsoft.clientSecret',
   'auth.ldapauth.bindCredentials',
-  'auth.oidc.clientSecret'
+  'auth.oidc.clientSecret',
+  'llm.apiKey'
 ]
 
 function cloneSettings<T>(value: T): T {

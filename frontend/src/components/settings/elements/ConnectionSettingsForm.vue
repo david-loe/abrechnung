@@ -20,6 +20,9 @@ const schema = ref({})
 const formRef = useTemplateRef('form')
 
 async function postConnectionSettings(connectionSettings: ConnectionSettings) {
+  if (!connectionSettings.llm?.baseUrl) {
+    connectionSettings.llm = null
+  }
   if (!connectionSettings.smtp?.host) {
     connectionSettings.smtp = null
   }
@@ -39,6 +42,9 @@ async function postConnectionSettings(connectionSettings: ConnectionSettings) {
 }
 function loadConnectionSettings(connectionSettings: ConnectionSettings) {
   if (connectionSettings) {
+    if (connectionSettings.llm === null) {
+      connectionSettings.llm = undefined
+    }
     if (connectionSettings.smtp === null) {
       connectionSettings.smtp = undefined
     }

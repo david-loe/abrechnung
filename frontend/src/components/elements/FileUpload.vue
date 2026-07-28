@@ -58,6 +58,15 @@
       :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile<string, Blob>>[]).length === 0"
       :multiple="multiple"
       :disabled="disabled" >
+    <div
+      v-if="backgroundProcessingStatus"
+      class="form-text"
+      :class="backgroundProcessingStatus === 'receiptProcessingFailed' ? 'text-danger' : ''"
+      role="status"
+      aria-live="polite">
+      <span v-if="backgroundProcessingStatus !== 'receiptProcessingFailed'" class="spinner-border spinner-border-sm me-1"></span>
+      {{ t(`labels.${backgroundProcessingStatus}`) }}
+    </div>
   </div>
 </template>
 
@@ -65,13 +74,15 @@
 import { DocumentFile, Token } from 'abrechnung-common/types.js'
 import { fileEventToDocumentFiles, rotateImageClockwise } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
-import { computed, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import API from '../../api.js'
 import ENV from '../../env.js'
 import { showFile } from '../../helper.js'
 import { logger } from '../../logger.js'
+import { extractReceiptText } from '../../ocr/index.js'
+import { receiptProcessingStatus, ReceiptProcessingStep } from '../../receiptSuggestions.js'
 import FileUploadFileElement from './FileUploadFileElement.vue'
 
 const { t } = useI18n()
@@ -86,6 +97,8 @@ type BaseProps = {
   accept?: string
   endpointPrefix?: string
   ownerId?: string
+  receiptProcessing?: boolean
+  suggestionProcessing?: boolean
   showUploadFromPhone?: boolean
 }
 
@@ -99,10 +112,17 @@ const props = withDefaults(defineProps<Props>(), {
   accept: 'image/png, image/jpeg, .pdf',
   endpointPrefix: '',
   multiple: true,
+  receiptProcessing: false,
+  suggestionProcessing: false,
   showUploadFromPhone: true
 })
 
-const emit = defineEmits<{ (e: 'update:modelValue', v: FileT[]): void; (e: 'update:modelValue', v: FileT | null): void }>()
+const emit = defineEmits<{
+  (e: 'update:modelValue', v: FileT[]): void
+  (e: 'update:modelValue', v: FileT | null): void
+  (e: 'processing', v: boolean): void
+  (e: 'receipts-ready'): void
+}>()
 
 defineExpose({ clear })
 
@@ -123,6 +143,7 @@ const token = ref(undefined as Token<string, Blob> | undefined)
 const qrSrc = ref('')
 const rotatingKey = ref('')
 const rotatedUnsavedFiles = ref<FileT[]>([])
+const processingFiles = ref<{ key: string; name: string; status: ReceiptProcessingStep }[]>([])
 let fetchTokenInterval = undefined as NodeJS.Timeout | undefined
 const expireAfterSeconds = APP_DATA.value?.settings.uploadTokenExpireAfterSeconds ?? 1
 const secondsLeft = ref(expireAfterSeconds)
@@ -140,9 +161,21 @@ function currentFiles(): FileT[] {
   return Array.isArray(props.modelValue) ? props.modelValue : [props.modelValue]
 }
 const showRotateSaveHint = computed(() => {
+  if (props.receiptProcessing) return false
   const files = currentFiles()
   return files.some((file) => !file._id && rotatedUnsavedFiles.value.includes(file))
 })
+const backgroundProcessingStatus = computed(() =>
+  receiptProcessingStatus(
+    processingFiles.value.map(({ status }) => status),
+    props.suggestionProcessing
+  )
+)
+watch(
+  () => processingFiles.value.some(({ status }) => status === 'uploading'),
+  (processing) => emit('processing', processing),
+  { immediate: true }
+)
 function trackRotatedUnsavedFile(file: FileT) {
   rotatedUnsavedFiles.value = rotatedUnsavedFiles.value.concat(file)
 }
@@ -189,6 +222,19 @@ async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: num
       type: (rotatedBlob.type || file.type) as DocumentFile<string, Blob>['type'],
       data: rotatedBlob
     }
+    if (props.receiptProcessing) {
+      const [uploadedFile] = await processReceiptFiles([rotatedFile], false, false)
+      if (!uploadedFile) return
+      if (Array.isArray(props.modelValue) && typeof index === 'number') {
+        emit('update:modelValue', props.modelValue.map((current, currentIndex) => (currentIndex === index ? uploadedFile : current)))
+      } else {
+        emit('update:modelValue', uploadedFile)
+      }
+      await nextTick()
+      emit('receipts-ready')
+      await showFile(new File([rotatedBlob], file.name || 'image', { type: rotatedBlob.type || file.type }))
+      return
+    }
     trackRotatedUnsavedFile(rotatedFile)
     if (Array.isArray(props.modelValue) && typeof index === 'number') {
       props.modelValue.splice(index, 1, rotatedFile)
@@ -220,12 +266,113 @@ async function deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: num
 async function changeFile(event: Event) {
   const newFiles = await fileEventToDocumentFiles(event, ENV.VITE_MAX_FILE_SIZE, ENV.VITE_IMAGE_COMPRESSION_THRESHOLD_PX, t)
   if (newFiles && newFiles.length > 0) {
+    if (props.receiptProcessing) {
+      await processReceiptFiles(newFiles)
+      return
+    }
     if (props.multiple) {
       emit('update:modelValue', props.modelValue.concat(newFiles))
     } else {
       emit('update:modelValue', newFiles[0])
     }
   }
+}
+
+function processingItem(file: FileT, status: 'uploading' | 'ocr') {
+  const item = { key: crypto.randomUUID(), name: file.name || t('labels.receipt'), status } as const
+  processingFiles.value.push({ ...item })
+  return processingFiles.value.at(-1) as (typeof processingFiles.value)[number]
+}
+
+function removeFinishedProcessingItems() {
+  processingFiles.value = processingFiles.value.filter(({ status }) => status === 'error')
+}
+
+async function startReceiptPipeline(file: FileT) {
+  if (!file.data || !file.name || !file.type) throw new Error('Receipt data is missing')
+  const item = processingItem(file, 'uploading')
+  const formData = new FormData()
+  formData.append('file', new File([file.data], file.name, { type: file.type }))
+  const uploadRequest = API.setter<FileT>(
+    `${props.endpointPrefix}documentFile`,
+    formData,
+    { params: props.ownerId ? { ownerId: props.ownerId } : undefined },
+    false
+  )
+  const ocrResult = extractReceiptText(file.data).then(
+    (ocr) => ({ ocr }),
+    (error) => ({ error })
+  )
+  const upload = await uploadRequest
+  if (!upload.ok) {
+    item.status = 'error'
+    throw new Error('Receipt upload failed')
+  }
+  item.status = 'ocr'
+  const documentFile = upload.ok
+  const completeOcr = async () => {
+    const text = await ocrResult
+    if ('error' in text) {
+      item.status = 'error'
+      logger.error(text.error)
+      return
+    }
+    const result = await API.setter(
+      `${props.endpointPrefix}documentFile/ocr`,
+      { documentFileId: documentFile._id, ocr: text.ocr },
+      {},
+      false
+    )
+    if (result.error) {
+      item.status = 'error'
+      return
+    }
+    const index = processingFiles.value.indexOf(item)
+    if (index !== -1) processingFiles.value.splice(index, 1)
+  }
+  return { documentFile, completeOcr }
+}
+
+async function processReceiptFiles(files: FileT[], append = true, notify = true) {
+  const results = await Promise.allSettled(files.map(startReceiptPipeline))
+  const uploaded = results.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+  const documentFiles = uploaded.map(({ documentFile }) => documentFile)
+  if (append && documentFiles.length > 0) {
+    if (props.multiple) {
+      emit('update:modelValue', currentFiles().concat(documentFiles))
+    } else {
+      emit('update:modelValue', documentFiles[0])
+    }
+  }
+  await Promise.all(uploaded.map(({ completeOcr }) => completeOcr()))
+  removeFinishedProcessingItems()
+  if (notify && documentFiles.length > 0) emit('receipts-ready')
+  return documentFiles
+}
+
+async function processExistingReceiptFiles(files: FileT[]) {
+  const tasks = files.map(async (file) => {
+    if (!file._id) return
+    const item = processingItem(file, 'ocr')
+    const blob = await getImageBlob(file)
+    if (!blob) {
+      item.status = 'error'
+      return
+    }
+    try {
+      const ocr = await extractReceiptText(blob)
+      const result = await API.setter(`${props.endpointPrefix}documentFile/ocr`, { documentFileId: file._id, ocr }, {}, false)
+      if (result.error) throw result.error
+      const index = processingFiles.value.indexOf(item)
+      if (index !== -1) processingFiles.value.splice(index, 1)
+    } catch (error) {
+      item.status = 'error'
+      logger.error(error)
+    }
+  })
+  await Promise.all(tasks)
+  removeFinishedProcessingItems()
+  emit('receipts-ready')
 }
 async function generateToken() {
   token.value = (await API.setter<Token<string, Blob>>('user/token', {}, undefined, false)).ok
@@ -255,6 +402,7 @@ async function getTokenFiles() {
       } else {
         emit('update:modelValue', fetchedToken.files[0])
       }
+      if (props.receiptProcessing) void processExistingReceiptFiles(fetchedToken.files)
       clear()
     }
   } else {
