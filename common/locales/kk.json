@@ -529,6 +529,7 @@
     "receiptOcrInProgress": "Түбіртек мәтіні танылуда …",
     "receiptProcessingFailed": "Түбіртектерді өңдеу сәтсіз аяқталды.",
     "receiptProcessingInProgress": "Түбіртектер өңделуде …",
+    "receiptSuggestionFailed": "ЖИ ұсынысын жасау мүмкін болмады.",
     "receiptSuggestionInProgress": "ЖИ ұсынысы жасалуда …",
     "receipts": "Түбіртектер",
     "receiptUploadInProgress": "Түбіртектер жүктелуде …",

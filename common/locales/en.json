@@ -529,6 +529,7 @@
     "receiptOcrInProgress": "Recognizing receipt text …",
     "receiptProcessingFailed": "Receipt processing failed.",
     "receiptProcessingInProgress": "Processing receipts …",
+    "receiptSuggestionFailed": "AI suggestion could not be created.",
     "receiptSuggestionInProgress": "Creating AI suggestion …",
     "receipts": "Receipts",
     "receiptUploadInProgress": "Uploading receipts …",

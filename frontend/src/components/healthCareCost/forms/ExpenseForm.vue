@@ -14,6 +14,9 @@
         :required="true"
         :endpointPrefix="endpointPrefix"
         :ownerId="ownerId"
+        :report-id="reportId"
+        source-report-type="HealthCareCost"
+        :suggestion-failed="suggestionFailed"
         :suggestion-processing="suggestingFromReceipts"
         receipt-processing
         @processing="(processing: boolean) => (uploadingReceipts = processing)"
@@ -134,6 +137,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   endpointPrefix: { type: String, default: '' },
   ownerId: { type: String },
+  reportId: { type: String },
   showPrevButton: { type: Boolean, default: false },
   showNextButton: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
@@ -143,6 +147,7 @@ const props = defineProps({
 const dirtyFields = new Set<string>()
 const uploadingReceipts = ref(false)
 const suggestingFromReceipts = ref(false)
+const suggestionFailed = ref(false)
 let suggestionGeneration = 0
 const formExpense = ref(input())
 const fileUploadRef = useTemplateRef('fileUpload')
@@ -156,6 +161,7 @@ function clear() {
   fileUploadRef.value?.clear()
   suggestionGeneration += 1
   suggestingFromReceipts.value = false
+  suggestionFailed.value = false
   dirtyFields.clear()
   formExpense.value = defaultExpense()
 }
@@ -179,6 +185,7 @@ function protectExistingValues() {
 async function suggestFromReceipts() {
   const generation = ++suggestionGeneration
   suggestingFromReceipts.value = true
+  suggestionFailed.value = false
   try {
     const position = formExpense.value.cost.positions[0]
     const suggestion = await requestReceiptSuggestion({
@@ -186,6 +193,8 @@ async function suggestFromReceipts() {
       reportType: 'ExpenseReport',
       projectId: position?.project?._id ?? props.defaultProject._id,
       documentFileIds: receiptIds(formExpense.value.cost.receipts),
+      reportId: props.reportId,
+      sourceReportType: 'HealthCareCost',
       endpointPrefix: props.endpointPrefix
     })
     if (generation !== suggestionGeneration || suggestion?.type !== 'expense') return
@@ -201,6 +210,8 @@ async function suggestFromReceipts() {
         reportType: 'ExpenseReport'
       })
     }
+  } catch {
+    if (generation === suggestionGeneration) suggestionFailed.value = true
   } finally {
     if (generation === suggestionGeneration) suggestingFromReceipts.value = false
   }

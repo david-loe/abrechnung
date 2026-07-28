@@ -529,6 +529,7 @@
     "receiptOcrInProgress": "Reconociendo el texto de los recibos …",
     "receiptProcessingFailed": "Error al procesar los recibos.",
     "receiptProcessingInProgress": "Procesando recibos …",
+    "receiptSuggestionFailed": "No se pudo crear la sugerencia de IA.",
     "receiptSuggestionInProgress": "Creando sugerencia con IA …",
     "receipts": "Recibos",
     "receiptUploadInProgress": "Subiendo recibos …",

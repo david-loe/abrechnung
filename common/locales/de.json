@@ -529,6 +529,7 @@
     "receiptOcrInProgress": "Texterkennung für Belege läuft …",
     "receiptProcessingFailed": "Belegverarbeitung fehlgeschlagen.",
     "receiptProcessingInProgress": "Belege werden verarbeitet …",
+    "receiptSuggestionFailed": "KI-Vorschlag konnte nicht erstellt werden.",
     "receiptSuggestionInProgress": "KI-Vorschlag wird erstellt …",
     "receipts": "Belege",
     "receiptUploadInProgress": "Belege werden hochgeladen …",

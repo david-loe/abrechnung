@@ -1,23 +1,40 @@
 import { Body, Consumes, Controller, Get, Middlewares, Post, Produces, Query, Request, Route, SuccessResponse, Tags } from '@tsoa/runtime'
+import { SuggestionSourceReportType } from 'abrechnung-common/types.js'
 import ejs from 'ejs'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import { Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
+import { authorizeExaminedReport } from '../examinedReports.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import Token from '../models/token.js'
 import User from '../models/user.js'
 import { getFileUtilsContent, getUploadTemplate } from '../templates/cache.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { File } from './types.js'
 
 async function validateToken(req: ExRequest, _res: ExResponse, next: NextFunction) {
-  const user = await User.findOne({ _id: req.query.userId as string }).lean()
+  const user = await User.findOne({ _id: req.query.userId as string })
   if (!user?.token?._id.equals(req.query.tokenId as string)) {
     throw new AuthorizationError('Token not valid')
   }
+  req.user = user
   next()
+}
+
+async function uploadOwner(
+  user: Express.User,
+  userId: string,
+  ownerId?: string,
+  reportId?: string,
+  sourceReportType?: SuggestionSourceReportType
+) {
+  if (!ownerId) return new Types.ObjectId(userId)
+  if (!reportId || !sourceReportType) throw new ValidationClientError('Examined uploads require a report context.')
+  const report = await authorizeExaminedReport({ reportId, sourceReportType }, user)
+  if (!report.owner.equals(ownerId)) throw new NotAllowedError()
+  return report.owner
 }
 
 @Tags('Upload')
@@ -31,7 +48,9 @@ export class UploadController extends Controller {
     @Request() req: ExRequest,
     @Query() userId: string,
     @Query() tokenId: string,
-    @Query() ownerId?: string
+    @Query() ownerId?: string,
+    @Query() reportId?: string,
+    @Query() sourceReportType?: SuggestionSourceReportType
   ): Promise<void> {
     const user = await User.findOne({ _id: userId }).lean()
     if (!user?.token) {
@@ -42,11 +61,10 @@ export class UploadController extends Controller {
     url.searchParams.append('userId', userId)
     url.searchParams.append('tokenId', tokenId)
     if (ownerId) {
-      const owner = await User.findOne({ _id: ownerId }).lean()
-      if (!owner) {
-        throw new NotFoundError(`No user found for ownerId: ${ownerId}`)
-      }
+      await uploadOwner(req.user as Express.User, userId, ownerId, reportId, sourceReportType)
       url.searchParams.append('ownerId', ownerId)
+      url.searchParams.append('reportId', reportId as string)
+      url.searchParams.append('sourceReportType', sourceReportType as string)
     }
     const secondsLeft = Math.round((new Date(user.token.expireAt).valueOf() - Date.now()) / 1_000)
     const text = {
@@ -78,11 +96,14 @@ export class UploadController extends Controller {
     @Body() requestBody: { files: File[] },
     @Query() userId: string,
     @Query() tokenId: string,
-    @Query() ownerId?: string
+    @Query() ownerId?: string,
+    @Query() reportId?: string,
+    @Query() sourceReportType?: SuggestionSourceReportType
   ) {
     const token = await Token.findOne({ _id: tokenId })
     if (token) {
-      await documentFileHandler(['files'], { owner: ownerId || userId, temporary: true })(req)
+      const owner = await uploadOwner(req.user as Express.User, userId, ownerId, reportId, sourceReportType)
+      await documentFileHandler(['files'], { owner, temporary: true })(req)
       token.files = token.files.concat(requestBody.files as unknown as Types.ObjectId[])
       token.markModified('files')
       await token.save()

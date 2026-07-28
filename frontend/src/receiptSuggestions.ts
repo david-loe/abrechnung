@@ -8,7 +8,8 @@ import {
   ProjectSimple,
   ReceiptSuggestion,
   SuggestedCost,
-  SuggestionReportType
+  SuggestionReportType,
+  SuggestionSourceReportType
 } from 'abrechnung-common/types.js'
 import API from './api.js'
 
@@ -18,6 +19,8 @@ interface SuggestionContext {
   projectId: string
   documentFileIds: string[]
   endpointPrefix: string
+  reportId?: string
+  sourceReportType: SuggestionSourceReportType
 }
 
 interface CostSuggestionContext {
@@ -30,23 +33,31 @@ interface CostSuggestionContext {
 
 export type ReceiptProcessingStep = 'uploading' | 'ocr' | 'error'
 
-export function receiptProcessingStatus(steps: ReceiptProcessingStep[], suggestionProcessing: boolean) {
+export function receiptProcessingStatus(steps: ReceiptProcessingStep[], suggestionProcessing: boolean, suggestionFailed = false) {
   const activeSteps = new Set(steps)
   if (activeSteps.has('uploading') && activeSteps.has('ocr')) return 'receiptProcessingInProgress'
   if (activeSteps.has('uploading')) return 'receiptUploadInProgress'
   if (activeSteps.has('ocr')) return 'receiptOcrInProgress'
   if (suggestionProcessing) return 'receiptSuggestionInProgress'
   if (activeSteps.has('error')) return 'receiptProcessingFailed'
+  if (suggestionFailed) return 'receiptSuggestionFailed'
 }
 
 export async function requestReceiptSuggestion(context: SuggestionContext) {
   if (context.documentFileIds.length === 0) return undefined
   const result = await API.getter<ReceiptSuggestion>(
     `${context.endpointPrefix}suggestions`,
-    { type: context.type, reportType: context.reportType, projectId: context.projectId, documentFileIds: context.documentFileIds },
+    {
+      type: context.type,
+      reportType: context.reportType,
+      projectId: context.projectId,
+      documentFileIds: context.documentFileIds,
+      ...(context.endpointPrefix === 'examine/' ? { reportId: context.reportId, sourceReportType: context.sourceReportType } : {})
+    },
     {},
     { showAlert: false }
   )
+  if (result.error) throw result.error
   return result.ok?.data
 }
 

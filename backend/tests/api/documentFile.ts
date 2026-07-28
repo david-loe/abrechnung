@@ -12,10 +12,15 @@ await loginUser(agent, 'user')
 
 let documentFileId = ''
 let projectId = ''
+let reportId = ''
+let reportOwnerId = ''
 
 test.serial('POST /documentFile creates a temporary receipt', async (t) => {
   const projectResponse = await agent.get('/project')
   projectId = projectResponse.body.data[0]._id
+  const reportResponse = await agent.post('/expenseReport/inWork').send({ name: 'Receipt suggestion context', project: projectId })
+  t.is(reportResponse.status, 200)
+  reportId = reportResponse.body.result._id
 
   const response = await agent
     .post('/documentFile')
@@ -25,6 +30,7 @@ test.serial('POST /documentFile creates a temporary receipt', async (t) => {
   t.like(response.body.result, { name: 'invoice.pdf', type: 'application/pdf' })
   t.false(Object.hasOwn(response.body.result, 'data'))
   documentFileId = response.body.result._id
+  reportOwnerId = response.body.result.owner._id ?? response.body.result.owner
 
   const storedDocument = await DocumentFile.findById(documentFileId).select('+expiresAt').lean()
   t.truthy(storedDocument?.expiresAt)
@@ -41,6 +47,100 @@ test.serial('POST /documentFile/ocr stores OCR only for the owner', async (t) =>
 
   const storedDocument = await DocumentFile.findById(documentFileId).select('+ocr').lean()
   t.is(storedDocument?.ocr, 'Invoice date 2026-07-24, total 10.70 EUR')
+})
+
+test.serial('Examiner document endpoints require and enforce the report context', async (t) => {
+  await loginUser(agent, 'travel')
+  const foreignUpload = await agent
+    .post('/documentFile')
+    .attach('file', 'tests/files/dummy.pdf', { filename: 'foreign.pdf', contentType: 'application/pdf' })
+  t.is(foreignUpload.status, 201)
+  const foreignDocumentFileId = foreignUpload.body.result._id as string
+
+  try {
+    await loginUser(agent, 'expenseReport')
+    const missingContext = await agent.post('/examine/documentFile/ocr').send({ documentFileId, ocr: 'missing context' })
+    t.is(missingContext.status, 422)
+
+    const wrongReportType = await agent
+      .post('/examine/documentFile/ocr')
+      .send({ documentFileId, ocr: 'wrong report', reportId, sourceReportType: 'Travel' })
+    t.is(wrongReportType.status, 403)
+
+    const foreignDocument = await agent
+      .post('/examine/documentFile/ocr')
+      .send({ documentFileId: foreignDocumentFileId, ocr: 'foreign receipt', reportId, sourceReportType: 'ExpenseReport' })
+    t.is(foreignDocument.status, 403)
+
+    const ocrResponse = await agent
+      .post('/examine/documentFile/ocr')
+      .send({ documentFileId, ocr: 'examiner OCR', reportId, sourceReportType: 'ExpenseReport' })
+    t.is(ocrResponse.status, 204)
+
+    const missingGetContext = await agent.get('/examine/documentFile').query({ _id: documentFileId })
+    t.is(missingGetContext.status, 422)
+    const getResponse = await agent.get('/examine/documentFile').query({ _id: documentFileId, reportId, sourceReportType: 'ExpenseReport' })
+    t.is(getResponse.status, 200)
+    t.is(getResponse.headers['content-type'], 'application/pdf')
+
+    const examinedUpload = await agent
+      .post('/examine/documentFile')
+      .query({ ownerId: documentFileId, reportId, sourceReportType: 'ExpenseReport' })
+      .attach('file', 'tests/files/dummy.pdf', { filename: 'examined.pdf', contentType: 'application/pdf' })
+    t.is(examinedUpload.status, 403)
+
+    const authorizedUpload = await agent
+      .post('/examine/documentFile')
+      .query({ ownerId: reportOwnerId, reportId, sourceReportType: 'ExpenseReport' })
+      .attach('file', 'tests/files/dummy.pdf', { filename: 'examined.pdf', contentType: 'application/pdf' })
+    t.is(authorizedUpload.status, 201)
+
+    const deleteResponse = await agent
+      .delete('/examine/documentFile')
+      .query({ _id: authorizedUpload.body.result._id, reportId, sourceReportType: 'ExpenseReport' })
+    t.is(deleteResponse.status, 200)
+  } finally {
+    await loginUser(agent, 'travel')
+    const cleanup = await agent.delete('/documentFile').query({ _id: foreignDocumentFileId })
+    t.is(cleanup.status, 200)
+    await loginUser(agent, 'user')
+  }
+})
+
+test.serial('Examiner suggestion endpoint enforces the report context before calling the LLM', async (t) => {
+  try {
+    await loginUser(agent, 'expenseReport')
+    const missingContext = await agent
+      .get('/examine/suggestions')
+      .query({ type: 'expense', reportType: 'ExpenseReport', projectId, documentFileIds: documentFileId })
+    t.is(missingContext.status, 422)
+
+    const wrongReportType = await agent
+      .get('/examine/suggestions')
+      .query({
+        type: 'expense',
+        reportType: 'ExpenseReport',
+        projectId,
+        documentFileIds: documentFileId,
+        reportId,
+        sourceReportType: 'Travel'
+      })
+    t.is(wrongReportType.status, 403)
+
+    const wrongProject = await agent
+      .get('/examine/suggestions')
+      .query({
+        type: 'expense',
+        reportType: 'ExpenseReport',
+        projectId: documentFileId,
+        documentFileIds: documentFileId,
+        reportId,
+        sourceReportType: 'ExpenseReport'
+      })
+    t.is(wrongProject.status, 403)
+  } finally {
+    await loginUser(agent, 'user')
+  }
 })
 
 test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (t) => {
@@ -88,7 +188,22 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
       type: 'json_schema',
       json_schema: { name: 'receipt_suggestion', strict: true }
     })
+
+    await loginUser(agent, 'expenseReport')
+    const examinedResponse = await agent
+      .get('/examine/suggestions')
+      .query({
+        type: 'expense',
+        reportType: 'ExpenseReport',
+        projectId,
+        documentFileIds: documentFileId,
+        reportId,
+        sourceReportType: 'ExpenseReport'
+      })
+    t.is(examinedResponse.status, 200)
+    t.deepEqual(examinedResponse.body.data, response.body.data)
   } finally {
+    await loginUser(agent, 'user')
     axios.post = originalPost
     settings.llm = originalLlm
     await settings.save()
