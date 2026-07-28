@@ -34,6 +34,7 @@ describe('receipt suggestion application', () => {
     expect(receiptProcessingStatus(['ocr', 'ocr'], false)).toBe('receiptOcrInProgress')
     expect(receiptProcessingStatus(['uploading', 'ocr', 'uploading'], false)).toBe('receiptProcessingInProgress')
     expect(receiptProcessingStatus([], true)).toBe('receiptSuggestionInProgress')
+    expect(receiptProcessingStatus([], false, true)).toBe('receiptSuggestionFailed')
   })
 
   it('passes suggestion parameters to the configured Axios query serializer', async () => {
@@ -44,15 +45,55 @@ describe('receipt suggestion application', () => {
       reportType: 'Travel',
       projectId: 'project',
       documentFileIds: ['first', 'second'],
+      sourceReportType: 'Travel',
       endpointPrefix: ''
     })
 
-    expect(vi.mocked(API.getter).mock.calls[0][1]).toEqual({
+    expect(vi.mocked(API.getter).mock.calls.at(-1)?.[1]).toEqual({
       type: 'expense',
       reportType: 'Travel',
       projectId: 'project',
       documentFileIds: ['first', 'second']
     })
+  })
+
+  it('includes the examined report context in suggestion queries', async () => {
+    vi.mocked(API.getter).mockResolvedValueOnce({ ok: { data: { type: 'expense' }, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } })
+
+    await requestReceiptSuggestion({
+      type: 'expense',
+      reportType: 'ExpenseReport',
+      projectId: 'project',
+      documentFileIds: ['receipt'],
+      reportId: 'report',
+      sourceReportType: 'ExpenseReport',
+      endpointPrefix: 'examine/'
+    })
+
+    expect(vi.mocked(API.getter).mock.calls.at(-1)?.[1]).toEqual({
+      type: 'expense',
+      reportType: 'ExpenseReport',
+      projectId: 'project',
+      documentFileIds: ['receipt'],
+      reportId: 'report',
+      sourceReportType: 'ExpenseReport'
+    })
+  })
+
+  it('lets the form expose a failed suggestion request', async () => {
+    const error = new Error('suggestion failed')
+    vi.mocked(API.getter).mockResolvedValueOnce({ error })
+
+    await expect(
+      requestReceiptSuggestion({
+        type: 'expense',
+        reportType: 'Travel',
+        projectId: 'project',
+        documentFileIds: ['receipt'],
+        sourceReportType: 'Travel',
+        endpointPrefix: ''
+      })
+    ).rejects.toBe(error)
   })
 
   it('fills only a pristine default cost and keeps distinct VAT positions', () => {

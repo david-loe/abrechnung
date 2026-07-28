@@ -17,11 +17,11 @@ import {
 import { DocumentFileType, documentFileTypes } from 'abrechnung-common/types.js'
 import { mongo, Types } from 'mongoose'
 import { MAX_OCR_CHARACTERS, temporaryDocumentFileExpiration } from '../documentFiles.js'
+import { authorizeExaminedReport, ExaminedReportContext } from '../examinedReports.js'
 import { fileHandler } from '../helper.js'
 import DocumentFile, { StoredDocumentFile } from '../models/documentFile.js'
-import User from '../models/user.js'
 import { Controller, checkOwner } from './controller.js'
-import { NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
+import { NotAllowedError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
 interface OcrBody {
@@ -29,6 +29,8 @@ interface OcrBody {
   /** @maxLength 500000 */
   ocr: string
 }
+
+interface ExaminedOcrBody extends OcrBody, ExaminedReportContext {}
 
 function documentFileResult(documentFile: StoredDocumentFile) {
   return { _id: documentFile._id, name: documentFile.name, owner: documentFile.owner, type: documentFile.type }
@@ -114,19 +116,25 @@ export class DocumentFileAdminController extends Controller {
   @Middlewares(fileHandler.single('file'))
   @Consumes('multipart/form-data')
   @SuccessResponse(201)
-  public async postAny(@Query() ownerId: string, @Request() request: AuthenticatedExpressRequest) {
-    const owner = Types.ObjectId.isValid(ownerId) ? await User.findById(ownerId, { _id: 1 }).lean() : null
-    if (!owner) throw new NotFoundError('No owner found')
+  public async postAny(
+    @Query() ownerId: string,
+    @Query() reportId: string,
+    @Query() sourceReportType: ExaminedReportContext['sourceReportType'],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const report = await authorizeExaminedReport({ reportId, sourceReportType }, request.user)
+    if (!report.owner.equals(ownerId)) throw new NotAllowedError()
     this.setStatus(201)
-    return await createDocumentFile(request, owner._id)
+    return await createDocumentFile(request, report.owner)
   }
 
   @Post('ocr')
   @SuccessResponse(204)
-  public async postAnyOcr(@Body() body: OcrBody) {
+  public async postAnyOcr(@Body() body: ExaminedOcrBody, @Request() request: AuthenticatedExpressRequest) {
     validateOcr(body.ocr)
-    const result = await DocumentFile.updateOne({ _id: body.documentFileId }, { $set: { ocr: body.ocr } })
-    if (result.matchedCount === 0) throw new NotFoundError('No file found')
+    const report = await authorizeExaminedReport(body, request.user)
+    const result = await DocumentFile.updateOne({ _id: body.documentFileId, owner: report.owner }, { $set: { ocr: body.ocr } })
+    if (result.matchedCount === 0) throw new NotAllowedError()
     this.setStatus(204)
   }
 
@@ -135,10 +143,16 @@ export class DocumentFileAdminController extends Controller {
   @Produces(documentFileTypes[1])
   @Produces(documentFileTypes[2])
   @SuccessResponse(200)
-  public async getAny(@Query() _id: string) {
-    const file = await DocumentFile.findOne({ _id: _id }).lean()
+  public async getAny(
+    @Query() _id: string,
+    @Query() reportId: string,
+    @Query() sourceReportType: ExaminedReportContext['sourceReportType'],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const report = await authorizeExaminedReport({ reportId, sourceReportType }, request.user)
+    const file = await DocumentFile.findOne({ _id, owner: report.owner }).lean()
     if (!file) {
-      throw new NotFoundError('No file found')
+      throw new NotAllowedError()
     }
     this.setHeader('Content-disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`)
     this.setHeader('Content-Type', file.type)
@@ -147,7 +161,13 @@ export class DocumentFileAdminController extends Controller {
   }
 
   @Delete()
-  public async deleteAny(@Query() _id: string) {
-    return await this.deleter(DocumentFile, { _id: _id })
+  public async deleteAny(
+    @Query() _id: string,
+    @Query() reportId: string,
+    @Query() sourceReportType: ExaminedReportContext['sourceReportType'],
+    @Request() request: AuthenticatedExpressRequest
+  ) {
+    const report = await authorizeExaminedReport({ reportId, sourceReportType }, request.user)
+    return await this.deleter(DocumentFile, { _id, checkOldObject: async (file) => file.owner.equals(report.owner) })
   }
 }

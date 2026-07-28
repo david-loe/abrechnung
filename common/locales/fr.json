@@ -548,6 +548,7 @@
     "receiptOcrInProgress": "Reconnaissance du texte des justificatifs …",
     "receiptProcessingFailed": "Échec du traitement des justificatifs.",
     "receiptProcessingInProgress": "Traitement des justificatifs …",
+    "receiptSuggestionFailed": "La suggestion par IA n’a pas pu être créée.",
     "receiptSuggestionInProgress": "Création de la suggestion par IA …",
     "receipts": "Justificatifs",
     "receiptUploadInProgress": "Téléversement des justificatifs …",

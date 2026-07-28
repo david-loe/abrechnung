@@ -548,6 +548,7 @@
     "receiptOcrInProgress": "Распознаётся текст квитанций …",
     "receiptProcessingFailed": "Не удалось обработать квитанции.",
     "receiptProcessingInProgress": "Квитанции обрабатываются …",
+    "receiptSuggestionFailed": "Не удалось создать предложение ИИ.",
     "receiptSuggestionInProgress": "Создаётся предложение ИИ …",
     "receipts": "Квитанции",
     "receiptUploadInProgress": "Квитанции загружаются …",

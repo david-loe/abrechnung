@@ -338,6 +338,8 @@ export interface DocumentFile<idType extends _id = _id, dataType extends binary 
 }
 
 export type SuggestionReportType = 'Travel' | 'ExpenseReport'
+export const suggestionSourceReportTypes = ['Travel', 'ExpenseReport', 'HealthCareCost'] as const
+export type SuggestionSourceReportType = (typeof suggestionSourceReportTypes)[number]
 
 export interface SuggestedCostPosition {
   description?: string

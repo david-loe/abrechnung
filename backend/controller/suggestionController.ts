@@ -1,7 +1,9 @@
 import { Get, Query, Request, Route, Security, SuccessResponse, Tags } from '@tsoa/runtime'
-import { SuggestionReportType } from 'abrechnung-common/types.js'
+import { SuggestionReportType, SuggestionSourceReportType } from 'abrechnung-common/types.js'
+import { authorizeExaminedReport } from '../examinedReports.js'
 import { createSuggestion } from '../suggestions.js'
 import { Controller } from './controller.js'
+import { NotAllowedError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
 @Tags('Suggestions')
@@ -43,10 +45,15 @@ export class SuggestionAdminController extends Controller {
     @Query() type: 'expense' | 'stage',
     @Query() reportType: SuggestionReportType,
     @Query() projectId: string,
-    @Query() documentFileIds: string[]
+    @Query() documentFileIds: string[],
+    @Query() reportId: string,
+    @Query() sourceReportType: SuggestionSourceReportType,
+    @Request() request: AuthenticatedExpressRequest
   ) {
     this.setHeader('Cache-Control', 'no-store')
-    const suggestion = await createSuggestion({ type, reportType, projectId, documentFileIds })
+    const report = await authorizeExaminedReport({ reportId, sourceReportType }, request.user)
+    if (!report.project.equals(projectId)) throw new NotAllowedError()
+    const suggestion = await createSuggestion({ type, reportType, projectId, documentFileIds, owner: report.owner })
     if (!suggestion) {
       this.setStatus(204)
       return

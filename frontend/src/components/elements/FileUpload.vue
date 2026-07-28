@@ -61,17 +61,17 @@
     <div
       v-if="backgroundProcessingStatus"
       class="form-text"
-      :class="backgroundProcessingStatus === 'receiptProcessingFailed' ? 'text-danger' : ''"
+      :class="backgroundProcessingFailed ? 'text-danger' : ''"
       role="status"
       aria-live="polite">
-      <span v-if="backgroundProcessingStatus !== 'receiptProcessingFailed'" class="spinner-border spinner-border-sm me-1"></span>
+      <span v-if="!backgroundProcessingFailed" class="spinner-border spinner-border-sm me-1"></span>
       {{ t(`labels.${backgroundProcessingStatus}`) }}
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { DocumentFile, Token } from 'abrechnung-common/types.js'
+import { DocumentFile, SuggestionSourceReportType, Token } from 'abrechnung-common/types.js'
 import { fileEventToDocumentFiles, rotateImageClockwise } from 'abrechnung-common/utils/file.js'
 import QRCode from 'qrcode'
 import { computed, nextTick, onUnmounted, ref, watch } from 'vue'
@@ -97,7 +97,10 @@ type BaseProps = {
   accept?: string
   endpointPrefix?: string
   ownerId?: string
+  reportId?: string
   receiptProcessing?: boolean
+  sourceReportType?: SuggestionSourceReportType
+  suggestionFailed?: boolean
   suggestionProcessing?: boolean
   showUploadFromPhone?: boolean
 }
@@ -113,6 +116,7 @@ const props = withDefaults(defineProps<Props>(), {
   endpointPrefix: '',
   multiple: true,
   receiptProcessing: false,
+  suggestionFailed: false,
   suggestionProcessing: false,
   showUploadFromPhone: true
 })
@@ -168,8 +172,12 @@ const showRotateSaveHint = computed(() => {
 const backgroundProcessingStatus = computed(() =>
   receiptProcessingStatus(
     processingFiles.value.map(({ status }) => status),
-    props.suggestionProcessing
+    props.suggestionProcessing,
+    props.suggestionFailed
   )
+)
+const backgroundProcessingFailed = computed(
+  () => backgroundProcessingStatus.value === 'receiptProcessingFailed' || backgroundProcessingStatus.value === 'receiptSuggestionFailed'
 )
 watch(
   () => processingFiles.value.some(({ status }) => status === 'uploading'),
@@ -192,7 +200,11 @@ async function _showFile(file: Partial<DocumentFile<string, Blob>>): Promise<voi
   if (file.data) {
     await showFile(file.data as File)
   } else if (file._id) {
-    await showFile({ params: { _id: file._id }, endpoint: `${props.endpointPrefix}documentFile`, filename: file.name as string })
+    await showFile({
+      params: { _id: file._id, ...examinedReportContext() },
+      endpoint: `${props.endpointPrefix}documentFile`,
+      filename: file.name as string
+    })
   }
 }
 async function getImageBlob(file: Partial<DocumentFile<string, Blob>>): Promise<Blob | null> {
@@ -202,7 +214,9 @@ async function getImageBlob(file: Partial<DocumentFile<string, Blob>>): Promise<
   if (!file._id) {
     return null
   }
-  const result = (await API.getter<Blob>(`${props.endpointPrefix}documentFile`, { _id: file._id }, { responseType: 'blob' })).ok
+  const result = (
+    await API.getter<Blob>(`${props.endpointPrefix}documentFile`, { _id: file._id, ...examinedReportContext() }, { responseType: 'blob' })
+  ).ok
   return result?.data || null
 }
 async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: number, degrees: 90 | 180 | 270 = 90) {
@@ -250,7 +264,7 @@ async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: num
 async function deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
   if (confirm(t('alerts.areYouSureDelete'))) {
     if (!file.data && file._id) {
-      const result = await API.deleter(`${props.endpointPrefix}documentFile`, { _id: file._id }, false)
+      const result = await API.deleter(`${props.endpointPrefix}documentFile`, { _id: file._id, ...examinedReportContext() }, false)
       if (!result) {
         return null
       }
@@ -284,6 +298,12 @@ function processingItem(file: FileT, status: 'uploading' | 'ocr') {
   return processingFiles.value.at(-1) as (typeof processingFiles.value)[number]
 }
 
+function examinedReportContext() {
+  if (!props.ownerId) return undefined
+  if (!props.reportId || !props.sourceReportType) throw new Error('Examined receipt uploads require a report context')
+  return { reportId: props.reportId, sourceReportType: props.sourceReportType }
+}
+
 function removeFinishedProcessingItems() {
   processingFiles.value = processingFiles.value.filter(({ status }) => status === 'error')
 }
@@ -296,7 +316,7 @@ async function startReceiptPipeline(file: FileT) {
   const uploadRequest = API.setter<FileT>(
     `${props.endpointPrefix}documentFile`,
     formData,
-    { params: props.ownerId ? { ownerId: props.ownerId } : undefined },
+    { params: props.ownerId ? { ownerId: props.ownerId, ...examinedReportContext() } : undefined },
     false
   )
   const ocrResult = extractReceiptText(file.data).then(
@@ -319,7 +339,7 @@ async function startReceiptPipeline(file: FileT) {
     }
     const result = await API.setter(
       `${props.endpointPrefix}documentFile/ocr`,
-      { documentFileId: documentFile._id, ocr: text.ocr },
+      { documentFileId: documentFile._id, ocr: text.ocr, ...examinedReportContext() },
       {},
       false
     )
@@ -361,7 +381,12 @@ async function processExistingReceiptFiles(files: FileT[]) {
     }
     try {
       const ocr = await extractReceiptText(blob)
-      const result = await API.setter(`${props.endpointPrefix}documentFile/ocr`, { documentFileId: file._id, ocr }, {}, false)
+      const result = await API.setter(
+        `${props.endpointPrefix}documentFile/ocr`,
+        { documentFileId: file._id, ocr, ...examinedReportContext() },
+        {},
+        false
+      )
       if (result.error) throw result.error
       const index = processingFiles.value.indexOf(item)
       if (index !== -1) processingFiles.value.splice(index, 1)
@@ -382,6 +407,10 @@ async function generateToken() {
     url.searchParams.append('tokenId', token.value._id)
     if (props.ownerId) {
       url.searchParams.append('ownerId', props.ownerId)
+      const context = examinedReportContext()
+      if (!context) throw new Error('Examined receipt uploads require a report context')
+      url.searchParams.append('reportId', context.reportId)
+      url.searchParams.append('sourceReportType', context.sourceReportType)
     }
     logger.info(`${t('labels.uploadLink')}:`)
     logger.info(url.href)
