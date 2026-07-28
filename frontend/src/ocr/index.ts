@@ -2,7 +2,13 @@ let modulePromise: Promise<typeof import('./receiptOcr.js')> | undefined
 let recognitionQueue = Promise.resolve('')
 
 function loadReceiptOcr() {
-  modulePromise ??= import('./receiptOcr.js')
+  if (!modulePromise) {
+    const current = import('./receiptOcr.js')
+    modulePromise = current
+    void current.catch(() => {
+      if (modulePromise === current) modulePromise = undefined
+    })
+  }
   return modulePromise
 }
 
@@ -19,5 +25,7 @@ export async function warmReceiptOcr() {
 export async function disposeReceiptOcr() {
   const current = modulePromise
   modulePromise = undefined
-  if (current) await (await current).disposeReceiptOcr()
+  if (!current) return
+  const receiptOcr = await current.catch(() => undefined)
+  await receiptOcr?.disposeReceiptOcr()
 }
