@@ -179,7 +179,20 @@ export async function initDB() {
   const projects = [{ identifier: '001', organisation: org?._id, name: 'Expense Management' }]
   await initer(Project, 'projects', projects)
   const categories = [
-    { name: 'General', style: { color: '#D8DCFF', text: 'black' as const }, isDefault: true, ledgerAccount: account4900 ?? undefined }
+    {
+      name: 'General',
+      style: { color: '#D8DCFF', text: 'black' as const },
+      isDefault: true,
+      ledgerAccount: account4900 ?? undefined,
+      for: 'ExpenseReport' as const
+    },
+    {
+      name: 'Travel expenses',
+      style: { color: '#D8DCFF', text: 'black' as const },
+      isDefault: true,
+      ledgerAccount: account4660 ?? undefined,
+      for: 'Travel' as const
+    }
   ]
   await initer(Category, 'category', categories)
 

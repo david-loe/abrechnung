@@ -1,6 +1,6 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
-import { NameDisplayFormat, ReportModelName, State } from 'abrechnung-common/types.js'
+import { NameDisplayFormat, ReportModelName, State, travelExpenseItems } from 'abrechnung-common/types.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
@@ -159,6 +159,16 @@ export async function checkForMigrations() {
       const ledgerAccounts = mongoose.connection.collection('ledgeraccounts')
       await Promise.all([
         ledgerAccounts.updateOne(
+          { identifier: '1530' },
+          { $setOnInsert: { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' } },
+          { upsert: true }
+        ),
+        ledgerAccounts.updateOne(
+          { identifier: '1740' },
+          { $setOnInsert: { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' } },
+          { upsert: true }
+        ),
+        ledgerAccounts.updateOne(
           { identifier: '1571' },
           { $setOnInsert: { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' } },
           { upsert: true }
@@ -179,12 +189,14 @@ export async function checkForMigrations() {
           { upsert: true }
         )
       ])
-      const [account1571, account1576, account4660, account4900] = await Promise.all(
-        ['1571', '1576', '4660', '4900'].map((identifier) => ledgerAccounts.findOne({ identifier }))
+      const [account1530, account1740, account1571, account1576, account4660, account4900] = await Promise.all(
+        ['1530', '1740', '1571', '1576', '4660', '4900'].map((identifier) => ledgerAccounts.findOne({ identifier }))
       )
-      if (!account1571 || !account1576 || !account4660 || !account4900) {
+      if (!account1530 || !account1740 || !account1571 || !account1576 || !account4660 || !account4900) {
         throw new Error('Required default ledger accounts for the cost-position migration are missing')
       }
+
+      const accountMapping = Object.fromEntries(travelExpenseItems.map((item) => [item, account4660._id]))
 
       await mongoose.connection
         .collection('organisations')
@@ -192,7 +204,12 @@ export async function checkForMigrations() {
           {},
           {
             $set: {
+              'accountingSettings.employeeLiabilitiesAccount': account1740._id,
+              'accountingSettings.employeeClaimsAccount': account1530._id,
+              'accountingSettings.accountMapping': accountMapping,
               'accountingSettings.vatAccountingEnabled': false,
+              'accountingSettings.includeBankBookings': false,
+              'accountingSettings.payoutAccounts': [],
               'accountingSettings.vatRates': [
                 { rate: 0 },
                 { rate: 7, inputTaxAccount: account1571._id },
@@ -203,6 +220,11 @@ export async function checkForMigrations() {
         )
 
       const categories = mongoose.connection.collection('categories')
+      await Promise.all([
+        categories.updateMany({ ledgerAccount: { $exists: false } }, { $set: { ledgerAccount: account4900._id } }),
+        categories.updateMany({ for: { $exists: false } }, { $set: { for: 'ExpenseReport' } })
+      ])
+
       async function ensureCategory(forType: 'Travel' | 'ExpenseReport', ledgerAccount: mongoose.Types.ObjectId, name: string) {
         const existing = await categories.findOne({ for: { $in: [forType, 'both'] }, ledgerAccount })
         if (existing) return existing._id
@@ -339,9 +361,6 @@ export async function checkForMigrations() {
       await mongoose.connection
         .collection('ledgeraccounts')
         .updateOne({ identifier: '1200' }, { $setOnInsert: { identifier: '1200', name: 'Bank' } }, { upsert: true })
-      await mongoose.connection
-        .collection('organisations')
-        .updateMany({}, { $set: { 'accountingSettings.payoutAccounts': [], 'accountingSettings.includeBankBookings': false } })
     }
     settings.migrateFrom = undefined
     await settings.save()
