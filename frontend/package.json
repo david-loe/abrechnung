@@ -27,7 +27,7 @@
     "qs": "^6.15.3",
     "simple-code-editor": "^2.1.0",
     "vue": "^3.5.40",
-    "vue-i18n": "^11.4.7",
+    "vue-i18n": "^11.4.8",
     "vue-router": "^5.2.0",
     "vue-select": "^4.0.0-beta.6",
     "vue-to-print": "^1.5.1",
