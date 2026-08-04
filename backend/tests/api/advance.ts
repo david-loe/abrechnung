@@ -33,7 +33,6 @@ async function getAdminUser(username: string) {
   return response.body.data[0] as {
     _id: string
     access: Record<string, boolean>
-    email: string
     projects: { assigned: Array<{ _id: string }>; supervised: Array<{ _id: string }> }
   }
 }
@@ -90,14 +89,12 @@ test.serial('load shared fixtures', async (t) => {
   insurance = insuranceResponse.body.data[0]
 })
 
-test.serial('DELETE /approve/advance deletes approved owner advance and mails owner plus project booker', async (t) => {
+test.serial('DELETE /approve/advance deletes approved owner advance', async (t) => {
+  const owner = await getAdminUser('fry')
   const reportName = 'Delete me as approver'
-  const createdResponse = await createAppliedAdvance(reportName)
+  const createdResponse = await createApprovedAdvanceByApprover(reportName, owner._id)
   t.is(createdResponse.status, 200)
   const advance = createdResponse.body.result as { _id: string }
-
-  const approvedResponse = await approveAdvance(advance._id)
-  t.is(approvedResponse.status, 200)
 
   const deleteResponse = await deleteApprovedAdvance(advance._id)
   t.is(deleteResponse.status, 200)
@@ -106,18 +103,6 @@ test.serial('DELETE /approve/advance deletes approved owner advance and mails ow
   await loginUser(agent, 'advance')
   const getDeletedResponse = await agent.get('/approve/advance').query({ _id: advance._id })
   t.not(getDeletedResponse.status, 200)
-})
-
-test.serial('DELETE /approve/advance deletes approver-created advance and deduplicates mail recipients', async (t) => {
-  const advanceUser = await getAdminUser('bender')
-  const reportName = 'Approver created advance'
-  const createdResponse = await createApprovedAdvanceByApprover(reportName, advanceUser._id)
-  t.is(createdResponse.status, 200)
-  const advance = createdResponse.body.result as { _id: string }
-
-  const deleteResponse = await deleteApprovedAdvance(advance._id)
-  t.is(deleteResponse.status, 200)
-  t.is(deleteResponse.body.deletedCount, 1)
 })
 
 test.serial('DELETE /approve/advance rejects deletion after receipt was confirmed', async (t) => {

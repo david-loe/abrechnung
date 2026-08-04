@@ -16,6 +16,7 @@ export type IntegrationEvent =
   | { type: 'travel.approved'; report: TravelEventTarget }
   | { type: 'travel.back_to_approved'; report: TravelEventTarget }
   | { type: 'advance.received'; report: Advance }
+  | { type: 'advance.deleted'; report: Advance; deletedBy: string }
 
 export type IntegrationEventByType<TType extends IntegrationEvent['type']> = Extract<IntegrationEvent, { type: TType }>
 

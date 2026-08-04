@@ -14,7 +14,6 @@ import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
-import { sendAdvanceDeletionNotification } from '../integrations/notifications/status.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -199,7 +198,11 @@ export class AdvanceApproveController extends Controller {
       ],
       cb: async (deleteResult) => {
         if (deleteResult.deletedCount === 1) {
-          await sendAdvanceDeletionNotification(deleteResult.deletedObject, request.user)
+          await emitIntegrationEvent({
+            type: 'advance.deleted',
+            report: deleteResult.deletedObject,
+            deletedBy: createOperationServices().formatter.name(request.user.name)
+          })
         }
       },
       checkOldObject: async (oldObject: AdvanceDoc) =>

@@ -26,7 +26,7 @@ function createTravelReport(overrides: Record<string, unknown> = {}) {
 function createIntegrations() {
   const calls = {
     webhooks: [] as IntegrationReport[],
-    notifications: [] as Array<{ report: unknown; textState?: string; notifyOwner?: boolean }>,
+    notifications: [] as Array<{ report: unknown; textState?: string; notifyOwner?: boolean; deletedBy?: string }>,
     reportMails: [] as IntegrationReport[],
     a1: [] as IntegrationReport[]
   }
@@ -88,6 +88,9 @@ function createIntegrations() {
         },
         'travel.back_to_approved': async (event) => {
           calls.notifications.push({ report: event.report, textState: 'BACK_TO_APPROVED' })
+        },
+        'advance.deleted': async (event) => {
+          calls.notifications.push({ report: event.report, textState: 'DELETED', notifyOwner: true, deletedBy: event.deletedBy })
         }
       }
     },
@@ -149,6 +152,17 @@ test('report.approval_withdrawn only triggers an owner notification', async (t) 
 
   t.deepEqual(calls.webhooks, [])
   t.deepEqual(calls.notifications, [{ report, textState: 'APPROVAL_WITHDRAWN', notifyOwner: true }])
+  t.deepEqual(calls.reportMails, [])
+})
+
+test('advance.deleted only triggers a notification with the deletion state', async (t) => {
+  const report = createReport() as Extract<IntegrationEvent, { type: 'advance.deleted' }>['report']
+  const { calls, integrations } = createIntegrations()
+
+  await emitIntegrationEvent({ type: 'advance.deleted', report, deletedBy: 'Bender' }, integrations)
+
+  t.deepEqual(calls.webhooks, [])
+  t.deepEqual(calls.notifications, [{ report, textState: 'DELETED', notifyOwner: true, deletedBy: 'Bender' }])
   t.deepEqual(calls.reportMails, [])
 })
 

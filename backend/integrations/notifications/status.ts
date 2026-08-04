@@ -7,7 +7,6 @@ import {
   HealthCareCostState,
   User as IUser,
   Locale,
-  ProjectSimpleWithName,
   ReportType,
   reportIsAdvance,
   reportIsHealthCareCost,
@@ -25,7 +24,7 @@ import i18n from '../../i18n.js'
 import User from '../../models/user.js'
 import { type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
-import { enqueueMail, type MailRecipient } from './email.js'
+import { enqueueMail } from './email.js'
 import { enqueuePushNotification } from './push.js'
 import { getOwnerReportRoute } from './statusLinks.js'
 
@@ -38,7 +37,8 @@ class StatusNotificationIntegration extends Integration {
     'report.back_to_in_work': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_IN_WORK'),
     'report.review_completed': async ({ report }) => await sendStatusNotification(report),
     'travel.approved': async ({ report }) => await sendStatusNotification(report),
-    'travel.back_to_approved': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_APPROVED')
+    'travel.back_to_approved': async ({ report }) => await sendStatusNotification(report, 'BACK_TO_APPROVED'),
+    'advance.deleted': async ({ report, deletedBy }) => await sendStatusNotification(report, 'DELETED', true, deletedBy)
   }
 
   public constructor() {
@@ -48,62 +48,11 @@ class StatusNotificationIntegration extends Integration {
 
 export const statusNotificationIntegration = new StatusNotificationIntegration()
 
-function dedupeRecipients(recipients: MailRecipient[]) {
-  const uniqueRecipients = new Map<string, MailRecipient>()
-  for (const recipient of recipients) {
-    uniqueRecipients.set(recipient.email, recipient)
-  }
-  return [...uniqueRecipients.values()]
-}
-
-export async function getAdvanceDeletionMailRecipients(advance: Pick<Advance<Types.ObjectId>, 'owner' | 'project'>) {
-  const supervisedProjectsFilter = { $or: [{ 'projects.supervised': [] }, { 'projects.supervised': advance.project._id }] }
-  const [owner, bookers] = await Promise.all([
-    User.findOne({ _id: advance.owner._id }).lean(),
-    User.find({ 'access.book/advance': true, ...supervisedProjectsFilter }).lean()
-  ])
-
-  return dedupeRecipients([...(owner ? [owner] : []), ...bookers])
-}
-
-export async function sendAdvanceDeletionNotification(
-  advance: Pick<Advance<Types.ObjectId>, '_id' | 'name' | 'owner' | 'project'>,
-  deletedBy: Pick<IUser<Types.ObjectId, mongo.Binary>, 'name'>
-) {
-  const recipients = await getAdvanceDeletionMailRecipients(advance)
-  if (recipients.length === 0) {
-    return
-  }
-
-  const recipientsByLanguage = new Map<Locale, MailRecipient[]>()
-  for (const recipient of recipients) {
-    const usersForLanguage = recipientsByLanguage.get(recipient.settings.language) ?? []
-    usersForLanguage.push(recipient)
-    recipientsByLanguage.set(recipient.settings.language, usersForLanguage)
-  }
-
-  const project = advance.project as ProjectSimpleWithName<Types.ObjectId>
-  for (const [language, localizedRecipients] of recipientsByLanguage) {
-    const interpolation = {
-      deletedBy: deletedBy.name.givenName,
-      lng: language,
-      owner: advance.owner.name.givenName,
-      project: `${project.identifier}${project.name ? ` ${project.name}` : ''}`,
-      reportName: advance.name
-    }
-
-    await enqueueMail(
-      localizedRecipients,
-      i18n.t('mail.advance.DELETED.subject', interpolation),
-      i18n.t('mail.advance.DELETED.paragraph', interpolation)
-    )
-  }
-}
-
 export async function sendStatusNotification(
   report: TravelSimple | ExpenseReportSimple | HealthCareCostSimple | Advance,
   textState?: string,
-  notifyOwner = false
+  notifyOwner = false,
+  deletedBy?: string
 ) {
   let recipients = []
   let reportType: ReportType
@@ -128,7 +77,10 @@ export async function sendStatusNotification(
 
   if (notifyOwner) {
     userFilter._id = report.owner._id
-    button.link = `${ENV.VITE_FRONTEND_URL}${getOwnerReportRoute(reportType, report._id, report.state)}`
+    button.link =
+      textState === 'DELETED'
+        ? `${ENV.VITE_FRONTEND_URL}/${reportType}`
+        : `${ENV.VITE_FRONTEND_URL}${getOwnerReportRoute(reportType, report._id, report.state)}`
   } else if (report.state === State.APPLIED_FOR) {
     userFilter[`access.approve/${reportType}`] = true
     Object.assign(userFilter, supervisedProjectsFilter)
@@ -148,9 +100,20 @@ export async function sendStatusNotification(
   }
 
   const language = recipients[0].settings.language
-  const interpolation: { owner: string; lng: Locale; comment?: string; commentator?: string } = {
+  const interpolation: {
+    owner: string
+    lng: Locale
+    comment?: string
+    commentator?: string
+    deletedBy?: string
+    project: string
+    reportName: string
+  } = {
+    deletedBy,
     owner: report.owner.name.givenName,
-    lng: language
+    lng: language,
+    project: `${report.project.identifier}${report.project.name ? ` ${report.project.name}` : ''}`,
+    reportName: report.name
   }
 
   if (report.comments.length > 0) {
@@ -167,7 +130,7 @@ export async function sendStatusNotification(
     ? i18n.t(`mail.${reportType}.${stateLabel}.lastParagraph`, interpolation)
     : undefined
 
-  if (reportIsAdvance(report) && report.state === AdvanceState.APPROVED) {
+  if (reportIsAdvance(report) && stateLabel === AdvanceState[AdvanceState.APPROVED]) {
     const confirmRoute = `/advance/${report._id}/confirm`
     let confirmLink = `${ENV.VITE_FRONTEND_URL}${confirmRoute}`
     if (recipients.length === 1 && recipients[0].fk.magiclogin) {
