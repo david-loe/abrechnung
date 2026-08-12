@@ -4,6 +4,7 @@ import escapeHtml from 'escape-html'
 import { createOperationServices } from '../../factory.js'
 import i18n from '../../i18n.js'
 import Organisation from '../../models/organisation.js'
+import Travel from '../../models/travel.js'
 import { type IntegrationEvent, type IntegrationEventHandlerMap } from '../events.js'
 import { Integration } from '../integration.js'
 import { enqueueMail } from './email.js'
@@ -12,8 +13,11 @@ type ApprovedTravelEvent = Extract<IntegrationEvent, { type: 'travel.directly_ap
 
 class A1NotificationIntegration extends Integration {
   private readonly notifyAboutApprovedTravel = async ({ report }: ApprovedTravelEvent) => {
-    if (report.isCrossBorder && report.destinationPlace.country.needsA1Certificate) {
-      await sendA1Notification(report)
+    // on newly created travels the event payload is unpopulated (country is a
+    // plain country code), so reload the travel to get country and owner populated
+    const travel = await Travel.findOne({ _id: report._id }).lean()
+    if (travel?.isCrossBorder && travel.destinationPlace.country.needsA1Certificate) {
+      await sendA1Notification(travel as TravelSimple)
     }
   }
 
