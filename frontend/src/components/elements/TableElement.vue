@@ -23,6 +23,7 @@
       @update:items-selected="(s: Item[]) => emits('update:itemsSelected', s)"
       @update:server-options="(o: ServerOptions) => emits('update:serverOptions', o)"
       @click-row="(a: ClickRowArgument) => emits('click-row', a)"
+      @expand-row="(index: number, item: Item) => emits('expand-row', index, item)"
       @update-sort="(s: UpdateSortArgument) => emits('update-sort', s)"
       :server-items-length="serverItemsLength"
       :loading="loading"
@@ -30,6 +31,7 @@
       :headers="headers"
       :sort-by="sortBy"
       :sort-type="sortType"
+      :must-sort="mustSort"
       alternating
       :preventContextMenuRow="false"
       body-item-class-name="text-truncate"
@@ -65,6 +67,7 @@ const props = defineProps({
   rowsPerPage: { type: Number, default: 5 },
   sortBy: { type: String },
   sortType: { type: String as PropType<SortType>, default: 'asc' },
+  mustSort: { type: Boolean, default: false },
   bodyRowClassName: { type: [String, Function] as PropType<string | ((item: Item, rowNum: number) => string)> },
   emptyMessage: { type: String },
   loading: { type: Boolean },
@@ -78,6 +81,7 @@ const emits = defineEmits<{
   'update:itemsSelected': [Item[]]
   'update:serverOptions': [ServerOptions]
   'click-row': [ClickRowArgument]
+  'expand-row': [number, Item]
   'update-sort': [UpdateSortArgument]
 }>()
 

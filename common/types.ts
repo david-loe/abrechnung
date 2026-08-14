@@ -184,6 +184,8 @@ export interface WorkerJobDetails extends WorkerJobSummary {
 
 export type WorkerJobCounts = Record<WorkerJobState, number>
 
+export type WorkerJobsResponse = GETResponse<WorkerJobSummary[]> & { counts: WorkerJobCounts; jobNames: string[] }
+
 export interface IntegrationSettings<idType extends _id = _id> {
   integrationKey: string
   schedules: { [scheduleKey: string]: IntegrationScheduleSettings }

@@ -11,10 +11,13 @@ export class WorkerJobsController extends Controller {
   @Get()
   public async get(
     @Query() state?: WorkerJobState,
+    @Query() name?: string,
+    @Query() id?: string,
     /** @isInt @minimum 1 @default 1 */ @Query() page = 1,
-    /** @isInt @minimum 1 @maximum 100 @default 25 */ @Query() limit = 25
+    /** @isInt @minimum 1 @maximum 100 @default 25 */ @Query() limit = 25,
+    /** @default desc */ @Query() sortDirection: 'asc' | 'desc' = 'desc'
   ) {
-    return await getWorkerJobs(state, page, limit)
+    return await getWorkerJobs({ state, name, id, page, limit, sortDirection })
   }
 
   @Get('{jobId}')

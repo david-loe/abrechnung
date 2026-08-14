@@ -2,6 +2,7 @@ import { Meta, WorkerJobCounts, WorkerJobDetails, WorkerJobState, WorkerJobSumma
 import { Job } from 'bullmq'
 import { ConflictError, NotFoundError } from '../controller/error.js'
 import { getIntegrationQueue, IntegrationJobData } from './queue.js'
+import { getIntegrationJobNames } from './registry.js'
 
 type IntegrationJob = Job<IntegrationJobData, unknown>
 
@@ -31,17 +32,46 @@ function serializeSummary(job: IntegrationJob, state: WorkerJobState): WorkerJob
   }
 }
 
-export async function getWorkerJobs(state: WorkerJobState | undefined, page: number, limit: number) {
+interface WorkerJobListOptions {
+  state?: WorkerJobState
+  name?: string
+  id?: string
+  page: number
+  limit: number
+  sortDirection: 'asc' | 'desc'
+}
+
+export async function getWorkerJobs({ state, name, id, page, limit, sortDirection }: WorkerJobListOptions) {
   const queue = getIntegrationQueue()
-  const states = state ? [state] : [...workerJobStates]
+  const jobsByState = await Promise.all(
+    workerJobStates.map(async (jobState) => ({ state: jobState, jobs: await queue.getJobs([jobState], 0, -1) }))
+  )
+  const jobsWithState = jobsByState.flatMap(({ state: jobState, jobs }) =>
+    jobs.map((job) => ({ job: job as IntegrationJob, state: jobState }))
+  )
+  const jobsMatchingName = name ? jobsWithState.filter(({ job }) => job.name === name) : jobsWithState
+  const normalizedId = id?.toLowerCase()
+  const jobsMatchingId = normalizedId
+    ? jobsMatchingName.filter(({ job }) => job.id?.toLowerCase().includes(normalizedId))
+    : jobsMatchingName
+  const counts = Object.fromEntries(
+    workerJobStates.map((jobState) => [jobState, jobsMatchingId.filter(({ state: currentState }) => currentState === jobState).length])
+  ) as WorkerJobCounts
+  const matchingJobs = state ? jobsMatchingId.filter(({ state: currentState }) => currentState === state) : jobsMatchingId
+  const direction = sortDirection === 'asc' ? 1 : -1
+
+  matchingJobs.sort(({ job: firstJob }, { job: secondJob }) => {
+    const timestampComparison = firstJob.timestamp - secondJob.timestamp
+    if (timestampComparison !== 0) return timestampComparison * direction
+    return (firstJob.id ?? '').localeCompare(secondJob.id ?? '') * direction
+  })
+
   const start = (page - 1) * limit
-  const [jobs, rawCounts] = await Promise.all([queue.getJobs(states, start, start + limit - 1), queue.getJobCounts(...workerJobStates)])
-  const counts = Object.fromEntries(workerJobStates.map((jobState) => [jobState, rawCounts[jobState] ?? 0])) as WorkerJobCounts
-  const count = state ? counts[state] : Object.values(counts).reduce((sum, value) => sum + value, 0)
-  const data = await Promise.all(jobs.map(async (job) => serializeSummary(job, requireWorkerJobState(await job.getState()))))
+  const count = matchingJobs.length
+  const data = matchingJobs.slice(start, start + limit).map(({ job, state: jobState }) => serializeSummary(job, jobState))
   const meta: Meta = { count, page, limit, countPages: Math.ceil(count / limit) }
 
-  return { data, meta, counts }
+  return { data, meta, counts, jobNames: getIntegrationJobNames() }
 }
 
 async function requireWorkerJob(jobId: string) {

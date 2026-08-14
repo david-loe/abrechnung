@@ -1,160 +1,184 @@
 <template>
   <div>
-    <div class="d-flex flex-wrap align-items-end gap-3 mb-3">
-      <div>
-        <label for="worker-job-state" class="form-label">{{ t('labels.state') }}</label>
-        <select id="worker-job-state" v-model="selectedState" class="form-select" @change="changeState">
-          <option value="">{{ t('labels.all') }} ({{ totalCount }})</option>
-          <option v-for="state in workerJobStates" :key="state" :value="state">
-            {{ t(`workerJobStates.${state}`) }} ({{ counts[state] }})
-          </option>
-        </select>
-      </div>
-      <div>
-        <label for="worker-job-page-size" class="form-label">{{ t('labels.entriesPerPage') }}</label>
-        <select id="worker-job-page-size" v-model.number="limit" class="form-select" @change="changePageSize">
-          <option :value="25">25</option>
-          <option :value="50">50</option>
-          <option :value="100">100</option>
-        </select>
-      </div>
+    <div class="d-flex justify-content-end mb-3">
       <button type="button" class="btn btn-outline-secondary" :disabled="loading" @click="loadJobs">
         <i class="bi bi-arrow-clockwise me-1"></i>{{ t('labels.refresh') }}
       </button>
     </div>
 
-    <div class="table-responsive border rounded">
-      <table class="table table-striped table-hover align-middle mb-0">
-        <thead>
-          <tr>
-            <th>{{ t('labels.job') }}</th>
-            <th>{{ t('labels.state') }}</th>
-            <th>{{ t('labels.createdAt') }}</th>
-            <th>{{ t('labels.duration') }}</th>
-            <th>{{ t('labels.attempts') }}</th>
-            <th class="text-end">{{ t('labels.actions') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <template v-for="job in jobs" :key="job.id">
-            <tr>
-              <td>
-                <div class="fw-semibold">{{ job.name }}</div>
-                <small class="text-body-secondary">{{ job.id }}</small>
-              </td>
-              <td><span class="badge" :class="stateBadge(job.state)">{{ t(`workerJobStates.${job.state}`) }}</span></td>
-              <td>{{ formatDate(job.timestamp) }}</td>
-              <td>{{ formatDuration(job) }}</td>
-              <td>{{ job.attemptsMade }} / {{ job.attempts }}</td>
-              <td class="text-end text-nowrap">
-                <button type="button" class="btn btn-light btn-sm" :title="t('labels.details')" @click="toggleDetails(job)">
-                  <i class="bi" :class="expandedJobId === job.id ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
-                </button>
-                <button
-                  v-if="job.state === 'failed'"
-                  type="button"
-                  class="btn btn-warning btn-sm ms-2"
-                  :disabled="retryingJobId === job.id"
-                  :title="t('labels.retry')"
-                  @click="retryJob(job)">
-                  <i class="bi bi-arrow-repeat"></i>
-                </button>
-              </td>
-            </tr>
-            <tr v-if="expandedJobId === job.id">
-              <td colspan="6" class="worker-job-details p-3">
-                <div v-if="detailsLoading" class="text-body-secondary">{{ t('labels.loading') }}</div>
-                <template v-else-if="details">
-                  <dl class="row mb-3">
-                    <dt class="col-sm-3">{{ t('labels.processedOn') }}</dt>
-                    <dd class="col-sm-9">{{ formatOptionalDate(details.processedOn) }}</dd>
-                    <dt class="col-sm-3">{{ t('labels.finishedOn') }}</dt>
-                    <dd class="col-sm-9">{{ formatOptionalDate(details.finishedOn) }}</dd>
-                    <template v-if="details.failedReason">
-                      <dt class="col-sm-3">{{ t('labels.error') }}</dt>
-                      <dd class="col-sm-9 text-danger text-break">{{ details.failedReason }}</dd>
-                    </template>
-                  </dl>
+    <TableElement
+      v-model:server-options="serverOptions"
+      db-key="adminWorkerJobs"
+      :rows-items="[25, 50, 100]"
+      :rows-per-page="25"
+      :server-items-length="meta.count"
+      :loading="loading"
+      :items="jobs"
+      :headers="headers"
+      :empty-message="t('labels.noWorkerJobs')"
+      must-sort
+      @expand-row="loadDetails">
+      <template #header-id="header">
+        <div class="filter-column">
+          {{ t(header.text) }}
+          <span class="clickable" @click="(event) => clickFilter('id', event)">
+            <i v-if="showFilter.id" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="showFilter.id" @click.stop>
+            <input v-model="selectedId" type="text" class="form-control" @input="scheduleIdFilter" >
+          </div>
+        </div>
+      </template>
 
-                  <h3 class="h6">{{ t('labels.payload') }}</h3>
-                  <pre>{{ formatValue(details.payload) }}</pre>
-                  <h3 class="h6">{{ t('labels.result') }}</h3>
-                  <pre>{{ details.result === null ? t('labels.noResult') : formatValue(details.result) }}</pre>
-                  <template v-if="details.stacktrace.length">
-                    <h3 class="h6">{{ t('labels.stacktrace') }}</h3>
-                    <pre>{{ details.stacktrace.join('\n') }}</pre>
-                  </template>
-                </template>
-              </td>
-            </tr>
-          </template>
-          <tr v-if="!loading && jobs.length === 0">
-            <td colspan="6" class="text-center text-body-secondary py-4">{{ t('labels.noWorkerJobs') }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+      <template #header-name="header">
+        <div class="filter-column">
+          {{ t(header.text) }}
+          <span class="clickable" @click="(event) => clickFilter('name', event)">
+            <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="showFilter.name" @click.stop>
+            <select v-model="selectedName" class="form-select" @change="applyFilters">
+              <option value="">{{ t('labels.all') }}</option>
+              <option v-for="jobName in jobNames" :key="jobName" :value="jobName">{{ jobName }}</option>
+            </select>
+          </div>
+        </div>
+      </template>
 
-    <div class="d-flex align-items-center justify-content-between mt-3">
-      <span class="text-body-secondary">{{ t('labels.pageXOfY', { X: page, Y: Math.max(meta.countPages, 1) }) }}</span>
-      <div class="btn-group">
-        <button type="button" class="btn btn-outline-secondary" :disabled="page <= 1 || loading" @click="goToPage(page - 1)">
-          <i class="bi bi-chevron-left"></i>
-        </button>
+      <template #header-state="header">
+        <div class="filter-column">
+          {{ t(header.text) }}
+          <span class="clickable" @click="(event) => clickFilter('state', event)">
+            <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
+            <i v-else class="bi bi-funnel"></i>
+          </span>
+          <div v-if="showFilter.state" @click.stop>
+            <select v-model="selectedState" class="form-select" @change="applyFilters">
+              <option value="">{{ t('labels.all') }} ({{ totalCount }})</option>
+              <option v-for="state in workerJobStates" :key="state" :value="state">
+                {{ t(`workerJobStates.${state}`) }} ({{ counts[state] }})
+              </option>
+            </select>
+          </div>
+        </div>
+      </template>
+
+      <template #item-id="{ id }: WorkerJobSummary"><span :title="id">{{ id }}</span></template>
+      <template #item-name="{ name }: WorkerJobSummary"><span class="fw-semibold">{{ name }}</span></template>
+      <template #item-state="{ state }: WorkerJobSummary">
+        <span class="badge" :class="stateBadge(state)">{{ t(`workerJobStates.${state}`) }}</span>
+      </template>
+      <template #item-timestamp="{ timestamp }: WorkerJobSummary">{{ formatDate(timestamp) }}</template>
+      <template #item-duration="job: WorkerJobSummary">{{ formatDuration(job) }}</template>
+      <template #item-attempts="job: WorkerJobSummary">{{ job.attemptsMade }} / {{ job.attempts }}</template>
+      <template #item-buttons="job: WorkerJobSummary">
         <button
+          v-if="job.state === 'failed'"
           type="button"
-          class="btn btn-outline-secondary"
-          :disabled="page >= meta.countPages || loading"
-          @click="goToPage(page + 1)">
-          <i class="bi bi-chevron-right"></i>
+          class="btn btn-warning btn-sm"
+          :disabled="retryingJobId === job.id"
+          :title="t('labels.retry')"
+          @click.stop="retryJob(job)">
+          <i class="bi bi-arrow-repeat"></i>
         </button>
-      </div>
-    </div>
+      </template>
+
+      <template #expand="job: WorkerJobSummary">
+        <div class="worker-job-details p-3">
+          <div v-if="detailsLoadingJobIds.has(job.id)" class="text-body-secondary">{{ t('labels.loading') }}</div>
+          <template v-else-if="detailsByJobId[job.id]">
+            <dl class="row mb-3">
+              <dt class="col-sm-3">{{ t('labels.processedOn') }}</dt>
+              <dd class="col-sm-9">{{ formatOptionalDate(detailsByJobId[job.id]?.processedOn) }}</dd>
+              <dt class="col-sm-3">{{ t('labels.finishedOn') }}</dt>
+              <dd class="col-sm-9">{{ formatOptionalDate(detailsByJobId[job.id]?.finishedOn) }}</dd>
+              <template v-if="detailsByJobId[job.id]?.failedReason">
+                <dt class="col-sm-3">{{ t('labels.error') }}</dt>
+                <dd class="col-sm-9 text-danger text-break">{{ detailsByJobId[job.id]?.failedReason }}</dd>
+              </template>
+            </dl>
+
+            <h3 class="h6">{{ t('labels.payload') }}</h3>
+            <pre>{{ formatValue(detailsByJobId[job.id]?.payload) }}</pre>
+            <h3 class="h6">{{ t('labels.result') }}</h3>
+            <pre>{{ detailsByJobId[job.id]?.result === null ? t('labels.noResult') : formatValue(detailsByJobId[job.id]?.result) }}</pre>
+            <template v-if="detailsByJobId[job.id]?.stacktrace.length">
+              <h3 class="h6">{{ t('labels.stacktrace') }}</h3>
+              <pre>{{ detailsByJobId[job.id]?.stacktrace.join('\n') }}</pre>
+            </template>
+          </template>
+        </div>
+      </template>
+    </TableElement>
   </div>
 </template>
 
 <script lang="ts" setup>
 import {
-  GETResponse,
   Meta,
   WorkerJobCounts,
   WorkerJobDetails,
+  WorkerJobsResponse,
   WorkerJobState,
   WorkerJobSummary,
   workerJobStates
 } from 'abrechnung-common/types.js'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { Header, Item, ServerOptions } from 'vue3-easy-data-table'
 import API from '@/api.js'
-
-type WorkerJobsResponse = GETResponse<WorkerJobSummary[]> & { counts: WorkerJobCounts }
+import TableElement from '@/components/elements/TableElement.vue'
 
 const { t, locale } = useI18n()
+const headers: Header[] = [
+  { text: 'labels.id', value: 'id' },
+  { text: 'labels.job', value: 'name' },
+  { text: 'labels.state', value: 'state' },
+  { text: 'labels.createdAt', value: 'timestamp', sortable: true },
+  { text: 'labels.duration', value: 'duration' },
+  { text: 'labels.attempts', value: 'attempts' },
+  { text: '', value: 'buttons', width: 60 }
+]
 const emptyCounts = () => Object.fromEntries(workerJobStates.map((state) => [state, 0])) as WorkerJobCounts
 const jobs = ref<WorkerJobSummary[]>([])
+const jobNames = ref<string[]>([])
 const counts = ref(emptyCounts())
 const meta = ref<Meta>({ count: 0, page: 1, limit: 25, countPages: 0 })
+const selectedId = ref('')
+const selectedName = ref('')
 const selectedState = ref<WorkerJobState | ''>('')
-const page = ref(1)
-const limit = ref(25)
+const showFilter = ref({ id: false, name: false, state: false })
+const serverOptions = ref<ServerOptions>({ page: 1, rowsPerPage: 25, sortBy: 'timestamp', sortType: 'desc' })
 const loading = ref(false)
-const expandedJobId = ref<string>()
-const details = ref<WorkerJobDetails>()
-const detailsLoading = ref(false)
+const detailsByJobId = ref<Record<string, WorkerJobDetails | undefined>>({})
+const detailsLoadingJobIds = ref(new Set<string>())
 const retryingJobId = ref<string>()
 const loadedAt = ref(Date.now())
 const totalCount = computed(() => Object.values(counts.value).reduce((sum, count) => sum + count, 0))
+let loadRequestId = 0
+let idFilterTimeout: ReturnType<typeof setTimeout> | undefined
 
 async function loadJobs() {
+  clearTimeout(idFilterTimeout)
+  const requestId = ++loadRequestId
   loading.value = true
+  detailsByJobId.value = {}
+  detailsLoadingJobIds.value = new Set()
   const result = await API.getter<WorkerJobSummary[]>('admin/jobs', {
+    ...(selectedId.value ? { id: selectedId.value } : {}),
+    ...(selectedName.value ? { name: selectedName.value } : {}),
     ...(selectedState.value ? { state: selectedState.value } : {}),
-    page: page.value,
-    limit: limit.value
+    page: serverOptions.value.page,
+    limit: serverOptions.value.rowsPerPage,
+    sortDirection: serverOptions.value.sortType === 'asc' ? 'asc' : 'desc'
   })
   const response = result.ok as WorkerJobsResponse | undefined
+  if (requestId !== loadRequestId) return
   if (response) {
     jobs.value = response.data
+    jobNames.value = response.jobNames
     counts.value = response.counts
     meta.value = response.meta
     loadedAt.value = Date.now()
@@ -162,18 +186,14 @@ async function loadJobs() {
   loading.value = false
 }
 
-async function toggleDetails(job: WorkerJobSummary) {
-  if (expandedJobId.value === job.id) {
-    expandedJobId.value = undefined
-    details.value = undefined
-    return
-  }
-  expandedJobId.value = job.id
-  details.value = undefined
-  detailsLoading.value = true
+async function loadDetails(_index: number, item: Item) {
+  const job = item as WorkerJobSummary
+  if (detailsByJobId.value[job.id] || detailsLoadingJobIds.value.has(job.id)) return
+
+  detailsLoadingJobIds.value.add(job.id)
   const result = await API.getter<WorkerJobDetails>(`admin/jobs/${encodeURIComponent(job.id)}`)
-  if (expandedJobId.value === job.id) details.value = result.ok?.data
-  detailsLoading.value = false
+  if (result.ok?.data) detailsByJobId.value[job.id] = result.ok.data
+  detailsLoadingJobIds.value.delete(job.id)
 }
 
 async function retryJob(job: WorkerJobSummary) {
@@ -181,26 +201,41 @@ async function retryJob(job: WorkerJobSummary) {
   retryingJobId.value = job.id
   const result = await API.setter<WorkerJobSummary>(`admin/jobs/${encodeURIComponent(job.id)}/retry`, {})
   retryingJobId.value = undefined
-  if (result.ok) {
-    expandedJobId.value = undefined
-    details.value = undefined
-    await loadJobs()
+  if (result.ok) await loadJobs()
+}
+
+function applyFilters() {
+  if (serverOptions.value.page === 1) {
+    void loadJobs()
+  } else {
+    serverOptions.value = { ...serverOptions.value, page: 1 }
   }
 }
 
-function changeState() {
-  page.value = 1
-  void loadJobs()
+function scheduleIdFilter() {
+  clearTimeout(idFilterTimeout)
+  idFilterTimeout = setTimeout(applyFilters, 300)
 }
 
-function changePageSize() {
-  page.value = 1
-  void loadJobs()
-}
+function clickFilter(filter: keyof typeof showFilter.value, event: MouseEvent) {
+  event.stopPropagation()
+  if (!showFilter.value[filter]) {
+    showFilter.value[filter] = true
+    return
+  }
 
-function goToPage(nextPage: number) {
-  page.value = nextPage
-  void loadJobs()
+  showFilter.value[filter] = false
+  if (filter === 'id') {
+    clearTimeout(idFilterTimeout)
+    selectedId.value = ''
+    applyFilters()
+  } else if (filter === 'name' && selectedName.value) {
+    selectedName.value = ''
+    applyFilters()
+  } else if (filter === 'state' && selectedState.value) {
+    selectedState.value = ''
+    applyFilters()
+  }
 }
 
 function formatDate(timestamp: number) {
@@ -235,6 +270,8 @@ function stateBadge(state: WorkerJobState) {
 }
 
 onMounted(loadJobs)
+onBeforeUnmount(() => clearTimeout(idFilterTimeout))
+watch(serverOptions, loadJobs, { deep: true })
 </script>
 
 <style scoped>

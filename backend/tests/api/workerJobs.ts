@@ -27,8 +27,7 @@ const job = {
 setIntegrationQueueForTests({
   close: async () => {},
   getJob: async (jobId: string) => (jobId === job.id ? job : undefined),
-  getJobs: async () => [job],
-  getJobCounts: async () => ({ waiting: 0, delayed: 0, active: 0, completed: 0, failed: 1 })
+  getJobs: async (states: string[]) => (states.includes(state) ? [job] : [])
 } as unknown as Queue<IntegrationJobData>)
 
 test.serial('worker job endpoints require administrator access', async (t) => {
@@ -38,12 +37,15 @@ test.serial('worker job endpoints require administrator access', async (t) => {
 
 test.serial('GET /admin/jobs returns summaries and details', async (t) => {
   await loginUser(agent, 'admin')
-  const listResponse = await agent.get('/admin/jobs').query({ state: 'failed', page: 1, limit: 25 })
+  const listResponse = await agent
+    .get('/admin/jobs')
+    .query({ name: 'webhooks.deliver', id: 'JOB-', state: 'failed', page: 1, limit: 25, sortDirection: 'asc' })
   const detailsResponse = await agent.get('/admin/jobs/job-1')
 
   t.is(listResponse.status, 200)
   t.is(listResponse.body.data[0].state, 'failed')
   t.is(listResponse.body.counts.failed, 1)
+  t.true(listResponse.body.jobNames.includes('webhooks.deliver'))
   t.is(detailsResponse.status, 200)
   t.deepEqual(detailsResponse.body.data.payload, { webhookId: 'hook-1' })
   t.deepEqual(detailsResponse.body.data.stacktrace, ['Error: request failed'])

@@ -22,3 +22,9 @@ export const integrations: Integration[] = [
 export function getIntegration(integrationKey: string) {
   return integrations.find((integration) => integration.key === integrationKey)
 }
+
+export function getIntegrationJobNames() {
+  return integrations
+    .flatMap((integration) => integration.getOperationKeys().map((operation) => integration.buildJobName(operation)))
+    .sort()
+}
