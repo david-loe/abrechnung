@@ -143,16 +143,15 @@ export interface oidcSettings {
 
 export const llmReasoningEfforts = ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'] as const
 export type LlmReasoningEffort = (typeof llmReasoningEfforts)[number]
-export const defaultLlmReasoningEffort: LlmReasoningEffort = 'none'
-export const defaultLlmRequestTimeoutSeconds = 180
 
 export interface LlmConnectionSettings {
   baseUrl: string
   model: string
-  apiKey?: string | null
-  reasoningEffort?: LlmReasoningEffort | null
-  maxTokens?: number | null
-  timeoutSeconds?: number
+  apiKey: string | null
+  reasoningEffort: LlmReasoningEffort | null
+  maxTokens: number | null
+  maxPromptOcrCharacters: number
+  timeoutSeconds: number
 }
 
 export interface ConnectionSettings<idType extends _id = _id> {

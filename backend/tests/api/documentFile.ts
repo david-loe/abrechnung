@@ -15,6 +15,27 @@ let projectId = ''
 let reportId = ''
 let reportOwnerId = ''
 
+interface RequestedSuggestionBody {
+  model: string
+  temperature: number
+  max_tokens?: number
+  reasoning_effort?: string
+  messages: { role: string; content: string }[]
+  response_format: {
+    type: string
+    json_schema: {
+      name: string
+      strict: boolean
+      schema: {
+        properties: {
+          cost: { properties: { currencyCode: { pattern?: string; enum?: unknown[] }; positions: Record<string, unknown> } }
+          startLocation: { properties: { countryCode: { pattern?: string; enum?: unknown[] } } }
+        }
+      }
+    }
+  }
+}
+
 test.serial('POST /documentFile creates a temporary receipt', async (t) => {
   const projectResponse = await agent.get('/project')
   projectId = projectResponse.body.data[0]._id
@@ -153,32 +174,46 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
     apiKey: 'secret',
     reasoningEffort: 'low',
     maxTokens: 1_024,
+    maxPromptOcrCharacters: 20,
     timeoutSeconds: 12
   }
   await settings.save()
+  await DocumentFile.findByIdAndUpdate(documentFileId, { ocr: 'Invoice date 2026-07-24, total 10.70 EUR' })
 
   const originalPost = axios.post
   let requestedUrl = ''
-  let requestedBody: unknown
+  const requestedBodies: RequestedSuggestionBody[] = []
   let requestedAuthorization = ''
   let requestedTimeout = 0
   axios.post = (async (url: string, body: unknown, config: { headers?: { Authorization?: string }; timeout?: number }) => {
     requestedUrl = url
-    requestedBody = body
+    requestedBodies.push(body as RequestedSuggestionBody)
     requestedAuthorization = config.headers?.Authorization ?? ''
     requestedTimeout = config.timeout ?? 0
-    const suggestion: ReceiptSuggestion = {
-      type: 'expense',
-      description: 'Lunch',
-      cost: {
-        date: '2026-07-24',
-        currencyCode: 'EUR',
-        positions: [
-          { description: 'Meal', grossAmount: 10.7, vatRate: 7 },
-          { description: 'Drinks', grossAmount: 5.9, vatRate: 7 }
-        ]
-      }
-    }
+    const schemaName = requestedBodies.at(-1)?.response_format.json_schema.name
+    const suggestion: ReceiptSuggestion =
+      schemaName === 'receipt_stage_suggestion'
+        ? {
+            type: 'stage',
+            departure: '2026-07-24T09:00',
+            arrival: '2026-07-24T13:00',
+            startLocation: { place: 'Berlin', countryCode: 'DE' },
+            endLocation: { place: 'Paris', countryCode: 'FR' },
+            transportType: 'otherTransport',
+            cost: { date: '2026-07-24', currencyCode: 'EUR', positions: [{ grossAmount: 10.7, vatRate: 7 }] }
+          }
+        : {
+            type: 'expense',
+            description: 'Lunch',
+            cost: {
+              date: '2026-07-24',
+              currencyCode: 'EUR',
+              positions: [
+                { description: 'Meal', grossAmount: 10.7, vatRate: 7 },
+                { description: 'Drinks', grossAmount: 5.9, vatRate: 7 }
+              ]
+            }
+          }
     return { data: { choices: [{ message: { content: JSON.stringify(suggestion) } }] } }
   }) as typeof axios.post
 
@@ -204,15 +239,39 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
     t.is(requestedUrl, 'http://llm.test/v1/chat/completions')
     t.is(requestedAuthorization, 'Bearer secret')
     t.is(requestedTimeout, 12_000)
-    t.like(requestedBody as object, { model: 'test-model', temperature: 0, max_tokens: 1_024, reasoning_effort: 'low' })
-    t.like((requestedBody as { response_format: object }).response_format, {
-      type: 'json_schema',
-      json_schema: { name: 'receipt_suggestion', strict: true }
-    })
-    const positionsSchema = (
-      requestedBody as { response_format: { json_schema: { schema: { properties: { cost: { properties: { positions: object } } } } } } }
-    ).response_format.json_schema.schema.properties.cost.properties.positions
+    const expenseBody = requestedBodies[0]
+    t.like(expenseBody, { model: 'test-model', temperature: 0, max_tokens: 1_024, reasoning_effort: 'low' })
+    t.like(expenseBody.response_format, { type: 'json_schema', json_schema: { name: 'receipt_expense_suggestion', strict: true } })
+    t.regex(expenseBody.messages[0].content, /expense/)
+    const expensePrompt = JSON.parse(expenseBody.messages[1].content)
+    t.deepEqual(Object.keys(expensePrompt), ['categories', 'vatRates', 'documents'])
+    t.deepEqual(expensePrompt.vatRates, [0, 7, 19])
+    t.is(expensePrompt.documents[0].text, 'Invoice date 2026-07')
+    const expenseCostSchema = expenseBody.response_format.json_schema.schema.properties.cost
+    t.is(expenseCostSchema.properties.currencyCode.pattern, '^[A-Z]{3}$')
+    t.false(Object.hasOwn(expenseCostSchema.properties.currencyCode, 'enum'))
+    const positionsSchema = expenseCostSchema.properties.positions
     t.false(Object.hasOwn(positionsSchema, 'maxItems'))
+
+    const stageResponse = await agent
+      .get('/suggestions')
+      .query({ type: 'stage', reportType: 'Travel', projectId, documentFileIds: documentFileId })
+    t.is(stageResponse.status, 200)
+    t.like(stageResponse.body.data, {
+      type: 'stage',
+      startLocation: { place: 'Berlin', countryCode: 'DE' },
+      endLocation: { place: 'Paris', countryCode: 'FR' },
+      transportType: 'otherTransport'
+    })
+    const stageBody = requestedBodies[1]
+    t.is(stageBody.response_format.json_schema.name, 'receipt_stage_suggestion')
+    t.regex(stageBody.messages[0].content, /travel stage/)
+    t.not(stageBody.messages[0].content, expenseBody.messages[0].content)
+    const stagePrompt = JSON.parse(stageBody.messages[1].content)
+    t.deepEqual(Object.keys(stagePrompt), ['categories', 'vatRates', 'documents'])
+    const countryCodeSchema = stageBody.response_format.json_schema.schema.properties.startLocation.properties.countryCode
+    t.is(countryCodeSchema.pattern, '^[A-Z]{2}$')
+    t.false(Object.hasOwn(countryCodeSchema, 'enum'))
 
     await loginUser(agent, 'expenseReport')
     const examinedResponse = await agent
@@ -239,7 +298,15 @@ test.serial('GET /suggestions returns 502 and logs actionable connection details
   const settings = await ConnectionSettings.findOne()
   if (!settings) return t.fail('Connection settings missing')
   const originalLlm = settings.toObject().llm
-  settings.llm = { baseUrl: 'http://llm.test/v1', model: 'test-model', apiKey: 'secret', reasoningEffort: null, timeoutSeconds: 7 }
+  settings.llm = {
+    baseUrl: 'http://llm.test/v1',
+    model: 'test-model',
+    apiKey: 'secret',
+    reasoningEffort: null,
+    maxTokens: null,
+    maxPromptOcrCharacters: 40_000,
+    timeoutSeconds: 7
+  }
   await settings.save()
   const originalPost = axios.post
   const originalLoggerError = logger.error

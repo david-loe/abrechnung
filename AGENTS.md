@@ -18,6 +18,9 @@ Treat this file as a living document: when code, tooling, workflows, commands, o
 - Make focused changes; avoid unrelated refactors.
 - Preserve existing architecture and conventions unless the task requires architectural changes.
 - Performance matters: prefer solutions that keep runtime fast for end users.
+- Settings keep stable required keys; use `null`, not missing keys.
+- Keep defaults at their schema/config consumer
+- `common/data` is initialization-only; runtime settings come from `BACKEND_CACHE`, other data from MongoDB.
 
 ## Execution Rules (Docker-first)
 - Default execution path is Docker Compose from repo root.
@@ -43,11 +46,6 @@ docker compose run common npm run test
 ```bash
 docker compose run backend npm run setup
 docker compose run backend npm run test
-```
-
-For changes to the LLM suggestion integration, also run the real Ollama structured-output smoke test:
-```bash
-docker compose run --rm ollama-smoke-test
 ```
 
 ### Frontend Package

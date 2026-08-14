@@ -1,13 +1,4 @@
-import {
-  ConnectionSettings,
-  defaultLlmReasoningEffort,
-  defaultLlmRequestTimeoutSeconds,
-  defaultLocale,
-  emailRegex,
-  llmReasoningEfforts,
-  locales,
-  smtpAuthTypes
-} from 'abrechnung-common/types.js'
+import { ConnectionSettings, defaultLocale, emailRegex, llmReasoningEfforts, locales, smtpAuthTypes } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
 import { verifyLdapauthConfig, verifySmtpConfig } from '../data/settingsValidator.js'
 import { BACKEND_CACHE } from '../db.js'
@@ -103,11 +94,11 @@ export const connectionSettingsSchema = () =>
       type: {
         baseUrl: { type: String, trim: true, required: true, label: 'Base URL', rules: requiredIf('llm.model') },
         model: { type: String, trim: true, required: true, label: 'Model', rules: requiredIf('llm.baseUrl') },
-        apiKey: { type: String, trim: true, label: 'API Key' },
+        apiKey: { type: String, trim: true, default: null, label: 'API Key' },
         reasoningEffort: {
           type: String,
           enum: llmReasoningEfforts,
-          default: defaultLlmReasoningEffort,
+          default: 'none',
           label: 'Reasoning Effort',
           description: 'Optional; supported values depend on the configured provider and model',
           translationPrefix: ''
@@ -115,18 +106,22 @@ export const connectionSettingsSchema = () =>
         maxTokens: {
           type: Number,
           min: 1,
-          validate: { validator: (value: number | null | undefined) => value == null || Number.isInteger(value), message: 'integer' },
+          default: null,
+          validate: { validator: (value: number | null) => value === null || Number.isInteger(value), message: 'integer' },
           rules: ['integer'],
           label: 'Max Output Tokens'
         },
-        timeoutSeconds: {
+        maxPromptOcrCharacters: {
           type: Number,
           min: 1,
-          max: 3_600,
+          max: 500_000,
           required: true,
-          default: defaultLlmRequestTimeoutSeconds,
-          label: 'Timeout [seconds]'
-        }
+          default: 40_000,
+          validate: { validator: (value: number) => Number.isInteger(value), message: 'integer' },
+          rules: ['integer'],
+          label: 'Max OCR Characters'
+        },
+        timeoutSeconds: { type: Number, min: 1, max: 3_600, required: true, default: 180, label: 'Timeout [seconds]' }
       },
       label: 'LLM',
       description: 'OpenAI-compatible API used for receipt suggestions'

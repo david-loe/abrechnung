@@ -52,6 +52,10 @@ test.serial('GET /admin/connectionSettings/form exposes LLM request controls', a
   t.true(llmSchema.maxTokens.rules.includes('integer'))
   t.true(llmSchema.maxTokens.rules.includes('min:1'))
   t.false(Object.hasOwn(llmSchema.maxTokens, 'default'))
+  t.like(llmSchema.maxPromptOcrCharacters, { type: 'text', inputType: 'number', default: 40_000 })
+  t.true(llmSchema.maxPromptOcrCharacters.rules.includes('integer'))
+  t.true(llmSchema.maxPromptOcrCharacters.rules.includes('min:1'))
+  t.true(llmSchema.maxPromptOcrCharacters.rules.includes('max:500000'))
   t.is(llmSchema.reasoningEffort.default, 'none')
   t.deepEqual(Object.keys(llmSchema.reasoningEffort.items), ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'])
 })
@@ -90,6 +94,7 @@ test.serial('POST /admin/connectionSettings accepts new secret values', async (t
   settings.auth.microsoft = { clientSecret: 'newSecretValue123', clientId: 'newClientId456', tenant: 'newTenant789' }
   if (!settings.llm) return t.fail('LLM connection settings missing')
   settings.llm.maxTokens = 2_048
+  settings.llm.maxPromptOcrCharacters = 12_345
 
   const postRes = await agent.post('/admin/connectionSettings').send(settings)
   t.is(postRes.status, 200)
@@ -97,6 +102,7 @@ test.serial('POST /admin/connectionSettings accepts new secret values', async (t
   const updatedSettings = await ConnectionSettings.findOne().lean()
   t.is(updatedSettings?.auth.microsoft?.clientSecret, settings.auth?.microsoft?.clientSecret)
   t.is(updatedSettings?.llm?.maxTokens, 2_048)
+  t.is(updatedSettings?.llm?.maxPromptOcrCharacters, 12_345)
   t.is(postRes.body.result.auth.microsoft.clientSecret, SECRET_PLACEHOLDER)
 })
 
