@@ -40,7 +40,7 @@
             'projects.assigned',
             'settings.organisation'
           ]"
-          @submitted="userListRef?.loadFromServer()" />
+          @submitted="refreshUsersAfterImport" />
       </section>
     </template>
 
@@ -57,7 +57,7 @@
           endpoint="create/project/bulk"
           :transformers="[{ path: 'organisation', key: 'name', array: APP_DATA.organisations }]"
           :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
-          @submitted="projectListRef?.loadFromServer()" />
+          @submitted="refreshProjectsAfterImport" />
       </section>
     </template>
   </main>
@@ -78,4 +78,14 @@ const APP_DATA = APP_LOADER.data
 const activeTab = ref<'users' | 'projects'>('users')
 const userListRef = useTemplateRef<{ loadFromServer: () => void }>('userList')
 const projectListRef = useTemplateRef<{ loadFromServer: () => void }>('projectList')
+
+function refreshUsersAfterImport() {
+  userListRef.value?.loadFromServer()
+  APP_LOADER.loadOptional('users')
+}
+
+function refreshProjectsAfterImport() {
+  projectListRef.value?.loadFromServer()
+  APP_LOADER.loadOptional('project')
+}
 </script>

@@ -39,7 +39,7 @@
     </ListElement>
     <div v-if="_showForm" class="container">
       <Vueform
-        :schema="schema"
+        :schema="formSchema"
         v-model="projectToEdit"
         :sync="true"
         :disabled="viewOnly"
@@ -149,6 +149,10 @@ const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchem
     }
   }
 })
+const readOnlySchema = Object.fromEntries(
+  Object.entries(schema).filter(([field]) => field !== 'assignees' && field !== 'supervisors')
+)
+const formSchema = computed(() => (viewOnly.value ? readOnlySchema : schema))
 </script>
 
 <style></style>

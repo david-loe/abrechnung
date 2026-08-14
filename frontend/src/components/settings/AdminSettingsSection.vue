@@ -30,7 +30,7 @@
             'projects.assigned',
             'settings.organisation'
           ]"
-          @submitted="userListRef?.loadFromServer()" />
+          @submitted="refreshUsersAfterImport" />
       </section>
 
       <section id="merge-users" class="section-anchor">
@@ -57,7 +57,7 @@
           endpoint="admin/project/bulk"
           :transformers="[{ path: 'organisation', key: 'name', array: APP_DATA.organisations }]"
           :template-fields="['identifier', 'name', 'organisation', 'budget.amount']"
-          @submitted="projectListRef?.loadFromServer()" />
+          @submitted="refreshProjectsAfterImport" />
       </section>
     </template>
 
@@ -149,6 +149,16 @@ const APP_DATA = APP_LOADER.data
 
 const userListRef = useTemplateRef<{ loadFromServer: () => void }>('userList')
 const projectListRef = useTemplateRef<{ loadFromServer: () => void }>('projectList')
+
+function refreshUsersAfterImport() {
+  userListRef.value?.loadFromServer()
+  APP_LOADER.loadOptional('users')
+}
+
+function refreshProjectsAfterImport() {
+  projectListRef.value?.loadFromServer()
+  APP_LOADER.loadOptional('project')
+}
 
 const activeSectionId = computed(
   () => (getAdminSectionById(route.meta.adminSectionId as AdminSectionId | undefined)?.id ?? 'users') as AdminSectionId
