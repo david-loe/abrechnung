@@ -87,6 +87,21 @@ describe('receipt suggestion application', () => {
     })
   })
 
+  it('keeps local stage suggestion times independent of the browser timezone', async () => {
+    vi.mocked(API.setter).mockResolvedValueOnce({ ok: { type: 'stage', departure: '2026-06-23T06:00', arrival: '2026-06-23T14:10' } })
+
+    const suggestion = await requestReceiptSuggestion({
+      type: 'stage',
+      reportType: 'Travel',
+      projectId: 'project',
+      documentFileIds: ['ticket'],
+      sourceReportType: 'Travel',
+      endpointPrefix: ''
+    })
+
+    expect(suggestion).toEqual({ type: 'stage', departure: '2026-06-23T06:00:00.000Z', arrival: '2026-06-23T14:10:00.000Z' })
+  })
+
   it('lets the form expose a failed suggestion request', async () => {
     const error = new Error('suggestion failed')
     vi.mocked(API.setter).mockResolvedValueOnce({ error })

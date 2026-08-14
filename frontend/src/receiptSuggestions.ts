@@ -11,6 +11,7 @@ import {
   SuggestionReportType,
   SuggestionSourceReportType
 } from 'abrechnung-common/types.js'
+import { htmlInputStringToDateTime } from 'abrechnung-common/utils/scripts.js'
 import API from './api.js'
 
 interface SuggestionContext {
@@ -43,6 +44,15 @@ export function receiptProcessingStatus(steps: ReceiptProcessingStep[], suggesti
   if (suggestionFailed) return 'receiptSuggestionFailed'
 }
 
+function normalizeReceiptSuggestion(suggestion: ReceiptSuggestion | undefined) {
+  if (suggestion?.type !== 'stage') return suggestion
+  return {
+    ...suggestion,
+    ...(suggestion.departure ? { departure: htmlInputStringToDateTime(suggestion.departure)?.toISOString() ?? suggestion.departure } : {}),
+    ...(suggestion.arrival ? { arrival: htmlInputStringToDateTime(suggestion.arrival)?.toISOString() ?? suggestion.arrival } : {})
+  }
+}
+
 export async function requestReceiptSuggestion(context: SuggestionContext) {
   if (context.documentFileIds.length === 0) return undefined
   const result = await API.setter<ReceiptSuggestion>(
@@ -58,7 +68,7 @@ export async function requestReceiptSuggestion(context: SuggestionContext) {
     false
   )
   if (result.error) throw result.error
-  return result.ok
+  return normalizeReceiptSuggestion(result.ok)
 }
 
 export function receiptIds(receipts: Partial<DocumentFile<string>>[]) {
