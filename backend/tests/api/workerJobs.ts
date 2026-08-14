@@ -37,9 +37,7 @@ test.serial('worker job endpoints require administrator access', async (t) => {
 
 test.serial('GET /admin/jobs returns summaries and details', async (t) => {
   await loginUser(agent, 'admin')
-  const listResponse = await agent
-    .get('/admin/jobs')
-    .query({ name: 'webhooks.deliver', id: 'JOB-', state: 'failed', page: 1, limit: 25, sortDirection: 'asc' })
+  const listResponse = await agent.get('/admin/jobs').query({ name: 'webhooks.deliver', id: 'job-1', state: 'failed', page: 1, limit: 25 })
   const detailsResponse = await agent.get('/admin/jobs/job-1')
 
   t.is(listResponse.status, 200)

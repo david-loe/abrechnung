@@ -16,7 +16,6 @@
       :items="jobs"
       :headers="headers"
       :empty-message="t('labels.noWorkerJobs')"
-      must-sort
       @expand-row="loadDetails">
       <template #header-id="header">
         <div class="filter-column">
@@ -136,7 +135,7 @@ const headers: Header[] = [
   { text: 'labels.id', value: 'id' },
   { text: 'labels.job', value: 'name' },
   { text: 'labels.state', value: 'state' },
-  { text: 'labels.createdAt', value: 'timestamp', sortable: true },
+  { text: 'labels.createdAt', value: 'timestamp' },
   { text: 'labels.duration', value: 'duration' },
   { text: 'labels.attempts', value: 'attempts' },
   { text: '', value: 'buttons', width: 60 }
@@ -150,7 +149,7 @@ const selectedId = ref('')
 const selectedName = ref('')
 const selectedState = ref<WorkerJobState | ''>('')
 const showFilter = ref({ id: false, name: false, state: false })
-const serverOptions = ref<ServerOptions>({ page: 1, rowsPerPage: 25, sortBy: 'timestamp', sortType: 'desc' })
+const serverOptions = ref<ServerOptions>({ page: 1, rowsPerPage: 25 })
 const loading = ref(false)
 const detailsByJobId = ref<Record<string, WorkerJobDetails | undefined>>({})
 const detailsLoadingJobIds = ref(new Set<string>())
@@ -171,8 +170,7 @@ async function loadJobs() {
     ...(selectedName.value ? { name: selectedName.value } : {}),
     ...(selectedState.value ? { state: selectedState.value } : {}),
     page: serverOptions.value.page,
-    limit: serverOptions.value.rowsPerPage,
-    sortDirection: serverOptions.value.sortType === 'asc' ? 'asc' : 'desc'
+    limit: serverOptions.value.rowsPerPage
   })
   const response = result.ok as WorkerJobsResponse | undefined
   if (requestId !== loadRequestId) return
@@ -190,8 +188,10 @@ async function loadDetails(_index: number, item: Item) {
   const job = item as WorkerJobSummary
   if (detailsByJobId.value[job.id] || detailsLoadingJobIds.value.has(job.id)) return
 
+  const requestId = loadRequestId
   detailsLoadingJobIds.value.add(job.id)
   const result = await API.getter<WorkerJobDetails>(`admin/jobs/${encodeURIComponent(job.id)}`)
+  if (requestId !== loadRequestId) return
   if (result.ok?.data) detailsByJobId.value[job.id] = result.ok.data
   detailsLoadingJobIds.value.delete(job.id)
 }

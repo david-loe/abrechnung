@@ -14,10 +14,9 @@ export class WorkerJobsController extends Controller {
     @Query() name?: string,
     @Query() id?: string,
     /** @isInt @minimum 1 @default 1 */ @Query() page = 1,
-    /** @isInt @minimum 1 @maximum 100 @default 25 */ @Query() limit = 25,
-    /** @default desc */ @Query() sortDirection: 'asc' | 'desc' = 'desc'
+    /** @isInt @minimum 1 @maximum 100 @default 25 */ @Query() limit = 25
   ) {
-    return await getWorkerJobs({ state, name, id, page, limit, sortDirection })
+    return await getWorkerJobs({ state, name, id, page, limit })
   }
 
   @Get('{jobId}')
