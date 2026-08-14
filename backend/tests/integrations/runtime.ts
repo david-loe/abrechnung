@@ -2,7 +2,12 @@ import test, { ExecutionContext } from 'ava'
 import { type Queue } from 'bullmq'
 import { Integration } from '../../integrations/integration.js'
 import { processIntegrationJob } from '../../integrations/processor.js'
-import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
+import {
+  closeIntegrationQueue,
+  getIntegrationJobRetentionOptions,
+  type IntegrationJobData,
+  setIntegrationQueueForTests
+} from '../../integrations/queue.js'
 
 function stubQueueAdd(t: ExecutionContext, implementation: (name: string, data: IntegrationJobData, opts?: unknown) => Promise<unknown>) {
   setIntegrationQueueForTests({
@@ -45,7 +50,7 @@ test.serial('Integration.enqueue applies integration-specific job options', asyn
   t.deepEqual(captured, {
     name: 'stub.send',
     data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
-    opts: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
+    opts: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
   })
 })
 
@@ -70,7 +75,7 @@ test.serial('Integration.enqueue lets explicit job options override integration 
   t.deepEqual(captured, {
     name: 'stub.send',
     data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
-    opts: { attempts: 5, removeOnComplete: true, jobId: 'job-1' }
+    opts: { attempts: 5, jobId: 'job-1', ...getIntegrationJobRetentionOptions() }
   })
 })
 
@@ -139,6 +144,19 @@ test.serial('processIntegrationJob resolves payload via buildPayload when the qu
   await processIntegrationJob({ integrationKey: 'stub', operation: 'sync', payload: null }, [new ScheduledIntegration()])
 
   t.deepEqual(calls, [{ ok: true }])
+})
+
+test('processIntegrationJob returns the operation result for BullMQ persistence', async (t) => {
+  class ResultIntegration extends Integration {
+    public override readonly operations = { run: { run: async () => ({ status: 200, ok: true }) } }
+
+    public constructor() {
+      super('stub')
+    }
+  }
+
+  const result = await processIntegrationJob({ integrationKey: 'stub', operation: 'run', payload: {} }, [new ResultIntegration()])
+  t.deepEqual(result, { status: 200, ok: true })
 })
 
 test('processIntegrationJob throws for an unknown integration key', async (t) => {

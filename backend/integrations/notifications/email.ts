@@ -33,7 +33,7 @@ class MailNotificationIntegration extends Integration {
       jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } },
       run: async (payload: unknown) => {
         const mail = payload as NotificationEmailPayload
-        await sendMail(mail.recipient, mail.subject, mail.paragraph, mail.language, mail.button, mail.lastParagraph)
+        return await sendMail(mail.recipient, mail.subject, mail.paragraph, mail.language, mail.button, mail.lastParagraph)
       }
     }
   }

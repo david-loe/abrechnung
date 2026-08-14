@@ -1,13 +1,13 @@
 import { Locale } from 'abrechnung-common/types.js'
 import { JobsOptions } from 'bullmq'
 import { type IntegrationEventHandlerMap } from './events.js'
-import { getIntegrationQueue } from './queue.js'
+import { getIntegrationJobRetentionOptions, getIntegrationQueue } from './queue.js'
 
 export const INTEGRATION_SCHEDULE_PREFIX = 'schedule:'
 
 export interface IntegrationOperationDefinition {
   // biome-ignore lint/suspicious/noExplicitAny: typing is too complex for now, can be improved in the future
-  run: (payload: any) => Promise<void>
+  run: (payload: any) => Promise<unknown>
   buildPayload?: () => Promise<unknown> | unknown
   jobOptions?: JobsOptions
 }
@@ -56,7 +56,7 @@ export class Integration {
     await getIntegrationQueue().add(
       this.buildJobName(operation),
       { integrationKey: this.key, operation, payload },
-      { ...definition.jobOptions, ...jobOptions }
+      { ...definition.jobOptions, ...jobOptions, ...getIntegrationJobRetentionOptions() }
     )
   }
 
@@ -67,6 +67,6 @@ export class Integration {
   public async runOperation(operation: string, payload: unknown) {
     const definition = this.requireOperation(operation)
     const resolvedPayload = payload ?? (await definition.buildPayload?.()) ?? {}
-    await definition.run(resolvedPayload)
+    return await definition.run(resolvedPayload)
   }
 }

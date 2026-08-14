@@ -1,6 +1,6 @@
 import { logger } from '../logger.js'
 import { INTEGRATION_SCHEDULE_PREFIX } from './integration.js'
-import { getIntegrationQueue } from './queue.js'
+import { getIntegrationJobRetentionOptions, getIntegrationQueue } from './queue.js'
 import { getIntegration } from './registry.js'
 import { scheduleToRepeatOptions } from './schedules.js'
 import { getAllIntegrationSettings } from './settings.js'
@@ -34,7 +34,7 @@ export async function syncIntegrationSchedules() {
       await queue.upsertJobScheduler(schedulerKey, scheduleToRepeatOptions(scheduleSettings.schedule), {
         name: integration.buildJobName(operation),
         data: { integrationKey: integration.key, operation, payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true, ...operationDefinition.jobOptions }
+        opts: { ...operationDefinition.jobOptions, ...getIntegrationJobRetentionOptions() }
       })
     }
   }

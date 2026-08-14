@@ -7,6 +7,13 @@ const int = makeValidator<number>((input: string) => {
   return coerced
 })
 
+const falseablePositiveInt = makeValidator<number | false>((input: string) => {
+  if (input.trim().toLowerCase() === 'false') return false
+  const coerced = Number(input)
+  if (!Number.isInteger(coerced) || coerced <= 0) throw new EnvError(`Invalid positive integer or false input: "${input}"`)
+  return coerced
+})
+
 const url = makeValidator<string>((input: string) => {
   try {
     const parsed = new URL(input)
@@ -79,6 +86,22 @@ const backendEnvConfig = Object.assign({}, baseEnvConfig, {
     desc: 'Delay between webhook retry attempts in milliseconds. BullMQ exponential: 2 ^ (attempts - 1) * delay'
   }),
   WORKER_CONCURRENCY: int({ default: 1, desc: 'Concurrency of the integration worker' }),
+  WORKER_JOB_FAILED_TTL_SECONDS: falseablePositiveInt({
+    default: false,
+    desc: 'Maximum failed job age in seconds; false keeps jobs without an age limit'
+  }),
+  WORKER_JOB_FAILED_MAX_COUNT: falseablePositiveInt({
+    default: 100,
+    desc: 'Maximum retained failed job count; false keeps jobs without a count limit'
+  }),
+  WORKER_JOB_COMPLETED_TTL_SECONDS: falseablePositiveInt({
+    default: 604_800,
+    desc: 'Maximum completed job age in seconds; false keeps jobs without an age limit'
+  }),
+  WORKER_JOB_COMPLETED_MAX_COUNT: falseablePositiveInt({
+    default: 400,
+    desc: 'Maximum retained completed job count; false keeps jobs without a count limit'
+  }),
   PROD_INIT_CONNECTION_SETTINGS: json<Partial<Omit<ConnectionSettings, '_id'>>>({
     default: undefined,
     desc: 'Initial connection settings for production environment as JSON object'

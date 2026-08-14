@@ -1,6 +1,7 @@
 import { Worker } from 'bullmq'
 import ENV from '../env.js'
 import { logger } from '../logger.js'
+import { notifyAdminsAboutFailedJob } from './notifications/jobFailure.js'
 import { processIntegrationJob } from './processor.js'
 import { INTEGRATION_QUEUE_NAME, type IntegrationJobData } from './queue.js'
 import { integrations } from './registry.js'
@@ -16,7 +17,7 @@ function createIntegrationWorker() {
     INTEGRATION_QUEUE_NAME,
     async (job) => {
       logger.debug(`Processing integration job ${job.id} (${describeJob(job.data)})`)
-      await processIntegrationJob(job.data, integrations)
+      return await processIntegrationJob(job.data, integrations)
     },
     { connection: { url: ENV.REDIS_URL }, prefix: ENV.REDIS_PREFIX, concurrency: ENV.WORKER_CONCURRENCY }
   )
@@ -29,6 +30,12 @@ function registerWorkerListeners(worker: Worker<IntegrationJobData>) {
 
   worker.on('failed', (job, error) => {
     logger.error(`Integration job ${job?.id} failed (${job ? describeJob(job.data) : 'unknown'})`, error)
+    if (job) {
+      void job
+        .getState()
+        .then((state) => (state === 'failed' ? notifyAdminsAboutFailedJob(job, error) : undefined))
+        .catch((notificationError) => logger.error('Could not notify administrators about failed integration job', notificationError))
+    }
   })
 
   worker.on('error', (error) => {

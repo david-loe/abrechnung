@@ -109,6 +109,7 @@
       </template>
       <template #fallback>Loading.. </template>
     </Suspense>
+    <WorkerJobs v-else-if="activeSectionId === 'workerJobs'" />
     <IntegrationSettingsForm v-else-if="activeSectionId === 'lumpSumSync'" integrationKey="lumpSums" />
     <StatsPage v-else-if="activeSectionId === 'stats'" />
     <AdminTools v-else-if="activeSectionId === 'adminTools'" />
@@ -141,6 +142,7 @@ import TravelSettingsForm from './elements/TravelSettingsForm.vue'
 import UserList from './elements/UserList.vue'
 import UserMerge from './elements/UserMerge.vue'
 import WebhookList from './elements/WebhookList.vue'
+import WorkerJobs from './elements/WorkerJobs.vue'
 
 const { t } = useI18n()
 const route = useRoute()

@@ -1,7 +1,12 @@
 import test, { ExecutionContext } from 'ava'
 import { type Queue } from 'bullmq'
 import { connectDB, disconnectDB } from '../../db.js'
-import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
+import {
+  closeIntegrationQueue,
+  getIntegrationJobRetentionOptions,
+  type IntegrationJobData,
+  setIntegrationQueueForTests
+} from '../../integrations/queue.js'
 import { syncIntegrationSchedules } from '../../integrations/scheduler.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
 
@@ -78,7 +83,7 @@ test.serial('syncIntegrationSchedules upserts repeatable jobs for enabled integr
       jobTemplate: {
         name: 'lumpSums.sync',
         data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true, attempts: 3, backoff: { type: 'exponential', delay: 5_000 } }
+        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
       }
     },
     {
@@ -87,7 +92,7 @@ test.serial('syncIntegrationSchedules upserts repeatable jobs for enabled integr
       jobTemplate: {
         name: 'retentionPolicy.apply',
         data: { integrationKey: 'retentionPolicy', operation: 'apply', payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true }
+        opts: getIntegrationJobRetentionOptions()
       }
     }
   ])
@@ -132,7 +137,7 @@ test.serial('syncIntegrationSchedules removes disabled and obsolete repeatable j
       jobTemplate: {
         name: 'lumpSums.sync',
         data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { removeOnComplete: true, removeOnFail: true, attempts: 3, backoff: { type: 'exponential', delay: 5_000 } }
+        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
       }
     }
   ])

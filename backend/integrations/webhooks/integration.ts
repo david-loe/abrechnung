@@ -42,7 +42,7 @@ class WebhookIntegration extends Integration {
     deliver: {
       jobOptions: { attempts: ENV.WEBHOOK_ATTEMPTS, backoff: { type: 'exponential', delay: ENV.WEBHOOK_RETRY_DELAY } },
       run: async ({ input, webhookId }: WebhookJobData) => {
-        await processWebhookJob({ input, webhookId })
+        return await processWebhookJob({ input, webhookId })
       }
     }
   }
