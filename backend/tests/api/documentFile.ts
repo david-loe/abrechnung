@@ -132,29 +132,29 @@ test.serial('Examiner suggestion endpoint enforces the report context before cal
   try {
     await loginUser(agent, 'expenseReport')
     const missingContext = await agent
-      .get('/examine/suggestions')
-      .query({ type: 'expense', reportType: 'ExpenseReport', projectId, documentFileIds: documentFileId })
+      .post('/examine/suggestions')
+      .send({ type: 'expense', reportType: 'ExpenseReport', projectId, documentFileIds: [documentFileId] })
     t.is(missingContext.status, 422)
 
     const wrongReportType = await agent
-      .get('/examine/suggestions')
-      .query({
+      .post('/examine/suggestions')
+      .send({
         type: 'expense',
         reportType: 'ExpenseReport',
         projectId,
-        documentFileIds: documentFileId,
+        documentFileIds: [documentFileId],
         reportId,
         sourceReportType: 'Travel'
       })
     t.is(wrongReportType.status, 403)
 
     const wrongProject = await agent
-      .get('/examine/suggestions')
-      .query({
+      .post('/examine/suggestions')
+      .send({
         type: 'expense',
         reportType: 'ExpenseReport',
         projectId: documentFileId,
-        documentFileIds: documentFileId,
+        documentFileIds: [documentFileId],
         reportId,
         sourceReportType: 'ExpenseReport'
       })
@@ -164,7 +164,7 @@ test.serial('Examiner suggestion endpoint enforces the report context before cal
   }
 })
 
-test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (t) => {
+test.serial('POST /suggestions returns validated OpenAI-compatible JSON', async (t) => {
   const settings = await ConnectionSettings.findOne()
   if (!settings) return t.fail('Connection settings missing')
   const originalLlm = settings.toObject().llm
@@ -219,12 +219,12 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
 
   try {
     const response = await agent
-      .get('/suggestions')
-      .query({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: documentFileId })
+      .post('/suggestions')
+      .send({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: [documentFileId] })
 
     t.is(response.status, 200)
     t.is(response.headers['cache-control'], 'no-store')
-    t.deepEqual(response.body.data, {
+    t.deepEqual(response.body.result, {
       type: 'expense',
       description: 'Lunch',
       cost: {
@@ -254,10 +254,10 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
     t.false(Object.hasOwn(positionsSchema, 'maxItems'))
 
     const stageResponse = await agent
-      .get('/suggestions')
-      .query({ type: 'stage', reportType: 'Travel', projectId, documentFileIds: documentFileId })
+      .post('/suggestions')
+      .send({ type: 'stage', reportType: 'Travel', projectId, documentFileIds: [documentFileId] })
     t.is(stageResponse.status, 200)
-    t.like(stageResponse.body.data, {
+    t.like(stageResponse.body.result, {
       type: 'stage',
       startLocation: { place: 'Berlin', countryCode: 'DE' },
       endLocation: { place: 'Paris', countryCode: 'FR' },
@@ -275,17 +275,17 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
 
     await loginUser(agent, 'expenseReport')
     const examinedResponse = await agent
-      .get('/examine/suggestions')
-      .query({
+      .post('/examine/suggestions')
+      .send({
         type: 'expense',
         reportType: 'ExpenseReport',
         projectId,
-        documentFileIds: documentFileId,
+        documentFileIds: [documentFileId],
         reportId,
         sourceReportType: 'ExpenseReport'
       })
     t.is(examinedResponse.status, 200)
-    t.deepEqual(examinedResponse.body.data, response.body.data)
+    t.deepEqual(examinedResponse.body.result, response.body.result)
   } finally {
     await loginUser(agent, 'user')
     axios.post = originalPost
@@ -294,7 +294,7 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
   }
 })
 
-test.serial('GET /suggestions returns 502 and logs actionable connection details for LLM failures', async (t) => {
+test.serial('POST /suggestions returns 502 and logs actionable connection details for LLM failures', async (t) => {
   const settings = await ConnectionSettings.findOne()
   if (!settings) return t.fail('Connection settings missing')
   const originalLlm = settings.toObject().llm
@@ -324,8 +324,8 @@ test.serial('GET /suggestions returns 502 and logs actionable connection details
 
   try {
     const response = await agent
-      .get('/suggestions')
-      .query({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: documentFileId })
+      .post('/suggestions')
+      .send({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: [documentFileId] })
 
     t.is(response.status, 502)
     t.is(response.body.name, 'alerts.upstreamServiceError')
@@ -341,7 +341,7 @@ test.serial('GET /suggestions returns 502 and logs actionable connection details
   }
 })
 
-test.serial('GET /suggestions returns no content without LLM settings', async (t) => {
+test.serial('POST /suggestions returns no content without LLM settings', async (t) => {
   const settings = await ConnectionSettings.findOne()
   if (!settings) return t.fail('Connection settings missing')
   const originalLlm = settings.toObject().llm
@@ -350,8 +350,8 @@ test.serial('GET /suggestions returns no content without LLM settings', async (t
 
   try {
     const response = await agent
-      .get('/suggestions')
-      .query({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: documentFileId })
+      .post('/suggestions')
+      .send({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: [documentFileId] })
     t.is(response.status, 204)
   } finally {
     settings.llm = originalLlm

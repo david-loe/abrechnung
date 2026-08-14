@@ -1,7 +1,7 @@
 import { baseCurrency, Category, Cost, Currency, ProjectSimple } from 'abrechnung-common/types.js'
 import { describe, expect, it, vi } from 'vitest'
 
-vi.mock('@/api.js', () => ({ default: { getter: vi.fn() } }))
+vi.mock('@/api.js', () => ({ default: { setter: vi.fn() } }))
 
 import API from '@/api.js'
 import { applySuggestedCost, receiptProcessingStatus, requestReceiptSuggestion, suggestedPlace } from '@/receiptSuggestions.js'
@@ -44,8 +44,8 @@ describe('receipt suggestion application', () => {
     expect(receiptProcessingStatus([], false, true)).toBe('receiptSuggestionFailed')
   })
 
-  it('passes suggestion parameters to the configured Axios query serializer', async () => {
-    vi.mocked(API.getter).mockResolvedValueOnce({ ok: { data: { type: 'expense' }, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } })
+  it('posts suggestion parameters without showing an alert', async () => {
+    vi.mocked(API.setter).mockResolvedValueOnce({ ok: { type: 'expense' } })
 
     await requestReceiptSuggestion({
       type: 'expense',
@@ -56,16 +56,16 @@ describe('receipt suggestion application', () => {
       endpointPrefix: ''
     })
 
-    expect(vi.mocked(API.getter).mock.calls.at(-1)?.[1]).toEqual({
-      type: 'expense',
-      reportType: 'Travel',
-      projectId: 'project',
-      documentFileIds: ['first', 'second']
-    })
+    expect(vi.mocked(API.setter).mock.calls.at(-1)).toEqual([
+      'suggestions',
+      { type: 'expense', reportType: 'Travel', projectId: 'project', documentFileIds: ['first', 'second'] },
+      {},
+      false
+    ])
   })
 
-  it('includes the examined report context in suggestion queries', async () => {
-    vi.mocked(API.getter).mockResolvedValueOnce({ ok: { data: { type: 'expense' }, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } })
+  it('includes the examined report context in suggestion requests', async () => {
+    vi.mocked(API.setter).mockResolvedValueOnce({ ok: { type: 'expense' } })
 
     await requestReceiptSuggestion({
       type: 'expense',
@@ -77,7 +77,7 @@ describe('receipt suggestion application', () => {
       endpointPrefix: 'examine/'
     })
 
-    expect(vi.mocked(API.getter).mock.calls.at(-1)?.[1]).toEqual({
+    expect(vi.mocked(API.setter).mock.calls.at(-1)?.[1]).toEqual({
       type: 'expense',
       reportType: 'ExpenseReport',
       projectId: 'project',
@@ -89,7 +89,7 @@ describe('receipt suggestion application', () => {
 
   it('lets the form expose a failed suggestion request', async () => {
     const error = new Error('suggestion failed')
-    vi.mocked(API.getter).mockResolvedValueOnce({ error })
+    vi.mocked(API.setter).mockResolvedValueOnce({ error })
 
     await expect(
       requestReceiptSuggestion({

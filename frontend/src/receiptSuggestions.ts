@@ -45,7 +45,7 @@ export function receiptProcessingStatus(steps: ReceiptProcessingStep[], suggesti
 
 export async function requestReceiptSuggestion(context: SuggestionContext) {
   if (context.documentFileIds.length === 0) return undefined
-  const result = await API.getter<ReceiptSuggestion>(
+  const result = await API.setter<ReceiptSuggestion>(
     `${context.endpointPrefix}suggestions`,
     {
       type: context.type,
@@ -55,10 +55,10 @@ export async function requestReceiptSuggestion(context: SuggestionContext) {
       ...(context.endpointPrefix === 'examine/' ? { reportId: context.reportId, sourceReportType: context.sourceReportType } : {})
     },
     {},
-    { showAlert: false }
+    false
   )
   if (result.error) throw result.error
-  return result.ok?.data
+  return result.ok
 }
 
 export function receiptIds(receipts: Partial<DocumentFile<string>>[]) {
