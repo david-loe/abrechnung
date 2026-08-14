@@ -42,12 +42,16 @@ test.serial('GET /admin/connectionSettings hides secrets', async (t) => {
   assertSanitizedValue(t, data, existingSettings, ['llm', 'apiKey'])
 })
 
-test.serial('GET /admin/connectionSettings/form exposes LLM timeout and reasoning controls', async (t) => {
+test.serial('GET /admin/connectionSettings/form exposes LLM request controls', async (t) => {
   const res = await agent.get('/admin/connectionSettings/form')
   t.is(res.status, 200)
 
   const llmSchema = res.body.data.llm.schema
   t.like(llmSchema.timeoutSeconds, { type: 'text', inputType: 'number', default: 180 })
+  t.like(llmSchema.maxTokens, { type: 'text', inputType: 'number' })
+  t.true(llmSchema.maxTokens.rules.includes('integer'))
+  t.true(llmSchema.maxTokens.rules.includes('min:1'))
+  t.false(Object.hasOwn(llmSchema.maxTokens, 'default'))
   t.is(llmSchema.reasoningEffort.default, 'none')
   t.deepEqual(Object.keys(llmSchema.reasoningEffort.items), ['none', 'minimal', 'low', 'medium', 'high', 'xhigh'])
 })
@@ -84,12 +88,15 @@ test.serial('POST /admin/connectionSettings accepts new secret values', async (t
   t.is(getRes.status, 200)
   const settings: IConnectionSettings = getRes.body.data
   settings.auth.microsoft = { clientSecret: 'newSecretValue123', clientId: 'newClientId456', tenant: 'newTenant789' }
+  if (!settings.llm) return t.fail('LLM connection settings missing')
+  settings.llm.maxTokens = 2_048
 
   const postRes = await agent.post('/admin/connectionSettings').send(settings)
   t.is(postRes.status, 200)
 
   const updatedSettings = await ConnectionSettings.findOne().lean()
   t.is(updatedSettings?.auth.microsoft?.clientSecret, settings.auth?.microsoft?.clientSecret)
+  t.is(updatedSettings?.llm?.maxTokens, 2_048)
   t.is(postRes.body.result.auth.microsoft.clientSecret, SECRET_PLACEHOLDER)
 })
 

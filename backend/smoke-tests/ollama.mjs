@@ -16,7 +16,6 @@ const schema = {
         currencyCode: { type: ['string', 'null'], enum: ['EUR', null] },
         positions: {
           type: ['array', 'null'],
-          maxItems: 1,
           items: {
             type: 'object',
             additionalProperties: false,
@@ -24,7 +23,7 @@ const schema = {
               description: { type: ['string', 'null'] },
               grossAmount: { type: 'number' },
               vatRate: { type: 'number', enum: [19] },
-              categoryId: { type: ['string', 'null'], enum: ['meals', null] }
+              categoryId: { type: ['string', 'null'], enum: ['drinks', 'meals', null] }
             },
             required: ['description', 'grossAmount', 'vatRate', 'categoryId']
           }
@@ -42,19 +41,30 @@ const response = await fetch(`${baseUrl}/chat/completions`, {
   body: JSON.stringify({
     model,
     temperature: 0,
-    max_tokens: 512,
     reasoning_effort: 'none',
     messages: [
       {
         role: 'system',
         content:
-          'Extract the receipt. Every property required by the response schema must be present, including when null. Return only compact JSON matching the response schema.'
+          'Extract the receipt. Create one cost position per receipt line. Multiple positions may use the same VAT rate. Every property required by the response schema must be present, including when null. Return only compact JSON matching the response schema.'
       },
       {
         role: 'user',
         content: JSON.stringify({
-          candidates: { categories: [{ _id: 'meals', name: 'Meals' }], currencyCodes: ['EUR'], vatRates: [19] },
-          documents: [{ name: 'receipt.pdf', text: 'Receipt: Coffee, 3.50 EUR total, VAT 19%, 2026-07-24.' }]
+          candidates: {
+            categories: [
+              { _id: 'drinks', name: 'Drinks' },
+              { _id: 'meals', name: 'Meals' }
+            ],
+            currencyCodes: ['EUR'],
+            vatRates: [19]
+          },
+          documents: [
+            {
+              name: 'receipt.pdf',
+              text: 'Receipt dated 2026-07-24. Coffee, category Drinks, gross 3.50 EUR including 19% VAT. Sandwich, category Meals, gross 6.50 EUR including 19% VAT. Total 10.00 EUR.'
+            }
+          ]
         })
       }
     ],
@@ -71,6 +81,12 @@ assert.equal(typeof content, 'string', 'Ollama response contains no assistant co
 const suggestion = JSON.parse(content)
 assert.equal(suggestion.type, 'expense')
 assert.equal(suggestion.cost?.currencyCode, 'EUR')
-assert.equal(suggestion.cost?.positions?.[0]?.grossAmount, 3.5)
-assert.equal(suggestion.cost?.positions?.[0]?.vatRate, 19)
+assert.deepEqual(
+  suggestion.cost?.positions?.map(({ grossAmount }) => grossAmount).sort((left, right) => left - right),
+  [3.5, 6.5]
+)
+assert.deepEqual(
+  suggestion.cost?.positions?.map(({ vatRate }) => vatRate),
+  [19, 19]
+)
 console.info(`Ollama smoke test passed with ${model}.`)

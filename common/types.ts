@@ -151,6 +151,7 @@ export interface LlmConnectionSettings {
   model: string
   apiKey?: string | null
   reasoningEffort?: LlmReasoningEffort | null
+  maxTokens?: number | null
   timeoutSeconds?: number
 }
 

@@ -15,6 +15,13 @@ const category = {
   isDefault: true,
   for: 'Travel'
 } as Category<string>
+const drinksCategory = {
+  ...category,
+  _id: 'drinks-category',
+  name: 'Drinks',
+  ledgerAccount: { _id: 'drinks-ledger' },
+  isDefault: false
+} as Category<string>
 const usd = {
   _id: 'USD',
   name: { de: 'US-Dollar', en: 'US dollar', fr: 'dollar américain', es: 'dólar estadounidense', ru: 'доллар США', kk: 'АҚШ доллары' }
@@ -96,7 +103,7 @@ describe('receipt suggestion application', () => {
     ).rejects.toBe(error)
   })
 
-  it('fills only a pristine default cost and keeps distinct VAT positions', () => {
+  it('fills only a pristine default cost and keeps positions with repeated VAT rates', () => {
     const cost = pristineCost()
 
     applySuggestedCost(
@@ -106,17 +113,24 @@ describe('receipt suggestion application', () => {
         currencyCode: 'USD',
         positions: [
           { description: 'Meal', grossAmount: 10.7, vatRate: 7, categoryId: category._id },
-          { description: 'Drinks', grossAmount: 5.95, vatRate: 19, categoryId: category._id }
+          { description: 'Drinks', grossAmount: 5.95, vatRate: 7, categoryId: drinksCategory._id }
         ]
       },
-      { categories: [category], currencies: [baseCurrency, usd], defaultProject: project, dirty: new Set(), reportType: 'Travel' }
+      {
+        categories: [category, drinksCategory],
+        currencies: [baseCurrency, usd],
+        defaultProject: project,
+        dirty: new Set(),
+        reportType: 'Travel'
+      }
     )
 
     expect(cost.date).toBe('2026-07-24')
     expect(cost.currency).toBe(usd)
     expect(cost.positions).toHaveLength(2)
-    expect(cost.positions.map(({ vatRate }) => vatRate)).toEqual([7, 19])
-    expect(cost.positions.every((position) => position.project === project && position.category === category)).toBe(true)
+    expect(cost.positions.map(({ vatRate }) => vatRate)).toEqual([7, 7])
+    expect(cost.positions.map(({ category: positionCategory }) => positionCategory)).toEqual([category, drinksCategory])
+    expect(cost.positions.every((position) => position.project === project)).toBe(true)
   })
 
   it('does not overwrite fields changed by the user', () => {

@@ -112,6 +112,13 @@ export const connectionSettingsSchema = () =>
           description: 'Optional; supported values depend on the configured provider and model',
           translationPrefix: ''
         },
+        maxTokens: {
+          type: Number,
+          min: 1,
+          validate: { validator: (value: number | null | undefined) => value == null || Number.isInteger(value), message: 'integer' },
+          rules: ['integer'],
+          label: 'Max Output Tokens'
+        },
         timeoutSeconds: {
           type: Number,
           min: 1,

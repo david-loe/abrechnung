@@ -147,7 +147,14 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
   const settings = await ConnectionSettings.findOne()
   if (!settings) return t.fail('Connection settings missing')
   const originalLlm = settings.toObject().llm
-  settings.llm = { baseUrl: 'http://llm.test/v1', model: 'test-model', apiKey: 'secret', reasoningEffort: 'low', timeoutSeconds: 12 }
+  settings.llm = {
+    baseUrl: 'http://llm.test/v1',
+    model: 'test-model',
+    apiKey: 'secret',
+    reasoningEffort: 'low',
+    maxTokens: 1_024,
+    timeoutSeconds: 12
+  }
   await settings.save()
 
   const originalPost = axios.post
@@ -163,7 +170,14 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
     const suggestion: ReceiptSuggestion = {
       type: 'expense',
       description: 'Lunch',
-      cost: { date: '2026-07-24', currencyCode: 'EUR', positions: [{ description: 'Meal', grossAmount: 10.7, vatRate: 7 }] }
+      cost: {
+        date: '2026-07-24',
+        currencyCode: 'EUR',
+        positions: [
+          { description: 'Meal', grossAmount: 10.7, vatRate: 7 },
+          { description: 'Drinks', grossAmount: 5.9, vatRate: 7 }
+        ]
+      }
     }
     return { data: { choices: [{ message: { content: JSON.stringify(suggestion) } }] } }
   }) as typeof axios.post
@@ -178,16 +192,27 @@ test.serial('GET /suggestions returns validated OpenAI-compatible JSON', async (
     t.deepEqual(response.body.data, {
       type: 'expense',
       description: 'Lunch',
-      cost: { date: '2026-07-24', currencyCode: 'EUR', positions: [{ description: 'Meal', grossAmount: 10.7, vatRate: 7 }] }
+      cost: {
+        date: '2026-07-24',
+        currencyCode: 'EUR',
+        positions: [
+          { description: 'Meal', grossAmount: 10.7, vatRate: 7 },
+          { description: 'Drinks', grossAmount: 5.9, vatRate: 7 }
+        ]
+      }
     })
     t.is(requestedUrl, 'http://llm.test/v1/chat/completions')
     t.is(requestedAuthorization, 'Bearer secret')
     t.is(requestedTimeout, 12_000)
-    t.like(requestedBody as object, { model: 'test-model', temperature: 0, max_tokens: 512, reasoning_effort: 'low' })
+    t.like(requestedBody as object, { model: 'test-model', temperature: 0, max_tokens: 1_024, reasoning_effort: 'low' })
     t.like((requestedBody as { response_format: object }).response_format, {
       type: 'json_schema',
       json_schema: { name: 'receipt_suggestion', strict: true }
     })
+    const positionsSchema = (
+      requestedBody as { response_format: { json_schema: { schema: { properties: { cost: { properties: { positions: object } } } } } } }
+    ).response_format.json_schema.schema.properties.cost.properties.positions
+    t.false(Object.hasOwn(positionsSchema, 'maxItems'))
 
     await loginUser(agent, 'expenseReport')
     const examinedResponse = await agent
@@ -240,6 +265,7 @@ test.serial('GET /suggestions returns 502 and logs actionable connection details
     t.like(loggedDetails as object, { endpoint: 'http://llm.test/v1/chat/completions', model: 'test-model', code: 'ECONNREFUSED' })
     t.is(requestedTimeout, 7_000)
     t.false(Object.hasOwn(requestedBody as object, 'reasoning_effort'))
+    t.false(Object.hasOwn(requestedBody as object, 'max_tokens'))
   } finally {
     axios.post = originalPost
     logger.error = originalLoggerError
