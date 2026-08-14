@@ -854,6 +854,7 @@ export const accesses = [
   'book/travel',
   'book/expenseReport',
   'book/healthCareCost',
+  'create/usersAndProjects',
   'admin'
 ] as const
 export type Access = (typeof accesses)[number]

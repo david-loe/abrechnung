@@ -1,3 +1,4 @@
+import type { Access } from 'abrechnung-common/types.js'
 import axios from 'axios'
 import { createRouter, createWebHistory, RouteLocationNormalized } from 'vue-router'
 import { app } from '@/app.js'
@@ -119,6 +120,11 @@ const routes = [
   { path: '/user', component: () => import('@/components/HomePage.vue'), meta: { requiresAuth: true, offlineCapable: true } },
   { path: '/user/settings', component: () => import('@/components/UserSettingsPage.vue'), meta: { requiresAuth: true } },
   {
+    path: '/create/usersAndProjects',
+    component: () => import('@/components/CreateUsersAndProjectsPage.vue'),
+    meta: { requiresAuth: true, requiresVueform: true, requiredAccess: 'create/usersAndProjects' }
+  },
+  {
     path: '/user/travel/:_id([0-9a-fA-F]{24})',
     component: () => import('@/components/HomePage.vue'),
     meta: { requiresAuth: true, offlineCapable: true },
@@ -164,6 +170,9 @@ router.beforeEach(async (to) => {
   const offline = !sessionState.isOnline.value
   if (offline && to.meta.requiresAuth && !to.meta.offlineCapable) return { path: '/offline-unavailable', query: { redirect: to.fullPath } }
   if (to.meta.requiresAuth && !(await auth())) return { path: '/login', query: { redirect: to.fullPath } }
+  if (to.meta.requiredAccess && !sessionState.authContext.value?.permissions[to.meta.requiredAccess as Access]) {
+    return { path: '/user' }
+  }
   if (to.meta.requiresVueform && !vueformLoaded) {
     const [{ default: Vueform }, { default: vueformConfig }] = await Promise.all([
       import('@vueform/vueform'),

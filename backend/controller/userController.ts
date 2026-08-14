@@ -118,6 +118,8 @@ export class UserController extends Controller {
 @Security('httpBearer', ['user', 'book/healthCareCost'])
 @Security('cookieAuth', ['user', 'admin'])
 @Security('httpBearer', ['user', 'admin'])
+@Security('cookieAuth', ['user', 'create/usersAndProjects'])
+@Security('httpBearer', ['user', 'create/usersAndProjects'])
 export class UsersController extends Controller {
   @Get()
   public async getNamesAndProjects(@Queries() query: GetterQuery<IUser>) {
@@ -129,7 +131,7 @@ export class UsersController extends Controller {
   }
 }
 
-async function sendNewMagicloginMail(user: IUser) {
+export async function sendNewMagicloginMail(user: IUser) {
   await enqueueMail(
     [user],
     i18n.t('mail.newMagiclogin.subject', { lng: user.settings.language }),

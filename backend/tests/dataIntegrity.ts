@@ -2,7 +2,7 @@ import { reportModelNames } from 'abrechnung-common/types.js'
 import test from 'ava'
 import mongoose, { Model, Types } from 'mongoose'
 import { connectDB, disconnectDB } from '../db.js'
-import { initializeReferenceCounters } from '../migrations.js'
+import { initializeReferenceCounters, initializeUsersAndProjectsCreationAccess } from '../migrations.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -43,6 +43,32 @@ test.serial('reference counter migration initializes all models and is idempoten
     t.is(await ReferenceCounter.countDocuments({ _id: { $in: reportModelNames } }), reportModelNames.length)
   } finally {
     await mongoose.connection.collection('expensereports').deleteOne({ _id: reportId })
+  }
+})
+
+test.serial('creation access migration initializes users and display settings idempotently', async (t) => {
+  const userId = new Types.ObjectId()
+  const displaySettingsId = new Types.ObjectId()
+  await Promise.all([
+    mongoose.connection.collection('users').insertOne({ _id: userId, access: {} }),
+    mongoose.connection.collection('displaysettings').insertOne({ _id: displaySettingsId, accessIcons: {} })
+  ])
+
+  try {
+    await initializeUsersAndProjectsCreationAccess()
+    await initializeUsersAndProjectsCreationAccess()
+
+    const [user, displaySettings] = await Promise.all([
+      mongoose.connection.collection('users').findOne({ _id: userId }),
+      mongoose.connection.collection('displaysettings').findOne({ _id: displaySettingsId })
+    ])
+    t.is(user?.access['create/usersAndProjects'], false)
+    t.deepEqual(displaySettings?.accessIcons['create/usersAndProjects'], ['person-plus', 'folder-plus'])
+  } finally {
+    await Promise.all([
+      mongoose.connection.collection('users').deleteOne({ _id: userId }),
+      mongoose.connection.collection('displaysettings').deleteOne({ _id: displaySettingsId })
+    ])
   }
 })
 

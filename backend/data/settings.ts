@@ -10,6 +10,7 @@ export default {
     'book/expenseReport': false,
     'book/healthCareCost': false,
     'book/travel': false,
+    'create/usersAndProjects': false,
     'examine/expenseReport': false,
     'examine/healthCareCost': false,
     'examine/travel': false,
@@ -25,5 +26,5 @@ export default {
   autoSelectAvailableAdvances: true,
   preventOwnersFromDeletingReportsAfterReviewCompleted: false,
   isReadOnly: false,
-  version: '2.7.0'
+  version: '2.7.1'
 } as const

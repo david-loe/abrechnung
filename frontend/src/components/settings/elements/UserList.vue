@@ -1,6 +1,6 @@
 <template>
   <div>
-    <template v-if="userToEdit">
+    <template v-if="userToEdit && !createOnly">
       <ModalComponent
         :header="`API Key (${formatter.name(userToEdit.name)})`"
         @afterClose=";($refs.apiKeyForm as any).resetForm()"
@@ -19,7 +19,7 @@
           include-user-id-in-request />
       </ModalComponent>
     </template>
-    <ListElement class="mb-3" ref="list" endpoint="admin/user" :filter="filter" :headers="headers" dbKeyPrefix="admin">
+    <ListElement class="mb-3" ref="list" :endpoint="endpoint" :filter="filter" :headers="headers" :dbKeyPrefix="dbKeyPrefix">
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
@@ -66,8 +66,13 @@
         </template>
       </template>
       <template #item-buttons="user">
-        <button type="button" class="btn btn-light btn-sm" @click="showForm(user)"><i class="bi bi-pencil"></i></button>
-        <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteUser(user)"><i class="bi bi-trash"></i></button>
+        <button v-if="createOnly" type="button" class="btn btn-light btn-sm" @click="showForm(user, true)">
+          <i class="bi bi-eye"></i>
+        </button>
+        <template v-else>
+          <button type="button" class="btn btn-light btn-sm" @click="showForm(user)"><i class="bi bi-pencil"></i></button>
+          <button type="button" class="btn btn-danger btn-sm ms-2" @click="deleteUser(user)"><i class="bi bi-trash"></i></button>
+        </template>
       </template>
     </ListElement>
     <div v-if="_showForm" class="container">
@@ -76,11 +81,13 @@
         :tabs="tabs"
         v-model="userToEdit"
         :sync="true"
+        :disabled="viewOnly"
         :endpoint="false"
         ref="form$"
         @submit="(form$: any) => postUser(form$.data)"
         @reset="_showForm = false"
         @mounted="setupForm" />
+      <button v-if="viewOnly" type="button" class="btn btn-secondary mt-3" @click="closeForm">{{ t('labels.cancel') }}</button>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.user') }) }}</button>
   </div>
@@ -88,8 +95,8 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
-import { accesses, User } from 'abrechnung-common/types.js'
-import { Ref, ref, useTemplateRef } from 'vue'
+import { accesses, idDocumentToId, User } from 'abrechnung-common/types.js'
+import { computed, Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import API from '@/api.js'
@@ -102,13 +109,22 @@ import { getSyncedMagicLogin } from './userForm.js'
 
 const { t } = useI18n()
 
-const headers: Header[] = [
+const props = withDefaults(defineProps<{ endpoint?: string; createOnly?: boolean; dbKeyPrefix?: string }>(), {
+  endpoint: 'admin/user',
+  createOnly: false,
+  dbKeyPrefix: 'admin'
+})
+
+const endpoint = computed(() => props.endpoint)
+const createOnly = computed(() => props.createOnly)
+const dbKeyPrefix = computed(() => props.dbKeyPrefix)
+const headers = computed<Header[]>(() => [
   { text: 'labels.name', value: 'name' },
   { text: 'labels.email', value: 'email' },
   { text: 'labels.projects', value: 'projects.assigned', sortable: true },
-  { text: 'labels.access', value: 'access' },
-  { text: '', value: 'buttons', width: 80 }
-]
+  ...(createOnly.value ? [] : [{ text: 'labels.access', value: 'access' }]),
+  { text: '', value: 'buttons', width: createOnly.value ? 48 : 80 }
+])
 
 const list = useTemplateRef('list')
 async function loadFromServer() {
@@ -148,26 +164,36 @@ function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) 
 
 const userToEdit: Ref<User | undefined> = ref(undefined)
 const _showForm = ref(false)
+const viewOnly = ref(false)
 const modal = useTemplateRef<{ modal: { show: () => void } }>('modal')
 
-function showForm(user?: User) {
+function showForm(user?: User, readOnly = false) {
   // biome-ignore lint/suspicious/noExplicitAny: reduce arrays of objects to arrays of _ids for vueform select elements
   let formUser: any = user
   if (formUser) {
     const formUserSettings = Object.assign({}, formUser.settings)
     const formUserProjects = Object.assign({}, formUser.projects)
     formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
-    formUser.settings.lastCurrencies = user?.settings.lastCurrencies.map((c) => c._id)
-    formUser.settings.lastCountries = user?.settings.lastCountries.map((c) => c._id)
-    formUser.projects.assigned = user?.projects.assigned.map((p) => p._id)
-    formUser.settings.organisation = user?.settings.organisation?._id
-    formUser.settings.insurance = user?.settings.insurance?._id
+    if (user?.settings.lastCurrencies) formUser.settings.lastCurrencies = user.settings.lastCurrencies.map((c) => c._id)
+    if (user?.settings.lastCountries) formUser.settings.lastCountries = user.settings.lastCountries.map((c) => c._id)
+    formUser.projects.assigned = user?.projects.assigned.map(idDocumentToId)
+    formUser.projects.supervised = user?.projects.supervised.map(idDocumentToId)
+    formUser.settings.organisation = user?.settings.organisation ? idDocumentToId(user.settings.organisation) : user?.settings.organisation
+    formUser.settings.insurance = user?.settings.insurance ? idDocumentToId(user.settings.insurance) : user?.settings.insurance
   }
   userToEdit.value = formUser
+  viewOnly.value = readOnly
   _showForm.value = true
 }
+
+function closeForm() {
+  _showForm.value = false
+  viewOnly.value = false
+  userToEdit.value = undefined
+}
 async function postUser(user: User) {
-  const result = await API.setter<User>('admin/user', user)
+  if (viewOnly.value) return
+  const result = await API.setter<User>(props.endpoint, user)
   if (result.ok) {
     _showForm.value = false
     userToEdit.value = undefined
@@ -176,7 +202,7 @@ async function postUser(user: User) {
   }
 }
 async function deleteUser(user: User<string>) {
-  const result = await API.deleter('admin/user', { _id: user._id })
+  const result = await API.deleter(props.endpoint, { _id: user._id })
   if (result) {
     loadFromServer()
     APP_LOADER.loadOptional('users')
@@ -185,9 +211,11 @@ async function deleteUser(user: User<string>) {
 
 // biome-ignore lint/suspicious/noExplicitAny: Vueform does not expose the mounted form instance type through its component event
 function setupForm(form$: any) {
-  form$.el$('fk.genApiKey').on('click', () => {
-    modal.value?.modal.show()
-  })
+  if (!props.createOnly) {
+    form$.el$('fk.genApiKey').on('click', () => {
+      modal.value?.modal.show()
+    })
+  }
 
   const magicLoginEnabled = schema.fk?.schema?.magiclogin?.type !== 'hidden'
   const emailElement = form$.el$('email')
@@ -215,16 +243,22 @@ const buttons = {
     reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
   }
 }
-const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>('admin/user/form')).ok?.data, {
+const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>(`${props.endpoint}/form`)).ok?.data, {
   buttons0: buttons,
   buttons1: buttons
 })
-if (schema.fk?.schema) {
+if (!props.createOnly && schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
 }
 const tabs = {
-  tab0: { label: t('labels.general'), elements: ['name', 'email', 'additionalDetails', 'projects', 'settings', 'buttons0'] },
-  tab1: { label: `Login & ${t('labels.access')}`, elements: ['fk', 'access', 'loseAccessAt', 'buttons1'] }
+  tab0: {
+    label: t('labels.general'),
+    elements: ['name', 'email', ...(props.createOnly ? ['employeeId'] : []), 'additionalDetails', 'projects', 'settings', 'buttons0']
+  },
+  tab1: {
+    label: props.createOnly ? 'Login' : `Login & ${t('labels.access')}`,
+    elements: ['fk', ...(props.createOnly ? [] : ['access']), 'loseAccessAt', 'buttons1']
+  }
 }
 </script>
 

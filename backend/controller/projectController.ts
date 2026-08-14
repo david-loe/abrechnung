@@ -33,7 +33,8 @@ export class ProjectController extends Controller {
         'book/advance',
         'book/expenseReport',
         'book/travel',
-        'book/healthCareCost'
+        'book/healthCareCost',
+        'create/usersAndProjects'
       ],
       'one'
     )
