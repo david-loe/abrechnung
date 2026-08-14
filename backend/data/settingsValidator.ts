@@ -1,4 +1,5 @@
-import { ldapauthSettings, smtpSettings } from 'abrechnung-common/types.js'
+import { LlmConnectionSettings, ldapauthSettings, smtpSettings } from 'abrechnung-common/types.js'
+import axios from 'axios'
 import ldap from 'ldapjs'
 import nodemailer from 'nodemailer'
 import SMTPConnection from 'nodemailer/lib/smtp-connection/index.js'
@@ -29,6 +30,18 @@ export function verifyLdapauthConfig(config: ldapauthSettings) {
 export function verifySmtpConfig(config: smtpSettings) {
   const testClient = nodemailer.createTransport(mapSmtpConfig(config))
   return testClient.verify()
+}
+
+export async function verifyLlmConfig(config: LlmConnectionSettings) {
+  const endpoint = `${config.baseUrl.replace(/\/+$/, '')}/models`
+  try {
+    await axios.get(endpoint, {
+      timeout: config.timeoutSeconds * 1_000,
+      headers: config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : undefined
+    })
+  } catch {
+    throw new Error('LLM connection test failed.')
+  }
 }
 
 export function mapLdapauthConfig(config: ldapauthSettings): LdapStrategy.Options['server'] {

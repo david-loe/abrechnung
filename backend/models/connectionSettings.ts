@@ -1,6 +1,6 @@
 import { ConnectionSettings, defaultLocale, emailRegex, llmReasoningEfforts, locales, smtpAuthTypes } from 'abrechnung-common/types.js'
 import { model, Schema, Types } from 'mongoose'
-import { verifyLdapauthConfig, verifySmtpConfig } from '../data/settingsValidator.js'
+import { verifyLdapauthConfig, verifyLlmConfig, verifySmtpConfig } from '../data/settingsValidator.js'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 
@@ -227,6 +227,9 @@ schema.pre('validate', async function () {
   }
   if (this.smtp?.host) {
     await verifySmtpConfig(this.smtp)
+  }
+  if (this.llm?.baseUrl) {
+    await verifyLlmConfig(this.llm)
   }
 })
 

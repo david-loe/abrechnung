@@ -14,9 +14,11 @@ import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import TravelModel from '../../models/travel.js'
+import TravelSettingsModel from '../../models/travelSettings.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 import { uploadPendingReceipts } from '../_documentFile.js'
+import { withSettingsRestore } from '../_settings.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -33,7 +35,6 @@ let travel: TravelSimple = {
   endDate: new Date('2023-09-02T00:00:00.000Z')
 }
 
-let originalVehicleRegistrationSetting: 'required' | 'optional' | 'none' | undefined
 let category: Category
 
 function withCostPositions<T>(record: T, description: string, kind: 'manual' | 'ownCar' = 'manual') {
@@ -55,7 +56,6 @@ async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwn
   await loginUser(agent, 'admin')
   const settingsResponse = await agent.get('/travelSettings')
   const settings = settingsResponse.body.data
-  originalVehicleRegistrationSetting ??= settings.vehicleRegistrationWhenUsingOwnCar
   await agent.post('/admin/travelSettings').send({ _id: settings._id, vehicleRegistrationWhenUsingOwnCar })
 }
 
@@ -346,146 +346,147 @@ test.serial('POST /travel/underExamination AGAIN', async (t) => {
 })
 
 test.serial('POST /travel/underExamination rejects ownCar without owner vehicle registration when required', async (t) => {
-  await setVehicleRegistrationRequirement('required')
-  await loginUser(agent, 'user')
-  await agent.post('/user/vehicleRegistration').field('noop', '1')
+  await withSettingsRestore(TravelSettingsModel, {}, async () => {
+    await setVehicleRegistrationRequirement('required')
+    await loginUser(agent, 'user')
+    await agent.post('/user/vehicleRegistration').field('noop', '1')
 
-  const ownCarTravel: TravelSimple = {
-    name: 'Own Car May 2024',
-    reason: 'Project meeting',
-    destinationPlace: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    startDate: new Date('2024-05-14T00:00:00.000Z'),
-    endDate: new Date('2024-05-14T00:00:00.000Z'),
-    project: travel.project
-  }
+    const ownCarTravel: TravelSimple = {
+      name: 'Own Car May 2024',
+      reason: 'Project meeting',
+      destinationPlace: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      startDate: new Date('2024-05-14T00:00:00.000Z'),
+      endDate: new Date('2024-05-14T00:00:00.000Z'),
+      project: travel.project
+    }
 
-  const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
-  t.is(createdResponse.status, 200)
-  const createdTravel = createdResponse.body.result as Travel
+    const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
+    t.is(createdResponse.status, 200)
+    const createdTravel = createdResponse.body.result as Travel
 
-  await loginUser(agent, 'travel')
-  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(approvedResponse.status, 200)
+    await loginUser(agent, 'travel')
+    const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(approvedResponse.status, 200)
 
-  await loginUser(agent, 'user')
-  const ownCarStage: Stage = {
-    departure: new Date('2024-05-14T08:00:00.000Z'),
-    arrival: new Date('2024-05-14T18:00:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Hamburg'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    midnightCountries: [],
-    transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
-    cost: {
-      amount: 0, //@ts-ignore
-      currency: { _id: 'EUR' }, //@ts-ignore
-      receipts: [],
-      date: new Date('2024-05-14T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  }
+    await loginUser(agent, 'user')
+    const ownCarStage: Stage = {
+      departure: new Date('2024-05-14T08:00:00.000Z'),
+      arrival: new Date('2024-05-14T18:00:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Hamburg'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      midnightCountries: [],
+      transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
+      cost: {
+        amount: 0, //@ts-ignore
+        currency: { _id: 'EUR' }, //@ts-ignore
+        receipts: [],
+        date: new Date('2024-05-14T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    }
 
-  const stageResponse = await agent
-    .post('/travel/stage')
-    .query({ parentId: createdTravel._id.toString() })
-    .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
-  t.is(stageResponse.status, 200)
+    const stageResponse = await agent
+      .post('/travel/stage')
+      .query({ parentId: createdTravel._id.toString() })
+      .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
+    t.is(stageResponse.status, 200)
 
-  const blockedResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
-  t.is(blockedResponse.status, 422)
-  t.true(
-    blockedResponse.body.errors.some(
-      (error: { path?: string; message: string }) => error.path === 'stages.0.cost.receipts' && error.message === 'requiredForReview'
+    const blockedResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
+    t.is(blockedResponse.status, 422)
+    t.true(
+      blockedResponse.body.errors.some(
+        (error: { path?: string; message: string }) => error.path === 'stages.0.cost.receipts' && error.message === 'requiredForReview'
+      )
     )
-  )
+  })
 })
 
 test.serial('POST /travel/underExamination allows ownCar with owner vehicle registration when required', async (t) => {
-  await loginUser(agent, 'user')
+  await withSettingsRestore(TravelSettingsModel, {}, async () => {
+    await setVehicleRegistrationRequirement('required')
+    await loginUser(agent, 'user')
 
-  let vehicleRegistrationRequest = agent.post('/user/vehicleRegistration')
-  for (const entry of objectToFormFields({
-    vehicleRegistration: [{ name: 'vehicle-registration.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
-  })) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      vehicleRegistrationRequest = vehicleRegistrationRequest.attach(entry.field, entry.val)
-    } else {
-      vehicleRegistrationRequest = vehicleRegistrationRequest.field(entry.field, entry.val)
+    let vehicleRegistrationRequest = agent.post('/user/vehicleRegistration')
+    for (const entry of objectToFormFields({
+      vehicleRegistration: [{ name: 'vehicle-registration.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
+    })) {
+      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+        vehicleRegistrationRequest = vehicleRegistrationRequest.attach(entry.field, entry.val)
+      } else {
+        vehicleRegistrationRequest = vehicleRegistrationRequest.field(entry.field, entry.val)
+      }
     }
-  }
-  const uploadResponse = await vehicleRegistrationRequest
-  t.is(uploadResponse.status, 200)
+    const uploadResponse = await vehicleRegistrationRequest
+    t.is(uploadResponse.status, 200)
 
-  const ownCarTravel: TravelSimple = {
-    name: 'Own Car June 2024',
-    reason: 'Workshop',
-    destinationPlace: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    startDate: new Date('2024-06-12T00:00:00.000Z'),
-    endDate: new Date('2024-06-12T00:00:00.000Z'),
-    project: travel.project
-  }
+    const ownCarTravel: TravelSimple = {
+      name: 'Own Car June 2024',
+      reason: 'Workshop',
+      destinationPlace: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      startDate: new Date('2024-06-12T00:00:00.000Z'),
+      endDate: new Date('2024-06-12T00:00:00.000Z'),
+      project: travel.project
+    }
 
-  const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
-  t.is(createdResponse.status, 200)
-  const createdTravel = createdResponse.body.result as Travel
+    const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
+    t.is(createdResponse.status, 200)
+    const createdTravel = createdResponse.body.result as Travel
 
-  await loginUser(agent, 'travel')
-  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(approvedResponse.status, 200)
+    await loginUser(agent, 'travel')
+    const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(approvedResponse.status, 200)
 
-  await loginUser(agent, 'user')
-  const ownCarStage: Stage = {
-    departure: new Date('2024-06-12T08:00:00.000Z'),
-    arrival: new Date('2024-06-12T18:00:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Hamburg'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    midnightCountries: [],
-    transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
-    cost: {
-      amount: 0, //@ts-ignore
-      currency: { _id: 'EUR' }, //@ts-ignore
-      receipts: [],
-      date: new Date('2024-06-12T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  }
+    await loginUser(agent, 'user')
+    const ownCarStage: Stage = {
+      departure: new Date('2024-06-12T08:00:00.000Z'),
+      arrival: new Date('2024-06-12T18:00:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Hamburg'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      midnightCountries: [],
+      transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
+      cost: {
+        amount: 0, //@ts-ignore
+        currency: { _id: 'EUR' }, //@ts-ignore
+        receipts: [],
+        date: new Date('2024-06-12T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    }
 
-  const stageResponse = await agent
-    .post('/travel/stage')
-    .query({ parentId: createdTravel._id.toString() })
-    .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
-  t.is(stageResponse.status, 200)
+    const stageResponse = await agent
+      .post('/travel/stage')
+      .query({ parentId: createdTravel._id.toString() })
+      .send(withCostPositions(ownCarStage, 'Own car', 'ownCar'))
+    t.is(stageResponse.status, 200)
 
-  const reviewResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
-  t.is(reviewResponse.status, 200)
-  t.is((reviewResponse.body.result as Travel).state, TravelState.IN_REVIEW)
-
-  if (originalVehicleRegistrationSetting) {
-    await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
-  }
+    const reviewResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
+    t.is(reviewResponse.status, 200)
+    t.is((reviewResponse.body.result as Travel).state, TravelState.IN_REVIEW)
+  })
 })
 
 // EXAMINE
@@ -656,9 +657,6 @@ test.serial('POST /approve/travel/withdrawApproval rejects approval and allows f
 //   }
 // })
 
-test.serial.after.always('Restore travel settings and drop DB connection', async () => {
-  if (originalVehicleRegistrationSetting) {
-    await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
-  }
+test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })

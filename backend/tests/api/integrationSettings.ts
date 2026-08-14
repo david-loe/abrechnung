@@ -3,6 +3,7 @@ import { shutdown } from '../../app.js'
 import { IntegrationSettingsPayload } from '../../integrations/settings.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
 import createAgent, { loginUser } from '../_agent.js'
+import { withSettingsRestore } from '../_settings.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'admin')
@@ -19,20 +20,22 @@ test.serial('GET /admin/integrationSettings/lumpSums returns the stored schedule
 })
 
 test.serial('POST /admin/integrationSettings/lumpSums persists updated schedule settings', async (t) => {
-  const settings: NewIntegrationSettings = {
-    integrationKey: 'lumpSums',
-    schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } },
-    settings: {}
-  }
+  await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'lumpSums' }, async () => {
+    const settings: NewIntegrationSettings = {
+      integrationKey: 'lumpSums',
+      schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } },
+      settings: {}
+    }
 
-  const postRes = await agent.post('/admin/integrationSettings/lumpSums').send(settings)
+    const postRes = await agent.post('/admin/integrationSettings/lumpSums').send(settings)
 
-  t.is(postRes.status, 200)
-  t.deepEqual(postRes.body.result, settings)
+    t.is(postRes.status, 200)
+    t.deepEqual(postRes.body.result, settings)
 
-  const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'lumpSums' }, { __v: 0 }).lean()
-  t.deepEqual(stored?.schedules, { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } })
-  t.deepEqual(stored?.settings, {})
+    const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'lumpSums' }, { __v: 0 }).lean()
+    t.deepEqual(stored?.schedules, { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } })
+    t.deepEqual(stored?.settings, {})
+  })
 })
 
 test.serial('GET /admin/integrationSettings/retentionPolicy/form returns the combined retention schema', async (t) => {
@@ -45,25 +48,27 @@ test.serial('GET /admin/integrationSettings/retentionPolicy/form returns the com
 })
 
 test.serial('POST /admin/integrationSettings/retentionPolicy persists schedule and retention settings together', async (t) => {
-  const settings: NewIntegrationSettings = {
-    integrationKey: 'retentionPolicy',
-    schedules: { apply: { enabled: false, schedule: { type: 'weekly', weekdays: [2, 4], hour: 5, minute: 30 } } },
-    settings: {
-      deleteApprovedTravelAfterXDaysUnused: 11,
-      deleteInWorkReportsAfterXDaysUnused: 12,
-      deleteBookedAfterXDays: 13,
-      mailXDaysBeforeDeletion: 4
+  await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'retentionPolicy' }, async () => {
+    const settings: NewIntegrationSettings = {
+      integrationKey: 'retentionPolicy',
+      schedules: { apply: { enabled: false, schedule: { type: 'weekly', weekdays: [2, 4], hour: 5, minute: 30 } } },
+      settings: {
+        deleteApprovedTravelAfterXDaysUnused: 11,
+        deleteInWorkReportsAfterXDaysUnused: 12,
+        deleteBookedAfterXDays: 13,
+        mailXDaysBeforeDeletion: 4
+      }
     }
-  }
 
-  const postRes = await agent.post('/admin/integrationSettings/retentionPolicy').send(settings)
+    const postRes = await agent.post('/admin/integrationSettings/retentionPolicy').send(settings)
 
-  t.is(postRes.status, 200)
-  t.deepEqual(postRes.body.result, settings)
+    t.is(postRes.status, 200)
+    t.deepEqual(postRes.body.result, settings)
 
-  const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'retentionPolicy' }, { __v: 0 }).lean()
-  t.deepEqual(stored?.schedules, { apply: { enabled: false, schedule: { type: 'weekly', weekdays: [2, 4], hour: 5, minute: 30 } } })
-  t.deepEqual(stored?.settings, settings.settings)
+    const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'retentionPolicy' }, { __v: 0 }).lean()
+    t.deepEqual(stored?.schedules, { apply: { enabled: false, schedule: { type: 'weekly', weekdays: [2, 4], hour: 5, minute: 30 } } })
+    t.deepEqual(stored?.settings, settings.settings)
+  })
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
