@@ -37,9 +37,13 @@ export async function validateDocumentFileReferences(documentFileIds: string[], 
   return ids
 }
 
-export async function claimDocumentFiles(documentFileIds: string[], owner: string | Types.ObjectId) {
-  const ids = await validateDocumentFileReferences(documentFileIds, owner)
+export async function claimDocumentFiles(documentFileIds: string[], owner?: string | Types.ObjectId) {
+  const ids = owner ? await validateDocumentFileReferences(documentFileIds, owner) : uniqueIds(documentFileIds)
   if (ids.length > 0) {
-    await DocumentFile.updateMany({ _id: { $in: ids }, owner }, { $unset: { expiresAt: 1 } })
+    const filter = { _id: { $in: ids }, ...(owner ? { owner } : {}) }
+    const result = await DocumentFile.updateMany(filter, { $unset: { expiresAt: 1 } })
+    if (result.matchedCount !== ids.length) {
+      throw new ValidationClientError('Invalid document file reference.', [{ path: 'documentFileIds', message: 'notAllowed' }])
+    }
   }
 }

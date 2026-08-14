@@ -13,6 +13,7 @@ import { DeleteResult } from 'mongodb'
 import { mongo, Types } from 'mongoose'
 import { PushSubscription } from 'web-push'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
+import { claimDocumentFiles } from '../documentFiles.js'
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
@@ -78,6 +79,7 @@ export class UserController extends Controller {
     request.user.vehicleRegistration = (requestBody.vehicleRegistration ?? []) as unknown as DocumentFile<Types.ObjectId, mongo.Binary>[]
     request.user.markModified('vehicleRegistration')
     const result = await request.user.save()
+    await claimDocumentFiles((requestBody.vehicleRegistration ?? []).map(String), request.user._id)
     return { message: 'alerts.successSaving', result: result }
   }
 
