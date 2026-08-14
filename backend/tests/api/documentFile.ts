@@ -1,10 +1,11 @@
-import { ReceiptSuggestion } from 'abrechnung-common/types.js'
 import test from 'ava'
 import axios from 'axios'
 import { shutdown } from '../../app.js'
 import { logger } from '../../logger.js'
 import ConnectionSettings from '../../models/connectionSettings.js'
 import DocumentFile from '../../models/documentFile.js'
+import Organisation from '../../models/organisation.js'
+import Project from '../../models/project.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { withSettingsRestore } from '../_settings.js'
 
@@ -29,7 +30,12 @@ interface RequestedSuggestionBody {
       strict: boolean
       schema: {
         properties: {
-          cost: { properties: { currencyCode: { pattern?: string; enum?: unknown[] }; positions: Record<string, unknown> } }
+          cost: {
+            properties: {
+              currencyCode: { pattern?: string; enum?: unknown[] }
+              positions: { items: { properties: Record<string, unknown>; required: string[] }; maxItems?: number }
+            }
+          }
           startLocation: { properties: { countryCode: { pattern?: string; enum?: unknown[] } } }
         }
       }
@@ -193,8 +199,13 @@ test.serial('POST /suggestions returns validated OpenAI-compatible JSON', async 
         requestedBodies.push(body as RequestedSuggestionBody)
         requestedAuthorization = config.headers?.Authorization ?? ''
         requestedTimeout = config.timeout ?? 0
-        const schemaName = requestedBodies.at(-1)?.response_format.json_schema.name
-        const suggestion: ReceiptSuggestion =
+        const responseSchema = requestedBodies.at(-1)?.response_format.json_schema
+        const schemaName = responseSchema?.name
+        const vatAccountingEnabled = Object.hasOwn(
+          responseSchema?.schema.properties.cost.properties.positions.items.properties ?? {},
+          'vatRate'
+        )
+        const suggestion: unknown =
           schemaName === 'receipt_stage_suggestion'
             ? {
                 type: 'stage',
@@ -212,8 +223,8 @@ test.serial('POST /suggestions returns validated OpenAI-compatible JSON', async 
                   date: '2026-07-24',
                   currencyCode: 'EUR',
                   positions: [
-                    { description: 'Meal', grossAmount: 10.7, vatRate: 7 },
-                    { description: 'Drinks', grossAmount: 5.9, vatRate: 7 }
+                    { description: 'Meal', grossAmount: 10.7, ...(vatAccountingEnabled ? { vatRate: 7 } : {}) },
+                    { description: 'Drinks', grossAmount: 5.9, ...(vatAccountingEnabled ? { vatRate: 7 } : {}) }
                   ]
                 }
               }
@@ -274,6 +285,29 @@ test.serial('POST /suggestions returns validated OpenAI-compatible JSON', async 
       const countryCodeSchema = stageBody.response_format.json_schema.schema.properties.startLocation.properties.countryCode
       t.is(countryCodeSchema.pattern, '^[A-Z]{2}$')
       t.false(Object.hasOwn(countryCodeSchema, 'enum'))
+
+      const project = await Project.findById(projectId, { organisation: 1 }).lean()
+      if (!project) return t.fail('Project missing')
+      await withSettingsRestore(Organisation, { _id: project.organisation }, async () => {
+        await Organisation.updateOne({ _id: project.organisation }, { $set: { 'accountingSettings.vatAccountingEnabled': false } })
+
+        const noVatResponse = await agent
+          .post('/suggestions')
+          .send({ type: 'expense', reportType: 'Travel', projectId, documentFileIds: [documentFileId] })
+        t.is(noVatResponse.status, 200)
+        t.deepEqual(noVatResponse.body.result.cost.positions, [
+          { description: 'Meal', grossAmount: 10.7, vatRate: 0 },
+          { description: 'Drinks', grossAmount: 5.9, vatRate: 0 }
+        ])
+
+        const noVatBody = requestedBodies[2]
+        t.notRegex(noVatBody.messages[0].content, /\bVAT\b/)
+        const noVatPrompt = JSON.parse(noVatBody.messages[1].content)
+        t.deepEqual(Object.keys(noVatPrompt), ['categories', 'documents'])
+        const noVatPositionsSchema = noVatBody.response_format.json_schema.schema.properties.cost.properties.positions.items
+        t.false(Object.hasOwn(noVatPositionsSchema.properties, 'vatRate'))
+        t.false(noVatPositionsSchema.required.includes('vatRate'))
+      })
 
       await loginUser(agent, 'expenseReport')
       const examinedResponse = await agent
