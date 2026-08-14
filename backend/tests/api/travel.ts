@@ -226,6 +226,31 @@ test.serial('POST /travel/stage', async (t) => {
   }
 })
 
+test.serial('POST /travel/stage allows a single position without description', async (t) => {
+  const existingStage = (travel as Travel).stages[0]
+  const position = existingStage.cost.positions[0]
+  const res = await agent
+    .post('/travel/stage')
+    .query({ parentId: travel._id.toString() })
+    .send({ ...existingStage, cost: { ...existingStage.cost, positions: [{ ...position, description: undefined }] } })
+
+  t.is(res.status, 200)
+  if (res.status === 200) {
+    travel = res.body.result
+  }
+})
+
+test.serial('POST /travel/stage requires descriptions for split positions', async (t) => {
+  const existingStage = (travel as Travel).stages[0]
+  const position = { ...existingStage.cost.positions[0], description: undefined }
+  const res = await agent
+    .post('/travel/stage')
+    .query({ parentId: travel._id.toString() })
+    .send({ ...existingStage, cost: { ...existingStage.cost, positions: [position, { ...position, _id: undefined, grossAmount: 0 }] } })
+
+  t.is(res.status, 422)
+})
+
 const expenses: TravelExpense[] = [
   {
     description: 'Konferenzkosten',

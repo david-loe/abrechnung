@@ -1,5 +1,44 @@
 <template>
   <form @submit.prevent="disabled ? null : emit(mode as 'add', output())">
+    <template
+      v-if="
+        formStage.transport.type !== 'ownCar' ||
+        (formStage.transport.type == 'ownCar' && formStage.cost.receipts && formStage.cost.receipts.length > 0)
+      ">
+      <div class="mb-3">
+        <label for="stageFormFile" class="form-label me-2">
+          {{ t('labels.receipts') }}
+          <span v-if="hasCostAmount" class="text-danger">*</span>
+        </label>
+        <InfoPoint :text="t('info.receipts')" />
+        <FileUpload
+          ref="fileUpload"
+          id="stageFormFile"
+          v-model="formStage.cost.receipts"
+          :disabled="disabled"
+          :required="hasCostAmount"
+          :endpointPrefix="endpointPrefix"
+          :ownerId="ownerId"
+          :report-id="reportId"
+          source-report-type="Travel"
+          :suggestion-failed="suggestionFailed"
+          :suggestion-processing="suggestingFromReceipts"
+          receipt-processing
+          @processing="(processing: boolean) => (uploadingReceipts = processing)"
+          @receipts-changing="cancelReceiptSuggestion"
+          @receipts-ready="suggestFromReceipts"
+          :showUploadFromPhone="props.showUploadFromPhone" />
+      </div>
+    </template>
+
+    <label for="stageFormTransport" class="form-label">
+      {{ t('labels.transport') }}
+      <span class="text-danger">*</span>
+    </label>
+    <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required @change="dirtyFields.add('transport')">
+      <option v-for="transport of transportTypes" :value="transport" :key="transport">{{ t('labels.' + transport) }}</option>
+    </select>
+
     <div class="mb-3">
       <div class="row">
         <div class="col">
@@ -68,14 +107,6 @@
           :withSpecialLumpSumInput="true" />
       </div>
     </div>
-
-    <label for="stageFormTransport" class="form-label">
-      {{ t('labels.transport') }}
-      <span class="text-danger">*</span>
-    </label>
-    <select class="form-select mb-3" v-model="formStage.transport.type" id="stageFormTransport" :disabled="disabled" required @change="dirtyFields.add('transport')">
-      <option v-for="transport of transportTypes" :value="transport" :key="transport">{{ t('labels.' + transport) }}</option>
-    </select>
 
     <template v-if="formStage.midnightCountries && formStage.midnightCountries.length > 0">
       <label for="stageFormMidnightCountries" class="form-label me-2">
@@ -184,39 +215,9 @@
       :disabled="disabled"
       :required="true"
       :amount-required="false"
+      :require-single-position-description="false"
       @user-change="dirtyFields.add('positions')"
       :own-car="formStage.transport.type === 'ownCar'" />
-
-    <template
-      v-if="
-        formStage.transport.type !== 'ownCar' ||
-        (formStage.transport.type == 'ownCar' && formStage.cost.receipts && formStage.cost.receipts.length > 0)
-      ">
-      <div class="mb-3">
-        <label for="stageFormFile" class="form-label me-2">
-          {{ t('labels.receipts') }}
-          <span v-if="hasCostAmount" class="text-danger">*</span>
-        </label>
-        <InfoPoint :text="t('info.receipts')" />
-        <FileUpload
-          ref="fileUpload"
-          id="stageFormFile"
-          v-model="formStage.cost.receipts"
-          :disabled="disabled"
-          :required="hasCostAmount"
-          :endpointPrefix="endpointPrefix"
-          :ownerId="ownerId"
-          :report-id="reportId"
-          source-report-type="Travel"
-          :suggestion-failed="suggestionFailed"
-          :suggestion-processing="suggestingFromReceipts"
-          receipt-processing
-          @processing="(processing: boolean) => (uploadingReceipts = processing)"
-          @receipts-changing="cancelReceiptSuggestion"
-          @receipts-ready="suggestFromReceipts"
-          :showUploadFromPhone="props.showUploadFromPhone" />
-      </div>
-    </template>
 
     <label for="stageFormPurpose" class="form-label me-2">
       {{ t('labels.purpose') }}
