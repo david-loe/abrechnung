@@ -78,6 +78,7 @@
     "travelLengthToShort": "Le voyage est plus court que la durée minimale configurée.",
     "unauthorized": "Non autorisé!",
     "unsavedChanges": "Vous avez des modifications non enregistrées. Êtes-vous sûr de vouloir quitter la page ?",
+    "unsavedChangesWillBeLost": "Vous avez des modifications non enregistrées. Voulez-vous tout de même changer d'entrée ? Vos modifications seront perdues.",
     "ValidationError": "Erreur de validation",
     "warningReapply": "En soumettant à nouveau, vous risquez de perdre des entrées en dehors de la nouvelle fenêtre de temps demandée.",
     "wrongPassword": "Mot de passe incorrect",
