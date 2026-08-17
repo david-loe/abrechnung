@@ -76,6 +76,7 @@
     "travelLengthToShort": "El viaje es más corto que la duración mínima configurada.",
     "unauthorized": "¡No autorizado!",
     "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres dejar la página?",
+    "unsavedChangesWillBeLost": "Tienes cambios sin guardar. ¿Quieres cambiar de entrada de todos modos? Tus cambios se perderán.",
     "ValidationError": "Error de validación",
     "warningReapply": "Al solicitar de nuevo podrían perderse registros que estén fuera del período solicitado nuevamente.",
     "wrongPassword": "Contraseña incorrecta",

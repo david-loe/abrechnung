@@ -76,6 +76,7 @@
     "travelLengthToShort": "Die Reise ist kürzer als die konfigurierte Mindestdauer.",
     "unauthorized": "Nicht autorisiert!",
     "unsavedChanges": "Du hast ungespeicherte Änderungen. Bist du sicher, dass du die Seite verlassen willst?",
+    "unsavedChangesWillBeLost": "Du hast ungespeicherte Änderungen. Möchtest du den Eintrag trotzdem wechseln? Deine Änderungen gehen dabei verloren.",
     "ValidationError": "Validierungsfehler",
     "warningReapply": "Durch das neu beantragen gehen eventuell Einträge verloren, die außerhalb des neubeantragten Zeitfensters liegen.",
     "wrongPassword": "Falsches Passwort",

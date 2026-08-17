@@ -236,14 +236,14 @@
           type="button"
           :class="'btn btn-light' + (showPrevButton ? '' : ' invisible')"
           :title="t('labels.previous')"
-          @click="$emit('prev')">
+          @click="navigate('prev')">
           <i class="bi bi-chevron-left"></i>
         </button>
         <button
           type="button"
           :class="'btn btn-light ms-2' + (showNextButton ? '' : ' invisible')"
           :title="t('labels.next')"
-          @click="$emit('next')">
+          @click="navigate('next')">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
@@ -269,6 +269,7 @@ import {
 import { datetimeToDate, datetimeToDateString, getDayList, multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 import { formatter } from '../../../formatter'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
@@ -311,6 +312,7 @@ const { t } = useI18n()
 const fileUploadRef = useTemplateRef('fileUpload')
 
 const formStage = ref(input())
+const { confirmNavigation, resetInitialValue } = useUnsavedChangesGuard(formStage)
 const hasCostAmount = computed(() =>
   formStage.value.cost.positions.some(({ grossAmount }) => Number.isFinite(grossAmount) && grossAmount !== 0)
 )
@@ -420,6 +422,13 @@ function output() {
   }
   return formStage.value as Partial<Stage<string>>
 }
+function navigate(direction: 'next' | 'prev') {
+  if (!confirmNavigation(t('alerts.unsavedChangesWillBeLost'))) {
+    return
+  }
+  if (direction === 'next') emit('next')
+  else emit('prev')
+}
 function input() {
   const stage = { ...defaultStage(), ...props.stage }
   if (stage.transport?.type !== 'ownCar' && stage.cost.positions.length === 0) {
@@ -433,6 +442,7 @@ watch(
   () => {
     clear()
     formStage.value = input()
+    resetInitialValue()
   }
 )
 watch(

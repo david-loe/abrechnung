@@ -91,14 +91,14 @@
           type="button"
           :class="'btn btn-light' + (showPrevButton ? '' : ' invisible')"
           :title="t('labels.previous')"
-          @click="emit('prev')">
+          @click="navigate('prev')">
           <i class="bi bi-chevron-left"></i>
         </button>
         <button
           type="button"
           :class="'btn btn-light ms-2' + (showNextButton ? '' : ' invisible')"
           :title="t('labels.next')"
-          @click="emit('next')">
+          @click="navigate('next')">
           <i class="bi bi-chevron-right"></i>
         </button>
       </div>
@@ -111,6 +111,7 @@ import { baseCurrency, ProjectSimple, TravelExpense } from 'abrechnung-common/ty
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import DateInput from '../../elements/DateInput.vue'
@@ -144,6 +145,7 @@ const props = defineProps({
 })
 
 const formExpense = ref(input())
+const { confirmNavigation, resetInitialValue } = useUnsavedChangesGuard(formExpense)
 const fileUploadRef = useTemplateRef('fileUpload')
 
 function defaultExpense() {
@@ -165,12 +167,20 @@ function input() {
 function output() {
   return formExpense.value
 }
+function navigate(direction: 'next' | 'prev') {
+  if (!confirmNavigation(t('alerts.unsavedChangesWillBeLost'))) {
+    return
+  }
+  if (direction === 'next') emit('next')
+  else emit('prev')
+}
 
 watch(
   () => props.expense,
   () => {
     clear()
     formExpense.value = input()
+    resetInitialValue()
   }
 )
 </script>

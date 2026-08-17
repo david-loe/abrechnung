@@ -76,6 +76,7 @@
     "travelLengthToShort": "The travel is shorter than the configured minimum duration.",
     "unauthorized": "Unauthorized!",
     "unsavedChanges": "You have unsaved changes. Are you sure you want to leave this page?",
+    "unsavedChangesWillBeLost": "You have unsaved changes. Do you want to switch entries anyway? Your changes will be lost.",
     "ValidationError": "Validation Error",
     "warningReapply": "By reapplying, entries may get lost which then lie outside the reapplied time window.",
     "wrongPassword": "Wrong Password",
