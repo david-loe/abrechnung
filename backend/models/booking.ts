@@ -15,8 +15,10 @@ import Formatter from 'abrechnung-common/utils/formatter.js'
 import {
   getBaseCurrencyAmount,
   getCostPositionBaseCurrencyAmount,
+  getCostPositionBaseCurrencyVatAmount,
   getCostPositionVatAmount,
   multiplyAmount,
+  multiplyAmountAndRound,
   refNumberToString,
   roundAmount,
   subtractAmounts,
@@ -197,10 +199,11 @@ export async function calculateBookings(
   ) {
     const project = projectContext(position.project)
     const grossAmount = allocateRoundedProjectAmount(project, multiplyAmount(getCostPositionBaseCurrencyAmount(cost, position), factor))
-    const vatAmount = getCostPositionVatAmount(
-      { grossAmount, vatRate: position.vatRate },
-      project.vatAccountingEnabled && position.kind !== 'ownCar'
-    )
+    const vatAccountingEnabled = project.vatAccountingEnabled && position.kind !== 'ownCar'
+    const vatAmount =
+      typeof position.vatAmountOverride === 'number'
+        ? multiplyAmountAndRound(getCostPositionBaseCurrencyVatAmount(cost, position, vatAccountingEnabled), factor)
+        : getCostPositionVatAmount({ grossAmount, vatRate: position.vatRate }, vatAccountingEnabled)
     const netAmount = roundAmount(subtractAmounts(grossAmount, vatAmount))
     addAccountAmount(project, ledgerAccount, netAmount)
     if (vatAmount !== 0) {

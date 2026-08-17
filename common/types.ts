@@ -489,6 +489,7 @@ export interface CostPosition<idType extends _id = _id> {
   description?: string | null
   grossAmount: number
   vatRate: number
+  vatAmountOverride?: number
   project: ProjectSimple<idType>
   category: Category<idType>
   _id?: idType

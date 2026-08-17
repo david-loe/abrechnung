@@ -14,6 +14,7 @@ import {
   textColors,
   UserSimple
 } from 'abrechnung-common/types.js'
+import { roundAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
@@ -68,6 +69,7 @@ export function positionedCostObject(options: { required: boolean; receiptsRequi
             description: { type: String, trim: true },
             grossAmount: { type: Number, min: opts.min, required: true },
             vatRate: { type: Number, min: 0, max: 100, required: true, default: 0 },
+            vatAmountOverride: { type: Number },
             project: { type: Schema.Types.ObjectId, ref: 'Project', required: true },
             category: { type: Schema.Types.ObjectId, ref: 'Category', required: true }
           }
@@ -127,8 +129,8 @@ export async function getCostPositionValidationIssues(
   const categoriesById = new Map(categories.map((category) => [category._id.toString(), category]))
   const organisationIds = Array.from(new Set(projects.map(({ organisation }) => organisation.toString())))
   const organisations = await mongoose
-    .model<{ _id: Types.ObjectId; accountingSettings: { vatRates: { rate: number }[] } }>('Organisation')
-    .find({ _id: { $in: organisationIds } }, { 'accountingSettings.vatRates.rate': 1 })
+    .model<{ _id: Types.ObjectId; accountingSettings: { vatAccountingEnabled: boolean; vatRates: { rate: number }[] } }>('Organisation')
+    .find({ _id: { $in: organisationIds } }, { 'accountingSettings.vatAccountingEnabled': 1, 'accountingSettings.vatRates.rate': 1 })
     .lean()
   const organisationsById = new Map(organisations.map((organisation) => [organisation._id.toString(), organisation]))
 
@@ -155,6 +157,22 @@ export async function getCostPositionValidationIssues(
         const allowedRates = accountingSettings?.vatRates.map(({ rate }) => rate) ?? [0]
         if (!allowedRates.includes(position.vatRate)) {
           issues.push({ path: `${prefix}.vatRate`, message: 'invalidVatRate' })
+        }
+        if (typeof position.vatAmountOverride === 'number') {
+          const hasValidPrecision = roundAmount(position.vatAmountOverride) === position.vatAmountOverride
+          const isWithinGrossAmount =
+            position.grossAmount >= 0
+              ? position.vatAmountOverride >= 0 && position.vatAmountOverride <= position.grossAmount
+              : position.vatAmountOverride <= 0 && position.vatAmountOverride >= position.grossAmount
+          if (
+            !accountingSettings?.vatAccountingEnabled ||
+            position.kind === 'ownCar' ||
+            position.vatRate === 0 ||
+            !hasValidPrecision ||
+            !isWithinGrossAmount
+          ) {
+            issues.push({ path: `${prefix}.vatAmountOverride`, message: 'invalidVatAmountOverride' })
+          }
         }
       }
 

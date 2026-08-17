@@ -288,13 +288,20 @@ export function getEffectiveCostPositionVatRate(position: Pick<CostPosition, 'va
   return vatAccountingEnabled ? position.vatRate : 0
 }
 
-export function getCostPositionVatAmount(position: Pick<CostPosition, 'grossAmount' | 'vatRate'>, vatAccountingEnabled: boolean) {
+export function getCostPositionVatAmount(
+  position: Pick<CostPosition, 'grossAmount' | 'vatRate' | 'vatAmountOverride'>,
+  vatAccountingEnabled: boolean
+) {
   const vatRate = getEffectiveCostPositionVatRate(position, vatAccountingEnabled)
   if (vatRate === 0) return 0
+  if (typeof position.vatAmountOverride === 'number') return roundAmount(position.vatAmountOverride)
   return roundAmount(new Big(position.grossAmount).times(vatRate).div(new Big(100).plus(vatRate)).toNumber())
 }
 
-export function getCostPositionNetAmount(position: Pick<CostPosition, 'grossAmount' | 'vatRate'>, vatAccountingEnabled: boolean) {
+export function getCostPositionNetAmount(
+  position: Pick<CostPosition, 'grossAmount' | 'vatRate' | 'vatAmountOverride'>,
+  vatAccountingEnabled: boolean
+) {
   return roundAmount(subtractAmounts(position.grossAmount, getCostPositionVatAmount(position, vatAccountingEnabled)))
 }
 
@@ -304,6 +311,16 @@ export function getCostPositionBaseCurrencyAmount(
 ) {
   if (idDocumentToId(cost.currency) === baseCurrency._id) return position.grossAmount
   return cost.exchangeRate ? multiplyAmountAndRound(position.grossAmount, cost.exchangeRate.rate) : 0
+}
+
+export function getCostPositionBaseCurrencyVatAmount(
+  cost: Pick<Cost, 'currency' | 'exchangeRate'>,
+  position: Pick<CostPosition, 'grossAmount' | 'vatRate' | 'vatAmountOverride'>,
+  vatAccountingEnabled: boolean
+) {
+  const vatAmount = getCostPositionVatAmount(position, vatAccountingEnabled)
+  if (idDocumentToId(cost.currency) === baseCurrency._id) return vatAmount
+  return cost.exchangeRate ? multiplyAmountAndRound(vatAmount, cost.exchangeRate.rate) : 0
 }
 
 export function getCostBaseCurrencyAmount(cost: Pick<Cost, 'currency' | 'exchangeRate' | 'positions'>) {
