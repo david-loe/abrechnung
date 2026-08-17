@@ -7,6 +7,67 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"WorkerJobState": {
+				"type": "string",
+				"enum": [
+					"waiting",
+					"delayed",
+					"active",
+					"completed",
+					"failed"
+				]
+			},
+			"WorkerJobSummary": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"integrationKey": {
+						"type": "string"
+					},
+					"operation": {
+						"type": "string"
+					},
+					"state": {
+						"$ref": "#/components/schemas/WorkerJobState"
+					},
+					"timestamp": {
+						"type": "number",
+						"format": "double"
+					},
+					"processedOn": {
+						"type": "number",
+						"format": "double"
+					},
+					"finishedOn": {
+						"type": "number",
+						"format": "double"
+					},
+					"attemptsMade": {
+						"type": "number",
+						"format": "double"
+					},
+					"attempts": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"integrationKey",
+					"operation",
+					"state",
+					"timestamp",
+					"attemptsMade",
+					"attempts"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Meta": {
 				"properties": {
 					"count": {
@@ -31,6 +92,107 @@
 					"page",
 					"limit",
 					"countPages"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Record_WorkerJobState.number_": {
+				"properties": {
+					"waiting": {
+						"type": "number",
+						"format": "double"
+					},
+					"delayed": {
+						"type": "number",
+						"format": "double"
+					},
+					"active": {
+						"type": "number",
+						"format": "double"
+					},
+					"completed": {
+						"type": "number",
+						"format": "double"
+					},
+					"failed": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"waiting",
+					"delayed",
+					"active",
+					"completed",
+					"failed"
+				],
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"WorkerJobCounts": {
+				"$ref": "#/components/schemas/Record_WorkerJobState.number_"
+			},
+			"WorkerJobDetails": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"integrationKey": {
+						"type": "string"
+					},
+					"operation": {
+						"type": "string"
+					},
+					"state": {
+						"$ref": "#/components/schemas/WorkerJobState"
+					},
+					"timestamp": {
+						"type": "number",
+						"format": "double"
+					},
+					"processedOn": {
+						"type": "number",
+						"format": "double"
+					},
+					"finishedOn": {
+						"type": "number",
+						"format": "double"
+					},
+					"attemptsMade": {
+						"type": "number",
+						"format": "double"
+					},
+					"attempts": {
+						"type": "number",
+						"format": "double"
+					},
+					"payload": {},
+					"result": {},
+					"failedReason": {
+						"type": "string"
+					},
+					"stacktrace": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"id",
+					"name",
+					"integrationKey",
+					"operation",
+					"state",
+					"timestamp",
+					"attemptsMade",
+					"attempts",
+					"payload",
+					"result",
+					"stacktrace"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -284,9 +446,6 @@
 						},
 						"type": "object"
 					},
-					"isActive": {
-						"type": "boolean"
-					},
 					"script": {
 						"type": "string"
 					},
@@ -323,9 +482,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -335,6 +491,12 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"isActive": {
+						"type": "boolean"
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -1082,6 +1244,9 @@
 										"subunit": {
 											"type": "string"
 										},
+										"_id": {
+											"type": "string"
+										},
 										"name": {
 											"properties": {
 												"kk": {
@@ -1104,9 +1269,6 @@
 												}
 											},
 											"type": "object"
-										},
-										"_id": {
-											"type": "string"
 										},
 										"symbol": {
 											"type": "string"
@@ -1185,6 +1347,9 @@
 											},
 											"type": "object"
 										},
+										"_id": {
+											"type": "string"
+										},
 										"name": {
 											"properties": {
 												"kk": {
@@ -1207,9 +1372,6 @@
 												}
 											},
 											"type": "object"
-										},
-										"_id": {
-											"type": "string"
 										}
 									},
 									"type": "object"
@@ -1743,19 +1905,6 @@
 							{
 								"items": {
 									"properties": {
-										"data": {
-											"anyOf": [
-												{
-													"type": "string"
-												},
-												{
-													"$ref": "#/components/schemas/Binary"
-												}
-											]
-										},
-										"name": {
-											"type": "string"
-										},
 										"type": {
 											"type": "string",
 											"enum": [
@@ -1773,6 +1922,19 @@
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
 											]
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/Binary"
+												}
+											]
+										},
+										"name": {
+											"type": "string"
 										}
 									},
 									"type": "object"
@@ -1849,9 +2011,6 @@
 														}
 													]
 												},
-												"name": {
-													"type": "string"
-												},
 												"_id": {
 													"anyOf": [
 														{
@@ -1861,6 +2020,9 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -2057,6 +2219,9 @@
 													},
 													"type": "object"
 												},
+												"_id": {
+													"type": "string"
+												},
 												"name": {
 													"properties": {
 														"kk": {
@@ -2079,9 +2244,6 @@
 														}
 													},
 													"type": "object"
-												},
-												"_id": {
-													"type": "string"
 												}
 											},
 											"type": "object"
@@ -2101,6 +2263,9 @@
 												"subunit": {
 													"type": "string"
 												},
+												"_id": {
+													"type": "string"
+												},
 												"name": {
 													"properties": {
 														"kk": {
@@ -2123,9 +2288,6 @@
 														}
 													},
 													"type": "object"
-												},
-												"_id": {
-													"type": "string"
 												},
 												"symbol": {
 													"type": "string"
@@ -2160,6 +2322,16 @@
 						},
 						"type": "object"
 					},
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					},
 					"token": {
 						"anyOf": [
 							{
@@ -2180,16 +2352,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"_id": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-							}
-						]
 					}
 				},
 				"type": "object"
@@ -2207,19 +2369,6 @@
 							{
 								"items": {
 									"properties": {
-										"data": {
-											"anyOf": [
-												{
-													"type": "string"
-												},
-												{
-													"$ref": "#/components/schemas/Binary"
-												}
-											]
-										},
-										"name": {
-											"type": "string"
-										},
 										"type": {
 											"type": "string",
 											"enum": [
@@ -2237,6 +2386,19 @@
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
 											]
+										},
+										"data": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"$ref": "#/components/schemas/Binary"
+												}
+											]
+										},
+										"name": {
+											"type": "string"
 										}
 									},
 									"type": "object"
@@ -2307,9 +2469,6 @@
 														}
 													]
 												},
-												"name": {
-													"type": "string"
-												},
 												"_id": {
 													"anyOf": [
 														{
@@ -2319,6 +2478,9 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -2515,6 +2677,9 @@
 													},
 													"type": "object"
 												},
+												"_id": {
+													"type": "string"
+												},
 												"name": {
 													"properties": {
 														"kk": {
@@ -2537,9 +2702,6 @@
 														}
 													},
 													"type": "object"
-												},
-												"_id": {
-													"type": "string"
 												}
 											},
 											"type": "object"
@@ -2559,6 +2721,9 @@
 												"subunit": {
 													"type": "string"
 												},
+												"_id": {
+													"type": "string"
+												},
 												"name": {
 													"properties": {
 														"kk": {
@@ -2581,9 +2746,6 @@
 														}
 													},
 													"type": "object"
-												},
-												"_id": {
-													"type": "string"
 												},
 												"symbol": {
 													"type": "string"
@@ -2618,6 +2780,16 @@
 						},
 						"type": "object"
 					},
+					"_id": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+							}
+						]
+					},
 					"token": {
 						"anyOf": [
 							{
@@ -2638,16 +2810,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"_id": {
-						"anyOf": [
-							{
-								"type": "string"
-							},
-							{
-								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-							}
-						]
 					}
 				},
 				"type": "object",
@@ -5492,19 +5654,6 @@
 									{
 										"items": {
 											"properties": {
-												"data": {
-													"anyOf": [
-														{
-															"type": "string"
-														},
-														{
-															"$ref": "#/components/schemas/Binary"
-														}
-													]
-												},
-												"name": {
-													"type": "string"
-												},
 												"type": {
 													"type": "string",
 													"enum": [
@@ -5522,6 +5671,19 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -5650,19 +5812,6 @@
 									{
 										"items": {
 											"properties": {
-												"data": {
-													"anyOf": [
-														{
-															"type": "string"
-														},
-														{
-															"$ref": "#/components/schemas/Binary"
-														}
-													]
-												},
-												"name": {
-													"type": "string"
-												},
 												"type": {
 													"type": "string",
 													"enum": [
@@ -5680,6 +5829,19 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -6611,9 +6773,6 @@
 											},
 											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
 										"_id": {
 											"anyOf": [
 												{
@@ -6623,6 +6782,9 @@
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
 											]
+										},
+										"name": {
+											"type": "string"
 										}
 									},
 									"type": "object"
@@ -6630,9 +6792,6 @@
 								"type": "array"
 							}
 						]
-					},
-					"name": {
-						"type": "string"
 					},
 					"_id": {
 						"anyOf": [
@@ -6643,6 +6802,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -6803,9 +6965,6 @@
 											},
 											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
 										"_id": {
 											"anyOf": [
 												{
@@ -6815,6 +6974,9 @@
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
 											]
+										},
+										"name": {
+											"type": "string"
 										}
 									},
 									"type": "object"
@@ -6822,9 +6984,6 @@
 								"type": "array"
 							}
 						]
-					},
-					"name": {
-						"type": "string"
 					},
 					"_id": {
 						"anyOf": [
@@ -6835,6 +6994,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					},
 					"advance": {
 						"$ref": "#/components/schemas/MoneyPost"
@@ -7041,9 +7203,6 @@
 											},
 											"type": "object"
 										},
-										"name": {
-											"type": "string"
-										},
 										"_id": {
 											"anyOf": [
 												{
@@ -7053,6 +7212,9 @@
 													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 												}
 											]
+										},
+										"name": {
+											"type": "string"
 										}
 									},
 									"type": "object"
@@ -7111,9 +7273,6 @@
 						},
 						"type": "object"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -7123,6 +7282,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -7938,9 +8100,6 @@
 							}
 						]
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -7950,6 +8109,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -7990,9 +8152,6 @@
 							}
 						]
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -8002,6 +8161,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -9039,12 +9201,6 @@
 					},
 					"logo": {
 						"properties": {
-							"data": {
-								"type": "string"
-							},
-							"name": {
-								"type": "string"
-							},
 							"type": {
 								"type": "string",
 								"enum": [
@@ -9054,6 +9210,12 @@
 								]
 							},
 							"_id": {
+								"type": "string"
+							},
+							"data": {
+								"type": "string"
+							},
+							"name": {
 								"type": "string"
 							}
 						},
@@ -9106,9 +9268,6 @@
 												"accountHolder": {
 													"type": "string"
 												},
-												"name": {
-													"type": "string"
-												},
 												"_id": {
 													"anyOf": [
 														{
@@ -9118,6 +9277,9 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -9245,9 +9407,6 @@
 					"subfolderPath": {
 						"type": "string"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -9257,6 +9416,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -9316,9 +9478,6 @@
 												"accountHolder": {
 													"type": "string"
 												},
-												"name": {
-													"type": "string"
-												},
 												"_id": {
 													"anyOf": [
 														{
@@ -9328,6 +9487,9 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -9455,9 +9617,6 @@
 					"subfolderPath": {
 						"type": "string"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -9467,6 +9626,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -9700,9 +9862,6 @@
 					"email": {
 						"type": "string"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -9712,6 +9871,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -10326,19 +10488,6 @@
 									{
 										"items": {
 											"properties": {
-												"data": {
-													"anyOf": [
-														{
-															"type": "string"
-														},
-														{
-															"$ref": "#/components/schemas/Binary"
-														}
-													]
-												},
-												"name": {
-													"type": "string"
-												},
 												"type": {
 													"type": "string",
 													"enum": [
@@ -10356,6 +10505,19 @@
 															"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 														}
 													]
+												},
+												"data": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"$ref": "#/components/schemas/Binary"
+														}
+													]
+												},
+												"name": {
+													"type": "string"
 												}
 											},
 											"type": "object"
@@ -12640,6 +12802,9 @@
 					"subunit": {
 						"type": "string"
 					},
+					"_id": {
+						"type": "string"
+					},
 					"name": {
 						"properties": {
 							"kk": {
@@ -12662,9 +12827,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"_id": {
-						"type": "string"
 					},
 					"symbol": {
 						"type": "string"
@@ -13182,6 +13344,9 @@
 						},
 						"type": "object"
 					},
+					"_id": {
+						"type": "string"
+					},
 					"name": {
 						"properties": {
 							"kk": {
@@ -13204,9 +13369,6 @@
 							}
 						},
 						"type": "object"
-					},
-					"_id": {
-						"type": "string"
 					}
 				},
 				"type": "object"
@@ -13687,9 +13849,6 @@
 							}
 						]
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -13699,6 +13858,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -14865,9 +15027,6 @@
 					"identifier": {
 						"type": "string"
 					},
-					"name": {
-						"type": "string"
-					},
 					"_id": {
 						"anyOf": [
 							{
@@ -14877,6 +15036,9 @@
 								"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 							}
 						]
+					},
+					"name": {
+						"type": "string"
 					}
 				},
 				"type": "object"
@@ -14903,6 +15065,214 @@
 		"contact": {}
 	},
 	"paths": {
+		"/admin/jobs": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"jobNames": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"counts": {
+											"$ref": "#/components/schemas/WorkerJobCounts"
+										},
+										"meta": {
+											"$ref": "#/components/schemas/Meta"
+										},
+										"data": {
+											"items": {
+												"$ref": "#/components/schemas/WorkerJobSummary"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"jobNames",
+										"counts",
+										"meta",
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Worker Jobs"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "state",
+						"required": false,
+						"schema": {
+							"$ref": "#/components/schemas/WorkerJobState"
+						}
+					},
+					{
+						"in": "query",
+						"name": "name",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "id",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "double",
+							"type": "number"
+						}
+					},
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 25,
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/admin/jobs/{jobId}": {
+			"get": {
+				"operationId": "GetOne",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/WorkerJobDetails"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Worker Jobs"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "jobId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/jobs/{jobId}/retry": {
+			"post": {
+				"operationId": "Retry",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/WorkerJobSummary"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Worker Jobs"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "jobId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/admin/webhook": {
 			"get": {
 				"operationId": "Get",
