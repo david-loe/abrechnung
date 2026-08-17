@@ -51,8 +51,6 @@ export async function sendReportViaMail(
   const { snapshot } = createOperationServices()
   const { connectionSettings, displaySettings, printerSettings, travelSettings } = snapshot
   if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
-    // the report is JSON-serialized through the integration queue, so
-    // project.organisation is a plain id string here — never access ._id on it
     const org = await Organisation.findOne({ _id: idDocumentToId(report.project.organisation) })
     if (org?.reportEmail) {
       const mailClient = await getMailClient()
