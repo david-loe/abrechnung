@@ -1,4 +1,4 @@
-import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
+import { BaseCurrencyMoneyNotNull, DocumentFileType, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
 import { getBaseCurrencyAmount } from 'abrechnung-common/utils/scripts.js'
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
@@ -10,6 +10,14 @@ import DocumentFile from './models/documentFile.js'
 interface ReqDocument extends Omit<IDocumentFile, 'data'> {
   data?: Buffer<ArrayBufferLike>
 }
+
+export async function saveDocumentFile(
+  file: { name: string; type: DocumentFileType; data: Buffer<ArrayBufferLike> },
+  owner: string | Types.ObjectId
+) {
+  return await new DocumentFile({ ...file, owner: new Types.ObjectId(owner) }).save()
+}
+
 type FileHandleOptions = { checkOwner?: boolean; owner?: string | Types.ObjectId; multiple?: boolean }
 export function documentFileHandler(pathToFiles: string[], options: FileHandleOptions = {}) {
   const opts = { checkOwner: true, multiple: true, ...options }
@@ -59,7 +67,9 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
           if (buffer) {
             reqDoc.owner = fileOwner
             reqDoc.data = buffer
-            const dbDoc = (await new DocumentFile(reqDoc).save()).toObject() as Partial<IDocumentFile>
+            const dbDoc = (
+              await saveDocumentFile({ name: reqDoc.name, type: reqDoc.type, data: buffer }, fileOwner)
+            ).toObject() as Partial<IDocumentFile>
             dbDoc.data = undefined
             reqDoc.data = undefined
             Object.assign(reqDoc, dbDoc)

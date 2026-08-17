@@ -25,6 +25,20 @@ https://github.com/david-loe/abrechnung/assets/56305409/8b31b6a1-e6c4-4bd9-bb76-
 
 #### [REST-API](https://david-loe.github.io/abrechnung/)
 
+### MCP für LLM-Clients
+
+Das Backend stellt unter `${VITE_BACKEND_URL}/mcp` einen Remote-MCP-Server über Streamable HTTP bereit. Unterstützt wird ausschließlich MCP `2026-07-28`; ältere MCP-Transporte und Protokollstände werden abgewiesen.
+
+Die Aktivierung erfolgt in den Verbindungseinstellungen:
+
+1. OIDC mit Server, Client-ID und Client-Secret konfigurieren.
+2. Unter `MCP OAuth` die Audience eintragen, für die der OIDC-Provider Access Tokens ausstellt.
+3. Beim OIDC-Provider den Scope `mcp` und die MCP-Resource `${VITE_BACKEND_URL}/mcp` konfigurieren.
+
+Ein Access Token muss vom konfigurierten OIDC-Issuer signiert sein, die konfigurierte Audience und den Scope `mcp` enthalten. Sein `sub` wird ausschließlich über `User.fk.oidc` einem aktiven Abrechnung-Benutzer mit `access.user` zugeordnet; es gibt keine automatische Benutzeranlage oder Verknüpfung.
+
+Die angebotenen Tools richten sich nach den bestehenden Berechtigungen des Benutzers. Dazu gehören eigene Reise- und Vorschussanträge sowie Auslagenabrechnungen, Belege als Base64-Upload, PDF-Abruf und – bei entsprechendem Special Access – Genehmigung, Prüfung, Anlage für andere Benutzer und Buchungsexporte. Schreibende beziehungsweise irreversible Tools sind mit MCP-Annotations gekennzeichnet, damit Clients vor ihrer Ausführung eine Bestätigung einholen können.
+
 ## Pauschalbeträge
 
 [pauschbetrag-api](https://github.com/david-loe/pauschbetrag-api)

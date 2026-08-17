@@ -175,6 +175,11 @@ export const connectionSettingsSchema = () =>
           },
           label: 'OIDC',
           description: `scope: 'openid email profile' - Callback URL: ${ENV.VITE_BACKEND_URL}/auth/oidc/callback`
+        },
+        mcp: {
+          type: { audience: { type: String, trim: true, required: true, label: 'Audience' } },
+          label: 'MCP OAuth',
+          description: `Resource: ${ENV.VITE_BACKEND_URL}/mcp - Required scope: 'mcp'`
         }
       },
 
