@@ -1,8 +1,9 @@
-import { Advance, BookingExportRow, Category, ExpenseReport, User } from 'abrechnung-common/types.js'
+import { Advance, BookingExportRow, Category, ExpenseReport, ExpenseReportState, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import ExchangeRate from '../../models/exchangeRate.js'
+import ExpenseReportModel from '../../models/expenseReport.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
@@ -88,8 +89,27 @@ test.serial('foreign expense report rejects an expense in a different currency',
   t.is(response.status, 422)
 })
 
+test.serial('foreign expense report cannot complete review without a recalculated exchange rate', async (t) => {
+  const reviewResponse = await agent.post('/expenseReport/underExamination').send({ _id: report._id })
+  t.is(reviewResponse.status, 200)
+
+  await ExpenseReportModel.updateOne(
+    { _id: report._id },
+    { $set: { exchangeRateDate: new Date('1999-12-31T00:00:00.000Z'), exchangeRate: 0.9 } }
+  )
+  try {
+    const completionResponse = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: report._id })
+    t.is(completionResponse.status, 422)
+    t.is(completionResponse.body.errors.exchangeRateDate.message, 'exchangeRateUnavailable')
+
+    const storedReport = await ExpenseReportModel.findById(report._id).lean()
+    t.is(storedReport?.state, ExpenseReportState.IN_REVIEW)
+  } finally {
+    await ExpenseReportModel.updateOne({ _id: report._id }, { $set: { exchangeRateDate: reportDate, exchangeRate: 0.9 } })
+  }
+})
+
 test.serial('foreign expense report books the advance carrying value and exchange difference', async (t) => {
-  await agent.post('/expenseReport/underExamination').send({ _id: report._id })
   await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: report._id })
 
   const response = await requestBookingExport(agent, '/book/expenseReport', [report._id])

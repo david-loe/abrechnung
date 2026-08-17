@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { getAdvances } from '@/components/advance/scripts.js'
+import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
 import { formatter } from '@/formatter.js'
 import { AdvanceSimple, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
 import { onMounted, ref, watch } from 'vue'
@@ -72,12 +72,6 @@ const { t } = useI18n()
 
 const advances = ref([] as AdvanceSimple[])
 
-function matchingCurrency(availableAdvances: AdvanceSimple[]) {
-  if (!props.currency) return availableAdvances
-  const currency = idDocumentToId(props.currency)
-  return availableAdvances.filter((advance) => idDocumentToId(advance.budget.currency) === currency)
-}
-
 // Filter method
 function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
   const term = search.toLowerCase()
@@ -111,7 +105,7 @@ function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
 }
 
 onMounted(async () => {
-  advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
+  advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
   setDefaultAdvances(advances.value)
 })
 
@@ -125,7 +119,7 @@ watch(
         emit('update:modelValue', null)
       }
     }
-    advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
+    advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
     setDefaultAdvances(advances.value)
   }
 )
@@ -145,7 +139,21 @@ watch(
 watch(
   () => props.currency,
   async () => {
-    advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
+    const selectedAdvances = Array.isArray(props.modelValue) ? props.modelValue : props.modelValue ? [props.modelValue] : []
+    const matchingSelection = filterAdvancesByCurrency(selectedAdvances, props.currency)
+    if (matchingSelection.length !== selectedAdvances.length) {
+      if (props.multiple) {
+        emit('update:modelValue', matchingSelection)
+      } else {
+        emit('update:modelValue', matchingSelection[0] ?? null)
+      }
+      if (matchingSelection.length === 0) {
+        setByUser = false
+        defaultFor = { userId: null, projectId: null }
+      }
+    }
+
+    advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
     setDefaultAdvances(advances.value)
   }
 )

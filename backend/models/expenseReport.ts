@@ -160,35 +160,45 @@ schema.pre('validate', async function () {
   if (!this.currency) {
     this.exchangeRateDate = undefined
     this.exchangeRate = undefined
-    return
-  }
-  if (!this.exchangeRateDate) {
-    this.invalidate('exchangeRateDate', 'required')
-  }
-  const currency = idDocumentToId(this.currency).toString()
-  for (const [index, expense] of this.expenses.entries()) {
-    if (idDocumentToId(expense.cost.currency).toString() !== currency) {
-      this.invalidate(`expenses.${index}.cost.currency`, 'reportCurrencyMismatch')
+  } else {
+    if (!this.exchangeRateDate) {
+      this.invalidate('exchangeRateDate', 'required')
+    }
+    const currency = idDocumentToId(this.currency).toString()
+    for (const [index, expense] of this.expenses.entries()) {
+      if (idDocumentToId(expense.cost.currency).toString() !== currency) {
+        this.invalidate(`expenses.${index}.cost.currency`, 'reportCurrencyMismatch')
+      }
+    }
+    const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
+    if (advanceIds.length > 0) {
+      const advances = await model<AdvanceBase<Types.ObjectId>>('Advance')
+        .find({ _id: { $in: advanceIds } }, { 'budget.currency': 1, 'balance.currency': 1 })
+        .lean()
+      if (
+        advances.length !== advanceIds.length ||
+        advances.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)
+      ) {
+        this.invalidate('advances', 'reportCurrencyMismatch')
+      }
     }
   }
-  const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
-  if (advanceIds.length > 0) {
-    const advances = await model<AdvanceBase<Types.ObjectId>>('Advance')
-      .find({ _id: { $in: advanceIds } }, { 'budget.currency': 1, 'balance.currency': 1 })
-      .lean()
-    if (
-      advances.length !== advanceIds.length ||
-      advances.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)
-    ) {
-      this.invalidate('advances', 'reportCurrencyMismatch')
-    }
+
+  await this.calculateExchangeRates()
+  if (
+    !this.historic &&
+    this.isModified('state') &&
+    this.state === ExpenseReportState.REVIEW_COMPLETED &&
+    this.currency &&
+    typeof this.exchangeRate !== 'number'
+  ) {
+    this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
   }
 })
 
 schema.pre('save', async function () {
   await populateAll(this, populates)
 
-  await this.calculateExchangeRates()
   this.addUp = addUp(this) as AddUp<Types.ObjectId, ExpenseReport<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)
