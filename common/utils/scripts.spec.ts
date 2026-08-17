@@ -23,6 +23,7 @@ import {
   escapeRegExp,
   getById,
   getCostGrossAmount,
+  getCostPositionBaseCurrencyVatAmount,
   getCostPositionNetAmount,
   getCostPositionVatAmount,
   getFlagEmoji,
@@ -210,6 +211,37 @@ test('cost position helpers calculate gross, net, and VAT amounts', (t) => {
   t.is(getCostPositionNetAmount(cost.positions[1], true), 9.88)
   t.is(getCostPositionVatAmount(cost.positions[1], false), 0)
   t.is(getCostPositionNetAmount(cost.positions[1], false), 11.76)
+})
+
+test('cost position helpers use a manual VAT amount override', (t) => {
+  const project = createProject('A')
+  const cost = createCost(11.76, project)
+  const position = cost.positions[0]
+  position.vatRate = 19
+  position.vatAmountOverride = 1.87
+
+  t.is(getCostPositionVatAmount(position, true), 1.87)
+  t.is(getCostPositionNetAmount(position, true), 9.89)
+  t.is(getCostPositionBaseCurrencyVatAmount(cost, position, true), 1.87)
+  t.is(getCostPositionVatAmount(position, false), 0)
+  t.is(getCostPositionNetAmount(position, false), 11.76)
+
+  position.grossAmount = -11.76
+  position.vatAmountOverride = -1.87
+  t.is(getCostPositionVatAmount(position, true), -1.87)
+  t.is(getCostPositionNetAmount(position, true), -9.89)
+})
+
+test('base currency VAT helper converts a manual override', (t) => {
+  const project = createProject('A')
+  const cost = createCost(11.76, project)
+  cost.currency = { _id: 'USD', name: { de: 'US-Dollar', en: 'US dollar', fr: '', es: '', ru: '', kk: '' } }
+  cost.exchangeRate = { date: new Date('2024-01-01').toISOString(), rate: 0.92 }
+  const position = cost.positions[0]
+  position.vatRate = 19
+  position.vatAmountOverride = 1.87
+
+  t.is(getCostPositionBaseCurrencyVatAmount(cost, position, true), 1.72)
 })
 
 const resolveProjectId = (entry: FlatAddUp<Id>['project']) => (typeof entry === 'string' ? entry : entry._id)

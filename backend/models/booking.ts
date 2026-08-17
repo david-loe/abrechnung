@@ -15,6 +15,7 @@ import Formatter from 'abrechnung-common/utils/formatter.js'
 import {
   getBaseCurrencyAmount,
   getCostPositionBaseCurrencyAmount,
+  getCostPositionBaseCurrencyVatAmount,
   getCostPositionVatAmount,
   multiplyAmount,
   refNumberToString,
@@ -149,6 +150,7 @@ export async function calculateBookings(
   const accountAmounts = new Map<string, { project: Types.ObjectId; ledgerAccount: Types.ObjectId; amount: number }>()
   const projectTotals = new Map<string, number>()
   const unroundedPositionTotals = new Map<string, number>()
+  const unroundedVatOverrideTotals = new Map<string, number>()
 
   function projectContext(projectValue: unknown) {
     const key = idKey(projectValue, 'booking project')
@@ -174,11 +176,11 @@ export async function calculateBookings(
     projectTotals.set(key, roundAmount(sumAmounts(projectTotals.get(key) ?? 0, amount)))
   }
 
-  function allocateRoundedProjectAmount(project: ProjectAccountingContext, amount: number) {
+  function allocateRoundedProjectAmount(totals: Map<string, number>, project: ProjectAccountingContext, amount: number) {
     const key = project.projectId.toString()
-    const previousTotal = unroundedPositionTotals.get(key) ?? 0
+    const previousTotal = totals.get(key) ?? 0
     const total = sumAmounts(previousTotal, amount)
-    unroundedPositionTotals.set(key, total)
+    totals.set(key, total)
     return subtractAmounts(roundAmount(total), roundAmount(previousTotal))
   }
 
@@ -196,11 +198,20 @@ export async function calculateBookings(
     factor = 1
   ) {
     const project = projectContext(position.project)
-    const grossAmount = allocateRoundedProjectAmount(project, multiplyAmount(getCostPositionBaseCurrencyAmount(cost, position), factor))
-    const vatAmount = getCostPositionVatAmount(
-      { grossAmount, vatRate: position.vatRate },
-      project.vatAccountingEnabled && position.kind !== 'ownCar'
+    const grossAmount = allocateRoundedProjectAmount(
+      unroundedPositionTotals,
+      project,
+      multiplyAmount(getCostPositionBaseCurrencyAmount(cost, position), factor)
     )
+    const vatAccountingEnabled = project.vatAccountingEnabled && position.kind !== 'ownCar'
+    const vatAmount =
+      typeof position.vatAmountOverride === 'number'
+        ? allocateRoundedProjectAmount(
+            unroundedVatOverrideTotals,
+            project,
+            multiplyAmount(getCostPositionBaseCurrencyVatAmount(cost, position, vatAccountingEnabled), factor)
+          )
+        : getCostPositionVatAmount({ grossAmount, vatRate: position.vatRate }, vatAccountingEnabled)
     const netAmount = roundAmount(subtractAmounts(grossAmount, vatAmount))
     addAccountAmount(project, ledgerAccount, netAmount)
     if (vatAmount !== 0) {

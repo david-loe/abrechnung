@@ -31,7 +31,7 @@
         </div>
         <div v-if="vatEnabled(position)" class="col-md-3">
           <label class="form-label">{{ t('labels.vatRate') }} <span class="text-danger">*</span></label>
-          <select v-model.number="position.vatRate" class="form-select" required :disabled="disabled" @change="changed">
+          <select v-model.number="position.vatRate" class="form-select" required :disabled="disabled" @change="vatRateChanged(position)">
             <option v-for="rate in vatRates(position)" :key="rate" :value="rate">{{ rate }} %</option>
           </select>
         </div>
@@ -52,11 +52,35 @@
           <CategorySelector v-model="position.category" :report-type="reportType" :disabled="disabled" required @update:model-value="changed" />
         </div>
       </div>
-      <div v-if="vatEnabled(position)" class="d-flex align-items-center mt-2">
-        <small class="text-secondary tnum">
-          {{ t('labels.netAmount') }}: {{ money(getCostPositionNetAmount(position, vatEnabled(position))) }} ·
-          {{ t('labels.vatAmount') }}: {{ money(getCostPositionVatAmount(position, vatEnabled(position))) }}
-        </small>
+      <div v-if="vatEnabled(position)" class="d-flex align-items-center gap-1 mt-2">
+        <small class="text-secondary tnum"> {{ t('labels.netAmount') }}: {{ money(getCostPositionNetAmount(position, true)) }} · </small>
+        <template v-if="editedVatPosition === position">
+          <label class="visually-hidden" :for="`vatAmount-${position._id || index}`">{{ t('labels.vatAmount') }}</label>
+          <div class="input-group input-group-sm w-auto">
+            <span class="input-group-text">{{ t('labels.vatAmount') }}</span>
+            <input
+              :id="`vatAmount-${position._id || index}`"
+              v-model.number="vatAmountDraft"
+              type="number"
+              step="0.01"
+              :min="Math.min(0, position.grossAmount)"
+              :max="Math.max(0, position.grossAmount)"
+              class="form-control tnum"
+              required
+              @input="saveVatAmountOverride(position)" >
+          </div>
+          <button type="button" class="btn btn-sm btn-link py-0" @click="resetVatAmountOverride(position)">{{ t('labels.reset') }}</button>
+        </template>
+        <template v-else>
+          <small class="text-secondary tnum">{{ t('labels.vatAmount') }}: {{ money(getCostPositionVatAmount(position, true)) }}</small>
+          <button
+            v-if="!disabled && position.vatRate !== 0"
+            type="button"
+            class="btn btn-sm btn-link py-0"
+            @click="editVatAmount(position)">
+            {{ t('labels.edit') }}
+          </button>
+        </template>
       </div>
     </div>
     <button
@@ -72,7 +96,7 @@
 <script setup lang="ts">
 import { Category, CostPosition, Currency, idDocumentToId, ProjectSimple } from 'abrechnung-common/types.js'
 import { getCostPositionNetAmount, getCostPositionVatAmount } from 'abrechnung-common/utils/scripts.js'
-import { PropType, watch } from 'vue'
+import { PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
@@ -93,6 +117,8 @@ const props = defineProps({
   requireSinglePositionDescription: { type: Boolean, default: true }
 })
 const emit = defineEmits<{ 'update:modelValue': [CostPosition<string>[]] }>()
+const editedVatPosition = ref<CostPosition<string>>()
+const vatAmountDraft = ref(0)
 
 function defaultCategory() {
   const categories = APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? []
@@ -119,9 +145,12 @@ function ensurePosition() {
   const positions = props.modelValue.map((position) => {
     const category = position.category ?? defaultCategory()
     const vatRate = position.kind === 'ownCar' || !vatRates(position).includes(position.vatRate) ? 0 : position.vatRate
-    if (category === position.category && vatRate === position.vatRate) return position
+    const clearVatOverride = typeof position.vatAmountOverride === 'number' && (!vatEnabled(position) || vatRate === 0)
+    if (category === position.category && vatRate === position.vatRate && !clearVatOverride) return position
     changedPosition = true
-    return { ...position, category: category as Category<string>, vatRate }
+    const normalizedPosition = { ...position, category: category as Category<string>, vatRate }
+    if (clearVatOverride) delete normalizedPosition.vatAmountOverride
+    return normalizedPosition
   })
   if (changedPosition) emit('update:modelValue', positions)
 }
@@ -131,7 +160,28 @@ function changed() {
 }
 function amountChanged(position: CostPosition<string>) {
   if (!props.amountRequired && !Number.isFinite(position.grossAmount)) position.grossAmount = 0
+  clearVatAmountOverride(position)
   changed()
+}
+function vatRateChanged(position: CostPosition<string>) {
+  clearVatAmountOverride(position)
+  changed()
+}
+function editVatAmount(position: CostPosition<string>) {
+  editedVatPosition.value = position
+  vatAmountDraft.value = getCostPositionVatAmount(position, true)
+}
+function saveVatAmountOverride(position: CostPosition<string>) {
+  position.vatAmountOverride = vatAmountDraft.value
+  changed()
+}
+function resetVatAmountOverride(position: CostPosition<string>) {
+  clearVatAmountOverride(position)
+  changed()
+}
+function clearVatAmountOverride(position: CostPosition<string>) {
+  delete position.vatAmountOverride
+  if (editedVatPosition.value === position) editedVatPosition.value = undefined
 }
 function addPosition() {
   emit('update:modelValue', [...props.modelValue, createPosition()])
@@ -162,7 +212,12 @@ function vatRates(position: CostPosition<string>) {
 }
 function setProject(position: CostPosition<string>, project: ProjectSimple<string>) {
   position.project = project
-  if (position.kind === 'ownCar' || !vatRates(position).includes(position.vatRate)) position.vatRate = 0
+  if (position.kind === 'ownCar' || !vatRates(position).includes(position.vatRate)) {
+    position.vatRate = 0
+    clearVatAmountOverride(position)
+  } else if (!vatEnabled(position)) {
+    clearVatAmountOverride(position)
+  }
   changed()
 }
 function money(amount: number) {

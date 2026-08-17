@@ -560,7 +560,7 @@ test.serial('GET /travel/report', async (t) => {
 
 // BOOK
 
-test.serial('POST /book/travel/bookingExportPackage', async (t) => {
+test.serial('POST /book/travel/bookingExportPackage cumulatively allocates mixed cent amounts and VAT overrides', async (t) => {
   const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())
   await TravelModel.collection.updateOne(
     { _id: new Types.ObjectId(idDocumentToId(travel._id).toString()) },
@@ -581,7 +581,8 @@ test.serial('POST /book/travel/bookingExportPackage', async (t) => {
                 kind: 'manual',
                 description: `Mixed cent expense ${position}`,
                 grossAmount: 0.01,
-                vatRate: 0,
+                vatRate: 19,
+                vatAmountOverride: 0.01,
                 project: projectId,
                 category: new Types.ObjectId(idDocumentToId(category._id).toString())
               })),

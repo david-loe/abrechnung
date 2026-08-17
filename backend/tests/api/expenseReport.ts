@@ -529,6 +529,58 @@ test.serial('POST /book/expenseReport/bookingExportPackage', async (t) => {
   t.is(incompletePackage.status, 422)
 })
 
+test.serial('bookable expense report uses a valid manual VAT amount override', async (t) => {
+  await loginUser(agent, 'user')
+  const createResponse = await agent.post('/expenseReport/inWork').send({ name: 'Adjusted VAT report', project: expenseReport.project })
+  t.is(createResponse.status, 200)
+  const adjustedVatReport = createResponse.body.result as ExpenseReportSimple
+
+  try {
+    const cost = createCost(119, { _id: 'EUR' }, new Date('2026-07-01T00:00:00.000Z'), [
+      { name: 'Adjusted VAT.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }
+    ])
+    const position = cost.positions[0] as (typeof cost.positions)[number] & { vatAmountOverride?: number }
+    position.vatRate = 19
+    position.vatAmountOverride = 119.01
+    const invalidExpenseResponse = await postMultipartExpense('/expenseReport/expense', adjustedVatReport._id.toString(), {
+      description: 'Invalid adjusted VAT',
+      cost
+    })
+    t.is(invalidExpenseResponse.status, 422)
+
+    position.vatAmountOverride = 18.99
+    const expenseResponse = await postMultipartExpense('/expenseReport/expense', adjustedVatReport._id.toString(), {
+      description: 'Adjusted VAT',
+      cost
+    })
+    t.is(expenseResponse.status, 200)
+    t.is((expenseResponse.body.result as ExpenseReport).expenses[0].cost.positions[0].vatAmountOverride, 18.99)
+    t.is((await agent.post('/expenseReport/underExamination').send({ _id: adjustedVatReport._id })).status, 200)
+
+    await loginUser(agent, 'expenseReport')
+    t.is((await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: adjustedVatReport._id })).status, 200)
+    const exportResponse = await requestBookingExport(agent, '/book/expenseReport', [adjustedVatReport._id])
+    t.is(exportResponse.status, 200)
+    const bookings = exportResponse.body.result.bookings as BookingExportRow[]
+    assertBookingsBalanced(t, bookings, 'ExpenseReport')
+    t.deepEqual(
+      bookings
+        .filter(({ side }) => side === 'debit')
+        .map(({ amount }) => amount)
+        .sort((left, right) => left - right),
+      [18.99, 100.01]
+    )
+    t.deepEqual(
+      bookings.filter(({ side }) => side === 'credit').map(({ amount }) => amount),
+      [119]
+    )
+  } finally {
+    await loginUser(agent, 'user')
+    const deleteResponse = await agent.delete('/expenseReport').query({ _id: adjustedVatReport._id.toString() })
+    t.is(deleteResponse.status, 200)
+  }
+})
+
 test.serial('bookable expense report reverses negative net and VAT totals', async (t) => {
   await loginUser(agent, 'user')
   const createResponse = await agent.post('/expenseReport/inWork').send({ name: 'Negative VAT report', project: expenseReport.project })
