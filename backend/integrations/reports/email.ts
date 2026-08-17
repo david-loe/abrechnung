@@ -2,6 +2,7 @@ import {
   Advance,
   ExpenseReport,
   HealthCareCost,
+  idDocumentToId,
   reportIsAdvance,
   reportIsHealthCareCost,
   reportIsTravel,
@@ -50,7 +51,7 @@ export async function sendReportViaMail(
   const { snapshot } = createOperationServices()
   const { connectionSettings, displaySettings, printerSettings, travelSettings } = snapshot
   if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
-    const org = await Organisation.findOne({ _id: report.project.organisation._id })
+    const org = await Organisation.findOne({ _id: idDocumentToId(report.project.organisation) })
     if (org?.reportEmail) {
       const mailClient = await getMailClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
