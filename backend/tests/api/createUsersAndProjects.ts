@@ -5,6 +5,7 @@ import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { BACKEND_CACHE } from '../../db.js'
 import Project from '../../models/project.js'
+import Settings from '../../models/settings.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 
@@ -147,6 +148,39 @@ test.serial('creator can create and list projects but cannot update or delete th
   t.is(attemptedUpdate.status, 200)
   t.not(attemptedUpdate.body.result._id, stored?._id.toString())
   t.is((await Project.findById(stored?._id).lean())?.name, 'Creator Project')
+})
+
+test.serial('creator can list standard projects when project visibility is restricted', async (t) => {
+  const settings = await Settings.findOne()
+  const creator = await User.findOne({ 'fk.ldapauth': 'fry' })
+  t.truthy(settings)
+  t.truthy(creator)
+  if (!settings || !creator) return
+
+  const originalUserCanSeeAllProjects = settings.userCanSeeAllProjects
+  const originalCreateAccess = creator.access['create/usersAndProjects']
+
+  try {
+    settings.userCanSeeAllProjects = false
+    await settings.save()
+
+    await loginUser(agent, 'user')
+    const creatorList = await agent.get('/project').query({ filterJSON: Base64.encode(JSON.stringify({ identifier: projectIdentifier })) })
+    t.is(creatorList.status, 200)
+    t.is(creatorList.body.data.length, 1)
+
+    creator.access['create/usersAndProjects'] = false
+    await creator.save()
+
+    const unauthorizedList = await agent.get('/project')
+    t.is(unauthorizedList.status, 401)
+    t.is(unauthorizedList.body.name, 'alerts.unauthorized')
+  } finally {
+    settings.userCanSeeAllProjects = originalUserCanSeeAllProjects
+    await settings.save()
+    creator.access['create/usersAndProjects'] = originalCreateAccess
+    await creator.save()
+  }
 })
 
 test.serial.after.always('Drop DB Connection', async () => {

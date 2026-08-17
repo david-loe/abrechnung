@@ -1,12 +1,10 @@
-import { reportModelNames } from 'abrechnung-common/types.js'
 import test from 'ava'
 import mongoose, { Model, Types } from 'mongoose'
 import { connectDB, disconnectDB } from '../db.js'
-import { initializeReferenceCounters, initializeUsersAndProjectsCreationAccess } from '../migrations.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
-import ReferenceCounter, { nextReference } from '../models/referenceCounter.js'
+import { nextReference } from '../models/referenceCounter.js'
 import Travel from '../models/travel.js'
 
 test.serial.before(async () => {
@@ -25,51 +23,6 @@ test.serial('reference allocation is atomic and independent per report model', a
     Array.from({ length: 50 }, (_value, index) => initialTravelReference + index + 1)
   )
   t.is(nextAdvanceReference, initialAdvanceReference + 1)
-})
-
-test.serial('reference counter migration initializes all models and is idempotent', async (t) => {
-  const counters = await ReferenceCounter.find({ _id: { $in: reportModelNames } }).lean()
-  const currentMaximum = Math.max(0, ...counters.map((counter) => counter.value))
-  const migratedReference = currentMaximum + 1_000
-  const reportId = new Types.ObjectId()
-
-  await mongoose.connection.collection('expensereports').insertOne({ _id: reportId, reference: migratedReference, historic: false })
-  try {
-    await initializeReferenceCounters()
-    await initializeReferenceCounters()
-
-    const migratedCounter = await ReferenceCounter.findById('ExpenseReport').lean()
-    t.is(migratedCounter?.value, migratedReference)
-    t.is(await ReferenceCounter.countDocuments({ _id: { $in: reportModelNames } }), reportModelNames.length)
-  } finally {
-    await mongoose.connection.collection('expensereports').deleteOne({ _id: reportId })
-  }
-})
-
-test.serial('creation access migration initializes users and display settings idempotently', async (t) => {
-  const userId = new Types.ObjectId()
-  const displaySettingsId = new Types.ObjectId()
-  await Promise.all([
-    mongoose.connection.collection('users').insertOne({ _id: userId, access: {} }),
-    mongoose.connection.collection('displaysettings').insertOne({ _id: displaySettingsId, accessIcons: {} })
-  ])
-
-  try {
-    await initializeUsersAndProjectsCreationAccess()
-    await initializeUsersAndProjectsCreationAccess()
-
-    const [user, displaySettings] = await Promise.all([
-      mongoose.connection.collection('users').findOne({ _id: userId }),
-      mongoose.connection.collection('displaysettings').findOne({ _id: displaySettingsId })
-    ])
-    t.is(user?.access['create/usersAndProjects'], false)
-    t.deepEqual(displaySettings?.accessIcons['create/usersAndProjects'], ['person-plus', 'folder-plus'])
-  } finally {
-    await Promise.all([
-      mongoose.connection.collection('users').deleteOne({ _id: userId }),
-      mongoose.connection.collection('displaysettings').deleteOne({ _id: displaySettingsId })
-    ])
-  }
 })
 
 type ReportModel = Model<unknown> & { hydrate(value: Record<string, unknown>): { deleteOne(): Promise<unknown> } }

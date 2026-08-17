@@ -243,23 +243,26 @@ const buttons = {
     reset: { type: 'button', resets: true, buttonLabel: t('labels.cancel'), columns: { container: 6 }, secondary: true }
   }
 }
-const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchema }>(`${props.endpoint}/form`)).ok?.data, {
-  buttons0: buttons,
-  buttons1: buttons
-})
+const formSchema = (await API.getter<{ [key: string]: VueformSchema }>(`${props.endpoint}/form`)).ok?.data ?? {}
+const { fk, loseAccessAt, ...generalSchema } = formSchema
+const schema = props.createOnly
+  ? Object.assign({}, generalSchema, { fk, loseAccessAt, buttons0: buttons })
+  : Object.assign({}, formSchema, { buttons0: buttons, buttons1: buttons })
 if (!props.createOnly && schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
 }
-const tabs = {
-  tab0: {
-    label: t('labels.general'),
-    elements: ['name', 'email', ...(props.createOnly ? ['employeeId'] : []), 'additionalDetails', 'projects', 'settings', 'buttons0']
-  },
-  tab1: {
-    label: props.createOnly ? 'Login' : `Login & ${t('labels.access')}`,
-    elements: ['fk', ...(props.createOnly ? [] : ['access']), 'loseAccessAt', 'buttons1']
-  }
-}
+const tabs = props.createOnly
+  ? undefined
+  : {
+      tab0: {
+        label: t('labels.general'),
+        elements: ['name', 'email', 'employeeId', 'additionalDetails', 'projects', 'settings', 'buttons0']
+      },
+      tab1: {
+        label: `Login & ${t('labels.access')}`,
+        elements: ['fk', 'access', 'loseAccessAt', 'buttons1']
+      }
+    }
 </script>
 
 <style></style>
