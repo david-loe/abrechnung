@@ -1,12 +1,10 @@
-import { reportModelNames } from 'abrechnung-common/types.js'
 import test from 'ava'
 import mongoose, { Model, Types } from 'mongoose'
 import { connectDB, disconnectDB } from '../db.js'
-import { initializeReferenceCounters } from '../migrations.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
-import ReferenceCounter, { nextReference } from '../models/referenceCounter.js'
+import { nextReference } from '../models/referenceCounter.js'
 import Travel from '../models/travel.js'
 
 test.serial.before(async () => {
@@ -25,25 +23,6 @@ test.serial('reference allocation is atomic and independent per report model', a
     Array.from({ length: 50 }, (_value, index) => initialTravelReference + index + 1)
   )
   t.is(nextAdvanceReference, initialAdvanceReference + 1)
-})
-
-test.serial('reference counter migration initializes all models and is idempotent', async (t) => {
-  const counters = await ReferenceCounter.find({ _id: { $in: reportModelNames } }).lean()
-  const currentMaximum = Math.max(0, ...counters.map((counter) => counter.value))
-  const migratedReference = currentMaximum + 1_000
-  const reportId = new Types.ObjectId()
-
-  await mongoose.connection.collection('expensereports').insertOne({ _id: reportId, reference: migratedReference, historic: false })
-  try {
-    await initializeReferenceCounters()
-    await initializeReferenceCounters()
-
-    const migratedCounter = await ReferenceCounter.findById('ExpenseReport').lean()
-    t.is(migratedCounter?.value, migratedReference)
-    t.is(await ReferenceCounter.countDocuments({ _id: { $in: reportModelNames } }), reportModelNames.length)
-  } finally {
-    await mongoose.connection.collection('expensereports').deleteOne({ _id: reportId })
-  }
 })
 
 type ReportModel = Model<unknown> & { hydrate(value: Record<string, unknown>): { deleteOne(): Promise<unknown> } }

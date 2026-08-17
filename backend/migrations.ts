@@ -33,6 +33,20 @@ export async function initializeReferenceCounters() {
   )
 }
 
+export async function initializeUsersAndProjectsCreationAccess() {
+  await Promise.all([
+    mongoose.connection
+      .collection('users')
+      .updateMany({ 'access.create/usersAndProjects': { $exists: false } }, { $set: { 'access.create/usersAndProjects': false } }),
+    mongoose.connection
+      .collection('displaysettings')
+      .updateMany(
+        { 'accessIcons.create/usersAndProjects': { $exists: false } },
+        { $set: { 'accessIcons.create/usersAndProjects': ['person-plus', 'folder-plus'] } }
+      )
+  ])
+}
+
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
   if (settings?.migrateFrom) {
@@ -345,6 +359,10 @@ export async function checkForMigrations() {
       await mongoose.connection
         .collection('ledgeraccounts')
         .updateOne({ identifier: '1200' }, { $setOnInsert: { identifier: '1200', name: 'Bank' } }, { upsert: true })
+    }
+    if (semver.lte(migrateFrom, '2.7.0')) {
+      logger.info('Apply migration from v2.7.0: add user and project creation access')
+      await initializeUsersAndProjectsCreationAccess()
     }
     settings.migrateFrom = undefined
     await settings.save()

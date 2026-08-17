@@ -25,6 +25,7 @@ export default {
     'book/expenseReport': ['coin', 'bank'] as string[],
     'book/healthCareCost': ['hospital', 'bank'] as string[],
     'book/travel': ['airplane', 'bank'] as string[],
+    'create/usersAndProjects': ['person-plus', 'folder-plus'] as string[],
     user: ['card-list'] as string[]
   },
   reportTypeIcons: {
