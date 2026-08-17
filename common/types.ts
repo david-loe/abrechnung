@@ -906,6 +906,20 @@ export const accesses = [
 ] as const
 export type Access = (typeof accesses)[number]
 
+export const actionAccesses = [
+  'approve/advance',
+  'approve/travel',
+  'examine/travel',
+  'examine/expenseReport',
+  'examine/healthCareCost',
+  'book/advance',
+  'book/travel',
+  'book/expenseReport',
+  'book/healthCareCost'
+] as const satisfies readonly Access[]
+export type ActionAccess = (typeof actionAccesses)[number]
+export type ActionCounts = Record<ActionAccess, number>
+
 export const meals = ['breakfast', 'lunch', 'dinner'] as const
 export type Meal = (typeof meals)[number]
 

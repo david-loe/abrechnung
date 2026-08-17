@@ -144,6 +144,7 @@ schema.post('save', async function () {
   }
 })
 
+schema.index({ historic: 1, state: 1, project: 1 })
 schema.index(
   { name: 'text', 'comments.text': 'text', 'expenses.description': 'text' },
   { weights: { name: 10, 'expenses.description': 6, 'comments.text': 3 } }

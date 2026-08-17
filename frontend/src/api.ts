@@ -2,6 +2,7 @@ import { GETResponse, SETResponse } from 'abrechnung-common/types.js'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
 import ENV from './env.js'
+import { eventBus } from './eventBus.js'
 import i18n from './i18n.js'
 import { logger } from './logger.js'
 import { purgeSession, sessionState } from './session.js'
@@ -63,6 +64,7 @@ class API {
     try {
       const res = await axios.post(`${ENV.VITE_BACKEND_URL}/${endpoint}`, data, Object.assign({ withCredentials: true }, config))
       if (showAlert) this.addAlert({ title: i18n.global.t(res.data.message), type: 'success' })
+      eventBus.dispatchEvent(new CustomEvent('api-mutation-succeeded', { detail: { endpoint, method: 'POST' } }))
       return { ok: (res.data as SETResponse<T>).result }
     } catch (error: unknown) {
       return this.#handleError(error, showAlert)
@@ -83,6 +85,7 @@ class API {
     try {
       const res = await axios.delete(`${ENV.VITE_BACKEND_URL}/${endpoint}`, { params: params, withCredentials: true })
       if (showAlert.success) this.addAlert({ message: '', title: i18n.global.t('alerts.successDeleting'), type: 'success' })
+      eventBus.dispatchEvent(new CustomEvent('api-mutation-succeeded', { detail: { endpoint, method: 'DELETE' } }))
       if (res.data.result) {
         return res.data.result
       }
