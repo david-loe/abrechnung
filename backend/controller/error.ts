@@ -48,6 +48,11 @@ export class NotImplementedError extends ClientError {
   name = 'alerts.notImplemented'
 }
 
+export class UpstreamServiceError extends ClientError {
+  status = 502
+  name = 'alerts.upstreamServiceError'
+}
+
 export class ReadOnlyError extends ClientError {
   status = 503
   name = 'alerts.isReadOnly'

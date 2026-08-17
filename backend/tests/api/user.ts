@@ -2,6 +2,7 @@ import { AuthContext, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import DocumentFile from '../../models/documentFile.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -117,6 +118,25 @@ test.serial('POST /user/vehicleRegistration', async (t) => {
   }
   const res2 = await agent.get('/documentFile').query({ _id: (res.body.result as User).vehicleRegistration?.[0]._id })
   t.is(res2.status, 200, 'GET /documentFile')
+})
+
+test.serial('POST /user/vehicleRegistration claims a temporary upload', async (t) => {
+  const upload = await agent
+    .post('/documentFile')
+    .attach('file', 'tests/files/dummy.pdf', { filename: 'phone-upload.pdf', contentType: 'application/pdf' })
+  t.is(upload.status, 201)
+  const documentFileId = upload.body.result._id as string
+  t.truthy((await DocumentFile.findById(documentFileId).select('+expiresAt').lean())?.expiresAt)
+
+  const response = await agent
+    .post('/user/vehicleRegistration')
+    .field('vehicleRegistration[0][_id]', documentFileId)
+    .field('vehicleRegistration[0][name]', 'phone-upload.pdf')
+    .field('vehicleRegistration[0][type]', 'application/pdf')
+  t.is(response.status, 200)
+
+  const storedDocument = await DocumentFile.findById(documentFileId).select('+expiresAt').lean()
+  t.is(storedDocument?.expiresAt, undefined)
 })
 
 test.serial('POST /user/vehicleRegistration allows clearing all files', async (t) => {

@@ -22,7 +22,10 @@ import { getLanguageFromNavigator } from '@/i18n'
 en.vueform.elements.list.add = '+ Add'
 de.vueform.elements.list.add = '+ Hinzufügen'
 
-const keysToExclude = new Set(['loseAccessAt', 'script'])
+const keysToExclude = ['loseAccessAt', 'script']
+const setKeysToExclude = new Set(keysToExclude)
+const keysToExcludeOnlyUndefined = ['maxTokens', 'maxPromptOcrCharacters', 'apiKey']
+const setKeysToExcludeOnlyUndefined = new Set([...keysToExclude, ...keysToExcludeOnlyUndefined])
 
 // biome-ignore lint/suspicious/noExplicitAny: to complex typing
 function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set<string> = new Set()) {
@@ -30,7 +33,7 @@ function deepReplace(obj: any, search: any, replacement: any, keysToExclude: Set
     if (!keysToExclude.has(key) && obj[key] === search) {
       obj[key] = replacement
     } else if (typeof obj[key] === 'object' && !(obj[key] instanceof File)) {
-      deepReplace(obj[key], search, replacement)
+      deepReplace(obj[key], search, replacement, keysToExclude)
     }
   }
 }
@@ -57,7 +60,7 @@ export default defineConfig({
   displayMessages: false,
   endpoints: {},
   beforeSend(form$: VueformElement) {
-    deepReplace(form$.data, null, undefined, keysToExclude)
-    deepReplace(form$.data, '', undefined, keysToExclude)
+    deepReplace(form$.data, '', null, setKeysToExclude)
+    deepReplace(form$.data, null, undefined, setKeysToExcludeOnlyUndefined)
   }
 })

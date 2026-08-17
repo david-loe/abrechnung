@@ -1,5 +1,5 @@
 import { Readable } from 'node:stream'
-import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
+import { Body, Delete, Get, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Validator } from 'abrechnung-common/report/validator.js'
 import {
   BookingExportPackageRequest,
@@ -15,8 +15,9 @@ import {
 } from 'abrechnung-common/types.js'
 import { mongo, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
+import { claimDocumentFiles, referencedDocumentFileIds, validateDocumentFileReferences } from '../documentFiles.js'
 import { createOperationServices } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
+import { checkIfUserIsProjectSupervisor } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
@@ -68,21 +69,20 @@ export class HealthCareCostController extends Controller {
   }
 
   @Post('expense')
-  @Middlewares(fileHandler.any())
-  @Consumes('multipart/form-data')
   public async postExpenseToOwn(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    return await this.setterForArrayElement(HealthCareCost, {
+    const receiptIds = referencedDocumentFileIds(requestBody.cost?.receipts)
+    const result = await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
       allowNew: true,
       async checkOldObject(oldObject) {
         if (!oldObject.historic && oldObject.state === State.EDITABLE_BY_OWNER && request.user._id.equals(oldObject.owner._id)) {
-          await documentFileHandler(['cost', 'receipts'])(request)
+          await validateDocumentFileReferences(receiptIds, request.user._id)
           // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
@@ -91,6 +91,8 @@ export class HealthCareCostController extends Controller {
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
+    await claimDocumentFiles(receiptIds, request.user._id)
+    return result
   }
 
   @Delete('expense')
@@ -237,14 +239,14 @@ export class HealthCareCostExamineController extends Controller {
   }
 
   @Post('expense')
-  @Middlewares(fileHandler.any())
-  @Consumes('multipart/form-data')
   public async postExpenseToAny(
     @Query('parentId') parentId: string,
     @Body() requestBody: SetterBody<Expense<Types.ObjectId, mongo.Binary>>,
     @Request() request: AuthenticatedExpressRequest
   ) {
-    return await this.setterForArrayElement(HealthCareCost, {
+    const receiptIds = referencedDocumentFileIds(requestBody.cost?.receipts)
+    let owner: Types.ObjectId | undefined
+    const result = await this.setterForArrayElement(HealthCareCost, {
       requestBody: requestBody as Expense,
       parentId,
       arrayElementKey: 'expenses',
@@ -255,7 +257,8 @@ export class HealthCareCostExamineController extends Controller {
           (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
           checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
         ) {
-          await documentFileHandler(['cost', 'receipts'], { owner: oldObject.owner._id })(request)
+          owner = oldObject.owner._id
+          await validateDocumentFileReferences(receiptIds, owner)
           // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
           oldObject.editor = request.user._id as any
           return true
@@ -264,6 +267,8 @@ export class HealthCareCostExamineController extends Controller {
       },
       sortFn: (a: Expense, b) => new Date(a.cost.date || 0).valueOf() - new Date(b.cost.date || 0).valueOf()
     })
+    if (owner) await claimDocumentFiles(receiptIds, owner)
+    return result
   }
 
   @Delete('expense')

@@ -226,7 +226,7 @@ schema.pre('validate', async function () {
           this.stages.map(({ cost }) => cost),
           'Travel',
           false,
-          true
+          false
         )
       : []
   ])

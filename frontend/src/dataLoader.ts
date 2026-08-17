@@ -22,6 +22,7 @@ import { eventBus } from './eventBus.js'
 import { formatter } from './formatter.js'
 import i18n, { getLanguageFromNavigator } from './i18n.js'
 import { logger } from './logger.js'
+import { disposeReceiptOcr, warmReceiptOcr } from './ocr/index.js'
 import { registerSessionPurgeHandler } from './session.js'
 
 type APP_DATA_REQUIRED_ENDPOINTS =
@@ -58,6 +59,7 @@ class APP_LOADER {
 
   constructor() {
     registerSessionPurgeHandler(() => this.reset())
+    registerSessionPurgeHandler(disposeReceiptOcr)
     eventBus.addEventListener('lastCurrencies-updated', (e) =>
       API.setter('user/settings', { lastCurrencies: (e as CustomEvent).detail.map((c: Currency) => c._id) }, {}, false)
     )
@@ -172,6 +174,12 @@ class APP_LOADER {
             this.data.value = data
             this.loginData.value = data
             this.state.value = 'LOADED'
+            const warmup = () => void warmReceiptOcr().catch((error) => logger.warn('Unable to initialize receipt OCR', error))
+            if (typeof window.requestIdleCallback === 'function') {
+              window.requestIdleCallback(warmup, { timeout: 5_000 })
+            } else {
+              globalThis.setTimeout(warmup, 0)
+            }
           }
         })
       })

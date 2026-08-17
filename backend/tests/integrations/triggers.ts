@@ -9,6 +9,7 @@ import {
 } from '../../integrations/queue.js'
 import { syncIntegrationSchedules } from '../../integrations/scheduler.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
+import { withSettingsRestore } from '../_settings.js'
 
 await connectDB()
 
@@ -51,95 +52,107 @@ test.after.always(async () => {
 })
 
 test.serial('syncIntegrationSchedules upserts repeatable jobs for enabled integration schedules', async (t) => {
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'lumpSums' },
-    { integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } }, settings: {} },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'retentionPolicy' },
-    {
-      integrationKey: 'retentionPolicy',
-      schedules: { apply: { enabled: true, schedule: { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 } } },
-      settings: {
-        deleteApprovedTravelAfterXDaysUnused: 0,
-        deleteInWorkReportsAfterXDaysUnused: 0,
-        deleteBookedAfterXDays: 0,
-        mailXDaysBeforeDeletion: 7
-      }
-    },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
+  await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'lumpSums' }, async () => {
+    await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'retentionPolicy' }, async () => {
+      await IntegrationSettingsModel.findOneAndUpdate(
+        { integrationKey: 'lumpSums' },
+        { integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } }, settings: {} },
+        { upsert: true, returnDocument: 'after', runValidators: true }
+      )
+      await IntegrationSettingsModel.findOneAndUpdate(
+        { integrationKey: 'retentionPolicy' },
+        {
+          integrationKey: 'retentionPolicy',
+          schedules: { apply: { enabled: true, schedule: { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 } } },
+          settings: {
+            deleteApprovedTravelAfterXDaysUnused: 0,
+            deleteInWorkReportsAfterXDaysUnused: 0,
+            deleteBookedAfterXDays: 0,
+            mailXDaysBeforeDeletion: 7
+          }
+        },
+        { upsert: true, returnDocument: 'after', runValidators: true }
+      )
 
-  const { upserts, removedSchedulers } = stubQueue(t)
+      const { upserts, removedSchedulers } = stubQueue(t)
 
-  await syncIntegrationSchedules()
+      await syncIntegrationSchedules()
 
-  t.deepEqual(removedSchedulers, [])
-  t.deepEqual(upserts, [
-    {
-      jobSchedulerId: 'schedule:lumpSums:sync',
-      repeatOpts: { pattern: '0 */6 * * *' },
-      jobTemplate: {
-        name: 'lumpSums.sync',
-        data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
-      }
-    },
-    {
-      jobSchedulerId: 'schedule:retentionPolicy:apply',
-      repeatOpts: { pattern: '15 2 * * 1,3' },
-      jobTemplate: {
-        name: 'retentionPolicy.apply',
-        data: { integrationKey: 'retentionPolicy', operation: 'apply', payload: null },
-        opts: getIntegrationJobRetentionOptions()
-      }
-    }
-  ])
+      t.deepEqual(removedSchedulers, [])
+      t.deepEqual(upserts, [
+        {
+          jobSchedulerId: 'schedule:lumpSums:sync',
+          repeatOpts: { pattern: '0 */6 * * *' },
+          jobTemplate: {
+            name: 'lumpSums.sync',
+            data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
+            opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
+          }
+        },
+        {
+          jobSchedulerId: 'schedule:retentionPolicy:apply',
+          repeatOpts: { pattern: '15 2 * * 1,3' },
+          jobTemplate: {
+            name: 'retentionPolicy.apply',
+            data: { integrationKey: 'retentionPolicy', operation: 'apply', payload: null },
+            opts: getIntegrationJobRetentionOptions()
+          }
+        }
+      ])
+    })
+  })
 })
 
 test.serial('syncIntegrationSchedules removes disabled and obsolete repeatable jobs', async (t) => {
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'lumpSums' },
-    { integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'daily', hour: 1, minute: 0 } } }, settings: {} },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'retentionPolicy' },
-    {
-      integrationKey: 'retentionPolicy',
-      schedules: { apply: { enabled: false, schedule: { type: 'daily', hour: 1, minute: 0 } } },
-      settings: {
-        deleteApprovedTravelAfterXDaysUnused: 0,
-        deleteInWorkReportsAfterXDaysUnused: 0,
-        deleteBookedAfterXDays: 0,
-        mailXDaysBeforeDeletion: 7
-      }
-    },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
+  await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'lumpSums' }, async () => {
+    await withSettingsRestore(IntegrationSettingsModel, { integrationKey: 'retentionPolicy' }, async () => {
+      await IntegrationSettingsModel.findOneAndUpdate(
+        { integrationKey: 'lumpSums' },
+        {
+          integrationKey: 'lumpSums',
+          schedules: { sync: { enabled: true, schedule: { type: 'daily', hour: 1, minute: 0 } } },
+          settings: {}
+        },
+        { upsert: true, returnDocument: 'after', runValidators: true }
+      )
+      await IntegrationSettingsModel.findOneAndUpdate(
+        { integrationKey: 'retentionPolicy' },
+        {
+          integrationKey: 'retentionPolicy',
+          schedules: { apply: { enabled: false, schedule: { type: 'daily', hour: 1, minute: 0 } } },
+          settings: {
+            deleteApprovedTravelAfterXDaysUnused: 0,
+            deleteInWorkReportsAfterXDaysUnused: 0,
+            deleteBookedAfterXDays: 0,
+            mailXDaysBeforeDeletion: 7
+          }
+        },
+        { upsert: true, returnDocument: 'after', runValidators: true }
+      )
 
-  const { upserts, removedSchedulers } = stubQueue(t, {
-    existingSchedulers: [
-      { key: 'schedule:lumpSums:sync', name: 'lumpSums.sync' },
-      { key: 'schedule:retentionPolicy:apply', name: 'retentionPolicy.apply' },
-      { key: 'schedule:legacy:orphan', name: 'legacy.orphan' },
-      { key: 'other:scheduler', name: 'other.scheduler' }
-    ]
+      const { upserts, removedSchedulers } = stubQueue(t, {
+        existingSchedulers: [
+          { key: 'schedule:lumpSums:sync', name: 'lumpSums.sync' },
+          { key: 'schedule:retentionPolicy:apply', name: 'retentionPolicy.apply' },
+          { key: 'schedule:legacy:orphan', name: 'legacy.orphan' },
+          { key: 'other:scheduler', name: 'other.scheduler' }
+        ]
+      })
+
+      await syncIntegrationSchedules()
+
+      t.deepEqual(upserts, [
+        {
+          jobSchedulerId: 'schedule:lumpSums:sync',
+          repeatOpts: { pattern: '0 1 * * *' },
+          jobTemplate: {
+            name: 'lumpSums.sync',
+            data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
+            opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
+          }
+        }
+      ])
+      t.deepEqual(removedSchedulers, ['schedule:retentionPolicy:apply', 'schedule:legacy:orphan'])
+    })
   })
-
-  await syncIntegrationSchedules()
-
-  t.deepEqual(upserts, [
-    {
-      jobSchedulerId: 'schedule:lumpSums:sync',
-      repeatOpts: { pattern: '0 1 * * *' },
-      jobTemplate: {
-        name: 'lumpSums.sync',
-        data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
-      }
-    }
-  ])
-  t.deepEqual(removedSchedulers, ['schedule:retentionPolicy:apply', 'schedule:legacy:orphan'])
 })

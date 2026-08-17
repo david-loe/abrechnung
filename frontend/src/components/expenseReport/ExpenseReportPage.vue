@@ -18,6 +18,7 @@
           :default-project="expenseReport.project"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
+          :report-id="expenseReport._id"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
           :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
@@ -457,15 +458,11 @@ async function completeReview() {
 }
 
 async function postExpense(expense: Partial<Expense>, closeModal = true, showAlert = true) {
-  let headers: Record<string, string> = {}
-  if (expense.cost?.receipts && expense.cost.receipts.length > 0) {
-    headers = { 'Content-Type': 'multipart/form-data' }
-  }
   modalFormIsLoading.value = true
   const result = await API.setter<ExpenseReport<string>>(
     `${props.endpointPrefix}expenseReport/expense`,
     expense,
-    { headers, params: { parentId: expenseReport.value._id } },
+    { params: { parentId: expenseReport.value._id } },
     showAlert
   )
   modalFormIsLoading.value = false

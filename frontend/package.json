@@ -7,12 +7,14 @@
     "./*": "./*"
   },
   "scripts": {
-    "dev": "vite & vue-tsc --noEmit --watch",
-    "build": "vue-tsc --noEmit && vite build && npm run check:bundle",
+    "check:ocr-assets": "node scripts/verify-ocr-assets.mjs",
+    "dev": "npm run check:ocr-assets && vite & vue-tsc --noEmit --watch",
+    "build": "npm run check:ocr-assets && vue-tsc --noEmit && vite build && npm run check:bundle",
     "check:bundle": "node scripts/check-bundle-budgets.mjs",
     "test": "vitest run"
   },
   "dependencies": {
+    "@paddleocr/paddleocr-js": "0.4.2",
     "@popperjs/core": "^2.11.8",
     "@vueform/vueform": "^1.13.13",
     "abrechnung-common": "file:../common",
@@ -23,6 +25,8 @@
     "fflate": "^0.8.3",
     "idb": "^8.0.3",
     "json-editor-vue": "^0.18.1",
+    "onnxruntime-web": "1.24.3",
+    "pdfjs-dist": "6.1.200",
     "qrcode": "^1.5.4",
     "qs": "^6.15.3",
     "simple-code-editor": "^2.1.0",

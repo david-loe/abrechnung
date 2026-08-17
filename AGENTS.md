@@ -18,6 +18,9 @@ Treat this file as a living document: when code, tooling, workflows, commands, o
 - Make focused changes; avoid unrelated refactors.
 - Preserve existing architecture and conventions unless the task requires architectural changes.
 - Performance matters: prefer solutions that keep runtime fast for end users.
+- Settings keep stable required keys; use `null`, not missing keys.
+- Keep defaults at their schema/config consumer
+- `common/data` is initialization-only; runtime settings come from `BACKEND_CACHE`, other data from MongoDB.
 
 ## Execution Rules (Docker-first)
 - Default execution path is Docker Compose from repo root.

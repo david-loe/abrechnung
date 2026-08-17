@@ -25,6 +25,7 @@
           :travelSettings="APP_DATA.travelSettings"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :report-id="travel._id"
           :show-next-button="modalMode === 'edit' && Boolean(tableRef?.getNext((modalObject as Stage), modalObjectType))"
           :show-prev-button="modalMode === 'edit' && Boolean(tableRef?.getPrev((modalObject as Stage), modalObjectType))"
           @add="postStage"
@@ -43,6 +44,7 @@
           :default-project="travel.project"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :report-id="travel._id"
           :show-next-button="modalMode === 'edit' && Boolean(tableRef?.getNext((modalObject as TravelExpense), modalObjectType))"
           :show-prev-button="modalMode === 'edit' && Boolean(tableRef?.getPrev((modalObject as TravelExpense), modalObjectType))"
           @add="postExpense"
@@ -602,15 +604,8 @@ async function completeReview() {
 }
 
 async function postStage(stage: Partial<Stage>) {
-  let headers: { 'Content-Type'?: string } = {}
-  if (stage.cost) {
-    if (stage.cost.receipts) {
-      headers = { 'Content-Type': 'multipart/form-data' }
-    }
-  }
   modalFormIsLoading.value = true
   const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel/stage`, stage, {
-    headers,
     params: { parentId: travel.value._id }
   })
   modalFormIsLoading.value = false
@@ -641,13 +636,8 @@ async function deleteStage(_id?: string) {
 }
 
 async function postExpense(expense: Partial<TravelExpense>) {
-  let headers: { 'Content-Type'?: string } = {}
-  if (expense.cost?.receipts) {
-    headers = { 'Content-Type': 'multipart/form-data' }
-  }
   modalFormIsLoading.value = true
   const result = await API.setter<Travel<string>>(`${props.endpointPrefix}travel/expense`, expense, {
-    headers,
     params: { parentId: travel.value._id }
   })
   modalFormIsLoading.value = false

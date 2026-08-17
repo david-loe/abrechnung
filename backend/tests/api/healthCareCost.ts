@@ -1,9 +1,9 @@
 import { BookingExportRow, Category, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { shutdown } from '../../app.js'
-import { objectToFormFields } from '../../helper.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { uploadPendingReceipts } from '../_documentFile.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -107,15 +107,8 @@ test.serial('POST /healthCareCost/expense', async (t) => {
         date: expense.date
       }
     }
-    let req = agent.post('/healthCareCost/expense').query({ parentId: healthCareCost._id.toString() })
-    for (const entry of objectToFormFields(expenseBody)) {
-      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-        req = req.attach(entry.field, entry.val)
-      } else {
-        req = req.field(entry.field, entry.val)
-      }
-    }
-    const res = await req
+    await uploadPendingReceipts(agent, expenseBody)
+    const res = await agent.post('/healthCareCost/expense').query({ parentId: healthCareCost._id.toString() }).send(expenseBody)
     if (res.status === 200) {
       t.pass()
     } else {

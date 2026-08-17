@@ -1,6 +1,7 @@
 import { Body, Consumes, Delete, Get, Middlewares, Post, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import { Organisation as IOrganisation, locales, OrganisationBankAccount } from 'abrechnung-common/types.js'
 import { mongo, Types } from 'mongoose'
+import { claimDocumentFiles } from '../documentFiles.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
@@ -84,7 +85,12 @@ export class OrganisationAdminController extends Controller {
         { path: 'accountingSettings.payoutAccounts', message: 'missingBankLedgerAccount' }
       ])
     }
-    return await this.setter(Organisation, { requestBody: requestBody as IOrganisation<Types.ObjectId, mongo.Binary>, allowNew: true })
+    const result = await this.setter(Organisation, {
+      requestBody: requestBody as IOrganisation<Types.ObjectId, mongo.Binary>,
+      allowNew: true
+    })
+    if (requestBody.logo?._id) await claimDocumentFiles([requestBody.logo._id])
+    return result
   }
 
   @Post('bulk')
