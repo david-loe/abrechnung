@@ -34,7 +34,7 @@
       :must-sort="mustSort"
       alternating
       :preventContextMenuRow="false"
-      body-item-class-name="text-truncate"
+      :body-item-class-name="bodyItemClassName"
       :style="{ filter: showSettings ? 'blur(3px)' : 'none', transition: 'filter 0.2s ease-in-out' }">
       <template #header="header">{{ header.text ? t(header.text) : '' }}</template>
       <!-- Standard-Slot weiterleiten -->
@@ -62,6 +62,7 @@ const props = defineProps({
   dbKey: { type: String },
   columnsToHide: { type: Array as PropType<string[]>, default: () => [] },
   filterOptions: { type: Array as PropType<FilterOption[]> },
+  fillColumn: { type: String },
   headers: { type: Array as PropType<Header[]>, required: true },
   rowsItems: { type: Array as PropType<number[]>, default: () => [5, 15, 25] },
   rowsPerPage: { type: Number, default: 5 },
@@ -84,6 +85,10 @@ const emits = defineEmits<{
   'expand-row': [number, Item]
   'update-sort': [UpdateSortArgument]
 }>()
+
+function bodyItemClassName(column: string) {
+  return column === props.fillColumn ? 'text-truncate fill-column' : 'text-truncate'
+}
 
 const headers = ref(props.headers)
 for (const columnToHide of props.columnsToHide) {
@@ -134,6 +139,11 @@ function orderHeaders(columnOrder: { value: string; text: string }[]) {
 <style>
 tbody.vue3-easy-data-table__body td {
   max-width: 150px;
+}
+
+tbody.vue3-easy-data-table__body td.fill-column {
+  width: 100%;
+  max-width: 0;
 }
 </style>
 

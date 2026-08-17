@@ -136,11 +136,13 @@
               :rows-items="[12, 50, 100]"
               :rows-per-page="50"
               db-key="expenseTableHealthCareCost"
+              fill-column="description"
               :empty-message="t('alerts.noData.healthCareCost')"
               :headers="[
                 { text: 'labels.date', value: 'cost.date', sortable: true },
                 { text: 'labels.description', value: 'description', sortable: true },
-                { text: 'labels.amount', value: 'cost' }
+                { text: 'labels.amount', value: 'cost' },
+                { text: '', value: 'note', width: 25 }
               ]"
               :items="healthCareCost.expenses"
               body-row-class-name="clickable"
@@ -151,6 +153,11 @@
               </template>
               <template #item-cost="{ cost }: Expense">
                 <div class="text-end tnum">{{ formatter.money(cost) }}</div>
+              </template>
+              <template #item-note="{ note }: Expense">
+                <span v-if="note?.trim()" @click.stop>
+                  <TooltipElement :text="note"><i class="bi bi-chat-left-text"></i></TooltipElement>
+                </span>
               </template>
             </TableElement>
           </div>
