@@ -57,7 +57,8 @@
       "expense": "There are no expenses yet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
       "searchX": "Nothing found for '{X}'.",
-      "stage": "There are no stages yet. Add one!"
+      "stage": "There are no stages yet. Add one!",
+      "stageImportSource": "No other own travel with stages is available."
     },
     "notAllowed": "Not allowed!",
     "notFound": "Not found!",
@@ -72,6 +73,9 @@
     "reviewRequirementsNotMet": "The report cannot be submitted for review yet.",
     "saveAfterRotate": "Image was rotated. Please save to keep this change.",
     "savedExpensesXOfY": "Saved expenses: {X}/{Y}.",
+    "stageImportSameTravel": "Source and target travel must be different.",
+    "stageImportSourceEmpty": "The source travel has no stages.",
+    "stageImportTargetNotEmpty": "Stages can only be imported into a travel without existing stages.",
     "stageOutOfBounds": "At least one stage is outside the approved travel range.",
     "stagesOutOfNewBoundsX": "⚠️ The following stages are outside the new travel dates:\n\n{X}",
     "stagesOverlapping": "Stages are overlapping",
@@ -448,6 +452,7 @@
     "identifier": "Identifier",
     "image": "Image",
     "import": "Import",
+    "importStages": "Import stages",
     "includeBankBookings": "Include bank entries in booking export",
     "includingSpouseRefund": "incl. spouse refunds",
     "inputTaxAccount": "Input tax",

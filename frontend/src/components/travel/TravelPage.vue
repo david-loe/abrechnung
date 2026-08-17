@@ -3,7 +3,9 @@
     <ModalComponent
       ref="modalComp"
       :header="
-        modalMode === 'add'
+        modalObjectType === 'stageImport'
+          ? t('labels.importStages')
+          : modalMode === 'add'
           ? t('labels.newX', { X: t('labels.' + modalObjectType) })
           : t('labels.editX', { X: t('labels.' + modalObjectType) })
       "
@@ -71,6 +73,12 @@
           :travelSettings="APP_DATA.travelSettings"
           :travelCalculator="APP_DATA.travelCalculator"
           @save="postLumpSums"
+          @cancel="resetAndHide" />
+        <StageImportForm
+          v-else-if="modalObjectType === 'stageImport'"
+          :target-travel-id="travel._id"
+          :loading="modalFormIsLoading"
+          @import="importStages"
           @cancel="resetAndHide" />
       </div>
     </ModalComponent>
@@ -170,6 +178,16 @@
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.stage') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.stage') }}</span>
+              </button>
+            </div>
+            <div v-if="endpointPrefix === '' && travel.stages.length === 0" class="col-auto">
+              <button
+                class="btn btn-outline-secondary"
+                @click="isReadOnly ? null : showModal('add', 'stageImport')"
+                :disabled="isReadOnly">
+                <i class="bi bi-copy"></i>
+                <span class="ms-1 d-none d-md-inline">{{ t('labels.importStages') }}</span>
+                <span class="ms-1 d-md-none">{{ t('labels.import') }}</span>
               </button>
             </div>
             <div class="col-auto">
@@ -312,6 +330,7 @@ import {
   TravelRecord,
   TravelRecordType,
   TravelSimple,
+  TravelStageImportRequest,
   TravelState,
   User,
   UserSimple
@@ -339,6 +358,7 @@ import LumpSumEditor from '@/components/travel/elements/LumpSumEditor.vue'
 import TravelTable from '@/components/travel/elements/TravelTable.vue'
 import ExpenseForm from '@/components/travel/forms/ExpenseForm.vue'
 import StageForm from '@/components/travel/forms/StageForm.vue'
+import StageImportForm from '@/components/travel/forms/StageImportForm.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
@@ -352,7 +372,7 @@ import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
 type ModalObject = Partial<TravelRecord> | Partial<TravelSimple> | Gap
-type ModalObjectType = TravelRecordType | 'travel' | 'lumpSums'
+type ModalObjectType = TravelRecordType | 'travel' | 'lumpSums' | 'stageImport'
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -630,6 +650,22 @@ async function postStage(stage: Partial<Stage>) {
     if (modalEl) {
       modalEl.scrollTo({ top: 0, behavior: 'smooth' })
     }
+  }
+}
+
+async function importStages(sourceTravelId: string) {
+  modalFormIsLoading.value = true
+  const request: TravelStageImportRequest<string> = {
+    sourceTravelId,
+    targetTravelId: travel.value._id
+  }
+  const result = await API.setter<Travel<string>>('travel/stage/import', request)
+  modalFormIsLoading.value = false
+  if (result.ok) {
+    setTravel(result.ok)
+    resetAndHide()
+  } else {
+    await getTravel()
   }
 }
 

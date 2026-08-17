@@ -57,7 +57,8 @@
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
       "searchX": "Kein Eintrag für '{X}' gefunden.",
-      "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu."
+      "stage": "Es sind noch keine Etappen vorhanden. Füge eine hinzu.",
+      "stageImportSource": "Es ist keine andere eigene Reise mit Etappen verfügbar."
     },
     "notAllowed": "Nicht erlaubt!",
     "notFound": "Nichts gefunden!",
@@ -72,6 +73,9 @@
     "reviewRequirementsNotMet": "Der Report kann noch nicht zur Prüfung eingereicht werden.",
     "saveAfterRotate": "Bild wurde gedreht. Bitte speichern, damit die Änderung erhalten bleibt.",
     "savedExpensesXOfY": "Auslagen gespeichert: {X}/{Y}.",
+    "stageImportSameTravel": "Quell- und Zielreise dürfen nicht identisch sein.",
+    "stageImportSourceEmpty": "Die Quellreise enthält keine Etappen.",
+    "stageImportTargetNotEmpty": "Etappen können nur in eine Reise ohne vorhandene Etappen importiert werden.",
     "stageOutOfBounds": "Mindestens eine Etappe liegt außerhalb des genehmigten Reisezeitraums.",
     "stagesOutOfNewBoundsX": "⚠️ Die folgenden Etappen liegen außerhalb der neuen Reisedaten:\n\n{X}",
     "stagesOverlapping": "Etappen überschneiden sich zeitlich",
@@ -448,6 +452,7 @@
     "identifier": "Kennung",
     "image": "Bild",
     "import": "Importieren",
+    "importStages": "Etappen importieren",
     "includeBankBookings": "Bankbuchungen im Buchungsexport einschließen",
     "includingSpouseRefund": "inkl. Ehepartner Pauschalen",
     "inputTaxAccount": "Vorsteuer",
