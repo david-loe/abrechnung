@@ -11,6 +11,7 @@ multi-ecosystem-groups:
       - "dependencies"
     commit-message:
       prefix: "chore(deps)"
+    open-pull-requests-limit: 1
 
 updates:
   - package-ecosystem: "github-actions"
@@ -18,7 +19,6 @@ updates:
     patterns:
       - "*"
     multi-ecosystem-group: "all-dependencies"
-    open-pull-requests-limit: 1
     labels:
       - "dependencies"
       - "github-actions"
@@ -36,7 +36,6 @@ updates:
     patterns:
       - "*"
     multi-ecosystem-group: "all-dependencies"
-    open-pull-requests-limit: 1
     labels:
       - "dependencies"
       - "npm"
