@@ -383,6 +383,7 @@ export interface ProjectWithUsers<idType extends _id = _id> extends Project<idTy
 export interface AccountingSettings<idType extends _id = _id> {
   employeeLiabilitiesAccount: LedgerAccount<idType>
   employeeClaimsAccount: LedgerAccount<idType>
+  currencyExchangeDifferencesAccount: LedgerAccount<idType>
   employeeSpecificTemplate?: string | null
   accountMapping: { [key in TravelExpenseItem]: LedgerAccount<idType> }
   vatAccountingEnabled: boolean
@@ -593,7 +594,7 @@ export interface AdvanceBase<idType extends _id = _id> {
   name: string
   budget: MoneyNotNull
   project: Project<idType>
-  balance: BaseCurrencyMoneyNotNull
+  balance: MoneyNotNull
   reason: string
   state: AdvanceState
   receivedOn?: Date | string | null
@@ -602,7 +603,7 @@ export interface AdvanceBase<idType extends _id = _id> {
 }
 
 export interface AdvanceSimple<idType extends _id = _id> extends ReportSimple<idType, AdvanceState>, AdvanceBase<idType> {
-  offsetAgainst: { type: ReportModelNameWithoutAdvance | 'offsetEntry'; reportId?: idType | null; subject: string; amount: number }[]
+  offsetAgainst: (MoneyNotNull & { type: ReportModelNameWithoutAdvance | 'offsetEntry'; reportId?: idType | null; subject: string })[]
 }
 
 export interface Advance<idType extends _id = _id> extends Report<idType, AdvanceState>, AdvanceSimple<idType> {}
@@ -637,6 +638,9 @@ export interface Travel<idType extends _id = _id, dataType extends binary = bina
 export interface ExpenseReportSimple<idType extends _id = _id> extends ReportSimple<idType, ExpenseReportState> {
   addUp: AddUp<idType, ExpenseReport<_id, binary>>[]
   advances: AdvanceBase<idType>[]
+  currency?: Currency | null
+  exchangeRateDate?: Date | string | null
+  exchangeRate?: number | null
 }
 export interface ExpenseReport<idType extends _id = _id, dataType extends binary = binary>
   extends ExpenseReportSimple<idType>,
@@ -981,6 +985,7 @@ export function reportIsExpenseReport(report: any): report is any {
 
 type AddUpBase<idType extends _id = _id> = {
   project: ProjectSimple<idType>
+  currency: Currency
   balance: BaseCurrencyMoneyNotNull
   total: BaseCurrencyMoneyNotNull
   advance: BaseCurrencyMoneyNotNull
@@ -1002,6 +1007,8 @@ export interface AddUpReport {
   expenses: (ExpenseReport | HealthCareCost)['expenses']
   advances: (ExpenseReport | HealthCareCost)['advances']
   project: (ExpenseReport | HealthCareCost)['project']
+  currency?: ExpenseReport['currency']
+  exchangeRate?: ExpenseReport['exchangeRate']
 }
 
 export type AddUp<idType extends _id = _id, T extends AddUpTravel | AddUpReport = AddUpTravel | AddUpReport> = T extends AddUpTravel

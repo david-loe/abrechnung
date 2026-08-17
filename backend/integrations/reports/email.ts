@@ -4,11 +4,12 @@ import {
   HealthCareCost,
   idDocumentToId,
   reportIsAdvance,
+  reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel,
   Travel
 } from 'abrechnung-common/types.js'
-import { getTotalBalance } from 'abrechnung-common/utils/scripts.js'
+import { getTotalBalance, getTotalBaseCurrencyBalance } from 'abrechnung-common/utils/scripts.js'
 import { Types } from 'mongoose'
 import { createFormatter, createOperationServices } from '../../factory.js'
 import i18n from '../../i18n.js'
@@ -63,7 +64,9 @@ export async function sendReportViaMail(
         subject = subject + i18n.t('labels.advance', { lng })
         totalSum = formatter.baseCurrency(report.budget.amount)
       } else {
-        totalSum = formatter.baseCurrency(getTotalBalance(report.addUp))
+        totalSum = formatter.baseCurrency(
+          reportIsExpenseReport(report) ? getTotalBaseCurrencyBalance(report) : getTotalBalance(report.addUp)
+        )
         if (reportIsTravel(report)) {
           subject = subject + i18n.t('labels.travel', { lng })
         } else if (reportIsHealthCareCost(report)) {

@@ -21,3 +21,28 @@ test('expense validation requires receipts for review', (t) => {
 
   t.deepEqual(results, [{ code: 'requiredForReview', severity: 'error', path: 'cost.receipts', reference: undefined }])
 })
+
+test('foreign expense report validation requires the shared exchange rate', (t) => {
+  const validator = new Validator({ requireReceipts: false })
+  const USD = { ...baseCurrency, _id: 'USD' }
+  const results = validator.getValidationResults({
+    currency: USD,
+    exchangeRateDate: new Date('2024-01-01'),
+    exchangeRate: null,
+    advances: [],
+    expenses: [
+      {
+        description: 'Taxi',
+        cost: {
+          positions: [{ _id: 'position', kind: 'manual', grossAmount: 12, vatRate: 0, project, category }],
+          currency: USD,
+          date: new Date('2024-01-01'),
+          receipts: []
+        },
+        _id: 'expense'
+      }
+    ]
+  })
+
+  t.deepEqual(results, [{ code: 'exchangeRateUnavailable', severity: 'error', path: 'exchangeRateDate' }])
+})

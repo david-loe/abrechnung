@@ -24,7 +24,7 @@ const advance: Advance<string> = {
   history: [],
   historic: false,
   budget: { amount: 100, currency: baseCurrency },
-  balance: { amount: 100 },
+  balance: { amount: 100, currency: baseCurrency },
   reason: 'Test reason',
   offsetAgainst: []
 }

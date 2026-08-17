@@ -8,6 +8,7 @@ import {
   idDocumentToId,
   State
 } from 'abrechnung-common/types.js'
+import { multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { Document, model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
@@ -305,7 +306,18 @@ export class AdvanceApproveController extends Controller {
     if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id)) {
       throw new NotFoundError(`No advance with id: '${requestBody.advanceId}' found or not allowed`)
     }
-    await advance.offset(requestBody.amount, 'offsetEntry', null, requestBody.subject)
+    await advance.offset(
+      {
+        amount: requestBody.amount,
+        currency: advance.balance.currency,
+        exchangeRate: advance.balance.exchangeRate
+          ? { ...advance.balance.exchangeRate, amount: multiplyAmountAndRound(requestBody.amount, advance.balance.exchangeRate.rate) }
+          : null
+      },
+      'offsetEntry',
+      null,
+      requestBody.subject
+    )
     const result: IAdvance | null = await Advance.findOne(
       { _id: idDocumentToId(requestBody.advanceId), historic: false },
       { historic: 0, history: 0 }

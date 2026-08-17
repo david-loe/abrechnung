@@ -17,6 +17,7 @@ export const organisationSchema = () => {
       type: {
         employeeLiabilitiesAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
         employeeClaimsAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
+        currencyExchangeDifferencesAccount: { type: Schema.Types.ObjectId, ref: 'LedgerAccount', required: true },
         employeeSpecificTemplate: { type: String, trim: true },
         accountMapping: { type: accountMapping, required: true },
         vatAccountingEnabled: { type: Boolean, required: true, default: true },
@@ -72,7 +73,10 @@ const schema = organisationSchema()
 
 const populates = {
   logo: [{ path: 'logo', select: { name: 1, type: 1 } }],
-  accountingSettings: [{ path: 'accountingSettings.payoutAccounts.ledgerAccount' }]
+  accountingSettings: [
+    { path: 'accountingSettings.currencyExchangeDifferencesAccount' },
+    { path: 'accountingSettings.payoutAccounts.ledgerAccount' }
+  ]
 }
 
 schema.pre(

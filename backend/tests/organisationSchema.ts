@@ -10,6 +10,7 @@ function organisation(includeBankBookings: boolean, withLedgerAccount: boolean) 
     accountingSettings: {
       employeeLiabilitiesAccount: ledgerAccount,
       employeeClaimsAccount: new Types.ObjectId(),
+      currencyExchangeDifferencesAccount: new Types.ObjectId(),
       accountMapping: Object.fromEntries(travelExpenseItems.map((item) => [item, new Types.ObjectId()])),
       vatAccountingEnabled: false,
       vatRates: [{ rate: 0 }],

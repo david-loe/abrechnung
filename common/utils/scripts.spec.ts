@@ -1,5 +1,6 @@
 import test from 'ava'
 import {
+  type AddUp,
   type AddUpReport,
   type AddUpTravel,
   type AdvanceBase,
@@ -8,6 +9,7 @@ import {
   type Category,
   type Cost,
   type CountrySimple,
+  type ExpenseReport,
   type FlatAddUp,
   type Place,
   type Project,
@@ -27,6 +29,7 @@ import {
   getCostPositionNetAmount,
   getCostPositionVatAmount,
   getFlagEmoji,
+  getTotalBaseCurrencyBalance,
   hexToRGB,
   htmlInputStringToDateTime,
   isValidDate,
@@ -271,12 +274,12 @@ const createCost = (amount: number, project: Project<Id>): Cost<Id> => ({
   date: new Date('2024-01-01').toISOString()
 })
 
-const createAdvance = (id: string, project: Project<Id>, amount: number): AdvanceBase<Id> => ({
+const createAdvance = (id: string, project: Project<Id>, amount: number, currency = baseCurrency): AdvanceBase<Id> => ({
   _id: id,
   name: `Advance ${id}`,
   project,
-  budget: { amount, currency: baseCurrency },
-  balance: { amount },
+  budget: { amount, currency },
+  balance: { amount, currency },
   reason: 'test',
   state: AdvanceState.APPROVED
 })
@@ -334,6 +337,31 @@ test('addUp aggregates expenses and advances per project for expense reports', (
   t.is(secondaryProjectAddUp.advance.amount, 25)
   t.is(secondaryProjectAddUp.balance.amount, 0)
   t.true(secondaryProjectAddUp.advanceOverflow)
+})
+
+test('addUp keeps a configured expense report in its currency and converts only the final balance', (t) => {
+  const project = createProject('A')
+  const USD = { ...baseCurrency, _id: 'USD', symbol: '$' }
+  const firstCost = createCost(100.01, project)
+  firstCost.currency = USD
+  const secondCost = createCost(0.01, project)
+  secondCost.currency = USD
+  const report: AddUpReport = {
+    project,
+    currency: USD,
+    exchangeRate: 0.9,
+    expenses: [
+      { _id: 'e1', description: 'First', cost: firstCost, note: null },
+      { _id: 'e2', description: 'Second', cost: secondCost, note: null }
+    ],
+    advances: [createAdvance('advance', project, 40, USD)]
+  }
+
+  const result = addUp<Id, AddUpReport>(report)
+  t.is(result[0].currency._id, 'USD')
+  t.is(result[0].expenses.amount, 100.02)
+  t.is(result[0].balance.amount, 60.02)
+  t.is(getTotalBaseCurrencyBalance({ addUp: result as AddUp<Id, ExpenseReport<Id>>[], currency: USD, exchangeRate: 0.9 }), 54.02)
 })
 
 test('addUp sums travel lump sums, applies professional share, and splits by project', (t) => {

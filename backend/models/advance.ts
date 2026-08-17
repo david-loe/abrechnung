@@ -5,11 +5,13 @@ import {
   advanceStates,
   baseCurrency,
   Comment,
+  idDocumentToId,
+  MoneyNotNull,
   ReportModelNameWithoutAdvance,
   reportModelNamesWithoutAdvance,
   State
 } from 'abrechnung-common/types.js'
-import { subtractAmounts } from 'abrechnung-common/utils/scripts.js'
+import { getBaseCurrencyAmount, multiplyAmountAndRound, roundAmount, subtractAmounts } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, Model, model, Query, Schema, Types } from 'mongoose'
 import { createOperationServices } from '../factory.js'
 import { setAdvanceBalance } from '../helper.js'
@@ -21,12 +23,12 @@ interface Methods {
   calculateExchangeRates(): Promise<void>
   addComment(): void
   offset(
-    reportTotal: number,
+    reportTotal: MoneyNotNull,
     reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
     reportId: Types.ObjectId | null,
     subject: string,
     session?: mongoose.ClientSession | null
-  ): Promise<number>
+  ): Promise<MoneyNotNull>
 }
 
 const advanceSchema = () =>
@@ -34,14 +36,16 @@ const advanceSchema = () =>
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject({ exchangeRate: true, receipts: false, required: true, min: 0, defaultCurrency: baseCurrency._id }),
-      balance: Object.assign({ description: 'in EUR' }, costObject({ exchangeRate: false, receipts: false, required: true, min: 0 })),
+      balance: costObject({ exchangeRate: true, receipts: false, required: true, min: 0, defaultCurrency: baseCurrency._id }),
       offsetAgainst: {
         type: [
           {
             type: { type: String, enum: [...reportModelNamesWithoutAdvance, 'offsetEntry'], required: true },
             reportId: { type: Schema.Types.ObjectId, refPath: 'offsetAgainst.type' },
             subject: { type: String },
-            amount: { type: Number, min: 0, required: true }
+            amount: { type: Number, min: 0, required: true },
+            currency: { type: String, ref: 'Currency', required: true, default: baseCurrency._id },
+            exchangeRate: { type: { date: { type: Date }, rate: { type: Number, min: 0 }, amount: { type: Number, min: 0 } } }
           }
         ]
       },
@@ -55,6 +59,8 @@ const schema = advanceSchema()
 
 const populates = {
   budget: [{ path: 'budget.currency' }],
+  balance: [{ path: 'balance.currency' }],
+  offsetAgainst: [{ path: 'offsetAgainst.currency' }],
   bookings: [{ path: 'bookings.ledgerAccount' }, { path: 'bookings.project', select: { identifier: 1, organisation: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1, additionalDetails: 1 } }],
@@ -116,13 +122,13 @@ interface AdvanceBaseDoc extends Methods, HydratedDocument<AdvanceBase> {}
 
 schema.methods.offset = async function (
   this: AdvanceBaseDoc,
-  reportTotal: number,
+  reportTotal: MoneyNotNull,
   reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
   reportId: Types.ObjectId | null,
   subject: string,
   session: mongoose.ClientSession | null = null
 ) {
-  if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal <= 0) {
+  if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal.amount <= 0) {
     return reportTotal
   }
   const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
@@ -132,21 +138,59 @@ schema.methods.offset = async function (
   if (reportId && doc.offsetAgainst.some((o) => o.reportId?.equals(reportId))) {
     throw new Error('This report has already been used to offset this advance')
   }
-  let amount = reportTotal
-  let difference = subtractAmounts(reportTotal, doc.balance.amount)
-  if (difference >= 0) {
-    amount = doc.balance.amount
-    doc.balance.amount = 0
-    doc.settledOn = new Date()
+  const advanceCurrency = idDocumentToId(doc.balance.currency).toString()
+  const reportCurrency = idDocumentToId(reportTotal.currency).toString()
+  let availableInReportCurrency: number
+  if (advanceCurrency === reportCurrency) {
+    availableInReportCurrency = doc.balance.amount
+  } else if (reportCurrency === baseCurrency._id) {
+    availableInReportCurrency = getBaseCurrencyAmount(doc.balance)
   } else {
-    doc.balance.amount = subtractAmounts(0, difference)
-    difference = 0
+    throw new Error(`Cannot offset ${advanceCurrency} advance with ${reportCurrency}`)
   }
-  doc.offsetAgainst.push({ type: reportModelName, reportId, subject, amount })
+
+  const amountInReportCurrency = Math.min(reportTotal.amount, availableInReportCurrency)
+  const consumesCompleteBalance = amountInReportCurrency >= availableInReportCurrency
+  const originalRate = doc.balance.exchangeRate?.rate
+  let amountInAdvanceCurrency = amountInReportCurrency
+  if (advanceCurrency !== reportCurrency) {
+    if (!originalRate) {
+      throw new Error(`Cannot offset foreign-currency advance ${doc._id.toString()} without an exchange rate`)
+    }
+    amountInAdvanceCurrency = consumesCompleteBalance ? doc.balance.amount : roundAmount(amountInReportCurrency / originalRate)
+  }
+
+  doc.balance.amount = consumesCompleteBalance ? 0 : roundAmount(subtractAmounts(doc.balance.amount, amountInAdvanceCurrency))
+  if (doc.balance.exchangeRate?.rate) {
+    doc.balance.exchangeRate.amount = multiplyAmountAndRound(doc.balance.amount, doc.balance.exchangeRate.rate)
+  }
+  if (doc.balance.amount === 0) {
+    doc.settledOn = new Date()
+  }
+
+  const offsetExchangeRate =
+    advanceCurrency !== baseCurrency._id && originalRate && doc.balance.exchangeRate
+      ? { date: doc.balance.exchangeRate.date, rate: originalRate, amount: multiplyAmountAndRound(amountInAdvanceCurrency, originalRate) }
+      : null
+  doc.offsetAgainst.push({
+    type: reportModelName,
+    reportId,
+    subject,
+    amount: amountInAdvanceCurrency,
+    currency: doc.balance.currency,
+    exchangeRate: offsetExchangeRate
+  })
   doc.markModified('offsetAgainst')
   await doc.save({ session })
   await recalcAllAssociatedReports(doc._id, session)
-  return difference
+  const difference = roundAmount(subtractAmounts(reportTotal.amount, amountInReportCurrency))
+  return {
+    ...reportTotal,
+    amount: difference,
+    ...(reportTotal.exchangeRate
+      ? { exchangeRate: { ...reportTotal.exchangeRate, amount: multiplyAmountAndRound(difference, reportTotal.exchangeRate.rate) } }
+      : {})
+  }
 }
 
 schema.methods.addComment = function () {

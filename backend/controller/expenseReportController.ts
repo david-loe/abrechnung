@@ -27,8 +27,19 @@ import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
 
 const expenseReportValidator = new Validator({ requireReceipts: true })
 type ExpenseSetterBody = SetterBody<Expense<Types.ObjectId, mongo.Binary>>
+type ExpenseReportDetailsBody = {
+  project?: IdDocument<Types.ObjectId>
+  _id?: string
+  name?: string
+  advances?: IdDocument<Types.ObjectId>[]
+  currency?: IdDocument<string> | null
+  exchangeRateDate?: Date | string | null
+}
 
-function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expenses'>, language: string) {
+function assertExpenseReportCanEnterReview(
+  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+  language: string
+) {
   const reviewSummary = expenseReportValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
@@ -167,10 +178,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id?: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
+  public async postOwnInWork(@Body() requestBody: ExpenseReportDetailsBody, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
 
     if (!extendedBody._id) {
@@ -357,10 +365,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Post()
-  public async postAny(
-    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
+  public async postAny(@Body() requestBody: ExpenseReportDetailsBody & { _id: string }, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
@@ -376,14 +381,7 @@ export class ExpenseReportExamineController extends Controller {
   @Post('inWork')
   public async postBackInWork(
     @Body()
-    requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id?: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      owner?: IdDocument<Types.ObjectId>
-      comment?: string
-    },
+    requestBody: ExpenseReportDetailsBody & { owner?: IdDocument<Types.ObjectId>; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
@@ -423,6 +421,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
