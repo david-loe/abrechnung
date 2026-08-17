@@ -82,7 +82,7 @@ test.serial('GET /category', async (t) => {
   }
 })
 
-test.serial('POST /examine/expenseReport/bulk creates reports and resolves advance references', async (t) => {
+test.serial('POST /examine/expenseReport/bulk distinguishes advance selection states', async (t) => {
   const owner = await User.findOne({ 'fk.ldapauth': 'fry' }).lean()
   t.truthy(owner)
   await loginUser(agent, 'advance')
@@ -98,22 +98,24 @@ test.serial('POST /examine/expenseReport/bulk creates reports and resolves advan
   t.is(advanceResponse.status, 200)
 
   await loginUser(agent, 'expenseReport')
-  const response = await agent
-    .post('/examine/expenseReport/bulk')
-    .send([
-      {
-        owner: owner?.email,
-        project: expenseReport.project.identifier,
-        name: 'CSV expense report',
-        advances: [refNumberToString(advanceResponse.body.result.reference, 'Advance')]
-      }
-    ])
+  const response = await agent.post('/examine/expenseReport/bulk').send([
+    {
+      owner: owner?.email,
+      project: expenseReport.project.identifier,
+      name: 'CSV expense report',
+      advances: [refNumberToString(advanceResponse.body.result.reference, 'Advance')]
+    },
+    { owner: owner?.email, project: expenseReport.project.identifier, name: 'CSV expense report without advances', advances: [''] },
+    { owner: owner?.email, project: expenseReport.project.identifier, name: 'CSV expense report with auto-selected advances' }
+  ])
 
   t.is(response.status, 200)
-  t.is(response.body.result.length, 1)
-  t.is(response.body.result[0].state, ExpenseReportState.IN_WORK)
-  t.is(response.body.result[0].owner._id, owner?._id.toString())
+  t.is(response.body.result.length, 3)
+  t.true(response.body.result.every(({ state }: ExpenseReport) => state === ExpenseReportState.IN_WORK))
+  t.true(response.body.result.every(({ owner: value }: ExpenseReport) => idDocumentToId(value).toString() === owner?._id.toString()))
   t.is(response.body.result[0].advances[0]._id, advanceResponse.body.result._id)
+  t.deepEqual(response.body.result[1].advances, [])
+  t.true(response.body.result[2].advances.some(({ _id }: { _id: string }) => _id === advanceResponse.body.result._id))
   await loginUser(agent, 'user')
 })
 

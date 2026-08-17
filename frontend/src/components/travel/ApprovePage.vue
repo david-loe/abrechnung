@@ -106,7 +106,7 @@
               { path: 'claimSpouseRefund', fn: parseCsvBoolean },
               { path: 'isCrossBorder', fn: parseCsvBoolean }
             ]"
-            @submitted="() => travelList?.loadFromServer()" />
+            @submitted="() => approvedTravelList?.loadFromServer()" />
         </div>
         <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">

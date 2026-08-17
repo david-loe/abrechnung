@@ -23,7 +23,7 @@
             endpoint="examine/expenseReport/bulk"
             :template-file-name="t('labels.expenseReport')"
             :template-fields="expenseReportImportTemplateFields"
-            @submitted="() => expenseReportList?.loadFromServer()" />
+            @submitted="refreshImportedExpenseReports" />
         </div>
         <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">
@@ -59,6 +59,7 @@
         </button>
         <hr class="hr" >
         <ExpenseReportList
+          ref="expandedExpenseReportList"
           endpoint="examine/expenseReport"
           :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
           :columns-to-hide="['report', 'organisation', 'reference',  ...(show === ExpenseReportState.IN_WORK ? ['addUp.totalBalance'] : ['addUp.totalTotal', 'addUp.totalAdvance' ])]"
@@ -92,6 +93,13 @@ const modalFormIsLoading = ref(false)
 
 const modalCompRef = useTemplateRef('modalComp')
 const expenseReportList = useTemplateRef('expenseReportList')
+const expandedExpenseReportList = useTemplateRef('expandedExpenseReportList')
+
+function refreshImportedExpenseReports() {
+  if (show.value === ExpenseReportState.IN_WORK) {
+    expandedExpenseReportList.value?.loadFromServer()
+  }
+}
 
 function showModal(mode: ModalMode, expenseReport?: Partial<ExpenseReportSimple<string>>) {
   if (expenseReport) {

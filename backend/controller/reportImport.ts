@@ -40,15 +40,20 @@ function parseAdvanceReference(reference: string) {
   return parsed.type === 'Advance' ? parsed.ref : undefined
 }
 
+function normalizeAdvanceSelection(advances: string[] | undefined) {
+  return advances?.length === 1 && advances[0].trim() === '' ? [] : advances
+}
+
 export async function resolveImportReferences(rows: ImportReferenceRow[], resolveAdvances = true) {
   if (rows.length === 0) {
     throw new ValidationClientError('The CSV import does not contain any data rows.')
   }
 
-  const ownerEmails = Array.from(new Set(rows.map(({ owner }) => owner?.trim()).filter(Boolean)))
-  const projectIdentifiers = Array.from(new Set(rows.map(({ project }) => project?.trim()).filter(Boolean)))
+  const normalizedRows = rows.map((row) => ({ ...row, advances: normalizeAdvanceSelection(row.advances) }))
+  const ownerEmails = Array.from(new Set(normalizedRows.map(({ owner }) => owner?.trim()).filter(Boolean)))
+  const projectIdentifiers = Array.from(new Set(normalizedRows.map(({ project }) => project?.trim()).filter(Boolean)))
   const parsedReferences = resolveAdvances
-    ? rows.flatMap(({ advances = [] }) => advances.map(parseAdvanceReference).filter((value) => value !== undefined))
+    ? normalizedRows.flatMap(({ advances = [] }) => advances.map(parseAdvanceReference).filter((value) => value !== undefined))
     : []
 
   const [users, projects, referencedAdvances] = await Promise.all([
@@ -61,7 +66,7 @@ export async function resolveImportReferences(rows: ImportReferenceRow[], resolv
   const advancesByReference = new Map(referencedAdvances.map((advance) => [advance.reference, advance]))
   const issues: ImportValidationIssue[] = []
 
-  const partiallyResolved = rows.map((row, rowIndex) => {
+  const partiallyResolved = normalizedRows.map((row, rowIndex) => {
     const owner = usersByEmail.get(row.owner?.trim())
     const project = projectsByIdentifier.get(row.project?.trim())
     if (!owner) addIssue(issues, rowIndex, 'owner', `No user found for email '${row.owner ?? ''}'.`)
@@ -97,7 +102,7 @@ export async function resolveImportReferences(rows: ImportReferenceRow[], resolv
   throwImportValidationIssues(issues)
 
   if (resolveAdvances && BACKEND_CACHE.settings.autoSelectAvailableAdvances) {
-    const rowsWithoutAdvanceSelection = rows
+    const rowsWithoutAdvanceSelection = normalizedRows
       .map((row, index) => ({ row, resolved: partiallyResolved[index] }))
       .filter(({ row }) => row.advances === undefined)
     if (rowsWithoutAdvanceSelection.length > 0) {

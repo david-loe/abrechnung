@@ -96,7 +96,7 @@
             :template-file-name="t('labels.advance')"
             :template-fields="advanceImportTemplateFields"
             :transformers="[{ path: 'budget.amount', fn: parseCsvNumber }]"
-            @submitted="() => advanceList?.loadFromServer()" />
+            @submitted="() => approvedAdvanceList?.loadFromServer()" />
         </div>
         <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">
