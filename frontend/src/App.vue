@@ -121,11 +121,11 @@
   </div>
   <div class="position-relative">
     <AlertComponent />
-    <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" v-slot="{ Component }">
+    <router-view :class="loadState === 'LOADED' ? 'd-block' : 'd-none'" v-slot="{ Component, route }">
       <template v-if="Component">
         <Suspense>
           <template #default>
-            <component :is="Component"></component>
+            <component :is="Component" :key="route.meta.remountOnPathChange ? route.path : undefined"></component>
           </template>
           <template #fallback></template>
         </Suspense>
