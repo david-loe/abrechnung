@@ -67,7 +67,7 @@
               :max="Math.max(0, position.grossAmount)"
               class="form-control tnum"
               required
-              @change="saveVatAmountOverride(position)" >
+              @input="saveVatAmountOverride(position)" >
           </div>
           <button type="button" class="btn btn-sm btn-link py-0" @click="resetVatAmountOverride(position)">{{ t('labels.reset') }}</button>
         </template>
