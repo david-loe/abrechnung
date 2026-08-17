@@ -1,5 +1,20 @@
 <template>
-  <StatePipeline class="mb-4" :state="advance.state" :StateEnum="AdvanceState" />
+  <div class="d-flex align-items-start gap-2">
+    <StatePipeline class="mb-4 flex-grow-1" :state="advance.state" :StateEnum="AdvanceState" />
+    <div class="dropdown">
+      <button
+        type="button"
+        class="btn btn-link link-body-emphasis p-0"
+        data-bs-toggle="dropdown"
+        data-bs-auto-close="outside"
+        :aria-label="t('labels.actions')">
+        <i class="bi bi-three-dots-vertical fs-3"></i>
+      </button>
+      <ul class="dropdown-menu dropdown-menu-end">
+        <CopyReportLinkMenuItem :reference="advance.reference" report-model-name="Advance" />
+      </ul>
+    </div>
+  </div>
   <table class="table mb-2">
     <tbody>
       <tr>
@@ -80,6 +95,7 @@
 import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from 'abrechnung-common/types.js'
 import { PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'

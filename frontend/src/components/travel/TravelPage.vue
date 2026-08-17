@@ -107,6 +107,10 @@
                 <i class="bi bi-three-dots-vertical fs-3"></i>
               </a>
               <ul class="dropdown-menu dropdown-menu-end">
+                <CopyReportLinkMenuItem :reference="travel.reference" report-model-name="Travel" />
+                <li>
+                  <hr class="dropdown-divider" >
+                </li>
                 <template v-if="endpointPrefix === 'examine/' && travel.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
@@ -321,6 +325,7 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
+import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import ErrorBanner, { RequestError } from '@/components/elements/ErrorBanner.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'

@@ -152,7 +152,7 @@ import {
   refStringRegexLax,
   User
 } from 'abrechnung-common/types.js'
-import { getById, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
+import { getById } from 'abrechnung-common/utils/scripts.js'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -167,7 +167,7 @@ import ReadOnlyBanner from '@/components/elements/ReadOnlyBanner.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TableElement from '@/components/elements/TableElement.vue'
 import APP_LOADER from '@/dataLoader.js'
-import { getRouteForReport, isMobile, subscribeToPush } from '@/helper.js'
+import { getRouteForReport, getRouteForReportReference, isMobile, subscribeToPush } from '@/helper.js'
 import { beginLogout, completeLogout, sessionState } from './session.js'
 
 const router = useRouter()
@@ -235,10 +235,8 @@ async function search() {
   if (APP_DATA.value && term) {
     loadingSearch.value = true
     if (refStringRegexLax.exec(term)) {
-      const params = refStringToNumber(term)
-      const result = await API.getter<SearchResult>('search/ref', params)
-      if (result.ok) {
-        const route = getRouteForReport(APP_DATA.value?.user, result.ok.data, params.type)
+      const route = await getRouteForReportReference(APP_DATA.value.user, term)
+      if (route) {
         router.push(route)
         searchInput.value = ''
       }

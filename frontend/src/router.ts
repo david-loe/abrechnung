@@ -142,6 +142,12 @@ const routes = [
     meta: { requiresAuth: true },
     props: (route: RouteLocationNormalized) => ({ reportId: route.params._id, reportType: 'advance', confirmAdvance: true })
   },
+  {
+    path: '/:reference',
+    component: () => import('@/components/ReportReferencePage.vue'),
+    meta: { requiresAuth: true },
+    props: (route: RouteLocationNormalized) => ({ reference: route.params.reference })
+  },
   { path: '/:pathMatch(.*)*', redirect: '/user' }
 ]
 
