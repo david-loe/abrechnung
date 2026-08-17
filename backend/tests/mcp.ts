@@ -1,6 +1,8 @@
 import test from 'ava'
 import { Types } from 'mongoose'
-import { createMcpServer } from '../mcp/tools.js'
+import { documentFileHandler } from '../helper.js'
+import { getScopes } from '../mcp/auth.js'
+import { createMcpServer, requestFor } from '../mcp/tools.js'
 import User from '../models/user.js'
 
 function createUser(access: Record<string, boolean>) {
@@ -63,4 +65,20 @@ test('special MCP tools follow the existing advance and expense-report permissio
   t.true(hasTool(server, 'create_expense_report_for_user'))
   t.true(hasTool(server, 'create_expense_report_booking_export'))
   t.false(hasTool(server, 'approve_travel'))
+})
+
+test('MCP controller requests carry the item body used by receipt middleware', async (t) => {
+  const user = createUser({})
+  const body = { cost: { receipts: [] } }
+  const request = requestFor(user, body)
+
+  t.is(request.body, body)
+  await t.notThrowsAsync(documentFileHandler(['cost', 'receipts'])(request))
+})
+
+test('MCP scopes support standard and Entra claim representations', (t) => {
+  t.deepEqual(getScopes({ scope: 'openid  mcp' }), ['openid', 'mcp'])
+  t.deepEqual(getScopes({ scp: 'openid\tmcp' }), ['openid', 'mcp'])
+  t.deepEqual(getScopes({ scp: ['openid', 'mcp'] }), ['openid', 'mcp'])
+  t.deepEqual(getScopes({ scp: ['mcp', 1] }), [])
 })

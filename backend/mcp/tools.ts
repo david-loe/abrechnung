@@ -43,6 +43,7 @@ import { UserDoc } from '../models/user.js'
 
 const objectIdSchema = z.string().regex(/^[0-9a-f]{24}$/i, 'Expected a MongoDB ObjectId')
 const referenceSchema = z.union([objectIdSchema, z.object({ _id: objectIdSchema })])
+const documentReferenceSchema = referenceSchema.transform((reference) => (typeof reference === 'string' ? { _id: reference } : reference))
 const countryReferenceSchema = z.union([z.string().regex(/^[A-Z]{2}$/), z.object({ _id: z.string().regex(/^[A-Z]{2}$/) })])
 const currencyReferenceSchema = z.union([z.string().regex(/^[A-Z]{3}$/), z.object({ _id: z.string().regex(/^[A-Z]{3}$/) })])
 const reportTypeSchema = z.enum(['travel', 'advance', 'expenseReport'])
@@ -71,7 +72,7 @@ const costSchema = z.object({
   currency: currencyReferenceSchema,
   exchangeRate: z.object({ date: z.iso.datetime(), rate: z.number().positive() }).optional().nullable(),
   date: z.iso.datetime().optional().nullable(),
-  receipts: z.array(referenceSchema).optional()
+  receipts: z.array(documentReferenceSchema).optional()
 })
 const expenseSchema = z.object({
   _id: objectIdSchema.optional(),
@@ -151,8 +152,8 @@ const destructiveAnnotations = {
   openWorldHint: false
 } satisfies ToolAnnotations
 
-function requestFor(user: UserDoc) {
-  return { user } as unknown as AuthenticatedExpressRequest
+export function requestFor(user: UserDoc, body: unknown = {}) {
+  return { user, body } as unknown as AuthenticatedExpressRequest
 }
 
 function hasAnyAccess(user: UserDoc, accesses: Access[]) {
@@ -311,7 +312,7 @@ async function upsertExpense(
   expense: z.infer<typeof expenseSchema>
 ) {
   const ownerId = await getReportOwner(reportType, reportId)
-  const request = requestFor(user)
+  const request = requestFor(user, expense)
   if (isOwn(user, ownerId)) {
     if (reportType === 'travel')
       return await new TravelController().postExpenseToOwn(
@@ -342,7 +343,7 @@ async function upsertExpense(
 
 async function upsertStage(user: UserDoc, reportId: string, stage: z.infer<typeof stageSchema>) {
   const ownerId = await getReportOwner('travel', reportId)
-  const request = requestFor(user)
+  const request = requestFor(user, stage)
   if (isOwn(user, ownerId))
     return await new TravelController().postStageToOwn(reportId, stage as unknown as Stage<Types.ObjectId, mongo.Binary>, request)
   if (user.access['examine/travel'])

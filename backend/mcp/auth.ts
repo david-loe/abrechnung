@@ -70,11 +70,14 @@ export function getMcpOAuthRuntime() {
   return cachedRuntime.value
 }
 
-function getScopes(payload: JWTPayload) {
+export function getScopes(payload: JWTPayload) {
   if (typeof payload.scope === 'string') {
     return payload.scope.split(/\s+/).filter(Boolean)
   }
   const scp = payload.scp
+  if (typeof scp === 'string') {
+    return scp.split(/\s+/).filter(Boolean)
+  }
   if (Array.isArray(scp) && scp.every((scope) => typeof scope === 'string')) {
     return scp
   }
