@@ -111,7 +111,7 @@ import { baseCurrency, ProjectSimple, TravelExpense } from 'abrechnung-common/ty
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
+import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
 import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import DateInput from '../../elements/DateInput.vue'
@@ -162,7 +162,7 @@ function clear() {
 }
 
 function input() {
-  return { ...defaultExpense(), ...props.expense }
+  return { ...defaultExpense(), ...cloneFormValue(props.expense ?? {}) }
 }
 function output() {
   return formExpense.value

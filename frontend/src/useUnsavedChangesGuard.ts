@@ -1,5 +1,9 @@
 import type { Ref } from 'vue'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref, toRaw } from 'vue'
+
+export function cloneFormValue<T>(value: T) {
+  return structuredClone(toRaw(value))
+}
 
 function snapshot(value: unknown) {
   return (
@@ -25,9 +29,14 @@ export function useUnsavedChangesGuard<T>(formValue: Ref<T>) {
     initialSnapshot.value = snapshot(formValue.value)
   }
 
+  async function resetInitialValueAfterUpdate() {
+    await nextTick()
+    resetInitialValue()
+  }
+
   function confirmNavigation(message: string) {
     return !hasUnsavedChanges.value || globalThis.confirm(message)
   }
 
-  return { confirmNavigation, hasUnsavedChanges, resetInitialValue }
+  return { confirmNavigation, hasUnsavedChanges, resetInitialValue, resetInitialValueAfterUpdate }
 }

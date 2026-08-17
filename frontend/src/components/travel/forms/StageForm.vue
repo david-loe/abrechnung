@@ -269,7 +269,7 @@ import {
 import { datetimeToDate, datetimeToDateString, getDayList, multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
+import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 import { formatter } from '../../../formatter'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
@@ -312,7 +312,7 @@ const { t } = useI18n()
 const fileUploadRef = useTemplateRef('fileUpload')
 
 const formStage = ref(input())
-const { confirmNavigation, resetInitialValue } = useUnsavedChangesGuard(formStage)
+const { confirmNavigation, resetInitialValueAfterUpdate } = useUnsavedChangesGuard(formStage)
 const hasCostAmount = computed(() =>
   formStage.value.cost.positions.some(({ grossAmount }) => Number.isFinite(grossAmount) && grossAmount !== 0)
 )
@@ -430,7 +430,7 @@ function navigate(direction: 'next' | 'prev') {
   else emit('prev')
 }
 function input() {
-  const stage = { ...defaultStage(), ...props.stage }
+  const stage = { ...defaultStage(), ...cloneFormValue(props.stage ?? {}) }
   if (stage.transport?.type !== 'ownCar' && stage.cost.positions.length === 0) {
     stage.cost.positions = [defaultCostPosition()]
   }
@@ -442,7 +442,7 @@ watch(
   () => {
     clear()
     formStage.value = input()
-    resetInitialValue()
+    void resetInitialValueAfterUpdate()
   }
 )
 watch(
