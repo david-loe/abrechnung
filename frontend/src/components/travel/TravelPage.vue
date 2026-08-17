@@ -159,7 +159,10 @@
         <div class="col-lg-auto col-12">
           <div class="row g-1 mb-4">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'stage', undefined)" :disabled="isReadOnly">
+              <button
+                class="btn btn-secondary"
+                @click="isReadOnly ? null : showModal('add', 'stage', travel.stages.length === 0 ? { departure: travel.startDate } : undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.stage') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.stage') }}</span>
