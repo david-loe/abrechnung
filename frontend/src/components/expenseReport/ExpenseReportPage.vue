@@ -178,9 +178,7 @@
               @click-row="(expense) => showModal('edit', 'expense', expense as Expense<string>)"
               @update-sort="updateExpenseSorting">
               <template #item-cost.date="{ cost }: Expense">
-                {{ new Date(cost.date || 0).getUTCFullYear() === new Date().getUTCFullYear()
-                    ? formatter.simpleDate(cost.date || '')
-                    : formatter.date(cost.date || '') }}
+                {{ formatter.dateWithYearIfNotCurrent(cost.date || '') }}
               </template>
               <template #item-cost="{ cost }: Expense">
                 <div class="text-end tnum">{{ formatter.money(cost) }}</div>

@@ -48,7 +48,7 @@
       <tbody class="table-group-divider">
         <tr v-for="day of localDays">
           <th scope="row" class="text-nowrap">
-            {{ formatter.simpleDate(day.date) }}
+            {{ formatter.dateWithYearIfNotCurrent(day.date) }}
             <span class="ms-1">{{ day.country.flag || '' }}</span>
           </th>
           <template v-if="day.purpose === 'professional'">

@@ -73,6 +73,16 @@ class Formatter {
     return ''
   }
   /**
+   * Day + Month in the current year, Day + Month + Year otherwise
+   */
+  dateWithYearIfNotCurrent(date: string | number | Date, locale?: Locale) {
+    const validDate = isValidDate(date)
+    if (!validDate) {
+      return ''
+    }
+    return validDate.getUTCFullYear() === new Date().getUTCFullYear() ? this.simpleDate(validDate, locale) : this.date(validDate, locale)
+  }
+  /**
    * Day + Month + Year + Hour + Minute
    */
   dateTime(date: string | number | Date, locale?: Locale) {

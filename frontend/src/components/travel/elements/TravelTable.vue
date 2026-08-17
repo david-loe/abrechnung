@@ -13,7 +13,7 @@
             style="margin-left: -1.25rem; margin-right: 0.156rem">
             <i class="bi bi-file-person"></i>
           </small>
-          {{ formatter.simpleDate((row.data as TravelDay).date) }}
+          {{ formatter.dateWithYearIfNotCurrent((row.data as TravelDay).date) }}
         </h5>
       </div>
       <div class="col">

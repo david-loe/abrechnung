@@ -3,8 +3,13 @@ import Formatter from './formatter.js'
 
 test('Formatter formats dates', (t) => {
   const f = new Formatter('en', 'givenNameFirst')
+  const currentYear = new Date().getUTCFullYear()
   t.is(f.date('2023-01-02'), '1/2/2023')
   t.is(f.simpleDate('2023-01-02'), '1/2')
+  t.is(f.dateWithYearIfNotCurrent(`${currentYear}-01-02`), '1/2')
+  t.is(f.dateWithYearIfNotCurrent(`${currentYear - 1}-01-02`), `1/2/${currentYear - 1}`)
+  t.is(f.dateWithYearIfNotCurrent(`${currentYear + 1}-01-02`), `1/2/${currentYear + 1}`)
+  t.is(f.dateWithYearIfNotCurrent('invalid'), '')
   t.is(f.dateTime('2023-01-02T10:05:00Z'), '1/2/2023, 10:05 AM')
   t.is(f.simpleDateTime('2023-01-02T10:05:00Z'), '1/2, 10:05 AM')
 })
