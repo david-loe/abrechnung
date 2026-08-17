@@ -13,14 +13,14 @@
     <template #option="{ name, budget, balance, project }">
       <div class="row align-items-center">
         <div class="col text-truncate">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto px-1"><span>{{ formatter.money(balance) }}</span></div>
+        <div class="col-auto px-1"><span>{{ formatter.money(balance, { useExchangeRate: false }) }}</span></div>
         <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75"><span>{{ formatter.money(budget) }}</span></div>
       </div>
     </template>
     <template #selected-option="{ name, balance, project }">
       <div class="row align-items-center">
         <div class="col-auto text-truncate" style="max-width: 220px">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto opacity-75"><span>{{ formatter.money(balance) }}</span></div>
+        <div class="col-auto opacity-75"><span>{{ formatter.money(balance, { useExchangeRate: false }) }}</span></div>
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
@@ -48,6 +48,7 @@ type BaseProps = {
   project?: ProjectSimple<string>
   endpointPrefix?: string
   setDefault?: boolean
+  currency?: IdDocument<string>
 }
 
 type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceSimple | null }
@@ -70,6 +71,12 @@ let defaultFor = { userId: null as null | string, projectId: null as null | stri
 const { t } = useI18n()
 
 const advances = ref([] as AdvanceSimple[])
+
+function matchingCurrency(availableAdvances: AdvanceSimple[]) {
+  if (!props.currency) return availableAdvances
+  const currency = idDocumentToId(props.currency)
+  return availableAdvances.filter((advance) => idDocumentToId(advance.budget.currency) === currency)
+}
 
 // Filter method
 function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
@@ -104,7 +111,7 @@ function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
 }
 
 onMounted(async () => {
-  advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
+  advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
   setDefaultAdvances(advances.value)
 })
 
@@ -118,7 +125,7 @@ watch(
         emit('update:modelValue', null)
       }
     }
-    advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
+    advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
     setDefaultAdvances(advances.value)
   }
 )
@@ -132,6 +139,13 @@ watch(
         emit('update:modelValue', null)
       }
     }
+    setDefaultAdvances(advances.value)
+  }
+)
+watch(
+  () => props.currency,
+  async () => {
+    advances.value = matchingCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix))
     setDefaultAdvances(advances.value)
   }
 )

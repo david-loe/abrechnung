@@ -30,7 +30,11 @@
           {{ t('labels.currency') }}
           <span class="text-danger">*</span>
         </label>
-        <CurrencySelector id="expenseFormCurrency" v-model="formExpense.cost.currency" :disabled="disabled" :required="true" />
+        <CurrencySelector
+          id="expenseFormCurrency"
+          v-model="formExpense.cost.currency"
+          :disabled="disabled || Boolean(reportCurrency)"
+          :required="true" />
         <small v-if="formExpense.cost.positions.length > 1" class="text-secondary tnum">
           {{ t('labels.total') }}: {{ formatter.currency(getCostGrossAmount(formExpense.cost), formExpense.cost.currency._id) }}
         </small>
@@ -98,7 +102,7 @@
 </template>
 
 <script lang="ts" setup>
-import { baseCurrency, Expense, ProjectSimple } from 'abrechnung-common/types.js'
+import { baseCurrency, Currency, Expense, ProjectSimple } from 'abrechnung-common/types.js'
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -130,7 +134,8 @@ const props = defineProps({
   showPrevButton: { type: Boolean, default: false },
   showNextButton: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
-  defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true }
+  defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true },
+  reportCurrency: { type: Object as PropType<Currency> }
 })
 
 const formExpense = ref(input())
@@ -138,7 +143,7 @@ const { confirmNavigation, resetInitialValue } = useUnsavedChangesGuard(formExpe
 const fileUploadRef = useTemplateRef('fileUpload')
 
 function defaultExpense() {
-  return { description: '', cost: { positions: [], currency: baseCurrency, receipts: [], date: '' }, note: undefined }
+  return { description: '', cost: { positions: [], currency: props.reportCurrency ?? baseCurrency, receipts: [], date: '' }, note: undefined }
 }
 function clear() {
   fileUploadRef.value?.clear()

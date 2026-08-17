@@ -16,6 +16,7 @@
           :loading="modalFormIsLoading"
           :mode="modalMode"
           :default-project="expenseReport.project"
+          :report-currency="expenseReport.currency || undefined"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
@@ -187,7 +188,7 @@
                 {{ formatter.dateWithYearIfNotCurrent(cost.date || '') }}
               </template>
               <template #item-cost="{ cost }: Expense">
-                <div class="text-end tnum">{{ formatter.money(cost) }}</div>
+                <div class="text-end tnum">{{ formatter.money(cost, { useExchangeRate: !expenseReport.currency }) }}</div>
               </template>
               <template #item-note="{ note }: Expense">
                 <span v-if="note?.trim()" @click.stop>
@@ -221,6 +222,8 @@
                   class="mb-4"
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
+                  :exchange-rate="expenseReport.exchangeRate"
+                  :exchange-rate-date="expenseReport.exchangeRateDate"
                   :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
                   <p v-for="comment of expenseReport.comments" :key="comment._id">

@@ -39,7 +39,7 @@
         <th scope="row">{{ t('labels.offsetAgainst') }}</th>
         <td>
           <div class="mb-1" v-for="report in advance.offsetAgainst"><small>
-            <span class="me-2 tnum">{{ formatter.money(report) }}</span>
+            <span class="me-2 tnum">{{ formatter.detailedMoney(report) }}</span>
             <i
               v-if="APP_DATA && report.type !== 'offsetEntry'"
               :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
@@ -49,7 +49,7 @@
       </tr>
       <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
-        <td><span class="tnum"> {{ formatter.money(advance.balance) }}</span></td>
+        <td><span class="tnum"> {{ formatter.detailedMoney(advance.balance, true) }}</span></td>
       </tr>
       <tr v-if="advance.receivedOn">
         <th scope="row">{{ t('labels.receivedOn') }}</th>

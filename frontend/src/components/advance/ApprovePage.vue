@@ -52,6 +52,7 @@
                   </label>
                   <div class="col-auto">
                     <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required >
+                    <small class="text-secondary">{{ modalAdvance.balance?.currency?._id }}</small>
                   </div>
                   <label for="subject" class="col-form-label col-auto">
                     {{ t('labels.subject') }}

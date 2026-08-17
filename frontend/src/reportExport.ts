@@ -10,6 +10,7 @@ import {
   type OrganisationWithVatSettings,
   type Place,
   type ProjectSimple,
+  reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel,
   type Stage,
@@ -24,6 +25,7 @@ import {
   getCostPositionNetAmount,
   getCostPositionVatAmount,
   getEffectiveCostPositionVatRate,
+  multiplyAmountAndRound,
   refNumberToString,
   rowsToCSV,
   sanitizeFilename
@@ -61,7 +63,12 @@ function vatAccountingEnabled(position: CostPosition<string>, organisations: Org
   return Boolean(organisations.find(({ _id }) => _id === organisationId)?.accountingSettings.vatAccountingEnabled)
 }
 
-function costCells(cost: Cost<string>, position: CostPosition<string>, organisations: OrganisationWithVatSettings<string>[]): CsvCell[] {
+function costCells(
+  cost: Cost<string>,
+  position: CostPosition<string>,
+  organisations: OrganisationWithVatSettings<string>[],
+  useReportCurrency = false
+): CsvCell[] {
   const vatEnabled = vatAccountingEnabled(position, organisations)
   return [
     position.grossAmount,
@@ -69,9 +76,9 @@ function costCells(cost: Cost<string>, position: CostPosition<string>, organisat
     getCostPositionVatAmount(position, vatEnabled),
     getEffectiveCostPositionVatRate(position, vatEnabled),
     cost.currency._id,
-    date(cost.exchangeRate?.date),
-    cost.exchangeRate?.rate,
-    getCostPositionBaseCurrencyAmount(cost, position)
+    useReportCurrency ? '' : date(cost.exchangeRate?.date),
+    useReportCurrency ? '' : cost.exchangeRate?.rate,
+    useReportCurrency ? '' : getCostPositionBaseCurrencyAmount(cost, position)
   ]
 }
 
@@ -83,7 +90,7 @@ function addSection(rows: CsvRow[], title: string, content: CsvRow[]) {
 }
 
 function projectDetailRows(report: ExportReport, t: Translate): CsvRow[] {
-  return [
+  const rows: CsvRow[] = [
     [
       t('csv.reference'),
       refNumberToString(
@@ -96,6 +103,14 @@ function projectDetailRows(report: ExportReport, t: Translate): CsvRow[] {
     [t('csv.projectIdentifier'), report.project.identifier],
     [t('csv.projectName'), report.project.name]
   ]
+  if (reportIsExpenseReport(report) && report.currency) {
+    rows.push(
+      [t('labels.expenseReportCurrency'), report.currency._id],
+      [t('labels.exchangeRateDate'), date(report.exchangeRateDate)],
+      [t('labels.exchangeRate'), report.exchangeRate]
+    )
+  }
+  return rows
 }
 
 function placeDetailRows(prefix: string, place: Omit<Place, 'place'> | Place | null | undefined, locale: Locale, t: Translate): CsvRow[] {
@@ -118,7 +133,8 @@ function expenseRows(
   expenses: Expense<string>[],
   organisations: OrganisationWithVatSettings<string>[],
   t: Translate,
-  includePurpose = false
+  includePurpose = false,
+  useReportCurrency = false
 ) {
   const headers = [
     t('labels.description'),
@@ -148,7 +164,7 @@ function expenseRows(
           expense.description,
           position.kind === 'ownCar' ? t('labels.ownCar') : position.description,
           date(expense.cost.date),
-          ...costCells(expense.cost, position, organisations),
+          ...costCells(expense.cost, position, organisations, useReportCurrency),
           projectIdentifier(position.project),
           position.category.name,
           expense.note
@@ -277,7 +293,32 @@ export function reportToCSV(report: ExportReport, organisations: OrganisationWit
   }
 
   addSection(rows, t('csv.sections.details'), details)
-  addSection(rows, t('csv.sections.expenses'), expenseRows(report.expenses, organisations, t, reportIsTravel(report)))
+  addSection(
+    rows,
+    t('csv.sections.expenses'),
+    expenseRows(report.expenses, organisations, t, reportIsTravel(report), reportIsExpenseReport(report) && Boolean(report.currency))
+  )
+
+  if (reportIsExpenseReport(report) && report.currency && typeof report.exchangeRate === 'number') {
+    addSection(rows, t('csv.sections.summary'), [
+      [
+        t('labels.project'),
+        t('labels.expenses'),
+        t('labels.advance'),
+        t('labels.balance'),
+        t('labels.currency'),
+        t('labels.balanceInBaseCurrency')
+      ],
+      ...report.addUp.map((addUp) => [
+        addUp.project.identifier,
+        addUp.expenses.amount,
+        addUp.advance.amount,
+        addUp.balance.amount,
+        addUp.currency._id,
+        multiplyAmountAndRound(addUp.balance.amount, report.exchangeRate as number)
+      ])
+    ])
+  }
 
   if (reportIsTravel(report)) {
     addSection(rows, t('csv.sections.stages'), stageRows(report.stages, organisations, locale, t))
