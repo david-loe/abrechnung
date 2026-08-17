@@ -33,7 +33,7 @@ class ReportMailIntegration extends Integration {
     send: {
       jobOptions: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } },
       run: async (payload: unknown) => {
-        await sendReportViaMail((payload as ReportEmailPayload).report)
+        return await sendReportViaMail((payload as ReportEmailPayload).report)
       }
     }
   }

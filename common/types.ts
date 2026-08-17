@@ -159,6 +159,33 @@ export interface IntegrationScheduleSettings {
   schedule: Schedule
 }
 
+export const workerJobStates = ['waiting', 'delayed', 'active', 'completed', 'failed'] as const
+export type WorkerJobState = (typeof workerJobStates)[number]
+
+export interface WorkerJobSummary {
+  id: string
+  name: string
+  integrationKey: string
+  operation: string
+  state: WorkerJobState
+  timestamp: number
+  processedOn?: number
+  finishedOn?: number
+  attemptsMade: number
+  attempts: number
+}
+
+export interface WorkerJobDetails extends WorkerJobSummary {
+  payload: unknown
+  result: unknown
+  failedReason?: string
+  stacktrace: string[]
+}
+
+export type WorkerJobCounts = Record<WorkerJobState, number>
+
+export type WorkerJobsResponse = GETResponse<WorkerJobSummary[]> & { counts: WorkerJobCounts; jobNames: string[] }
+
 export interface IntegrationSettings<idType extends _id = _id> {
   integrationKey: string
   schedules: { [scheduleKey: string]: IntegrationScheduleSettings }

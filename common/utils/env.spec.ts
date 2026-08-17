@@ -37,6 +37,31 @@ test('cleanBackendEnv parses numbers and booleans', (t) => {
   const env = cleanBackendEnv(ENV)
   t.is(env.VITE_MAX_FILE_SIZE, 16_000_000)
   t.true(env.TRUST_PROXY)
+  t.is(env.WORKER_JOB_FAILED_TTL_SECONDS, false)
+  t.is(env.WORKER_JOB_FAILED_MAX_COUNT, 100)
+  t.is(env.WORKER_JOB_COMPLETED_TTL_SECONDS, 604_800)
+  t.is(env.WORKER_JOB_COMPLETED_MAX_COUNT, 400)
+})
+
+test('cleanBackendEnv accepts explicit worker job retention limits and false', (t) => {
+  const env = cleanBackendEnv({
+    ...ENV,
+    WORKER_JOB_FAILED_TTL_SECONDS: '3600',
+    WORKER_JOB_FAILED_MAX_COUNT: 'false',
+    WORKER_JOB_COMPLETED_TTL_SECONDS: 'false',
+    WORKER_JOB_COMPLETED_MAX_COUNT: '25'
+  })
+
+  t.is(env.WORKER_JOB_FAILED_TTL_SECONDS, 3600)
+  t.is(env.WORKER_JOB_FAILED_MAX_COUNT, false)
+  t.is(env.WORKER_JOB_COMPLETED_TTL_SECONDS, false)
+  t.is(env.WORKER_JOB_COMPLETED_MAX_COUNT, 25)
+})
+
+test('cleanBackendEnv rejects invalid worker job retention limits', (t) => {
+  t.throws(() => cleanBackendEnv({ ...ENV, WORKER_JOB_FAILED_MAX_COUNT: '0' }, { reporter: throwReporter }))
+  t.throws(() => cleanBackendEnv({ ...ENV, WORKER_JOB_COMPLETED_TTL_SECONDS: '1.5' }, { reporter: throwReporter }))
+  t.throws(() => cleanBackendEnv({ ...ENV, WORKER_JOB_FAILED_TTL_SECONDS: 'null' }, { reporter: throwReporter }))
 })
 
 test('cleanFrontendEnv throws on invalid url', (t) => {

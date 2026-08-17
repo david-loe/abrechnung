@@ -24,6 +24,7 @@ export type AdminSectionId =
   | 'printerSettings'
   | 'settings'
   | 'webhooks'
+  | 'workerJobs'
   | 'lumpSumSync'
   | 'retentionPolicy'
   | 'stats'
@@ -162,6 +163,14 @@ export const adminSections: readonly AdminSection[] = [
     group: 'integrations',
     labelKey: 'labels.webhooks',
     keywordKey: 'settingsSearch.webhooks'
+  },
+  {
+    id: 'workerJobs',
+    path: 'integrations/worker-jobs',
+    routeName: 'admin-worker-jobs',
+    group: 'integrations',
+    labelKey: 'labels.workerJobs',
+    keywordKey: 'settingsSearch.workerJobs'
   },
   {
     id: 'lumpSumSync',

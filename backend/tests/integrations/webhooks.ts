@@ -3,7 +3,12 @@ import test, { ExecutionContext } from 'ava'
 import axios from 'axios'
 import { type Queue } from 'bullmq'
 import mongoose from 'mongoose'
-import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
+import {
+  closeIntegrationQueue,
+  getIntegrationJobRetentionOptions,
+  type IntegrationJobData,
+  setIntegrationQueueForTests
+} from '../../integrations/queue.js'
 import { webhookIntegration } from '../../integrations/webhooks/integration.js'
 import Webhook from '../../models/webhook.js'
 
@@ -71,12 +76,12 @@ test.serial('webhook events enqueue all matching hooks as separate jobs', async 
     {
       name: 'webhooks.deliver',
       data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhookId: hooks[0]._id } },
-      opts: deliverJobOptions
+      opts: { ...deliverJobOptions, ...getIntegrationJobRetentionOptions() }
     },
     {
       name: 'webhooks.deliver',
       data: { integrationKey: 'webhooks', operation: 'deliver', payload: { input: report, webhookId: hooks[1]._id } },
-      opts: deliverJobOptions
+      opts: { ...deliverJobOptions, ...getIntegrationJobRetentionOptions() }
     }
   ])
 })

@@ -8,5 +8,5 @@ export async function processIntegrationJob(job: IntegrationJobData, availableIn
     throw new Error(`No integration found for key '${job.integrationKey}'.`)
   }
 
-  await integration.runOperation(job.operation, job.payload)
+  return await integration.runOperation(job.operation, job.payload)
 }
