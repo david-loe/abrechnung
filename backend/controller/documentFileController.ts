@@ -62,3 +62,25 @@ export class DocumentFileAdminController extends Controller {
     return await this.deleter(DocumentFile, { _id: _id })
   }
 }
+
+@Tags('Admin', 'Document File')
+@Route('admin/documentFile')
+@Security('cookieAuth', ['admin'])
+@Security('httpBearer', ['admin'])
+export class AdminDocumentFileController extends Controller {
+  @Get()
+  @Produces(documentFileTypes[0])
+  @Produces(documentFileTypes[1])
+  @Produces(documentFileTypes[2])
+  @SuccessResponse(200)
+  public async getAny(@Query() _id: string) {
+    const file = await DocumentFile.findOne({ _id }).lean()
+    if (!file) {
+      throw new NotFoundError('No file found')
+    }
+    this.setHeader('Content-disposition', `inline; filename*=UTF-8''${encodeURIComponent(file.name)}`)
+    this.setHeader('Content-Type', file.type)
+    this.setHeader('Content-Length', file.data.length().toString())
+    return Readable.from([file.data.value()])
+  }
+}

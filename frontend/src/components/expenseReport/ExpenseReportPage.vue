@@ -18,7 +18,7 @@
           :default-project="expenseReport.project"
           :report-currency="expenseReport.currency || undefined"
           :endpointPrefix="endpointPrefix"
-          :ownerId="endpointPrefix === 'examine/' ? expenseReport.owner._id : undefined"
+          :ownerId="endpointPrefix === 'examine/' || viewOnly ? expenseReport.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
           :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
@@ -33,7 +33,7 @@
           :expenseReport="(modalObject as Partial<ExpenseReportSimple<string>>)"
           :loading="modalFormIsLoading"
           :owner="expenseReport.owner"
-          :update-user-org="endpointPrefix !== 'examine/'"
+          :update-user-org="endpointPrefix !== 'examine/' && !viewOnly"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
           @edit="editExpenseReportDetails" />
@@ -99,7 +99,7 @@
                 <li>
                   <a
                     :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
-                    @click="showModal('edit', 'expenseReport', expenseReport)">
+                    @click="viewOnly ? null : showModal('edit', 'expenseReport', expenseReport)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
                   </a>
@@ -107,11 +107,15 @@
                 <li><a
                   :class="
                       'dropdown-item clickable' +
-                      (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? ' disabled' : '')
+                      (viewOnly || (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE)
+                        ? ' disabled'
+                        : '')
                     "
                   @click="
-                      isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE ? null : deleteExpenseReport()
-                    ">
+                    viewOnly || (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE)
+                      ? null
+                      : deleteExpenseReport()
+                  ">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ t('labels.delete') }}</span>
                 </a></li>
@@ -120,7 +124,7 @@
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
             expenseReport.project.identifier +
             (expenseReport.project.name ? ' ' + expenseReport.project.name : '') }}
         </div>
@@ -287,8 +291,12 @@
                   <div>
                     <button
                       class="btn btn-secondary"
-                      @click="expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/' ? null : backToInWork()"
-                      :disabled="expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/'">
+                      @click="
+                        viewOnly || (expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/')
+                          ? null
+                          : backToInWork()
+                      "
+                      :disabled="viewOnly || (expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/')">
                       <i class="bi bi-arrow-counterclockwise"></i>
                       <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                     </button>
@@ -363,7 +371,8 @@ const expenseReportCompletionValidator = new Validator({ requireExchangeRate: tr
 const props = defineProps({
   _id: { type: String, required: true },
   parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
-  endpointPrefix: { type: String, default: '' }
+  endpointPrefix: { type: String, default: '' },
+  viewOnly: { type: Boolean, default: false }
 })
 
 const router = useRouter()
@@ -384,6 +393,7 @@ const modalFormIsLoading = ref(false)
 
 const isReadOnly = computed(() => {
   return (
+    props.viewOnly ||
     !sessionState.isOnline.value ||
     ((expenseReport.value.state > State.EDITABLE_BY_OWNER ||
       (expenseReport.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&

@@ -17,7 +17,7 @@
           :mode="modalMode"
           :default-project="healthCareCost.project"
           :endpointPrefix="endpointPrefix"
-          :ownerId="endpointPrefix === 'examine/' ? healthCareCost.owner._id : undefined"
+          :ownerId="endpointPrefix === 'examine/' || viewOnly ? healthCareCost.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(getNext(modalObject as Expense<string>))"
           :show-prev-button="modalMode === 'edit' && Boolean(getPrev(modalObject as Expense<string>))"
           @add="postExpense"
@@ -32,7 +32,7 @@
           :healthCareCost="modalObject as HealthCareCostSimple<string>"
           :loading="modalFormIsLoading"
           :owner="healthCareCost.owner"
-          :update-user-org="endpointPrefix !== 'examine/'"
+          :update-user-org="endpointPrefix !== 'examine/' && !viewOnly"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide()"
           @edit="editHealthCareCostDetails" />
@@ -98,16 +98,17 @@
                 <li>
                   <a
                     :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
-                    @click="showModal('edit', 'healthCareCost', healthCareCost)">
+                    @click="viewOnly ? null : showModal('edit', 'healthCareCost', healthCareCost)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.healthCareCost') }) }) }}</span>
                   </a>
                 </li>
                 <li><a
                   :class="
-                      'dropdown-item clickable' + (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? ' disabled' : '')
+                      'dropdown-item clickable' +
+                      (viewOnly || (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE) ? ' disabled' : '')
                     "
-                  @click="isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE ? null : deleteHealthCareCost()">
+                  @click="viewOnly || (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE) ? null : deleteHealthCareCost()">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ t('labels.delete') }}</span>
                 </a></li>
@@ -116,7 +117,7 @@
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
             healthCareCost.project.identifier +
             (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '') }}
         </div>
@@ -234,9 +235,11 @@
                     <button
                       class="btn btn-secondary"
                       @click="
-                        healthCareCost.editor._id !== healthCareCost.owner._id && endpointPrefix !== 'examine/' ? null : backToInWork()
+                        viewOnly || (healthCareCost.editor._id !== healthCareCost.owner._id && endpointPrefix !== 'examine/')
+                          ? null
+                          : backToInWork()
                       "
-                      :disabled="healthCareCost.editor._id !== healthCareCost.owner._id && endpointPrefix !== 'examine/'">
+                      :disabled="viewOnly || (healthCareCost.editor._id !== healthCareCost.owner._id && endpointPrefix !== 'examine/')">
                       <i class="bi bi-arrow-counterclockwise"></i>
                       <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                     </button>
@@ -324,7 +327,8 @@ const healthCareCostValidator = new Validator({ requireReceipts: true })
 const props = defineProps({
   _id: { type: String, required: true },
   parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
-  endpointPrefix: { type: String, default: '' }
+  endpointPrefix: { type: String, default: '' },
+  viewOnly: { type: Boolean, default: false }
 })
 
 const router = useRouter()
@@ -344,6 +348,7 @@ const isDownloadingFn = () => isDownloading
 
 const isReadOnly = computed(() => {
   return (
+    props.viewOnly ||
     !sessionState.isOnline.value ||
     ((healthCareCost.value.state > State.EDITABLE_BY_OWNER ||
       (healthCareCost.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&

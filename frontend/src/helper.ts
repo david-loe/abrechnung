@@ -138,6 +138,12 @@ export function getRouteForReport(
     if (user.access['approve/advance']) {
       return `/approve/advance/${report._id}`
     }
+    if (user.access['book/advance']) {
+      return `/book/advance/${report._id}`
+    }
+    if (user.access.admin) {
+      return `/admin/report/${reportType}/${report._id}`
+    }
     return `/book/advance/${report._id}`
   }
 
@@ -148,12 +154,24 @@ export function getRouteForReport(
     if (user.access['approve/travel'] && report.state <= TravelState.APPROVED) {
       return `/approve/travel/${report._id}`
     }
+    if (user.access['book/travel']) {
+      return `/book/travel/${report._id}`
+    }
+    if (user.access.admin) {
+      return `/admin/report/${reportType}/${report._id}`
+    }
     return `/book/travel/${report._id}`
   }
 
   //reportType === 'expenseReport' || reportType === 'healthCareCost'
   if (user.access[`examine/${reportType}`] && report.state >= State.EDITABLE_BY_OWNER && report.state <= State.BOOKABLE) {
     return `/examine/${reportType}/${report._id}`
+  }
+  if (user.access[`book/${reportType}`]) {
+    return `/book/${reportType}/${report._id}`
+  }
+  if (user.access.admin) {
+    return `/admin/report/${reportType}/${report._id}`
   }
   return `/book/${reportType}/${report._id}`
 }

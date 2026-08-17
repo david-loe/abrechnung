@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@/api.js', () => ({ default: { getter: vi.fn() } }))
 
 import API from '@/api.js'
-import { getReportReferenceUrl, getRouteForReportReference } from '@/helper.js'
+import { getReportReferenceUrl, getRouteForReport, getRouteForReportReference } from '@/helper.js'
 
 const owner = { _id: 'owner' } as User
 const meta = { count: 1, page: 1, limit: 1, countPages: 1 }
@@ -34,6 +34,35 @@ describe('report reference links', () => {
     } as never)
 
     await expect(getRouteForReportReference(examiner, 'T-001')).resolves.toBe('/examine/travel/report-id')
+  })
+
+  it.each([
+    ['Travel', '/admin/report/travel/report-id'],
+    ['ExpenseReport', '/admin/report/expenseReport/report-id'],
+    ['HealthCareCost', '/admin/report/healthCareCost/report-id'],
+    ['Advance', '/admin/report/advance/report-id']
+  ] as [ReportModelName, string][])(
+    'routes an admin without report permissions to the read-only %s view',
+    (reportModelName, expectedRoute) => {
+      const admin = { _id: 'admin', access: { admin: true } } as unknown as User
+      const report = { _id: 'report-id', owner: 'owner', state: TravelState.APPLIED_FOR }
+
+      expect(getRouteForReport(admin, report, reportModelName)).toBe(expectedRoute)
+    }
+  )
+
+  it('keeps owner access ahead of the additional admin read access', () => {
+    const adminOwner = { _id: 'owner', access: { admin: true } } as unknown as User
+    const report = { _id: 'report-id', owner: 'owner', state: TravelState.APPLIED_FOR }
+
+    expect(getRouteForReport(adminOwner, report, 'Travel')).toBe('/travel/report-id')
+  })
+
+  it('keeps explicit workflow access ahead of the additional admin read access', () => {
+    const adminExaminer = { _id: 'admin', access: { admin: true, 'examine/travel': true } } as unknown as User
+    const report = { _id: 'report-id', owner: 'owner', state: TravelState.APPROVED }
+
+    expect(getRouteForReport(adminExaminer, report, 'Travel')).toBe('/examine/travel/report-id')
   })
 
   it('does not request malformed references', async () => {
