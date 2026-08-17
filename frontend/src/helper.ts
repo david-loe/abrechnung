@@ -4,10 +4,12 @@ import {
   IdDocument,
   idDocumentToId,
   ReportModelName,
+  refStringRegexLax,
   State,
   TravelState,
   User
 } from 'abrechnung-common/types.js'
+import { refNumberToString, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from './api'
@@ -154,4 +156,18 @@ export function getRouteForReport(
     return `/examine/${reportType}/${report._id}`
   }
   return `/book/${reportType}/${report._id}`
+}
+
+export async function getRouteForReportReference(user: User, reference: string) {
+  if (!refStringRegexLax.test(reference)) return undefined
+
+  const params = refStringToNumber(reference)
+  const result = await API.getter<{ state: AnyState; owner: IdDocument; _id: string }>('search/ref', params)
+  if (!result.ok) return undefined
+
+  return getRouteForReport(user, result.ok.data, params.type)
+}
+
+export function getReportReferenceUrl(reference: number, reportModelName: ReportModelName) {
+  return `${ENV.VITE_FRONTEND_URL}/${refNumberToString(reference, reportModelName)}`
 }
