@@ -1035,6 +1035,9 @@
 							"book/healthCareCost": {
 								"type": "boolean"
 							},
+							"create/usersAndProjects": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -1055,6 +1058,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -1601,6 +1605,9 @@
 							"book/healthCareCost": {
 								"type": "boolean"
 							},
+							"create/usersAndProjects": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -1621,6 +1628,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -2043,6 +2051,9 @@
 					"access": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"create/usersAndProjects": {
 								"type": "boolean"
 							},
 							"book/healthCareCost": {
@@ -2501,6 +2512,9 @@
 					"access": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"create/usersAndProjects": {
 								"type": "boolean"
 							},
 							"book/healthCareCost": {
@@ -7452,6 +7466,9 @@
 							"book/healthCareCost": {
 								"type": "boolean"
 							},
+							"create/usersAndProjects": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -7472,6 +7489,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -7597,6 +7615,9 @@
 							"book/healthCareCost": {
 								"type": "boolean"
 							},
+							"create/usersAndProjects": {
+								"type": "boolean"
+							},
 							"admin": {
 								"type": "boolean"
 							}
@@ -7617,6 +7638,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -7714,6 +7736,9 @@
 					"defaultAccess": {
 						"properties": {
 							"admin": {
+								"type": "boolean"
+							},
+							"create/usersAndProjects": {
 								"type": "boolean"
 							},
 							"book/healthCareCost": {
@@ -11847,6 +11872,12 @@
 								},
 								"type": "array"
 							},
+							"create/usersAndProjects": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"admin": {
 								"items": {
 									"type": "string"
@@ -11870,6 +11901,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -12206,6 +12238,12 @@
 								},
 								"type": "array"
 							},
+							"create/usersAndProjects": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
 							"admin": {
 								"items": {
 									"type": "string"
@@ -12229,6 +12267,7 @@
 							"book/travel",
 							"book/expenseReport",
 							"book/healthCareCost",
+							"create/usersAndProjects",
 							"admin"
 						],
 						"type": "object"
@@ -12291,6 +12330,12 @@
 					"accessIcons": {
 						"properties": {
 							"admin": {
+								"items": {
+									"type": "string"
+								},
+								"type": "array"
+							},
+							"create/usersAndProjects": {
 								"items": {
 									"type": "string"
 								},
@@ -12836,6 +12881,147 @@
 			},
 			"SetterBody_ICurrency_": {
 				"$ref": "#/components/schemas/SetterPartial_ICurrency.NoPost_"
+			},
+			"CreateUserProjects": {
+				"properties": {
+					"assigned": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"supervised": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateUserSettings": {
+				"properties": {
+					"language": {
+						"$ref": "#/components/schemas/Locale"
+					},
+					"insurance": {
+						"type": "string",
+						"nullable": true
+					},
+					"organisation": {
+						"type": "string",
+						"nullable": true
+					},
+					"bankAccount": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/BankAccount"
+							}
+						],
+						"nullable": true
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateUserBody": {
+				"properties": {
+					"name": {
+						"$ref": "#/components/schemas/Name"
+					},
+					"email": {
+						"type": "string"
+					},
+					"employeeId": {
+						"type": "string",
+						"nullable": true
+					},
+					"fk": {
+						"properties": {
+							"magiclogin": {
+								"type": "string",
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"additionalDetails": {
+						"type": "string",
+						"nullable": true
+					},
+					"loseAccessAt": {
+						"type": "string",
+						"format": "date-time",
+						"nullable": true
+					},
+					"projects": {
+						"$ref": "#/components/schemas/CreateUserProjects"
+					},
+					"settings": {
+						"$ref": "#/components/schemas/CreateUserSettings"
+					}
+				},
+				"required": [
+					"name",
+					"email"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"CreateProjectBody": {
+				"properties": {
+					"identifier": {
+						"type": "string"
+					},
+					"organisation": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string",
+						"nullable": true
+					},
+					"budget": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double",
+								"nullable": true
+							}
+						},
+						"type": "object"
+					},
+					"balance": {
+						"properties": {
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"amount"
+						],
+						"type": "object"
+					},
+					"assignees": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"supervisors": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"identifier",
+					"organisation"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"LumpSum": {
 				"properties": {
@@ -13913,6 +14099,9 @@
 						"type": "boolean"
 					},
 					"book/healthCareCost": {
+						"type": "boolean"
+					},
+					"create/usersAndProjects": {
 						"type": "boolean"
 					},
 					"admin": {
@@ -16046,6 +16235,18 @@
 						"httpBearer": [
 							"user",
 							"admin"
+						]
+					},
+					{
+						"cookieAuth": [
+							"user",
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"user",
+							"create/usersAndProjects"
 						]
 					}
 				],
@@ -25127,6 +25328,724 @@
 					{
 						"httpBearer": [
 							"admin"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/create/user": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_User__id.binary_-or-User__id.binary_-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"email",
+									"name",
+									"_id",
+									"employeeId",
+									"fk",
+									"access",
+									"projects",
+									"settings",
+									"loseAccessAt",
+									"additionalDetails",
+									"vehicleRegistration",
+									"token"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"settings": {
+													"properties": {
+														"bankAccount": {
+															"$ref": "#/components/schemas/BankAccount"
+														},
+														"organisation": {
+															"$ref": "#/components/schemas/OrganisationSimple__id_"
+														},
+														"insurance": {
+															"$ref": "#/components/schemas/HealthInsurance__id_"
+														},
+														"language": {
+															"type": "string",
+															"enum": [
+																"de",
+																"en",
+																"fr",
+																"ru",
+																"es",
+																"kk"
+															]
+														}
+													},
+													"required": [
+														"bankAccount",
+														"organisation",
+														"insurance",
+														"language"
+													],
+													"type": "object"
+												},
+												"projects": {
+													"$ref": "#/components/schemas/UserProjects__id_"
+												},
+												"loseAccessAt": {
+													"anyOf": [
+														{
+															"type": "string"
+														},
+														{
+															"type": "string",
+															"format": "date-time"
+														}
+													]
+												},
+												"additionalDetails": {
+													"type": "string"
+												},
+												"fk": {
+													"properties": {
+														"magiclogin": {
+															"type": "string"
+														}
+													},
+													"required": [
+														"magiclogin"
+													],
+													"type": "object"
+												},
+												"employeeId": {
+													"type": "string"
+												},
+												"email": {
+													"type": "string"
+												},
+												"name": {
+													"$ref": "#/components/schemas/Name"
+												},
+												"_id": {
+													"$ref": "#/components/schemas/_id"
+												}
+											},
+											"required": [
+												"settings",
+												"projects",
+												"loseAccessAt",
+												"additionalDetails",
+												"fk",
+												"employeeId",
+												"email",
+												"name",
+												"_id"
+											],
+											"type": "object"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateUserBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/create/user/bulk": {
+			"post": {
+				"operationId": "PostMany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"properties": {
+													"settings": {
+														"properties": {
+															"bankAccount": {
+																"$ref": "#/components/schemas/BankAccount"
+															},
+															"organisation": {
+																"$ref": "#/components/schemas/OrganisationSimple__id_"
+															},
+															"insurance": {
+																"$ref": "#/components/schemas/HealthInsurance__id_"
+															},
+															"language": {
+																"type": "string",
+																"enum": [
+																	"de",
+																	"en",
+																	"fr",
+																	"ru",
+																	"es",
+																	"kk"
+																]
+															}
+														},
+														"required": [
+															"bankAccount",
+															"organisation",
+															"insurance",
+															"language"
+														],
+														"type": "object"
+													},
+													"projects": {
+														"$ref": "#/components/schemas/UserProjects__id_"
+													},
+													"loseAccessAt": {
+														"anyOf": [
+															{
+																"type": "string"
+															},
+															{
+																"type": "string",
+																"format": "date-time"
+															}
+														]
+													},
+													"additionalDetails": {
+														"type": "string"
+													},
+													"fk": {
+														"properties": {
+															"magiclogin": {
+																"type": "string"
+															}
+														},
+														"required": [
+															"magiclogin"
+														],
+														"type": "object"
+													},
+													"employeeId": {
+														"type": "string"
+													},
+													"email": {
+														"type": "string"
+													},
+													"name": {
+														"$ref": "#/components/schemas/Name"
+													},
+													"_id": {
+														"$ref": "#/components/schemas/_id"
+													}
+												},
+												"required": [
+													"settings",
+													"projects",
+													"loseAccessAt",
+													"additionalDetails",
+													"fk",
+													"employeeId",
+													"email",
+													"name",
+													"_id"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/CreateUserBody"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/create/user/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/create/project": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_Project__id_-or-Project__id_-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "limit",
+						"required": false,
+						"schema": {
+							"default": 0,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 0
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"format": "int32",
+							"type": "integer",
+							"minimum": 1
+						}
+					},
+					{
+						"in": "query",
+						"name": "_id",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "additionalFields",
+						"required": false,
+						"schema": {
+							"type": "array",
+							"items": {
+								"type": "string",
+								"enum": [
+									"identifier",
+									"organisation",
+									"_id",
+									"name",
+									"balance",
+									"budget"
+								],
+								"nullable": false
+							}
+						}
+					},
+					{
+						"in": "query",
+						"name": "filterJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sortJSON",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "Post",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreateProjectBody"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/create/project/bulk": {
+			"post": {
+				"operationId": "PostMany",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"allOf": [
+													{
+														"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
+													},
+													{
+														"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+													},
+													{
+														"properties": {
+															"__v": {
+																"type": "number",
+																"format": "double"
+															}
+														},
+														"required": [
+															"__v"
+														],
+														"type": "object"
+													}
+												]
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/CreateProjectBody"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/create/project/form": {
+			"get": {
+				"operationId": "GetForm",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Create Users and Projects"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"create/usersAndProjects"
+						]
+					},
+					{
+						"httpBearer": [
+							"create/usersAndProjects"
 						]
 					}
 				],
