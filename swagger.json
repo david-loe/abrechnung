@@ -3547,6 +3547,10 @@
 						"type": "number",
 						"format": "double"
 					},
+					"vatAmountOverride": {
+						"type": "number",
+						"format": "double"
+					},
 					"project": {
 						"$ref": "#/components/schemas/ProjectSimple__id_"
 					},
@@ -4806,6 +4810,10 @@
 						"type": "number",
 						"format": "double"
 					},
+					"vatAmountOverride": {
+						"type": "number",
+						"format": "double"
+					},
 					"project": {
 						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
 					},
@@ -5719,6 +5727,10 @@
 												}
 											]
 										},
+										"vatAmountOverride": {
+											"type": "number",
+											"format": "double"
+										},
 										"vatRate": {
 											"type": "number",
 											"format": "double"
@@ -5876,6 +5888,10 @@
 													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
 												}
 											]
+										},
+										"vatAmountOverride": {
+											"type": "number",
+											"format": "double"
 										},
 										"vatRate": {
 											"type": "number",
@@ -10564,6 +10580,10 @@
 												}
 											]
 										},
+										"vatAmountOverride": {
+											"type": "number",
+											"format": "double"
+										},
 										"vatRate": {
 											"type": "number",
 											"format": "double"
@@ -11343,6 +11363,10 @@
 					"vatRate": {
 						"type": "number",
 						"format": "double"
+					},
+					"vatAmountOverride": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"required": [
@@ -11370,6 +11394,10 @@
 						"format": "double"
 					},
 					"vatRate": {
+						"type": "number",
+						"format": "double"
+					},
+					"vatAmountOverride": {
 						"type": "number",
 						"format": "double"
 					},
