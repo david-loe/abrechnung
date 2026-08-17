@@ -91,6 +91,14 @@
           <h2>{{ t('accesses.approve/advance') }}</h2>
         </div>
         <div class="col-auto">
+          <CSVImport
+            endpoint="approve/advance/bulk"
+            :template-file-name="t('labels.advance')"
+            :template-fields="advanceImportTemplateFields"
+            :transformers="[{ path: 'budget.amount', fn: parseCsvNumber }]"
+            @submitted="() => advanceList?.loadFromServer()" />
+        </div>
+        <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.advance') }) }}</span>
@@ -141,10 +149,12 @@ import Advance from '@/components/advance/Advance.vue'
 import AdvanceList from '@/components/advance/AdvanceList.vue'
 import AdvanceApproveForm from '@/components/advance/forms/AdvanceApproveForm.vue'
 import AdvanceForm from '@/components/advance/forms/AdvanceForm.vue'
+import CSVImport from '@/components/elements/CSVImport.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
+import { advanceImportTemplateFields, parseCsvNumber } from '@/csvImport.js'
 
 const props = defineProps<{ _id?: string }>()
 const router = useRouter()

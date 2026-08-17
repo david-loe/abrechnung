@@ -19,12 +19,14 @@ import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import ApprovedTravel from '../models/approvedTravel.js'
+import Country from '../models/country.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
-import { AuthenticatedExpressRequest, TravelApplication, TravelPost } from './types.js'
+import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
+import { AuthenticatedExpressRequest, TravelApplication, TravelBulkImportPost, TravelPost } from './types.js'
 
 async function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
   const owner = await User.findOne({ _id: report.owner._id }, { vehicleRegistration: 1 }).lean()
@@ -302,6 +304,81 @@ export class TravelApproveController extends Controller {
       projection: { history: 0, historic: 0, bookings: 0, expenses: 0, stages: 0, days: 0 },
       sort: { updatedAt: -1 }
     })
+  }
+
+  @Post('bulk')
+  public async postManyApproved(@Body() requestBody: TravelBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
+    const resolvedReferences = await resolveImportReferences(requestBody)
+    const countries = await Country.find(
+      { _id: { $in: requestBody.map(({ destinationPlace }) => destinationPlace?.country) } },
+      { _id: 1, needsA1Certificate: 1 }
+    ).lean()
+    validateImportValues(
+      requestBody.map(({ destinationPlace }) => destinationPlace?.country),
+      new Set(countries.map(({ _id }) => _id)),
+      'destinationPlace.country',
+      'country'
+    )
+
+    const countriesById = new Map(countries.map((country) => [country._id, country]))
+    const validationErrors: { path: string; message: string }[] = []
+    for (const [index, row] of requestBody.entries()) {
+      const startDate = new Date(row.startDate)
+      const endDate = new Date(row.endDate)
+      const rowLabel = `CSV row ${index + 3}`
+      if (Number.isNaN(startDate.valueOf())) {
+        validationErrors.push({ path: `${index}.startDate`, message: `${rowLabel}: Invalid start date.` })
+      }
+      if (Number.isNaN(endDate.valueOf())) {
+        validationErrors.push({ path: `${index}.endDate`, message: `${rowLabel}: Invalid end date.` })
+      }
+      if (!Number.isNaN(startDate.valueOf()) && !Number.isNaN(endDate.valueOf())) {
+        const dayCount = (endDate.valueOf() - startDate.valueOf()) / (1_000 * 60 * 60 * 24)
+        if (dayCount < 0) {
+          validationErrors.push({ path: `${index}.endDate`, message: `${rowLabel}: End date must not be before start date.` })
+        } else if (dayCount > BACKEND_CACHE.travelSettings.maxTravelDayCount) {
+          validationErrors.push({ path: `${index}.endDate`, message: `${rowLabel}: Travel exceeds the maximum duration.` })
+        }
+      }
+      if (row.claimSpouseRefund && !BACKEND_CACHE.travelSettings.allowSpouseRefund) {
+        validationErrors.push({ path: `${index}.claimSpouseRefund`, message: `${rowLabel}: Spouse refund is disabled.` })
+      } else if (row.claimSpouseRefund && !row.fellowTravelersNames?.trim()) {
+        validationErrors.push({ path: `${index}.fellowTravelersNames`, message: `${rowLabel}: Fellow traveler names are required.` })
+      }
+      if (row.isCrossBorder && countriesById.get(row.destinationPlace.country)?.needsA1Certificate) {
+        if (!row.a1Certificate?.exactAddress?.trim()) {
+          validationErrors.push({ path: `${index}.a1Certificate.exactAddress`, message: `${rowLabel}: Exact address is required.` })
+        }
+        if (!row.a1Certificate?.destinationName?.trim()) {
+          validationErrors.push({ path: `${index}.a1Certificate.destinationName`, message: `${rowLabel}: Destination name is required.` })
+        }
+      }
+    }
+    if (validationErrors.length > 0) {
+      throw new ValidationClientError(validationErrors[0].message, validationErrors)
+    }
+
+    const documents = requestBody.map((row, index) => {
+      let name = row.name
+      if (!name && row.startDate) {
+        const date = new Date(row.startDate)
+        name = `${row.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
+      return new Travel({
+        ...row,
+        name,
+        destinationPlace: { place: row.destinationPlace?.place, country: row.destinationPlace?.country },
+        owner: resolvedReferences[index].owner,
+        project: resolvedReferences[index].project,
+        advances: resolvedReferences[index].advances,
+        state: TravelState.APPROVED,
+        editor: request.user._id,
+        a1Certificate: row.isCrossBorder ? row.a1Certificate : undefined
+      })
+    })
+    const result = await bulkSaveImport(Travel, documents)
+    await Promise.all(result.map((travel) => emitIntegrationEvent({ type: 'travel.approved', report: travel })))
+    return { message: 'alerts.successSaving', result }
   }
 
   @Post('approved')

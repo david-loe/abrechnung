@@ -48,8 +48,22 @@ function readFile(event: Event) {
     const file = target.files[0]
     const reader = new FileReader()
     reader.readAsText(file)
-    reader.onload = (e: Event) => {
-      submit(convert((e.target as FileReader).result as string))
+    reader.onload = async (e: Event) => {
+      try {
+        await submit(convert((e.target as FileReader).result as string))
+      } catch (error) {
+        API.addAlert({
+          title: t('alerts.ValidationError'),
+          message: error instanceof Error ? error.message : String(error),
+          type: 'danger'
+        })
+      } finally {
+        target.value = ''
+      }
+    }
+    reader.onerror = () => {
+      API.addAlert({ title: t('alerts.ValidationError'), message: reader.error?.message, type: 'danger' })
+      target.value = ''
     }
   }
 }

@@ -16,6 +16,7 @@ import { checkIfUserIsProjectSupervisor } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
+import Currency from '../models/currency.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import ReportUsage from '../models/reportUsage.js'
@@ -23,7 +24,8 @@ import Travel from '../models/travel.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
 import { AuthorizationError, NotFoundError } from './error.js'
-import { AuthenticatedExpressRequest, MoneyPost } from './types.js'
+import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
+import { AdvanceBulkImportPost, AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
 interface AdvanceApplication {
   project?: IdDocument<Types.ObjectId>
@@ -187,6 +189,44 @@ export class AdvanceApproveController extends Controller {
       filter.$and?.push({ project: { $in: request.user.projects.supervised as any } })
     }
     return await this.getter(Advance, { query, filter, projection: { history: 0, historic: 0, bookings: 0 }, sort: { updatedAt: -1 } })
+  }
+
+  @Post('bulk')
+  public async postManyApproved(@Body() requestBody: AdvanceBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
+    const resolvedReferences = await resolveImportReferences(requestBody, false)
+    const currencies = await Currency.find({ _id: { $in: requestBody.map(({ budget }) => budget?.currency) } }, { _id: 1 }).lean()
+    validateImportValues(
+      requestBody.map(({ budget }) => budget?.currency),
+      new Set(currencies.map(({ _id }) => _id)),
+      'budget.currency',
+      'currency'
+    )
+
+    const imports = requestBody.map((row, index) => ({
+      name: row.name,
+      reason: row.reason,
+      budget: { amount: row.budget?.amount, currency: row.budget?.currency, exchangeRate: undefined },
+      comment: row.comment,
+      bookingRemark: row.bookingRemark,
+      owner: resolvedReferences[index].owner,
+      project: resolvedReferences[index].project,
+      state: AdvanceState.APPROVED,
+      editor: request.user._id
+    }))
+    await Promise.all(
+      imports.map(async (advance) => {
+        await createOperationServices().currencyConverter.addExchangeRate(advance.budget, new Date())
+        setAdvanceBalance(advance as unknown as IAdvance)
+        if (!advance.name) {
+          const date = new Date()
+          advance.name = `${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+        }
+      })
+    )
+    const documents = imports.map((advance) => new Advance(advance))
+    const result = await bulkSaveImport(Advance, documents)
+    await Promise.all(result.map((advance) => emitIntegrationEvent({ type: 'report.review_completed', report: advance })))
+    return { message: 'alerts.successSaving', result }
   }
 
   @Delete()

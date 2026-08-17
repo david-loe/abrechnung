@@ -6,10 +6,12 @@ import {
   ExpenseReportState,
   idDocumentToId
 } from 'abrechnung-common/types.js'
+import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import test from 'ava'
 import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import ExpenseReportModel from '../../models/expenseReport.js'
 import LedgerAccount from '../../models/ledgerAccount.js'
 import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
@@ -78,6 +80,56 @@ test.serial('GET /category', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+test.serial('POST /examine/expenseReport/bulk creates reports and resolves advance references', async (t) => {
+  const owner = await User.findOne({ 'fk.ldapauth': 'fry' }).lean()
+  t.truthy(owner)
+  await loginUser(agent, 'advance')
+  const advanceResponse = await agent
+    .post('/approve/advance/approved')
+    .send({
+      owner: owner?._id,
+      project: expenseReport.project,
+      name: 'CSV expense report advance',
+      reason: 'CSV import test',
+      budget: { amount: 80, currency: 'EUR' }
+    })
+  t.is(advanceResponse.status, 200)
+
+  await loginUser(agent, 'expenseReport')
+  const response = await agent
+    .post('/examine/expenseReport/bulk')
+    .send([
+      {
+        owner: owner?.email,
+        project: expenseReport.project.identifier,
+        name: 'CSV expense report',
+        advances: [refNumberToString(advanceResponse.body.result.reference, 'Advance')]
+      }
+    ])
+
+  t.is(response.status, 200)
+  t.is(response.body.result.length, 1)
+  t.is(response.body.result[0].state, ExpenseReportState.IN_WORK)
+  t.is(response.body.result[0].owner._id, owner?._id.toString())
+  t.is(response.body.result[0].advances[0]._id, advanceResponse.body.result._id)
+  await loginUser(agent, 'user')
+})
+
+test.serial('POST /examine/expenseReport/bulk rejects all rows when one owner is invalid', async (t) => {
+  const owner = await User.findOne({ 'fk.ldapauth': 'fry' }).lean()
+  const names = ['CSV atomic valid expense report', 'CSV atomic invalid expense report']
+  await loginUser(agent, 'expenseReport')
+  const response = await agent.post('/examine/expenseReport/bulk').send([
+    { owner: owner?.email, project: expenseReport.project.identifier, name: names[0], advances: [] },
+    { owner: 'missing@example.com', project: expenseReport.project.identifier, name: names[1], advances: [] }
+  ])
+
+  t.is(response.status, 422)
+  t.regex(response.body.message, /CSV row 4/)
+  t.is(await ExpenseReportModel.countDocuments({ name: { $in: names } }), 0)
+  await loginUser(agent, 'user')
 })
 
 test.serial('POST /expenseReport/inWork', async (t) => {

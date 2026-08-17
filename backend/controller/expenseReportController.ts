@@ -23,7 +23,8 @@ import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
-import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
+import { bulkSaveImport, resolveImportReferences } from './reportImport.js'
+import { AuthenticatedExpressRequest, ExpenseBulkImportPost, ExpenseReportBulkImportPost } from './types.js'
 
 const expenseReportReviewValidator = new Validator({ requireReceipts: true })
 const expenseReportCompletionValidator = new Validator({ requireExchangeRate: true, requireReceipts: true })
@@ -295,6 +296,29 @@ export class ExpenseReportExamineController extends Controller {
       allowedAdditionalFields: ['expenses'],
       sort: { updatedAt: -1 }
     })
+  }
+
+  @Post('bulk')
+  public async postManyInWork(@Body() requestBody: ExpenseReportBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
+    const resolvedReferences = await resolveImportReferences(requestBody)
+    const documents = requestBody.map((row, index) => {
+      let name = row.name
+      if (!name) {
+        const date = new Date()
+        name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
+      return new ExpenseReport({
+        name,
+        owner: resolvedReferences[index].owner,
+        project: resolvedReferences[index].project,
+        advances: resolvedReferences[index].advances,
+        state: ExpenseReportState.IN_WORK,
+        editor: request.user._id
+      })
+    })
+    const result = await bulkSaveImport(ExpenseReport, documents)
+    await Promise.all(result.map((report) => emitIntegrationEvent({ type: 'report.review_requested', report })))
+    return { message: 'alerts.successSaving', result }
   }
 
   @Delete()
