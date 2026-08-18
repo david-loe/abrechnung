@@ -13,6 +13,7 @@ import ENV from './env.js'
 import i18n from './i18n.js'
 import { closeIntegrationQueue } from './integrations/queue.js'
 import { logger } from './logger.js'
+import { closeMcpServer, registerMcpRoutes } from './mcp/server.js'
 import { checkForMigrations } from './migrations.js'
 import { initializeBackendRuntime, shutdownBackendRuntime } from './runtime.js'
 
@@ -31,8 +32,6 @@ export default async function () {
     })
   }
 
-  app.use(express.json({ limit: '2mb' }))
-  app.use(express.urlencoded({ limit: '2mb', extended: true }))
   app.use(cors({ credentials: true, origin: [ENV.VITE_FRONTEND_URL, ENV.VITE_BACKEND_URL] }))
 
   if (ENV.RATE_LIMIT_WINDOW_MS || ENV.RATE_LIMIT) {
@@ -49,12 +48,22 @@ export default async function () {
   }
 
   app.use((req, _res, next) => {
-    if (BACKEND_CACHE.settings.isReadOnly && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && req.path !== '/readOnly') {
+    if (
+      BACKEND_CACHE.settings.isReadOnly &&
+      ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) &&
+      req.path !== '/readOnly' &&
+      req.path !== '/mcp'
+    ) {
       next(new ReadOnlyError())
     } else {
       next()
     }
   })
+
+  registerMcpRoutes(app)
+
+  app.use(express.json({ limit: '2mb' }))
+  app.use(express.urlencoded({ limit: '2mb', extended: true }))
 
   // only use secure cookie with https and trust proxy setup
   const useSecureCookie = ENV.VITE_BACKEND_URL.startsWith('https') && Boolean(ENV.TRUST_PROXY)
@@ -103,6 +112,7 @@ export default async function () {
 }
 
 export async function shutdown() {
+  await closeMcpServer()
   await closeIntegrationQueue()
   await shutdownBackendRuntime()
   await disconnectDB()

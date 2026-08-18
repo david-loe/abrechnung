@@ -141,9 +141,18 @@ export interface oidcSettings {
   clientSecret: string // Client Secret
 }
 
+export interface mcpOAuthSettings {
+  audience: string
+}
+
 export interface ConnectionSettings<idType extends _id = _id> {
   PDFReportsViaEmail: { sendPDFReportsToOrganisationEmail: boolean; locale: Locale }
-  auth: { microsoft?: microsoftSettings | null; ldapauth?: ldapauthSettings | null; oidc?: oidcSettings | null }
+  auth: {
+    microsoft?: microsoftSettings | null
+    ldapauth?: ldapauthSettings | null
+    oidc?: oidcSettings | null
+    mcp?: mcpOAuthSettings | null
+  }
   smtp?: smtpSettings | null
 
   _id: idType

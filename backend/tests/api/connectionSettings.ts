@@ -80,6 +80,20 @@ test.serial('POST /admin/connectionSettings accepts new secret values', async (t
   t.is(postRes.body.result.auth.microsoft.clientSecret, SECRET_PLACEHOLDER)
 })
 
+test.serial('POST /admin/connectionSettings persists the MCP OAuth audience', async (t) => {
+  const getRes = await agent.get('/admin/connectionSettings')
+  t.is(getRes.status, 200)
+  const settings: IConnectionSettings = getRes.body.data
+  settings.auth.mcp = { audience: 'https://abrechnung.example/mcp' }
+
+  const postRes = await agent.post('/admin/connectionSettings').send(settings)
+  t.is(postRes.status, 200)
+  t.is(postRes.body.result.auth.mcp.audience, settings.auth.mcp.audience)
+
+  const updatedSettings = await ConnectionSettings.findOne().lean()
+  t.is(updatedSettings?.auth.mcp?.audience, settings.auth.mcp.audience)
+})
+
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })

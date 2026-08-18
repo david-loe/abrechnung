@@ -32,6 +32,9 @@ async function postConnectionSettings(connectionSettings: ConnectionSettings) {
   if (!connectionSettings.auth.oidc?.clientId) {
     connectionSettings.auth.oidc = null
   }
+  if (!connectionSettings.auth.mcp?.audience) {
+    connectionSettings.auth.mcp = null
+  }
   const result = await API.setter<ConnectionSettings>('admin/connectionSettings', connectionSettings)
   if (result.ok) {
     loadConnectionSettings(result.ok)
@@ -50,6 +53,9 @@ function loadConnectionSettings(connectionSettings: ConnectionSettings) {
     }
     if (connectionSettings.auth.oidc === null) {
       connectionSettings.auth.oidc = undefined
+    }
+    if (connectionSettings.auth.mcp === null) {
+      connectionSettings.auth.mcp = undefined
     }
   }
   //@ts-expect-error is wrongly typed as Vueform and not VueformElement
