@@ -17,6 +17,20 @@ describe('unsaved changes guard', () => {
     expect(source).toEqual({ transport: { type: 'train' }, cost: { positions: [{ amount: 12 }] } })
   })
 
+  it('clones receipt data inside nested reactive values', () => {
+    const receipt = new Blob(['receipt'], { type: 'text/plain' })
+    const cost = reactive({ positions: [{ amount: 12 }], receipts: [{ name: 'receipt.txt', type: 'text/plain', data: receipt }] })
+    const source = { description: 'Train', cost }
+
+    const formValue = cloneFormValue(source)
+
+    expect(formValue.cost).not.toBe(cost)
+    expect(formValue.cost.receipts[0].data).toBeInstanceOf(Blob)
+    expect(formValue.cost.receipts[0].data.size).toBe(receipt.size)
+    formValue.cost.positions[0].amount = 24
+    expect(cost.positions[0].amount).toBe(12)
+  })
+
   it('only asks for confirmation when the form differs from its initial value', () => {
     const confirm = vi.fn(() => false)
     vi.stubGlobal('confirm', confirm)
@@ -46,6 +60,15 @@ describe('unsaved changes guard', () => {
     guard.resetInitialValue()
 
     expect(guard.hasUnsavedChanges.value).toBe(false)
+  })
+
+  it('detects an added receipt as an unsaved change', () => {
+    const formValue = ref({ cost: { receipts: [] as Blob[] } })
+    const guard = useUnsavedChangesGuard(formValue)
+
+    formValue.value.cost.receipts.push(new Blob(['receipt'], { type: 'text/plain' }))
+
+    expect(guard.hasUnsavedChanges.value).toBe(true)
   })
 
   it('accepts form normalizations scheduled by a value change as part of the initial value', async () => {
