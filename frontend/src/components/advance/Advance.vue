@@ -35,6 +35,10 @@
           </span>
         </td>
       </tr>
+      <tr v-if="isForeignCurrency">
+        <th scope="row">{{ t('labels.exchangeRateDate') }}</th>
+        <td>{{ advance.exchangeRateDate ? formatter.date(advance.exchangeRateDate) : '—' }}</td>
+      </tr>
       <tr v-if="advance.offsetAgainst.length > 0">
         <th scope="row">{{ t('labels.offsetAgainst') }}</th>
         <td>
@@ -92,8 +96,8 @@
   </div>
 </template>
 <script setup lang="ts">
-import { AdvanceSimple, AdvanceState, getReportTypeFromModelName, State } from 'abrechnung-common/types.js'
-import { PropType, ref } from 'vue'
+import { AdvanceSimple, AdvanceState, baseCurrency, getReportTypeFromModelName, idDocumentToId, State } from 'abrechnung-common/types.js'
+import { computed, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
@@ -110,6 +114,7 @@ const props = defineProps({
 
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
+const isForeignCurrency = computed(() => idDocumentToId(props.advance.budget.currency) !== baseCurrency._id)
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data

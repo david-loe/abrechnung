@@ -41,6 +41,7 @@ const advance = (
       reason: 'Foreign expenses',
       owner: user,
       project,
+      exchangeRateDate: today,
       budget: { amount: 100, currency: 'USD' }
     })
 ).body.result as Advance
@@ -164,6 +165,7 @@ test.serial('foreign advance keeps its remaining balance in the original currenc
         reason: 'Foreign expenses',
         owner: user,
         project,
+        exchangeRateDate: today,
         budget: { amount: 100, currency: 'USD' }
       })
   ).body.result as Advance
@@ -190,6 +192,7 @@ test.serial('foreign advance keeps its remaining balance in the original currenc
 
   const storedAdvance = (await agent.get('/advance').query({ _id: partialAdvance._id })).body.data as Advance
   t.is(storedAdvance.balance.currency._id, 'USD')
+  t.deepEqual(new Date(storedAdvance.exchangeRateDate as Date | string), today)
   t.is(storedAdvance.balance.amount, 40)
   t.is(storedAdvance.balance.exchangeRate?.amount, 38)
   t.is(storedAdvance.offsetAgainst[0].amount, 60)

@@ -36,6 +36,10 @@ const advanceSchema = () =>
     Object.assign(requestBaseSchema(advanceStates, AdvanceState.APPLIED_FOR, 'Advance', false), {
       reason: { type: String, required: true },
       budget: costObject({ exchangeRate: true, receipts: false, required: true, min: 0, defaultCurrency: baseCurrency._id }),
+      exchangeRateDate: {
+        type: Date,
+        validate: { validator: (value: Date | string | number) => Date.now() >= new Date(value).valueOf(), message: 'futureNotAllowed' }
+      },
       balance: costObject({ exchangeRate: true, receipts: false, required: true, min: 0, defaultCurrency: baseCurrency._id }),
       offsetAgainst: {
         type: [
@@ -90,7 +94,21 @@ schema.methods.saveToHistory = async function (save = true, session: mongoose.Cl
 }
 
 schema.methods.calculateExchangeRates = async function () {
-  await createOperationServices().currencyConverter.addExchangeRate(this.budget, this.createdAt ? this.createdAt : new Date())
+  const currency = idDocumentToId(this.budget.currency).toString()
+  if (currency === baseCurrency._id) {
+    this.exchangeRateDate = undefined
+    this.budget.exchangeRate = null
+    return
+  }
+  if (!this.exchangeRateDate) {
+    this.budget.exchangeRate = null
+    return
+  }
+  try {
+    await createOperationServices().currencyConverter.addExchangeRate(this.budget, this.exchangeRateDate)
+  } catch {
+    this.budget.exchangeRate = null
+  }
 }
 
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {
@@ -200,13 +218,24 @@ schema.methods.addComment = function () {
   }
 }
 
-schema.pre('validate', function () {
+schema.pre('validate', async function () {
   this.addComment()
+  await this.calculateExchangeRates()
+  const isForeignCurrency = idDocumentToId(this.budget.currency).toString() !== baseCurrency._id
+  if (!this.historic && this.state === AdvanceState.APPROVED && isForeignCurrency) {
+    if (!this.exchangeRateDate) {
+      this.invalidate('exchangeRateDate', 'required')
+    } else if (!this.budget.exchangeRate) {
+      this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
+    }
+  }
+  if (!this.historic && this.state === AdvanceState.APPROVED && (this.isNew || this.isModified('state'))) {
+    setAdvanceBalance(this)
+  }
 })
 
 schema.pre('save', async function () {
   await populateAll(this, populates)
-  await this.calculateExchangeRates()
   setLog(this)
   await addReferenceOnNewDocs(this, 'Advance')
   if (!this.historic && this.state < AdvanceState.APPROVED) {

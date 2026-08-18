@@ -593,6 +593,7 @@ export interface Report<idType extends _id = _id, S extends AnyState = AnyState>
 export interface AdvanceBase<idType extends _id = _id> {
   name: string
   budget: MoneyNotNull
+  exchangeRateDate?: Date | string | null
   project: Project<idType>
   balance: MoneyNotNull
   reason: string

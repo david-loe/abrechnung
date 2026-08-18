@@ -389,6 +389,7 @@ export async function checkForMigrations() {
 
       const advances = mongoose.connection.collection<{
         _id: mongoose.Types.ObjectId
+        createdAt: Date
         budget: { currency: string; exchangeRate?: { date: Date; rate: number; amount: number } | null }
         balance: { amount: number; currency?: string; exchangeRate?: { date: Date; rate: number; amount: number } | null }
         offsetAgainst: { amount: number; [key: string]: unknown }[]
@@ -409,6 +410,7 @@ export async function checkForMigrations() {
           { _id: advance._id },
           {
             $set: {
+              ...(currency !== baseCurrency._id ? { exchangeRateDate: advance.budget.exchangeRate?.date ?? advance.createdAt } : {}),
               balance: { amount: convertFromEuro(advance.balance.amount), currency, exchangeRate: exchangeRateFor(advance.balance.amount) },
               offsetAgainst: advance.offsetAgainst.map((offset) => ({
                 ...offset,

@@ -273,7 +273,12 @@ class ReportPrint<idType extends _id> {
       }
     } else if (reportIsAdvance(this.report)) {
       ownerLine = `${this.t('labels.advanceRecipient')}: ${this.drawer.formatter.name(this.report.owner.name)}`
-      metaInformation = [`${this.t('labels.reason')}: ${this.report.reason}`]
+      metaInformation = [
+        `${this.t('labels.reason')}: ${this.report.reason}`,
+        idDocumentToId(this.report.budget.currency) !== baseCurrency._id && this.report.exchangeRateDate
+          ? `${this.t('labels.exchangeRateDate')}: ${this.drawer.formatter.date(this.report.exchangeRateDate)}`
+          : ''
+      ].filter((line) => line !== '')
     } else if (reportIsHealthCareCost(this.report)) {
       ownerLine = `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}`
       const ec = this.report.expenses.length

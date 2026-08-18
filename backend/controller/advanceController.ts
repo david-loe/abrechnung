@@ -12,7 +12,7 @@ import { multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { Document, model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
+import { checkIfUserIsProjectSupervisor } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
@@ -30,6 +30,7 @@ interface AdvanceApplication {
   _id?: Types.ObjectId
   name?: string
   budget: MoneyPost
+  exchangeRateDate?: Date | string | null
   reason: string
   comment?: string
 }
@@ -220,13 +221,11 @@ export class AdvanceApproveController extends Controller {
   public async postAnyApproved(
     @Body() requestBody:
       | (AdvanceApplication & { owner: IdDocument; bookingRemark?: string | null })
-      | { _id: string; comment?: string; bookingRemark?: string | null },
+      | { _id: string; comment?: string; bookingRemark?: string | null; exchangeRateDate?: Date | string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      await createOperationServices().currencyConverter.addExchangeRate((extendedBody as AdvanceApplication).budget, new Date())
-      setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
         ;(extendedBody as AdvanceApplication).name =

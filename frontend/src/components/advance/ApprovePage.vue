@@ -16,7 +16,7 @@
               :advance="(modalAdvance as AdvanceSimple<string>)"
               :loading="modalFormIsLoading"
               @cancel="resetAndHide()"
-              @decision="(d, c, br) => approveAdvance((modalAdvance as AdvanceSimple<string>), d, c, br)" />
+              @decision="(d, c, br, exchangeRateDate) => approveAdvance((modalAdvance as AdvanceSimple<string>), d, c, br, exchangeRateDate)" />
             <template v-else>
               <Advance :advance="(modalAdvance as AdvanceSimple<string>)" endpointPrefix="approve/">
                 <template #buttons>
@@ -80,6 +80,7 @@
           :advance="modalAdvance"
           askOwner
           askBookingRemark
+          requireExchangeRateDate
           :loading="modalFormIsLoading"
           @add="(t) => approveAdvance(t as AdvanceSimple, 'approved')" />
       </div>
@@ -201,7 +202,8 @@ async function approveAdvance(
   advance: AdvanceSimple,
   decision: 'approved' | 'rejected',
   comment?: string | null,
-  bookingRemark?: string | null
+  bookingRemark?: string | null,
+  exchangeRateDate?: Date | string | null
 ) {
   if (advance) {
     if (comment) {
@@ -209,6 +211,9 @@ async function approveAdvance(
     }
     if (decision === 'approved' && bookingRemark) {
       advance.bookingRemark = bookingRemark
+    }
+    if (decision === 'approved' && exchangeRateDate !== undefined) {
+      advance.exchangeRateDate = exchangeRateDate
     }
     modalFormIsLoading.value = true
     const result = await API.setter<AdvanceSimple>(`approve/advance/${decision}`, advance)
