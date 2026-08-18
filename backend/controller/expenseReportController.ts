@@ -25,7 +25,8 @@ import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
 
-const expenseReportValidator = new Validator({ requireReceipts: true })
+const expenseReportReviewValidator = new Validator({ requireReceipts: true })
+const expenseReportCompletionValidator = new Validator({ requireExchangeRate: true, requireReceipts: true })
 type ExpenseSetterBody = SetterBody<Expense<Types.ObjectId, mongo.Binary>>
 type ExpenseReportDetailsBody = {
   project?: IdDocument<Types.ObjectId>
@@ -40,7 +41,20 @@ function assertExpenseReportCanEnterReview(
   report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
   language: string
 ) {
-  const reviewSummary = expenseReportValidator.getValidationSummary(report)
+  const reviewSummary = expenseReportReviewValidator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
+
+function assertExpenseReportCanCompleteReview(
+  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+  language: string
+) {
+  const reviewSummary = expenseReportCompletionValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
@@ -421,7 +435,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
+          assertExpenseReportCanCompleteReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

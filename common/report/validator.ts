@@ -20,7 +20,7 @@ export interface ValidationSummary {
   canEnterReview: boolean
 }
 
-export type ValidatorSettings = { requireReceipts?: boolean }
+export type ValidatorSettings = { requireExchangeRate?: boolean; requireReceipts?: boolean }
 
 type ExpenseValidatorRuntimeSettings = Required<ValidatorSettings> & { pathPrefix?: string; reference?: ValidationReference }
 
@@ -57,13 +57,15 @@ export class Validator<
   protected validators: ReportValidatorFn<TReport, TSettings, TContext>[] = [
     (report) => (report.expenses.length < 1 ? [{ code: 'noData.expense', severity: 'error' }] : []),
     (report, settings) => this.getReportExpenseValidationResults(report, settings),
-    (report) => {
+    (report, settings) => {
       if (!report.currency) return []
       const currency = idDocumentToId(report.currency).toString()
       const results: ValidationResult[] = []
-      if (!report.exchangeRateDate) results.push({ code: 'required', severity: 'error', path: 'exchangeRateDate' })
-      if (typeof report.exchangeRate !== 'number')
+      if (settings.requireExchangeRate && !report.exchangeRateDate) {
+        results.push({ code: 'required', severity: 'error', path: 'exchangeRateDate' })
+      } else if (settings.requireExchangeRate && typeof report.exchangeRate !== 'number') {
         results.push({ code: 'exchangeRateUnavailable', severity: 'error', path: 'exchangeRateDate' })
+      }
       for (const [index, expense] of report.expenses.entries()) {
         if (expense.cost && idDocumentToId(expense.cost.currency).toString() !== currency) {
           results.push({
@@ -82,7 +84,7 @@ export class Validator<
   ]
 
   constructor(settings = {} as TSettings) {
-    this.settings = { requireReceipts: true, ...settings } as Required<TSettings>
+    this.settings = { requireExchangeRate: false, requireReceipts: true, ...settings } as Required<TSettings>
   }
 
   protected getReportExpenseValidationResults(report: TReport, _settings: Required<TSettings>): ValidationResult[] {

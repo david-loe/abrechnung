@@ -53,6 +53,7 @@
     "negativeTotal": "Cette déclaration ne compense pas toutes les entrées négatives.",
     "noData": {
       "advanceForUserX": "Aucune avance approuvée pour '{X}'. Demandez-en une !",
+      "advanceForUserXInCurrencyY": "Aucune avance approuvée pour '{X}' en {Y}. Demandez-en une !",
       "expense": "Aucune dépense n'a encore été enregistrée. Ajoutez-en une.",
       "healthCareCost": "Vous n'avez pas encore soumis de frais de santé.",
       "searchX": "Aucune entrée trouvée pour '{X}'.",
@@ -645,6 +646,7 @@
     "uploadTokenExpireAfterSeconds": "Délai d'expiration du token de téléchargement [secondes]",
     "useDifferentProject": "Sélectionner un autre projet",
     "used": "Utilisé",
+    "useForeignCurrency": "Utiliser une devise étrangère",
     "user": "Utilisateur",
     "userCanSeeAllProjects": "Les utilisateurs peuvent voir TOUS les projets",
     "userImport": "Importer des utilisateurs",

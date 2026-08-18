@@ -53,6 +53,7 @@
     "negativeTotal": "This report does not offset all negative entries.",
     "noData": {
       "advanceForUserX": "No approved advance for '{X}'. Apply for one!",
+      "advanceForUserXInCurrencyY": "No approved advance for '{X}' in {Y}. Apply for one!",
       "expense": "There are no expenses yet. Add one!",
       "healthCareCost": "You have not submitted any health care costs yet.",
       "searchX": "Nothing found for '{X}'.",
@@ -645,6 +646,7 @@
     "uploadTokenExpireAfterSeconds": "Upload token expiration time [seconds]",
     "useDifferentProject": "Use different project",
     "used": "Used",
+    "useForeignCurrency": "Use foreign currency",
     "user": "User",
     "userCanSeeAllProjects": "Users can see ALL projects",
     "userImport": "Import users",

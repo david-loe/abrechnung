@@ -53,6 +53,7 @@
     "negativeTotal": "Diese Abrechnung gleicht nicht alle negativen Einträge aus.",
     "noData": {
       "advanceForUserX": "Kein genehmigter Vorschuss für '{X}'. Beantrage einen!",
+      "advanceForUserXInCurrencyY": "Kein genehmigter Vorschuss für '{X}' in {Y} gefunden. Beantrage einen!",
       "expense": "Es sind noch keine Auslagen eingetragen. Füge eine hinzu.",
       "healthCareCost": "Du hast noch keine Krankenkosten eingereicht.",
       "searchX": "Kein Eintrag für '{X}' gefunden.",
@@ -645,6 +646,7 @@
     "uploadTokenExpireAfterSeconds": "Uploadtoken Ablaufzeit [Sekunden]",
     "useDifferentProject": "Anderes Projekt auswählen",
     "used": "Verwendet",
+    "useForeignCurrency": "Fremdwährung verwenden",
     "user": "Benutzer",
     "userCanSeeAllProjects": "Benutzer können ALLE Projekte sehen",
     "userImport": "Benutzer importieren",

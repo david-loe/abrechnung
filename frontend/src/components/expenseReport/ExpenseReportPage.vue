@@ -210,7 +210,7 @@
             </div>
           </div>
           <ValidationIssuesAlert
-            :results="reviewResults"
+            :results="visibleValidationResults"
             :expenses="expenseReport.expenses"
             fallback-subject-label-key="labels.expenseReport"
             @action="handleReviewIssueAction" />
@@ -219,12 +219,29 @@
               <h5 class="card-title mb-3">{{ t('labels.summary') }}</h5>
               <div>
                 <AddUpTable
-                  class="mb-4"
+                  class="mb-3"
                   :add-up="expenseReport.addUp"
                   :project="expenseReport.project"
                   :exchange-rate="expenseReport.exchangeRate"
                   :exchange-rate-date="expenseReport.exchangeRateDate"
-                  :showAdvanceOverflow="expenseReport.state < State.BOOKABLE" />
+                  :show-advance-overflow="expenseReport.state < State.BOOKABLE"
+                  :show-exchange-rate-date="false" />
+                <div v-if="expenseReport.currency" class="mb-4">
+                  <label for="expenseReportExchangeRateDate" class="form-label">{{ t('labels.exchangeRateDate') }}</label>
+                  <div v-if="canEditExchangeRateDate" class="d-flex align-items-center gap-2">
+                    <DateInput
+                      id="expenseReportExchangeRateDate"
+                      class="exchange-rate-date-input"
+                      :model-value="expenseReport.exchangeRateDate || undefined"
+                      :disabled="exchangeRateDateSaving"
+                      :max="new Date()"
+                      @update:model-value="saveExchangeRateDate" />
+                    <span v-if="exchangeRateDateSaving" class="spinner-border spinner-border-sm flex-shrink-0"></span>
+                  </div>
+                  <div v-else class="text-secondary">
+                    {{ expenseReport.exchangeRateDate ? formatter.date(expenseReport.exchangeRateDate) : '—' }}
+                  </div>
+                </div>
                 <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
                   <p v-for="comment of expenseReport.comments" :key="comment._id">
                     <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
@@ -259,7 +276,10 @@
                 </div>
                 <template v-else-if="expenseReport.state === State.IN_REVIEW">
                   <div v-if="endpointPrefix === 'examine/'" class="mb-3">
-                    <button class="btn btn-success" @click="completeReview()">
+                    <button
+                      class="btn btn-success"
+                      :disabled="!canCompleteReview || exchangeRateDateSaving"
+                      @click="completeReview()">
                       <i class="bi bi-check2-square"></i>
                       <span class="ms-1">{{ t('labels.completeReview') }}</span>
                     </button>
@@ -312,6 +332,7 @@ import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import HelpButton from '@/components/elements/HelpButton.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
@@ -336,7 +357,8 @@ import type { ValidationIssueActionPayload } from '@/components/elements/validat
 type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
 type ModalMode = 'add' | 'edit'
-const expenseReportValidator = new Validator({ requireReceipts: true })
+const expenseReportReviewValidator = new Validator({ requireReceipts: true })
+const expenseReportCompletionValidator = new Validator({ requireExchangeRate: true, requireReceipts: true })
 
 const props = defineProps({
   _id: { type: String, required: true },
@@ -370,11 +392,24 @@ const isReadOnly = computed(() => {
 })
 
 const reviewResults = ref<ValidationResult[]>([])
+const completionResults = ref<ValidationResult[]>([])
+const visibleValidationResults = computed(() => {
+  return props.endpointPrefix === 'examine/' && expenseReport.value.state === State.IN_REVIEW
+    ? completionResults.value
+    : reviewResults.value
+})
 const canEnterReview = computed(() => !reviewResults.value.some((issue: ValidationResult) => issue.severity === 'error'))
+const canCompleteReview = computed(() => !completionResults.value.some((issue: ValidationResult) => issue.severity === 'error'))
 const reviewErrorCount = computed(() => reviewResults.value.filter((issue: ValidationResult) => issue.severity === 'error').length)
 const reviewDisabledTooltip = computed(() => t('alerts.reviewBlockedByValidationErrorsX', { X: reviewErrorCount.value }))
 
 const modalCompRef = useTemplateRef('modalComp')
+const exchangeRateDateSaving = ref(false)
+const canEditExchangeRateDate = computed(() => {
+  const examinerCanEditDuringReview =
+    props.endpointPrefix === 'examine/' && expenseReport.value.state === State.IN_REVIEW && sessionState.isOnline.value
+  return Boolean(expenseReport.value.currency) && expenseReport.value.state <= State.IN_REVIEW && (!isReadOnly.value || examinerCanEditDuringReview)
+})
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
@@ -457,6 +492,7 @@ async function backToInWork() {
 }
 
 async function completeReview() {
+  if (!canCompleteReview.value || exchangeRateDateSaving.value) return
   if (confirm(t('alerts.areYouSureCompleteReview'))) {
     const result = await API.setter<ExpenseReport<string>>('examine/expenseReport/reviewCompleted', {
       _id: expenseReport.value._id,
@@ -466,6 +502,22 @@ async function completeReview() {
     if (result.ok) {
       setExpenseReport(result.ok)
     }
+  }
+}
+
+async function saveExchangeRateDate(exchangeRateDate: Date | null) {
+  if (!canEditExchangeRateDate.value || exchangeRateDateSaving.value) return
+  expenseReport.value.exchangeRateDate = exchangeRateDate
+  exchangeRateDateSaving.value = true
+  const result = await API.setter<ExpenseReport<string>>(
+    `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
+    { _id: expenseReport.value._id, exchangeRateDate }
+  )
+  exchangeRateDateSaving.value = false
+  if (result.ok) {
+    setExpenseReport(result.ok)
+  } else {
+    await getExpenseReport()
   }
 }
 
@@ -530,7 +582,10 @@ async function getExpenseReport() {
 
 async function setExpenseReport(er: ExpenseReport<string>) {
   expenseReport.value = er
-  reviewResults.value = expenseReportValidator
+  reviewResults.value = expenseReportReviewValidator
+    .getValidationSummary(er)
+    .results.filter((issue: ValidationResult) => issue.severity === 'warning' || issue.severity === 'error')
+  completionResults.value = expenseReportCompletionValidator
     .getValidationSummary(er)
     .results.filter((issue: ValidationResult) => issue.severity === 'warning' || issue.severity === 'error')
   sortedExpenseIds = er.expenses.map((e) => e._id)
@@ -589,3 +644,10 @@ try {
 }
 const examinerMails = await getExaminerMails()
 </script>
+
+<style scoped>
+.exchange-rate-date-input {
+  min-width: 0;
+  max-width: 100%;
+}
+</style>

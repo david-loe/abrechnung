@@ -22,27 +22,18 @@
       <ProjectSelector id="expenseReportFormProject" v-model="formExpenseReport.project" :update-user-org="updateUserOrg" required />
     </div>
 
-    <div class="row mb-3">
-      <div class="col">
+    <div class="mb-3">
+      <template v-if="showCurrencySelector">
         <label for="expenseReportFormCurrency" class="form-label">{{ t('labels.expenseReportCurrency') }}</label>
         <CurrencySelector
           id="expenseReportFormCurrency"
           :model-value="formExpenseReport.currency || undefined"
           @update:model-value="(currency) => (formExpenseReport.currency = currency)"
           :exclude="[baseCurrency._id]" />
-      </div>
-      <div v-if="formExpenseReport.currency" class="col">
-        <label for="expenseReportExchangeRateDate" class="form-label">
-          {{ t('labels.exchangeRateDate') }}
-          <span class="text-danger">*</span>
-        </label>
-        <DateInput
-          id="expenseReportExchangeRateDate"
-          :model-value="formExpenseReport.exchangeRateDate || undefined"
-          @update:model-value="(date) => (formExpenseReport.exchangeRateDate = date)"
-          :max="new Date()"
-          required />
-      </div>
+      </template>
+      <button v-else type="button" class="btn btn-sm btn-link px-0" @click="showCurrencySelector = true">
+        {{ t('labels.useForeignCurrency') }}
+      </button>
     </div>
 
     <div v-if="currencyConflict" class="alert alert-danger" role="alert">
@@ -79,7 +70,6 @@ import { computed, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
-import DateInput from '@/components/elements/DateInput.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
@@ -99,6 +89,7 @@ const props = defineProps({
 })
 const APP_DATA = APP_LOADER.data
 const formExpenseReport = ref(input())
+const showCurrencySelector = ref(Boolean(formExpenseReport.value.currency))
 const currencyConflict = computed(() => {
   if (!formExpenseReport.value.currency) return false
   const currency = idDocumentToId(formExpenseReport.value.currency)
@@ -124,12 +115,16 @@ watch(
   () => props.expenseReport,
   () => {
     formExpenseReport.value = input()
+    showCurrencySelector.value = Boolean(formExpenseReport.value.currency)
   }
 )
 watch(
   () => formExpenseReport.value.currency,
   (currency) => {
-    if (!currency) formExpenseReport.value.exchangeRateDate = undefined
+    if (!currency) {
+      formExpenseReport.value.exchangeRateDate = undefined
+      showCurrencySelector.value = false
+    }
   }
 )
 </script>

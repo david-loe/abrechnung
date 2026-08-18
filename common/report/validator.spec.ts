@@ -22,12 +22,44 @@ test('expense validation requires receipts for review', (t) => {
   t.deepEqual(results, [{ code: 'requiredForReview', severity: 'error', path: 'cost.receipts', reference: undefined }])
 })
 
-test('foreign expense report validation requires the shared exchange rate', (t) => {
+const foreignExpenseReport = {
+  currency: { ...baseCurrency, _id: 'USD' },
+  exchangeRateDate: new Date('2024-01-01'),
+  exchangeRate: null,
+  advances: [],
+  expenses: [
+    {
+      description: 'Taxi',
+      cost: {
+        positions: [{ _id: 'position', kind: 'manual' as const, grossAmount: 12, vatRate: 0, project, category }],
+        currency: { ...baseCurrency, _id: 'USD' },
+        date: new Date('2024-01-01'),
+        receipts: []
+      },
+      _id: 'expense'
+    }
+  ]
+}
+
+test('foreign expense report validation allows a missing shared exchange rate before completion', (t) => {
   const validator = new Validator({ requireReceipts: false })
+
+  t.deepEqual(validator.getValidationResults(foreignExpenseReport), [])
+})
+
+test('foreign expense report completion validation requires the shared exchange rate', (t) => {
+  const validator = new Validator({ requireExchangeRate: true, requireReceipts: false })
+  const results = validator.getValidationResults(foreignExpenseReport)
+
+  t.deepEqual(results, [{ code: 'exchangeRateUnavailable', severity: 'error', path: 'exchangeRateDate' }])
+})
+
+test('foreign expense report completion validation requires an exchange rate date without duplicating the error', (t) => {
+  const validator = new Validator({ requireExchangeRate: true, requireReceipts: false })
   const USD = { ...baseCurrency, _id: 'USD' }
   const results = validator.getValidationResults({
     currency: USD,
-    exchangeRateDate: new Date('2024-01-01'),
+    exchangeRateDate: null,
     exchangeRate: null,
     advances: [],
     expenses: [
@@ -44,5 +76,5 @@ test('foreign expense report validation requires the shared exchange rate', (t) 
     ]
   })
 
-  t.deepEqual(results, [{ code: 'exchangeRateUnavailable', severity: 'error', path: 'exchangeRateDate' }])
+  t.deepEqual(results, [{ code: 'required', severity: 'error', path: 'exchangeRateDate' }])
 })

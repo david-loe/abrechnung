@@ -28,6 +28,9 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
+      <span v-else-if="currency">
+        {{ t('alerts.noData.advanceForUserXInCurrencyY', { X: formatter.name((owner as UserSimple | undefined)?.name), Y: currencyName }) }}
+      </span>
       <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name((owner as UserSimple | undefined)?.name) }) }}</span>
     </template>
   </v-select>
@@ -36,8 +39,8 @@
 <script setup lang="ts">
 import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
 import { formatter } from '@/formatter.js'
-import { AdvanceSimple, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
-import { onMounted, ref, watch } from 'vue'
+import { AdvanceSimple, Currency, IdDocument, idDocumentToId, Locale, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 type BaseProps = {
@@ -48,7 +51,7 @@ type BaseProps = {
   project?: ProjectSimple<string>
   endpointPrefix?: string
   setDefault?: boolean
-  currency?: IdDocument<string>
+  currency?: Currency
 }
 
 type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceSimple | null }
@@ -68,9 +71,10 @@ const emit = defineEmits<{ (e: 'update:modelValue', v: AdvanceSimple | null): vo
 
 let setByUser = props.modelValue && (!props.multiple || (Array.isArray(props.modelValue) && props.modelValue.length > 0))
 let defaultFor = { userId: null as null | string, projectId: null as null | string }
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 const advances = ref([] as AdvanceSimple[])
+const currencyName = computed(() => props.currency?.name[locale.value as Locale]?.trim() || props.currency?._id)
 
 // Filter method
 function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {

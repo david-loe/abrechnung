@@ -161,9 +161,6 @@ schema.pre('validate', async function () {
     this.exchangeRateDate = undefined
     this.exchangeRate = undefined
   } else {
-    if (!this.exchangeRateDate) {
-      this.invalidate('exchangeRateDate', 'required')
-    }
     const currency = idDocumentToId(this.currency).toString()
     for (const [index, expense] of this.expenses.entries()) {
       if (idDocumentToId(expense.cost.currency).toString() !== currency) {
@@ -185,14 +182,12 @@ schema.pre('validate', async function () {
   }
 
   await this.calculateExchangeRates()
-  if (
-    !this.historic &&
-    this.isModified('state') &&
-    this.state === ExpenseReportState.REVIEW_COMPLETED &&
-    this.currency &&
-    typeof this.exchangeRate !== 'number'
-  ) {
-    this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
+  if (!this.historic && this.state === ExpenseReportState.REVIEW_COMPLETED && this.currency) {
+    if (!this.exchangeRateDate) {
+      this.invalidate('exchangeRateDate', 'required')
+    } else if (typeof this.exchangeRate !== 'number') {
+      this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
+    }
   }
 })
 

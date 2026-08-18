@@ -42,8 +42,10 @@
             {{ `1 ${addUp[0]?.currency._id} = ${formatter.float(exchangeRate)} ${baseCurrency._id}` }}
           </span>
           <span v-else>⚠️ {{ t('alerts.exchangeRateUnavailable') }}</span>
-          <br >
-          <small class="text-secondary">{{ formatter.date(exchangeRateDate) }}</small>
+          <template v-if="showExchangeRateDate">
+            <br >
+            <small class="text-secondary">{{ formatter.date(exchangeRateDate) }}</small>
+          </template>
         </td>
       </tr>
       <tr v-if="project.budget && project.budget.amount">
@@ -75,6 +77,7 @@ const props = defineProps({
   project: { type: Object as PropType<Project>, required: true },
   exchangeRate: { type: Number as PropType<number | null> },
   exchangeRateDate: { type: [String, Date] as PropType<Date | string | null> },
+  showExchangeRateDate: { type: Boolean, default: true },
   showAdvanceOverflow: { type: Boolean, default: true },
   withLumpSums: { type: Boolean, default: false }
 })

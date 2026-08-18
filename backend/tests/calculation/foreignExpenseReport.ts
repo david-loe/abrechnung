@@ -49,7 +49,7 @@ await loginUser(agent, 'expenseReport')
 let report = (
   await agent
     .post('/expenseReport/inWork')
-    .send({ name: 'USD expense report calculation test', project, currency: 'USD', exchangeRateDate: reportDate, advances: [advance._id] })
+    .send({ name: 'USD expense report calculation test', project, currency: 'USD', advances: [advance._id] })
 ).body.result as ExpenseReport
 
 const expense = {
@@ -68,6 +68,36 @@ for (const entry of objectToFormFields(expense)) {
 }
 report = (await request).body.result as ExpenseReport
 
+test.serial('foreign expense report can be created without an exchange rate date', (t) => {
+  t.falsy(report.exchangeRateDate)
+  t.is(report.exchangeRate, null)
+})
+
+test.serial('foreign expense report can enter review without an exchange rate date but cannot complete it', async (t) => {
+  const reviewResponse = await agent.post('/expenseReport/underExamination').send({ _id: report._id })
+  t.is(reviewResponse.status, 200)
+  report = reviewResponse.body.result as ExpenseReport
+
+  const completionResponse = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: report._id })
+  t.is(completionResponse.status, 422)
+  t.true(
+    completionResponse.body.errors.some(
+      (error: { path?: string; message: string }) => error.path === 'exchangeRateDate' && error.message === 'required'
+    )
+  )
+
+  const storedReport = await ExpenseReportModel.findById(report._id).lean()
+  t.is(storedReport?.state, ExpenseReportState.IN_REVIEW)
+})
+
+test.serial('exchange rate date can be saved during review', async (t) => {
+  const response = await agent.post('/examine/expenseReport').send({ _id: report._id, exchangeRateDate: reportDate })
+  t.is(response.status, 200)
+  report = response.body.result as ExpenseReport
+
+  t.true(Math.abs((report.exchangeRate ?? 0) - 0.9) < Number.EPSILON)
+})
+
 test.serial('foreign expense report calculates in report currency and converts the final balance', (t) => {
   t.true(Math.abs((report.exchangeRate ?? 0) - 0.9) < Number.EPSILON)
   t.is(report.addUp[0].currency._id, 'USD')
@@ -80,7 +110,7 @@ test.serial('foreign expense report rejects an expense in a different currency',
   const mismatchingExpense = structuredClone(expense)
   mismatchingExpense.description = 'Wrong currency'
   mismatchingExpense.cost.currency = { _id: 'EUR' }
-  let mismatchingRequest = agent.post('/expenseReport/expense').query({ parentId: report._id.toString() })
+  let mismatchingRequest = agent.post('/examine/expenseReport/expense').query({ parentId: report._id.toString() })
   for (const entry of objectToFormFields(mismatchingExpense)) {
     if (entry.field.endsWith('[data]')) mismatchingRequest = mismatchingRequest.attach(entry.field, entry.val)
     else mismatchingRequest = mismatchingRequest.field(entry.field, entry.val)
@@ -90,9 +120,6 @@ test.serial('foreign expense report rejects an expense in a different currency',
 })
 
 test.serial('foreign expense report cannot complete review without a recalculated exchange rate', async (t) => {
-  const reviewResponse = await agent.post('/expenseReport/underExamination').send({ _id: report._id })
-  t.is(reviewResponse.status, 200)
-
   await ExpenseReportModel.updateOne(
     { _id: report._id },
     { $set: { exchangeRateDate: new Date('1999-12-31T00:00:00.000Z'), exchangeRate: 0.9 } }
