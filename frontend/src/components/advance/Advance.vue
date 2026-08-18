@@ -27,23 +27,22 @@
       </tr>
       <tr>
         <th scope="row">{{ t('labels.budget') }}</th>
-        <td>
-          <span class="tnum"> {{ formatter.money(advance.budget) }}</span>
-          <span v-if="advance.budget.exchangeRate" class="text-secondary">
-            &nbsp;-&nbsp;
-            {{ formatter.money(advance.budget, { useExchangeRate: false }) }}
-          </span>
-        </td>
+        <td><span class="tnum"><ConvertedMoney :money="advance.budget" /></span></td>
       </tr>
       <tr v-if="isForeignCurrency">
         <th scope="row">{{ t('labels.exchangeRateDate') }}</th>
-        <td>{{ advance.exchangeRateDate ? formatter.date(advance.exchangeRateDate) : '—' }}</td>
+        <td>
+          <span class="text-muted">{{ advance.exchangeRateDate ? formatter.date(advance.exchangeRateDate) : '—' }}</span>
+          <template v-if="exchangeRate !== undefined">
+            <span>&nbsp;-&nbsp;{{ formatter.float(exchangeRate) }}</span>
+          </template>
+        </td>
       </tr>
       <tr v-if="advance.offsetAgainst.length > 0">
         <th scope="row">{{ t('labels.offsetAgainst') }}</th>
         <td>
           <div class="mb-1" v-for="report in advance.offsetAgainst"><small>
-            <span class="me-2 tnum">{{ formatter.detailedMoney(report) }}</span>
+            <span class="me-2 tnum"><ConvertedMoney :money="report" /></span>
             <i
               v-if="APP_DATA && report.type !== 'offsetEntry'"
               :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
@@ -53,7 +52,7 @@
       </tr>
       <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
-        <td><span class="tnum"> {{ formatter.detailedMoney(advance.balance, true) }}</span></td>
+        <td><span class="tnum"><ConvertedMoney :money="advance.balance" /></span></td>
       </tr>
       <tr v-if="advance.receivedOn">
         <th scope="row">{{ t('labels.receivedOn') }}</th>
@@ -100,6 +99,7 @@ import { AdvanceSimple, AdvanceState, baseCurrency, getReportTypeFromModelName, 
 import { computed, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
+import ConvertedMoney from '@/components/elements/ConvertedMoney.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
@@ -115,6 +115,7 @@ const props = defineProps({
 const isDownloading = ref('')
 const isDownloadingFn = () => isDownloading
 const isForeignCurrency = computed(() => idDocumentToId(props.advance.budget.currency) !== baseCurrency._id)
+const exchangeRate = computed(() => props.advance.budget.exchangeRate?.rate)
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data

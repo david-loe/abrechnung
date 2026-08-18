@@ -15,6 +15,7 @@ import {
   idDocumentToId,
   Locale,
   Meal,
+  Money,
   Place,
   PrinterSettings,
   PrintOptions,
@@ -276,7 +277,7 @@ class ReportPrint<idType extends _id> {
       metaInformation = [
         `${this.t('labels.reason')}: ${this.report.reason}`,
         idDocumentToId(this.report.budget.currency) !== baseCurrency._id && this.report.exchangeRateDate
-          ? `${this.t('labels.exchangeRateDate')}: ${this.drawer.formatter.date(this.report.exchangeRateDate)}`
+          ? `${this.t('labels.exchangeRateDate')}: ${this.drawer.formatter.date(this.report.exchangeRateDate)}${typeof this.report.budget.exchangeRate?.rate === 'number' ? ` - ${this.drawer.formatter.float(this.report.budget.exchangeRate.rate)}` : ''}`
           : ''
       ].filter((line) => line !== '')
     } else if (reportIsHealthCareCost(this.report)) {
@@ -337,12 +338,12 @@ class ReportPrint<idType extends _id> {
   async drawSummary(options: Options) {
     const columns: Column[] = []
     columns.push({ key: '0', width: 100, alignment: TextAlignment.Left, title: 'title', fn: (l: string) => this.t(l) })
-    const moneyColumn = (key: string) => ({ key, width: 75, alignment: TextAlignment.Right, title: 'title' })
+    const moneyColumn = (key: string, width = 75) => ({ key, width, alignment: TextAlignment.Right, title: 'title' })
     let summary = []
     if (reportIsAdvance(this.report)) {
-      columns.push(moneyColumn('1'))
-      summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.detailedMoney(this.report.budget) })
-      summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.detailedMoney(this.report.balance, true) })
+      columns.push(moneyColumn('1', 150))
+      summary.push({ '0': this.t('labels.advance'), '1': this.formatConvertedMoney(this.report.budget) })
+      summary.push({ '0': this.t('labels.balance'), '1': this.formatConvertedMoney(this.report.balance) })
     } else {
       for (let i = 0; i < this.report.addUp.length; i++) {
         columns.push(moneyColumn((i + 1).toString(10)))
@@ -693,7 +694,7 @@ class ReportPrint<idType extends _id> {
     if (!reportIsAdvance(this.report) || this.report.offsetAgainst.length === 0) {
       return options.yStart
     }
-    const rows = this.report.offsetAgainst.map((offset) => ({ ...offset, formattedAmount: this.drawer.formatter.detailedMoney(offset) }))
+    const rows = this.report.offsetAgainst.map((offset) => ({ ...offset, formattedAmount: this.formatConvertedMoney(offset) }))
     const columns: Column[] = []
     columns.push({ key: 'subject', width: 280, alignment: TextAlignment.Left, title: this.t('labels.subject') })
     columns.push({
@@ -717,6 +718,11 @@ class ReportPrint<idType extends _id> {
     options.yStart -= fontSize * 1.25
 
     return await this.drawer.drawTable(rows, columns, options)
+  }
+
+  formatConvertedMoney(money: Money) {
+    const parts = this.drawer.formatter.moneyDisplayParts(money)
+    return parts.secondary ? `${parts.primary} - ${parts.secondary}` : parts.primary
   }
   t(textIdentifier: string, interpolation: Record<string, string> = {}) {
     return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation)
