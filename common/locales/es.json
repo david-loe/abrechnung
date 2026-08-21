@@ -57,7 +57,8 @@
       "expense": "Todavía no se han registrado gastos. Añade uno.",
       "healthCareCost": "Todavía no has presentado gastos médicos.",
       "searchX": "No se encontró ninguna entrada para \"{X}\".",
-      "stage": "Aún no hay etapas registradas. Añade una."
+      "stage": "Aún no hay etapas registradas. Añade una.",
+      "stageImportSource": "No hay ningún otro viaje propio con etapas disponible."
     },
     "notAllowed": "¡No permitido!",
     "notFound": "¡Nada encontrado!",
@@ -72,6 +73,9 @@
     "reviewRequirementsNotMet": "El reporte todavía no se puede enviar a revisión.",
     "saveAfterRotate": "La imagen se giró. Guarda para conservar este cambio.",
     "savedExpensesXOfY": "Gastos guardados: {X}/{Y}.",
+    "stageImportSameTravel": "El viaje de origen y el de destino deben ser diferentes.",
+    "stageImportSourceEmpty": "El viaje de origen no contiene etapas.",
+    "stageImportTargetNotEmpty": "Las etapas solo se pueden importar a un viaje sin etapas existentes.",
     "stageOutOfBounds": "Al menos una etapa está fuera del periodo de viaje aprobado.",
     "stagesOutOfNewBoundsX": "⚠️ Las etapas siguientes están fuera de las nuevas fechas de viaje:\n\n{X}",
     "stagesOverlapping": "Las etapas se superponen temporalmente",
@@ -448,6 +452,7 @@
     "identifier": "Identificación",
     "image": "Imagen",
     "import": "Importar",
+    "importStages": "Importar etapas",
     "includeBankBookings": "Incluir asientos bancarios en la exportación contable",
     "includingSpouseRefund": "Incl. sumas globales del cónyuge",
     "inputTaxAccount": "IVA",

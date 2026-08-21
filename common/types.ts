@@ -626,6 +626,20 @@ export interface TravelSimple<idType extends _id = _id> extends TravelBase, Repo
   a1Certificate?: { exactAddress: string; destinationName: string } | null
 }
 
+export interface TravelStageImportSource<idType extends _id = _id> {
+  _id: idType
+  name: string
+  reference: number
+  destinationPlace: TravelSimple<idType>['destinationPlace']
+  startDate: Date | string
+  endDate: Date | string
+}
+
+export interface TravelStageImportRequest<idType extends _id = _id> {
+  sourceTravelId: idType
+  targetTravelId: idType
+}
+
 export interface Travel<idType extends _id = _id, dataType extends binary = binary>
   extends TravelSimple<idType>,
     Report<idType, TravelState> {

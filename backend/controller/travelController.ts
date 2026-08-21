@@ -2,6 +2,7 @@ import { Readable } from 'node:stream'
 import { Body, Consumes, Delete, Get, Middlewares, Post, Produces, Queries, Query, Request, Route, Security, Tags } from '@tsoa/runtime'
 import {
   BookingExportPackageRequest,
+  baseCurrency,
   IdDocument,
   Travel as ITravel,
   User as IUser,
@@ -9,6 +10,8 @@ import {
   Stage,
   State,
   TravelExpense,
+  TravelStageImportRequest,
+  TravelStageImportSource,
   TravelState,
   UserWithName
 } from 'abrechnung-common/types.js'
@@ -24,7 +27,7 @@ import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
+import { AuthorizationError, ConflictError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelBulkImportPost, TravelPost } from './types.js'
 
@@ -38,6 +41,41 @@ async function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
       reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
     )
+  }
+}
+
+function shiftDate(date: Date | string, offset: number) {
+  return new Date(new Date(date).valueOf() + offset)
+}
+
+function createImportedStage(stage: Stage<Types.ObjectId, mongo.Binary>, targetTravel: TravelDoc, offset: number) {
+  const positions = []
+  if (stage.transport.type === 'ownCar') {
+    const sourcePosition = stage.cost.positions.find((position) => position.kind === 'ownCar')
+    if (sourcePosition) {
+      positions.push({
+        kind: 'ownCar' as const,
+        grossAmount: 0,
+        vatRate: 0,
+        project: idDocumentToId(targetTravel.project),
+        category: idDocumentToId(sourcePosition.category)
+      })
+    }
+  }
+
+  return {
+    departure: shiftDate(stage.departure, offset),
+    arrival: shiftDate(stage.arrival, offset),
+    startLocation: { ...stage.startLocation, country: idDocumentToId(stage.startLocation.country) },
+    endLocation: { ...stage.endLocation, country: idDocumentToId(stage.endLocation.country) },
+    midnightCountries: (stage.midnightCountries ?? []).map(({ date, country }) => ({
+      date: shiftDate(date, offset),
+      country: idDocumentToId(country)
+    })),
+    transport: { ...stage.transport },
+    cost: { positions, currency: baseCurrency._id, receipts: [] },
+    purpose: stage.purpose,
+    note: stage.note
   }
 }
 
@@ -56,6 +94,73 @@ export class TravelController extends Controller {
       allowedAdditionalFields: ['expenses', 'stages', 'days'],
       sort: { startDate: -1 }
     })
+  }
+
+  @Get('stage/import')
+  public async getOwnStageImportSources(@Query() targetTravelId: string, @Request() request: AuthenticatedExpressRequest) {
+    const targetTravel = await Travel.findOne({
+      _id: targetTravelId,
+      // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+      owner: request.user._id as any,
+      historic: false
+    }).select({ _id: 1 })
+    if (!targetTravel) {
+      throw new NotFoundError(`No Travel for _id: '${targetTravelId}' found.`)
+    }
+
+    return await this.getter<TravelStageImportSource<Types.ObjectId>, ITravel<Types.ObjectId, mongo.Binary>>(Travel, {
+      query: {},
+      filter: {
+        // biome-ignore lint/suspicious/noExplicitAny: Populated path has to be queried with ObjectId
+        owner: request.user._id as any,
+        historic: false,
+        _id: { $ne: new Types.ObjectId(targetTravelId) },
+        'stages.0': { $exists: true }
+      } as unknown as QueryFilter<ITravel<Types.ObjectId, mongo.Binary>>,
+      projection: { name: 1, reference: 1, destinationPlace: 1, startDate: 1, endDate: 1 },
+      sort: { startDate: -1 }
+    })
+  }
+
+  @Post('stage/import')
+  public async importStagesToOwn(@Body() requestBody: TravelStageImportRequest<string>, @Request() request: AuthenticatedExpressRequest) {
+    const [sourceTravel, targetTravel] = await Promise.all([
+      Travel.findOne({ _id: requestBody.sourceTravelId }),
+      Travel.findOne({ _id: requestBody.targetTravelId })
+    ])
+    if (!sourceTravel) {
+      throw new NotFoundError(`No Travel for _id: '${requestBody.sourceTravelId}' found.`)
+    }
+    if (!targetTravel) {
+      throw new NotFoundError(`No Travel for _id: '${requestBody.targetTravelId}' found.`)
+    }
+    if (
+      sourceTravel.historic ||
+      targetTravel.historic ||
+      !sourceTravel.owner._id.equals(request.user._id) ||
+      !targetTravel.owner._id.equals(request.user._id) ||
+      targetTravel.state !== State.EDITABLE_BY_OWNER
+    ) {
+      throw new NotAllowedError('Not allowed to import stages for these Travels')
+    }
+    if (sourceTravel._id.equals(targetTravel._id)) {
+      throw new ConflictError(i18n.t('alerts.stageImportSameTravel', { lng: request.user.settings.language }))
+    }
+    if (sourceTravel.stages.length === 0) {
+      throw new ConflictError(i18n.t('alerts.stageImportSourceEmpty', { lng: request.user.settings.language }))
+    }
+    if (targetTravel.stages.length > 0) {
+      throw new ConflictError(i18n.t('alerts.stageImportTargetNotEmpty', { lng: request.user.settings.language }))
+    }
+
+    const offset = new Date(targetTravel.startDate).valueOf() - new Date(sourceTravel.startDate).valueOf()
+    const importedStages = sourceTravel.stages.map((stage) => createImportedStage(stage, targetTravel, offset))
+    targetTravel.stages.push(...(importedStages as unknown as Stage<Types.ObjectId, mongo.Binary>[]))
+    // biome-ignore lint/suspicious/noExplicitAny: using Types.ObjectId to set IdDocument in backend
+    targetTravel.editor = request.user._id as any
+    targetTravel.markModified('stages')
+    const result = (await targetTravel.save()).toObject()
+    return { message: 'alerts.successSaving', result }
   }
 
   @Delete()

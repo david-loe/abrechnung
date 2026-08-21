@@ -57,7 +57,8 @@
       "expense": "Aucune dépense n'a encore été enregistrée. Ajoutez-en une.",
       "healthCareCost": "Vous n'avez pas encore soumis de frais de santé.",
       "searchX": "Aucune entrée trouvée pour '{X}'.",
-      "stage": "Il n'y a pas encore d'étapes. Ajoutez-en une."
+      "stage": "Il n'y a pas encore d'étapes. Ajoutez-en une.",
+      "stageImportSource": "Aucun autre voyage personnel avec des étapes n'est disponible."
     },
     "notAllowed": "Non autorisé !",
     "notFound": "Rien trouvé !",
@@ -72,6 +73,9 @@
     "reviewRequirementsNotMet": "Le rapport ne peut pas encore être soumis pour examen.",
     "saveAfterRotate": "L'image a été pivotée. Veuillez enregistrer pour conserver cette modification.",
     "savedExpensesXOfY": "Dépenses enregistrées : {X}/{Y}.",
+    "stageImportSameTravel": "Le voyage source et le voyage cible doivent être différents.",
+    "stageImportSourceEmpty": "Le voyage source ne contient aucune étape.",
+    "stageImportTargetNotEmpty": "Les étapes ne peuvent être importées que dans un voyage sans étapes existantes.",
     "stageOutOfBounds": "Au moins une étape est en dehors de la période de voyage approuvée.",
     "stagesOutOfNewBoundsX": "⚠️ Les étapes suivantes sont en dehors des nouvelles dates de voyage:\n\n{X}",
     "stagesOverlapping": "Les étapes se chevauchent dans le temps",
@@ -448,6 +452,7 @@
     "identifier": "Identifiant",
     "image": "Image",
     "import": "Importer",
+    "importStages": "Importer des étapes",
     "includeBankBookings": "Inclure les écritures bancaires dans l'export comptable",
     "includingSpouseRefund": "Incl. forfaits pour conjoint",
     "inputTaxAccount": "TVA",
