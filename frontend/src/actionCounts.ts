@@ -12,6 +12,7 @@ interface ApiMutationSucceededDetail {
 const counts = ref<ActionCounts | null>(null)
 const total = computed(() => actionAccesses.reduce((sum, access) => sum + (counts.value?.[access] ?? 0), 0))
 let inFlight: Promise<void> | undefined
+let inFlightGeneration: number | undefined
 let refreshQueued = false
 let started = false
 let generation = 0
@@ -35,17 +36,19 @@ function changesActionCounts({ endpoint, method }: ApiMutationSucceededDetail) {
 export function refreshActionCounts(queueAfterInFlight = false) {
   if (!sessionState.isOnline.value || !sessionState.authContext.value) return Promise.resolve()
   if (inFlight) {
-    refreshQueued ||= queueAfterInFlight
+    refreshQueued ||= queueAfterInFlight || inFlightGeneration !== generation
     return inFlight
   }
 
   const requestGeneration = generation
+  inFlightGeneration = requestGeneration
   inFlight = API.getter<ActionCounts>('user/actionCounts', {}, {}, { showAlert: false })
     .then((result) => {
       if (result.ok && requestGeneration === generation) counts.value = result.ok.data
     })
     .finally(() => {
       inFlight = undefined
+      inFlightGeneration = undefined
       if (refreshQueued) {
         refreshQueued = false
         void refreshActionCounts()

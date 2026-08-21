@@ -93,6 +93,31 @@ describe('action counts', () => {
     await vi.waitFor(() => expect(API.getter).toHaveBeenCalledTimes(2))
   })
 
+  it('queues a fresh request when the session changes during an in-flight refresh', async () => {
+    let resolveRequest:
+      | ((value: { ok: { data: ActionCounts; meta: { count: number; page: number; limit: number; countPages: number } } }) => void)
+      | undefined
+    const freshCounts = { ...actionCounts, 'approve/advance': 10 }
+    vi.mocked(API.getter)
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRequest = resolve
+        })
+      )
+      .mockResolvedValueOnce({ ok: { data: freshCounts, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } })
+
+    const staleRequest = refreshActionCounts()
+    testState.purgeHandler?.()
+    const sessionRequest = refreshActionCounts()
+
+    expect(API.getter).toHaveBeenCalledOnce()
+    resolveRequest?.({ ok: { data: actionCounts, meta: { count: 1, page: 1, limit: 1, countPages: 1 } } })
+    await Promise.all([staleRequest, sessionRequest])
+
+    await vi.waitFor(() => expect(API.getter).toHaveBeenCalledTimes(2))
+    await vi.waitFor(() => expect(actionCountState.counts.value).toEqual(freshCounts))
+  })
+
   it('does not request counts while offline', async () => {
     testState.isOnline.value = false
     await refreshActionCounts()
