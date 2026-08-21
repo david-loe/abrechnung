@@ -14,6 +14,7 @@ import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import TravelModel from '../../models/travel.js'
+import UserModel from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
@@ -68,6 +69,67 @@ test.serial('GET /project', async (t) => {
     console.log(res.body)
     t.fail()
   }
+})
+
+test.serial('POST /approve/travel/bulk creates approved travels from natural references', async (t) => {
+  const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
+  t.truthy(owner)
+  await loginUser(agent, 'travel')
+  const response = await agent
+    .post('/approve/travel/bulk')
+    .send([
+      {
+        owner: owner?.email,
+        project: travel.project.identifier,
+        name: 'CSV approved travel',
+        destinationPlace: { place: 'Ankara', country: 'TR' },
+        reason: 'CSV conference',
+        startDate: '2025-05-10',
+        endDate: '2025-05-12',
+        advances: [],
+        isCrossBorder: false
+      }
+    ])
+
+  t.is(response.status, 200)
+  t.is(response.body.result.length, 1)
+  t.is(response.body.result[0].state, TravelState.APPROVED)
+  t.is(response.body.result[0].owner._id, owner?._id.toString())
+  t.is(response.body.result[0].destinationPlace.country._id, 'TR')
+  await loginUser(agent, 'user')
+})
+
+test.serial('POST /approve/travel/bulk rejects all rows when one country is invalid', async (t) => {
+  const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
+  const names = ['CSV atomic valid travel', 'CSV atomic invalid travel']
+  await loginUser(agent, 'travel')
+  const response = await agent.post('/approve/travel/bulk').send([
+    {
+      owner: owner?.email,
+      project: travel.project.identifier,
+      name: names[0],
+      destinationPlace: { place: 'Berlin', country: 'DE' },
+      reason: 'Valid row',
+      startDate: '2025-05-10',
+      endDate: '2025-05-11',
+      advances: []
+    },
+    {
+      owner: owner?.email,
+      project: travel.project.identifier,
+      name: names[1],
+      destinationPlace: { place: 'Unknown', country: 'XX' },
+      reason: 'Invalid row',
+      startDate: '2025-05-10',
+      endDate: '2025-05-11',
+      advances: []
+    }
+  ])
+
+  t.is(response.status, 422)
+  t.regex(response.body.message, /CSV row 4/)
+  t.is(await TravelModel.countDocuments({ name: { $in: names } }), 0)
+  await loginUser(agent, 'user')
 })
 
 test.serial('POST /travel/appliedFor', async (t) => {

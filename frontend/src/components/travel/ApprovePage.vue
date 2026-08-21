@@ -96,6 +96,19 @@
           <h2>{{ t('accesses.approve/travel') }}</h2>
         </div>
         <div class="col-auto">
+          <CSVImport
+            endpoint="approve/travel/bulk"
+            :template-file-name="t('labels.travel')"
+            :template-fields="travelImportTemplateFields"
+            :transformers="[
+              { path: 'startDate', fn: convertGermanDateToHTMLDate },
+              { path: 'endDate', fn: convertGermanDateToHTMLDate },
+              { path: 'claimSpouseRefund', fn: parseCsvBoolean },
+              { path: 'isCrossBorder', fn: parseCsvBoolean }
+            ]"
+            @submitted="() => approvedTravelList?.loadFromServer()" />
+        </div>
+        <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.travel') }) }}</span>
@@ -147,12 +160,13 @@
 
 <script lang="ts" setup>
 import { OrganisationSimple, TravelSimple, TravelState } from 'abrechnung-common/types.js'
-import { datetimeToDateString } from 'abrechnung-common/utils/scripts.js'
+import { convertGermanDateToHTMLDate, datetimeToDateString } from 'abrechnung-common/utils/scripts.js'
 import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
 import DateInput from '@/components/elements/DateInput.vue'
+import CSVImport from '@/components/elements/CSVImport.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
@@ -162,6 +176,7 @@ import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
 import APP_LOADER from '@/dataLoader.js'
+import { parseCsvBoolean, travelImportTemplateFields } from '@/csvImport.js'
 import { showFile } from '@/helper.js'
 import OrganisationSelector from '../elements/OrganisationSelector.vue'
 

@@ -62,6 +62,40 @@ export interface TravelApplication
   advance: MoneyPost | undefined
 }
 
+export interface AdvanceBulkImportPost {
+  owner: string
+  project: string
+  name?: string
+  reason: string
+  budget: { amount: number; currency: string }
+  exchangeRateDate?: Date | string
+  comment?: string
+  bookingRemark?: string
+}
+
+export interface TravelBulkImportPost {
+  owner: string
+  project: string
+  name?: string
+  reason: string
+  destinationPlace: { place: string; country: string }
+  startDate: Date | string
+  endDate: Date | string
+  claimSpouseRefund?: boolean
+  fellowTravelersNames?: string
+  advances?: string[]
+  isCrossBorder?: boolean
+  a1Certificate?: { exactAddress?: string; destinationName?: string }
+}
+
+export interface ExpenseReportBulkImportPost {
+  owner: string
+  project: string
+  name?: string
+  advances?: string[]
+  currency?: CurrencyCode
+}
+
 export interface TravelPost extends Omit<TravelSimple<Types.ObjectId>, 'state' | 'comments' | 'comment' | 'progress' | 'log' | 'addUp'> {
   lastPlaceOfWork: Travel<Types.ObjectId>['lastPlaceOfWork']
   days: TravelDayPost[]

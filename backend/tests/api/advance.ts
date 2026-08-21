@@ -4,6 +4,7 @@ import test from 'ava'
 import { type Queue } from 'bullmq'
 import { shutdown } from '../../app.js'
 import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
+import Advance from '../../models/advance.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
@@ -32,6 +33,7 @@ async function getAdminUser(username: string) {
   const response = await agent.get('/admin/user').query({ filterJSON: Base64.encode(JSON.stringify({ 'fk.ldapauth': username })) })
   return response.body.data[0] as {
     _id: string
+    email: string
     access: Record<string, boolean>
     projects: { assigned: Array<{ _id: string }>; supervised: Array<{ _id: string }> }
   }
@@ -106,6 +108,53 @@ test.serial('foreign advance can be submitted without a date but approval requir
   t.truthy(approvedResponse.body.result.budget.exchangeRate)
   t.is(approvedResponse.body.result.balance.exchangeRate.rate, approvedResponse.body.result.budget.exchangeRate.rate)
   t.is(approvedResponse.body.result.balance.exchangeRate.amount, approvedResponse.body.result.budget.exchangeRate.amount)
+})
+
+test.serial('POST /approve/advance/bulk creates approved advances from natural references', async (t) => {
+  const owner = await getAdminUser('fry')
+  await loginUser(agent, 'advance')
+  const response = await agent.post('/approve/advance/bulk').send([
+    {
+      owner: owner.email,
+      project: project.identifier,
+      name: 'CSV advance one',
+      reason: 'Conference costs',
+      budget: { amount: 123.45, currency: 'EUR' },
+      comment: 'Imported comment',
+      bookingRemark: 'CSV booking remark'
+    },
+    {
+      owner: owner.email,
+      project: project.identifier,
+      name: 'CSV advance two',
+      reason: 'Travel costs',
+      budget: { amount: 50, currency: 'USD' },
+      exchangeRateDate: new Date()
+    }
+  ])
+
+  t.is(response.status, 200)
+  t.is(response.body.result.length, 2)
+  t.true(response.body.result.every(({ state }: { state: AdvanceState }) => state === AdvanceState.APPROVED))
+  t.true(response.body.result.every(({ owner: value }: { owner: { _id: string } }) => value._id === owner._id))
+  t.is(response.body.result[0].bookingRemark, 'CSV booking remark')
+  t.is(response.body.result[1].budget.currency._id, 'USD')
+  t.truthy(response.body.result[1].budget.exchangeRate)
+  t.truthy(response.body.result[1].exchangeRateDate)
+})
+
+test.serial('POST /approve/advance/bulk rejects all rows when one row is invalid', async (t) => {
+  const owner = await getAdminUser('fry')
+  const names = ['CSV atomic valid advance', 'CSV atomic invalid advance']
+  await loginUser(agent, 'advance')
+  const response = await agent.post('/approve/advance/bulk').send([
+    { owner: owner.email, project: project.identifier, name: names[0], reason: 'Valid row', budget: { amount: 10, currency: 'EUR' } },
+    { owner: owner.email, project: project.identifier, name: names[1], reason: 'Invalid row', budget: { amount: -10, currency: 'EUR' } }
+  ])
+
+  t.is(response.status, 422)
+  t.regex(response.body.message, /CSV row 4/)
+  t.is(await Advance.countDocuments({ name: { $in: names } }), 0)
 })
 
 test.serial('DELETE /approve/advance deletes approved owner advance', async (t) => {

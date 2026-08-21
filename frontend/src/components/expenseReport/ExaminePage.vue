@@ -19,6 +19,13 @@
           <h2>{{ t('accesses.examine/expenseReport') }}</h2>
         </div>
         <div class="col-auto">
+          <CSVImport
+            endpoint="examine/expenseReport/bulk"
+            :template-file-name="t('labels.expenseReport')"
+            :template-fields="expenseReportImportTemplateFields"
+            @submitted="refreshImportedExpenseReports" />
+        </div>
+        <div class="col-auto">
           <button class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.expenseReport') }) }}</span>
@@ -27,6 +34,7 @@
       </div>
       <ExpenseReportList
         class="mb-5"
+        ref="expenseReportList"
         endpoint="examine/expenseReport"
         :stateFilter="ExpenseReportState.IN_REVIEW"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'addUp.totalAdvance', 'organisation', 'bookingRemark', 'reference']"
@@ -51,6 +59,7 @@
         </button>
         <hr class="hr" >
         <ExpenseReportList
+          ref="expandedExpenseReportList"
           endpoint="examine/expenseReport"
           :stateFilter="show === ExpenseReportState.IN_WORK ? show : { $gte: show }"
           :columns-to-hide="['report', 'organisation', 'reference',  ...(show === ExpenseReportState.IN_WORK ? ['addUp.totalBalance'] : ['addUp.totalTotal', 'addUp.totalAdvance' ])]"
@@ -65,10 +74,12 @@ import { ExpenseReportSimple, ExpenseReportState } from 'abrechnung-common/types
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
+import CSVImport from '@/components/elements/CSVImport.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import ExpenseReportList from '@/components/expenseReport/ExpenseReportList.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import { expenseReportImportTemplateFields } from '@/csvImport.js'
 import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
@@ -81,6 +92,14 @@ const modalMode = ref('add' as ModalMode)
 const modalFormIsLoading = ref(false)
 
 const modalCompRef = useTemplateRef('modalComp')
+const expenseReportList = useTemplateRef('expenseReportList')
+const expandedExpenseReportList = useTemplateRef('expandedExpenseReportList')
+
+function refreshImportedExpenseReports() {
+  if (show.value === ExpenseReportState.IN_WORK) {
+    expandedExpenseReportList.value?.loadFromServer()
+  }
+}
 
 function showModal(mode: ModalMode, expenseReport?: Partial<ExpenseReportSimple<string>>) {
   if (expenseReport) {
