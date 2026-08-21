@@ -65,6 +65,11 @@ function getPermissionFilter(user: User) {
     return { historic: false, $or: [{ owner: user._id }, ...ors] }
   }
 
+  if (user.access.admin) {
+    const currentReports = { historic: false }
+    return { Travel: currentReports, ExpenseReport: currentReports, HealthCareCost: currentReports, Advance: currentReports }
+  }
+
   const travelStates = new Set<number>()
   if (user.access['approve/travel']) {
     travelStates.add(TravelState.APPLIED_FOR)

@@ -17,6 +17,30 @@ const routes = [
   },
   { path: '/offline-unavailable', component: () => import('@/components/OfflineUnavailablePage.vue'), meta: { requiresAuth: false } },
   {
+    path: '/admin/report/travel/:_id([0-9a-fA-F]{24})',
+    component: () => import('@/components/travel/TravelPage.vue'),
+    meta: { requiresAuth: true, requiredAccess: 'admin', remountOnPathChange: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [], endpointPrefix: 'admin/', viewOnly: true })
+  },
+  {
+    path: '/admin/report/expenseReport/:_id([0-9a-fA-F]{24})',
+    component: () => import('@/components/expenseReport/ExpenseReportPage.vue'),
+    meta: { requiresAuth: true, requiredAccess: 'admin', remountOnPathChange: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [], endpointPrefix: 'admin/', viewOnly: true })
+  },
+  {
+    path: '/admin/report/healthCareCost/:_id([0-9a-fA-F]{24})',
+    component: () => import('@/components/healthCareCost/HealthCareCostPage.vue'),
+    meta: { requiresAuth: true, requiredAccess: 'admin', remountOnPathChange: true },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id, parentPages: [], endpointPrefix: 'admin/', viewOnly: true })
+  },
+  {
+    path: '/admin/report/advance/:_id([0-9a-fA-F]{24})',
+    component: () => import('@/components/advance/AdminPage.vue'),
+    meta: { requiresAuth: true, requiredAccess: 'admin' },
+    props: (route: RouteLocationNormalized) => ({ _id: route.params._id })
+  },
+  {
     path: '/admin',
     component: () => import('@/components/settings/SettingsPage.vue'),
     meta: { requiresAuth: true, requiresVueform: true },

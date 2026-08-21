@@ -22,11 +22,11 @@
           :disabled="isReadOnly"
           :loading="modalFormIsLoading"
           :vehicleRegistration="
-            endpointPrefix !== 'examine/' && travel.state === TravelState.APPROVED ? APP_DATA.user.vehicleRegistration : null
+            !viewOnly && endpointPrefix !== 'examine/' && travel.state === TravelState.APPROVED ? APP_DATA.user.vehicleRegistration : null
           "
           :travelSettings="APP_DATA.travelSettings"
           :endpointPrefix="endpointPrefix"
-          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :ownerId="endpointPrefix === 'examine/' || viewOnly ? travel.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(tableRef?.getNext((modalObject as Stage), modalObjectType))"
           :show-prev-button="modalMode === 'edit' && Boolean(tableRef?.getPrev((modalObject as Stage), modalObjectType))"
           @add="postStage"
@@ -44,7 +44,7 @@
           :mode="modalMode"
           :default-project="travel.project"
           :endpointPrefix="endpointPrefix"
-          :ownerId="endpointPrefix === 'examine/' ? travel.owner._id : undefined"
+          :ownerId="endpointPrefix === 'examine/' || viewOnly ? travel.owner._id : undefined"
           :show-next-button="modalMode === 'edit' && Boolean(tableRef?.getNext((modalObject as TravelExpense), modalObjectType))"
           :show-prev-button="modalMode === 'edit' && Boolean(tableRef?.getPrev((modalObject as TravelExpense), modalObjectType))"
           @add="postExpense"
@@ -61,7 +61,7 @@
           :createNotApply="APP_DATA?.user.access['approved:travel']"
           :loading="modalFormIsLoading"
           :owner="travel.owner"
-          :update-user-org="endpointPrefix !== 'examine/'"
+          :update-user-org="endpointPrefix !== 'examine/' && !viewOnly"
           :endpoint-prefix="endpointPrefix"
           @cancel="resetAndHide"
           @edit="(t) =>editTravelDetails(t as TravelSimple<string>)" />
@@ -142,15 +142,18 @@
                 <li>
                   <hr class="dropdown-divider" >
                 </li>
-                <li><a :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')" @click="showModal('edit', 'travel', travel)">
+                <li><a
+                  :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
+                  @click="viewOnly ? null : showModal('edit', 'travel', travel)">
                   <span class="me-1"><i class="bi bi-pencil"></i></span>
                   <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
                 </a></li>
                 <li><a
                   :class="
-                      'dropdown-item clickable' + (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? ' disabled' : '')
+                      'dropdown-item clickable' +
+                      (viewOnly || (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE) ? ' disabled' : '')
                     "
-                  @click="isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE ? null : deleteTravel()">
+                  @click="viewOnly || (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE) ? null : deleteTravel()">
                   <span class="me-1"><i class="bi bi-trash"></i></span>
                   <span>{{ t('labels.delete') }}</span>
                 </a></li>
@@ -159,7 +162,7 @@
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' ? formatter.name(travel.owner.name) + ' - ' : '') +
+          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(travel.owner.name) + ' - ' : '') +
             travel.project.identifier +
             (travel.project.name ? ' ' + travel.project.name : '') }}
         </div>
@@ -200,8 +203,8 @@
             <div class="col-auto">
               <button
                 class="btn btn-outline-secondary"
-                @click="travel.days.length < 1 ? null : showModal('edit', 'lumpSums', undefined)"
-                :disabled="travel.days.length < 1">
+                @click="viewOnly || travel.days.length < 1 ? null : showModal('edit', 'lumpSums', undefined)"
+                :disabled="viewOnly || travel.days.length < 1">
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.editX', { X: t('labels.lumpSums') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.lumpSums') }}</span>
               </button>
@@ -283,8 +286,8 @@
                     <div>
                       <button
                         class="btn btn-secondary"
-                        @click="travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/' ? null : backToApproved()"
-                        :disabled="travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/'">
+                        @click="viewOnly || (travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/') ? null : backToApproved()"
+                        :disabled="viewOnly || (travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/')">
                         <i class="bi bi-arrow-counterclockwise"></i>
                         <span class="ms-1">{{ t(endpointPrefix === 'examine/' ? 'labels.backToApplicant' : 'labels.editAgain') }}</span>
                       </button>
@@ -377,7 +380,8 @@ type ModalObjectType = TravelRecordType | 'travel' | 'lumpSums' | 'stageImport'
 const props = defineProps({
   _id: { type: String, required: true },
   parentPages: { type: Array as PropType<{ link: string; title: string }[]>, required: true },
-  endpointPrefix: { type: String, default: '' }
+  endpointPrefix: { type: String, default: '' },
+  viewOnly: { type: Boolean, default: false }
 })
 
 const router = useRouter()
@@ -405,6 +409,7 @@ const APP_DATA = APP_LOADER.data
 
 const isReadOnly = computed(() => {
   return (
+    props.viewOnly ||
     !sessionState.isOnline.value ||
     ((travel.value.state > State.EDITABLE_BY_OWNER ||
       (travel.value.state === State.EDITABLE_BY_OWNER && props.endpointPrefix === 'examine/')) &&
@@ -422,10 +427,10 @@ const travelValidationResults = computed(() => {
     return [] as ValidationResult[]
   }
   const results = APP_DATA.value.travelCalculator.validator.getValidationSummary(travel.value, {
-    vehicleRegistration: props.endpointPrefix !== 'examine/' ? APP_DATA.value.user.vehicleRegistration : null
+    vehicleRegistration: props.endpointPrefix !== 'examine/' && !props.viewOnly ? APP_DATA.value.user.vehicleRegistration : null
   }).results
 
-  if (props.endpointPrefix !== 'examine/') {
+  if (props.endpointPrefix !== 'examine/' && !props.viewOnly) {
     return results
   }
 
