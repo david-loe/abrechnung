@@ -25880,6 +25880,50 @@
 				]
 			}
 		},
+		"/admin/documentFile": {
+			"get": {
+				"operationId": "GetAny",
+				"responses": {
+					"200": {
+						"description": "",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Document File"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/displaySettings": {
 			"get": {
 				"operationId": "Get",
@@ -30032,6 +30076,742 @@
 						"required": true,
 						"schema": {
 							"$ref": "#/components/schemas/ReportModelName"
+						}
+					}
+				]
+			}
+		},
+		"/admin/travel": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												}
+											]
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/travel/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/expenseReport": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												}
+											]
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/expenseReport/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/healthCareCost": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												}
+											]
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/healthCareCost/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Health Care Cost"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/advance": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"anyOf": [
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/HealthCareCost_mongoose.Types.ObjectId.Binary_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												},
+												{
+													"allOf": [
+														{
+															"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+														},
+														{
+															"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+														},
+														{
+															"properties": {
+																"__v": {
+																	"type": "number",
+																	"format": "double"
+																}
+															},
+															"required": [
+																"__v"
+															],
+															"type": "object"
+														}
+													]
+												}
+											]
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/admin/advance/report": {
+			"get": {
+				"operationId": "GetReport",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/pdf": {
+								"schema": {
+									"type": "string",
+									"format": "byte"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Admin",
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"admin"
+						]
+					},
+					{
+						"httpBearer": [
+							"admin"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "_id",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
 				]
