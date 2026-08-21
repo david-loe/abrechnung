@@ -1167,6 +1167,62 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Record_ActionAccess.number_": {
+				"properties": {
+					"approve/advance": {
+						"type": "number",
+						"format": "double"
+					},
+					"approve/travel": {
+						"type": "number",
+						"format": "double"
+					},
+					"examine/travel": {
+						"type": "number",
+						"format": "double"
+					},
+					"examine/expenseReport": {
+						"type": "number",
+						"format": "double"
+					},
+					"examine/healthCareCost": {
+						"type": "number",
+						"format": "double"
+					},
+					"book/advance": {
+						"type": "number",
+						"format": "double"
+					},
+					"book/travel": {
+						"type": "number",
+						"format": "double"
+					},
+					"book/expenseReport": {
+						"type": "number",
+						"format": "double"
+					},
+					"book/healthCareCost": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"approve/advance",
+					"approve/travel",
+					"examine/travel",
+					"examine/expenseReport",
+					"examine/healthCareCost",
+					"book/advance",
+					"book/travel",
+					"book/expenseReport",
+					"book/healthCareCost"
+				],
+				"type": "object",
+				"description": "Construct a type with a set of properties K of type T"
+			},
+			"ActionCounts": {
+				"$ref": "#/components/schemas/Record_ActionAccess.number_"
+			},
 			"NativeDate": {
 				"type": "string"
 			},
@@ -16319,6 +16375,47 @@
 									"properties": {
 										"data": {
 											"$ref": "#/components/schemas/User__id.binary_"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/actionCounts": {
+			"get": {
+				"operationId": "GetActionCounts",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"$ref": "#/components/schemas/ActionCounts"
 										}
 									},
 									"required": [
