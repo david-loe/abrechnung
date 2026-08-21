@@ -21,6 +21,7 @@ const stateChangingPostEndpoints = [
   /^advance\/(appliedFor|received)$/,
   /^travel\/(appliedFor|approved|underExamination)$/,
   /^(expenseReport|healthCareCost)\/(inWork|underExamination)$/,
+  /^approve\/advance\/bulk$/,
   /^approve\/(advance|travel)\/(approved|rejected|withdrawApproval)$/,
   /^examine\/(travel|expenseReport|healthCareCost)\/(approved|inWork|reviewCompleted|underExamination)$/,
   /^book\/(advance|travel|expenseReport|healthCareCost)\/booked$/

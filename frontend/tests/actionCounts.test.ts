@@ -138,6 +138,9 @@ describe('action counts', () => {
       new CustomEvent('api-mutation-succeeded', { detail: { endpoint: 'examine/travel/reviewCompleted', method: 'POST' } })
     )
     await vi.waitFor(() => expect(API.getter).toHaveBeenCalledTimes(2))
+
+    eventBus.dispatchEvent(new CustomEvent('api-mutation-succeeded', { detail: { endpoint: 'approve/advance/bulk', method: 'POST' } }))
+    await vi.waitFor(() => expect(API.getter).toHaveBeenCalledTimes(3))
   })
 
   it('clears counts with the session', async () => {
