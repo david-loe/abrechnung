@@ -1,6 +1,7 @@
 import {
   type Advance,
   type Booking,
+  baseCurrency,
   type Cost,
   type CostPosition,
   type ExpenseReport,
@@ -18,6 +19,7 @@ import {
   getCostPositionBaseCurrencyVatAmount,
   getCostPositionVatAmount,
   multiplyAmount,
+  multiplyAmountAndRound,
   refNumberToString,
   roundAmount,
   subtractAmounts,
@@ -41,6 +43,7 @@ interface ProjectAccountingContext {
   projectId: Types.ObjectId
   employeeLiabilitiesAccount: Types.ObjectId
   employeeClaimsAccount: Types.ObjectId
+  currencyExchangeDifferencesAccount: Types.ObjectId
   accountMapping: Record<string, Types.ObjectId>
   vatAccountingEnabled: boolean
   vatRates: { rate: number; inputTaxAccount?: Types.ObjectId }[]
@@ -104,6 +107,7 @@ async function loadAccountingContext(report: BookableReport) {
       accountingSettings: {
         employeeLiabilitiesAccount: Types.ObjectId
         employeeClaimsAccount: Types.ObjectId
+        currencyExchangeDifferencesAccount: Types.ObjectId
         accountMapping: Record<string, Types.ObjectId>
         vatAccountingEnabled: boolean
         vatRates: { rate: number; inputTaxAccount?: Types.ObjectId }[]
@@ -151,6 +155,12 @@ export async function calculateBookings(
   const projectTotals = new Map<string, number>()
   const unroundedPositionTotals = new Map<string, number>()
   const unroundedVatOverrideTotals = new Map<string, number>()
+  const reportCurrencyMode =
+    reportModelName === 'ExpenseReport' && Boolean((report as ExpenseReport<Types.ObjectId, mongo.Binary>).currency)
+  const reportExchangeRate = reportCurrencyMode ? (report as ExpenseReport<Types.ObjectId, mongo.Binary>).exchangeRate : null
+  if (reportCurrencyMode && typeof reportExchangeRate !== 'number') {
+    throw new Error('Cannot create bookings for a foreign-currency expense report without an exchange rate')
+  }
 
   function projectContext(projectValue: unknown) {
     const key = idKey(projectValue, 'booking project')
@@ -201,7 +211,12 @@ export async function calculateBookings(
     const grossAmount = allocateRoundedProjectAmount(
       unroundedPositionTotals,
       project,
-      multiplyAmount(getCostPositionBaseCurrencyAmount(cost, position), factor)
+      multiplyAmount(
+        reportCurrencyMode
+          ? multiplyAmount(position.grossAmount, reportExchangeRate as number)
+          : getCostPositionBaseCurrencyAmount(cost, position),
+        factor
+      )
     )
     const vatAccountingEnabled = project.vatAccountingEnabled && position.kind !== 'ownCar'
     const vatAmount =
@@ -209,7 +224,12 @@ export async function calculateBookings(
         ? allocateRoundedProjectAmount(
             unroundedVatOverrideTotals,
             project,
-            multiplyAmount(getCostPositionBaseCurrencyVatAmount(cost, position, vatAccountingEnabled), factor)
+            multiplyAmount(
+              reportCurrencyMode
+                ? multiplyAmount(position.vatAmountOverride, reportExchangeRate as number)
+                : getCostPositionBaseCurrencyVatAmount(cost, position, vatAccountingEnabled),
+              factor
+            )
           )
         : getCostPositionVatAmount({ grossAmount, vatRate: position.vatRate }, vatAccountingEnabled)
     const netAmount = roundAmount(subtractAmounts(grossAmount, vatAmount))
@@ -275,12 +295,38 @@ export async function calculateBookings(
     const advanceAmounts = new Map(
       costReport.addUp.map(({ project, advance }) => [idKey(project, 'summary project'), roundAmount(advance.amount)])
     )
+    const addUpsByProject = new Map(costReport.addUp.map((addUp) => [idKey(addUp.project, 'summary project'), addUp]))
     for (const [projectId, total] of projectTotals) {
       const project = projectContext(projectId)
       if (total > 0) {
-        const advanceAmount = Math.min(total, Math.max(advanceAmounts.get(projectId) ?? 0, 0))
-        addAccountAmount(project, project.employeeClaimsAccount, oppositeSideAmount(advanceAmount))
-        addAccountAmount(project, project.employeeLiabilitiesAccount, oppositeSideAmount(subtractAmounts(total, advanceAmount)))
+        if (reportCurrencyMode) {
+          const addUp = addUpsByProject.get(projectId)
+          if (!addUp) throw new Error(`Cannot create bookings without a summary for project ${projectId}`)
+          const balanceAmount = multiplyAmountAndRound(addUp.balance.amount, reportExchangeRate as number)
+          const carryingAmount = costReport.advances
+            .filter((advance) => idKey(advance.project, 'advance project') === projectId)
+            .reduce((sum, advance) => {
+              const enrichedAdvance = advance as Advance<Types.ObjectId>
+              const offset = enrichedAdvance.offsetAgainst?.find(
+                ({ reportId }) => reportId && idDocumentToId(reportId).toString() === report._id.toString()
+              )
+              if (!offset) return sum
+              const offsetCurrency = idDocumentToId(offset.currency).toString()
+              if (offsetCurrency === baseCurrency._id) return sumAmounts(sum, offset.amount)
+              if (typeof offset.exchangeRate?.amount !== 'number') {
+                throw new Error(`Cannot book foreign-currency advance ${advance._id.toString()} without an exchange rate`)
+              }
+              return sumAmounts(sum, offset.exchangeRate.amount)
+            }, 0)
+          addAccountAmount(project, project.employeeClaimsAccount, oppositeSideAmount(carryingAmount))
+          addAccountAmount(project, project.employeeLiabilitiesAccount, oppositeSideAmount(balanceAmount))
+          const difference = subtractAmounts(total, sumAmounts(carryingAmount, balanceAmount))
+          addAccountAmount(project, project.currencyExchangeDifferencesAccount, oppositeSideAmount(difference))
+        } else {
+          const advanceAmount = Math.min(total, Math.max(advanceAmounts.get(projectId) ?? 0, 0))
+          addAccountAmount(project, project.employeeClaimsAccount, oppositeSideAmount(advanceAmount))
+          addAccountAmount(project, project.employeeLiabilitiesAccount, oppositeSideAmount(subtractAmounts(total, advanceAmount)))
+        }
       } else if (total < 0) {
         addAccountAmount(project, project.employeeClaimsAccount, oppositeSideAmount(total))
       }

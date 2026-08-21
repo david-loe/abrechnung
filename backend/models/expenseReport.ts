@@ -1,4 +1,13 @@
-import { AddUp, Comment, ExpenseReport, ExpenseReportState, expenseReportStates } from 'abrechnung-common/types.js'
+import {
+  AddUp,
+  AdvanceBase,
+  baseCurrency,
+  Comment,
+  ExpenseReport,
+  ExpenseReportState,
+  expenseReportStates,
+  idDocumentToId
+} from 'abrechnung-common/types.js'
 import { addUp } from 'abrechnung-common/utils/scripts.js'
 import { HydratedDocument, Model, model, mongo, Query, Schema, Types } from 'mongoose'
 import { createOperationServices } from '../factory.js'
@@ -25,6 +34,19 @@ interface Methods {
 const expenseReportSchema = () =>
   new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, Model<ExpenseReport<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
+      currency: {
+        type: String,
+        ref: 'Currency',
+        validate: {
+          validator: (value: string | null | undefined) => !value || value !== baseCurrency._id,
+          message: 'baseCurrencyNotAllowed'
+        }
+      },
+      exchangeRateDate: {
+        type: Date,
+        validate: { validator: (value: Date | string | number) => Date.now() >= new Date(value).valueOf(), message: 'futureNotAllowed' }
+      },
+      exchangeRate: { type: Number, min: 0 },
       expenses: [
         {
           description: { type: String, required: true },
@@ -39,14 +61,15 @@ const expenseReportSchema = () =>
 const schema = expenseReportSchema()
 
 const populates = {
+  currency: [{ path: 'currency' }],
   expenses: [
     { path: 'expenses.cost.currency' },
     { path: 'expenses.cost.receipts', select: { name: 1, type: 1 } },
     { path: 'expenses.cost.positions.project', select: { identifier: 1, organisation: 1 } },
     { path: 'expenses.cost.positions.category' }
   ],
-  addUp: [{ path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
-  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1 } }],
+  addUp: [{ path: 'addUp.currency' }, { path: 'addUp.project', select: { identifier: 1, organisation: 1 } }],
+  advances: [{ path: 'advances', select: { name: 1, balance: 1, budget: 1, state: 1, project: 1, offsetAgainst: 1 } }],
   bookings: [{ path: 'bookings.ledgerAccount' }, { path: 'bookings.project', select: { identifier: 1, organisation: 1 } }],
   project: [{ path: 'project' }],
   owner: [{ path: 'owner', select: { name: 1, email: 1, additionalDetails: 1 } }],
@@ -86,6 +109,22 @@ schema.methods.saveToHistory = async function () {
 
 schema.methods.calculateExchangeRates = async function () {
   const { currencyConverter } = createOperationServices()
+  if (this.currency) {
+    for (const expense of this.expenses) {
+      expense.cost.exchangeRate = null
+    }
+    if (!this.exchangeRateDate) {
+      this.exchangeRate = null
+      return
+    }
+    try {
+      const conversion = await currencyConverter.convert(this.exchangeRateDate, 1, idDocumentToId(this.currency).toString())
+      this.exchangeRate = conversion?.rate ?? null
+    } catch {
+      this.exchangeRate = null
+    }
+    return
+  }
   const promiseList = []
   for (const expense of this.expenses) {
     promiseList.push(currencyConverter.addCostExchangeRate(expense.cost, expense.cost.date as Date))
@@ -117,10 +156,44 @@ schema.pre('validate', async function () {
   }
 })
 
+schema.pre('validate', async function () {
+  if (!this.currency) {
+    this.exchangeRateDate = undefined
+    this.exchangeRate = undefined
+  } else {
+    const currency = idDocumentToId(this.currency).toString()
+    for (const [index, expense] of this.expenses.entries()) {
+      if (idDocumentToId(expense.cost.currency).toString() !== currency) {
+        this.invalidate(`expenses.${index}.cost.currency`, 'reportCurrencyMismatch')
+      }
+    }
+    const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
+    if (advanceIds.length > 0) {
+      const advances = await model<AdvanceBase<Types.ObjectId>>('Advance')
+        .find({ _id: { $in: advanceIds } }, { 'budget.currency': 1, 'balance.currency': 1 })
+        .lean()
+      if (
+        advances.length !== advanceIds.length ||
+        advances.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)
+      ) {
+        this.invalidate('advances', 'reportCurrencyMismatch')
+      }
+    }
+  }
+
+  await this.calculateExchangeRates()
+  if (!this.historic && this.state === ExpenseReportState.REVIEW_COMPLETED && this.currency) {
+    if (!this.exchangeRateDate) {
+      this.invalidate('exchangeRateDate', 'required')
+    } else if (typeof this.exchangeRate !== 'number') {
+      this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
+    }
+  }
+})
+
 schema.pre('save', async function () {
   await populateAll(this, populates)
 
-  await this.calculateExchangeRates()
   this.addUp = addUp(this) as AddUp<Types.ObjectId, ExpenseReport<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
   setLog(this)

@@ -1,5 +1,4 @@
-import { BaseCurrencyMoneyNotNull, DocumentFile as IDocumentFile, User as IUser, Money } from 'abrechnung-common/types.js'
-import { getBaseCurrencyAmount } from 'abrechnung-common/utils/scripts.js'
+import { DocumentFile as IDocumentFile, User as IUser, Money, MoneyNotNull } from 'abrechnung-common/types.js'
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
@@ -124,8 +123,12 @@ export function genAuthenticatedLink(
   })
 }
 
-export function setAdvanceBalance(advance: { budget: Money; balance?: BaseCurrencyMoneyNotNull }) {
-  advance.balance = { amount: getBaseCurrencyAmount(advance.budget) }
+export function setAdvanceBalance(advance: { budget: Money; balance?: MoneyNotNull }) {
+  advance.balance = {
+    amount: advance.budget.amount ?? 0,
+    currency: advance.budget.currency,
+    exchangeRate: advance.budget.exchangeRate ? { ...advance.budget.exchangeRate } : null
+  }
 }
 
 interface FormField {

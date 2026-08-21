@@ -32,6 +32,20 @@
       </div>
     </div>
 
+    <div v-if="isForeignCurrency" class="mb-3">
+      <label for="advanceExchangeRateDate" class="form-label">
+        {{ t('labels.exchangeRateDate') }}
+        <span v-if="requireExchangeRateDate" class="text-danger">*</span>
+      </label>
+      <DateInput
+        id="advanceExchangeRateDate"
+        :model-value="formAdvance.exchangeRateDate || undefined"
+        :disabled="disabled"
+        :required="requireExchangeRateDate"
+        :max="new Date()"
+        @update:model-value="(date) => (formAdvance.exchangeRateDate = date)" />
+    </div>
+
     <div class="mb-3">
       <label for="advanceFormProject" class="form-label me-2">
         {{ t('labels.project') }}
@@ -70,10 +84,11 @@
 </template>
 
 <script lang="ts" setup>
-import { AdvanceSimple, baseCurrency } from 'abrechnung-common/types.js'
-import { PropType, ref, watch } from 'vue'
+import { AdvanceSimple, baseCurrency, idDocumentToId } from 'abrechnung-common/types.js'
+import { computed, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
@@ -87,6 +102,7 @@ const props = defineProps({
   disabled: { type: Boolean, default: false },
   askOwner: { type: Boolean, default: false },
   askBookingRemark: { type: Boolean, default: false },
+  requireExchangeRateDate: { type: Boolean, default: false },
   loading: { type: Boolean, default: false }
 })
 
@@ -99,6 +115,7 @@ function defaultAdvance() {
     name: undefined,
     reason: undefined,
     budget: { amount: null, currency: baseCurrency },
+    exchangeRateDate: undefined as Date | string | null | undefined,
     owner: undefined,
     project: undefined,
     comment: undefined,
@@ -107,7 +124,11 @@ function defaultAdvance() {
 }
 
 function input() {
-  return { ...defaultAdvance(), ...props.advance }
+  const advance = { ...defaultAdvance(), ...props.advance }
+  if (idDocumentToId(advance.budget.currency) !== baseCurrency._id && !advance.exchangeRateDate) {
+    advance.exchangeRateDate = new Date()
+  }
+  return advance
 }
 
 function output() {
@@ -118,6 +139,19 @@ watch(
   () => props.advance,
   () => {
     formAdvance.value = input() as ReturnType<typeof defaultAdvance>
+  }
+)
+
+const isForeignCurrency = computed(() => idDocumentToId(formAdvance.value.budget.currency) !== baseCurrency._id)
+
+watch(
+  () => formAdvance.value.budget.currency,
+  (currency) => {
+    if (idDocumentToId(currency) === baseCurrency._id) {
+      formAdvance.value.exchangeRateDate = undefined
+    } else if (!formAdvance.value.exchangeRateDate) {
+      formAdvance.value.exchangeRateDate = new Date()
+    }
   }
 )
 </script>

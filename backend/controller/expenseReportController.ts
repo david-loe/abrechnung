@@ -25,11 +25,36 @@ import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost } from './types.js'
 
-const expenseReportValidator = new Validator({ requireReceipts: true })
+const expenseReportReviewValidator = new Validator({ requireReceipts: true })
+const expenseReportCompletionValidator = new Validator({ requireExchangeRate: true, requireReceipts: true })
 type ExpenseSetterBody = SetterBody<Expense<Types.ObjectId, mongo.Binary>>
+type ExpenseReportDetailsBody = {
+  project?: IdDocument<Types.ObjectId>
+  _id?: string
+  name?: string
+  advances?: IdDocument<Types.ObjectId>[]
+  currency?: IdDocument<string> | null
+  exchangeRateDate?: Date | string | null
+}
 
-function assertExpenseReportCanEnterReview(report: Pick<IExpenseReport, 'expenses'>, language: string) {
-  const reviewSummary = expenseReportValidator.getValidationSummary(report)
+function assertExpenseReportCanEnterReview(
+  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+  language: string
+) {
+  const reviewSummary = expenseReportReviewValidator.getValidationSummary(report)
+  if (!reviewSummary.canEnterReview) {
+    throw new ValidationClientError(
+      i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
+      reviewSummary.results.filter((result) => result.severity === 'error').map((result) => ({ path: result.path, message: result.code }))
+    )
+  }
+}
+
+function assertExpenseReportCanCompleteReview(
+  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+  language: string
+) {
+  const reviewSummary = expenseReportCompletionValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
       i18n.t('alerts.reviewRequirementsNotMet', { lng: language }),
@@ -167,10 +192,7 @@ export class ExpenseReportController extends Controller {
   }
 
   @Post('inWork')
-  public async postOwnInWork(
-    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id?: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
+  public async postOwnInWork(@Body() requestBody: ExpenseReportDetailsBody, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
 
     if (!extendedBody._id) {
@@ -357,10 +379,7 @@ export class ExpenseReportExamineController extends Controller {
   }
 
   @Post()
-  public async postAny(
-    @Body() requestBody: { project?: IdDocument<Types.ObjectId>; _id: string; name?: string; advances?: IdDocument<Types.ObjectId>[] },
-    @Request() request: AuthenticatedExpressRequest
-  ) {
+  public async postAny(@Body() requestBody: ExpenseReportDetailsBody & { _id: string }, @Request() request: AuthenticatedExpressRequest) {
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
@@ -376,14 +395,7 @@ export class ExpenseReportExamineController extends Controller {
   @Post('inWork')
   public async postBackInWork(
     @Body()
-    requestBody: {
-      project?: IdDocument<Types.ObjectId>
-      _id?: string
-      name?: string
-      advances?: IdDocument<Types.ObjectId>[]
-      owner?: IdDocument<Types.ObjectId>
-      comment?: string
-    },
+    requestBody: ExpenseReportDetailsBody & { owner?: IdDocument<Types.ObjectId>; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
@@ -423,6 +435,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          assertExpenseReportCanCompleteReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

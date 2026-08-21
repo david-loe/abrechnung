@@ -13,14 +13,14 @@
     <template #option="{ name, budget, balance, project }">
       <div class="row align-items-center">
         <div class="col text-truncate">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto px-1"><span>{{ formatter.money(balance) }}</span></div>
+        <div class="col-auto px-1"><span>{{ formatter.money(balance, { useExchangeRate: false }) }}</span></div>
         <div v-if="balance.amount !== budget.amount" class="col-auto px-1 opacity-75"><span>{{ formatter.money(budget) }}</span></div>
       </div>
     </template>
     <template #selected-option="{ name, balance, project }">
       <div class="row align-items-center">
         <div class="col-auto text-truncate" style="max-width: 220px">{{ `${name} [${project.identifier}]` }}</div>
-        <div class="col-auto opacity-75"><span>{{ formatter.money(balance) }}</span></div>
+        <div class="col-auto opacity-75"><span>{{ formatter.money(balance, { useExchangeRate: false }) }}</span></div>
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
@@ -28,16 +28,19 @@
     </template>
     <template #no-options="{ search, searching, loading }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
+      <span v-else-if="currency">
+        {{ t('alerts.noData.advanceForUserXInCurrencyY', { X: formatter.name((owner as UserSimple | undefined)?.name), Y: currencyName }) }}
+      </span>
       <span v-else>{{ t('alerts.noData.advanceForUserX', { X: formatter.name((owner as UserSimple | undefined)?.name) }) }}</span>
     </template>
   </v-select>
 </template>
 
 <script setup lang="ts">
-import { getAdvances } from '@/components/advance/scripts.js'
+import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
 import { formatter } from '@/formatter.js'
-import { AdvanceSimple, IdDocument, idDocumentToId, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
-import { onMounted, ref, watch } from 'vue'
+import { AdvanceSimple, Currency, IdDocument, idDocumentToId, Locale, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 type BaseProps = {
@@ -48,6 +51,7 @@ type BaseProps = {
   project?: ProjectSimple<string>
   endpointPrefix?: string
   setDefault?: boolean
+  currency?: Currency
 }
 
 type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceSimple | null }
@@ -67,9 +71,10 @@ const emit = defineEmits<{ (e: 'update:modelValue', v: AdvanceSimple | null): vo
 
 let setByUser = props.modelValue && (!props.multiple || (Array.isArray(props.modelValue) && props.modelValue.length > 0))
 let defaultFor = { userId: null as null | string, projectId: null as null | string }
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 const advances = ref([] as AdvanceSimple[])
+const currencyName = computed(() => props.currency?.name[locale.value as Locale]?.trim() || props.currency?._id)
 
 // Filter method
 function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
@@ -104,7 +109,7 @@ function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {
 }
 
 onMounted(async () => {
-  advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
+  advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
   setDefaultAdvances(advances.value)
 })
 
@@ -118,7 +123,7 @@ watch(
         emit('update:modelValue', null)
       }
     }
-    advances.value = await getAdvances(idDocumentToId(props.owner), props.endpointPrefix)
+    advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
     setDefaultAdvances(advances.value)
   }
 )
@@ -132,6 +137,27 @@ watch(
         emit('update:modelValue', null)
       }
     }
+    setDefaultAdvances(advances.value)
+  }
+)
+watch(
+  () => props.currency,
+  async () => {
+    const selectedAdvances = Array.isArray(props.modelValue) ? props.modelValue : props.modelValue ? [props.modelValue] : []
+    const matchingSelection = filterAdvancesByCurrency(selectedAdvances, props.currency)
+    if (matchingSelection.length !== selectedAdvances.length) {
+      if (props.multiple) {
+        emit('update:modelValue', matchingSelection)
+      } else {
+        emit('update:modelValue', matchingSelection[0] ?? null)
+      }
+      if (matchingSelection.length === 0) {
+        setByUser = false
+        defaultFor = { userId: null, projectId: null }
+      }
+    }
+
+    advances.value = filterAdvancesByCurrency(await getAdvances(idDocumentToId(props.owner), props.endpointPrefix), props.currency)
     setDefaultAdvances(advances.value)
   }
 )

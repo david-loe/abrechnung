@@ -12,8 +12,10 @@ import {
   getModelNameFromReport,
   getReportTypeFromModelName,
   HealthCareCost,
+  idDocumentToId,
   Locale,
   Meal,
+  Money,
   Place,
   PrinterSettings,
   PrintOptions,
@@ -21,6 +23,7 @@ import {
   PurposeSimple,
   ReportModelNameWithoutAdvance,
   reportIsAdvance,
+  reportIsExpenseReport,
   reportIsHealthCareCost,
   reportIsTravel,
   State,
@@ -33,7 +36,7 @@ import {
   UserSimple
 } from '../types.js'
 import Formatter from '../utils/formatter.js'
-import { getAddUpTableData, getTotalBalance, isValidDate, refNumberToString } from '../utils/scripts.js'
+import { getAddUpTableData, getTotalBalance, getTotalBaseCurrencyBalance, isValidDate, refNumberToString } from '../utils/scripts.js'
 import { Column, EMPTY_CELL, Options, PDFDrawer, Printer, ReceiptMap, TableOptions } from './printer.js'
 
 function getReceiptMap<idType extends _id>(costList: { cost: Cost<idType> }[], startNumber = 1) {
@@ -271,7 +274,12 @@ class ReportPrint<idType extends _id> {
       }
     } else if (reportIsAdvance(this.report)) {
       ownerLine = `${this.t('labels.advanceRecipient')}: ${this.drawer.formatter.name(this.report.owner.name)}`
-      metaInformation = [`${this.t('labels.reason')}: ${this.report.reason}`]
+      metaInformation = [
+        `${this.t('labels.reason')}: ${this.report.reason}`,
+        idDocumentToId(this.report.budget.currency) !== baseCurrency._id && this.report.exchangeRateDate
+          ? `${this.t('labels.exchangeRateDate')}: ${this.drawer.formatter.date(this.report.exchangeRateDate)}${typeof this.report.budget.exchangeRate?.rate === 'number' ? ` - ${this.drawer.formatter.float(this.report.budget.exchangeRate.rate)}` : ''}`
+          : ''
+      ].filter((line) => line !== '')
     } else if (reportIsHealthCareCost(this.report)) {
       ownerLine = `${this.t('labels.applicant')}: ${this.drawer.formatter.name(this.report.owner.name)}`
       const ec = this.report.expenses.length
@@ -286,6 +294,13 @@ class ReportPrint<idType extends _id> {
       ownerLine = `${this.t('labels.expensePayer')}: ${this.drawer.formatter.name(this.report.owner.name)}`
       const ec = this.report.expenses.length
       metaInformation = [
+        this.report.currency ? `${this.t('labels.currency')}: ${idDocumentToId(this.report.currency)}` : '',
+        this.report.currency && this.report.exchangeRateDate
+          ? `${this.t('labels.exchangeRateDate')}: ${this.drawer.formatter.date(this.report.exchangeRateDate)}`
+          : '',
+        this.report.currency && typeof this.report.exchangeRate === 'number'
+          ? `${this.t('labels.exchangeRate')}: ${this.drawer.formatter.float(this.report.exchangeRate)}`
+          : '',
         ec > 0
           ? `${this.t('labels.from')}: ${this.drawer.formatter.date(this.report.expenses[0].cost.date || '')}    ${this.t('labels.to')}: ${this.drawer.formatter.date(this.report.expenses[ec - 1].cost.date || '')}`
           : ''
@@ -323,17 +338,22 @@ class ReportPrint<idType extends _id> {
   async drawSummary(options: Options) {
     const columns: Column[] = []
     columns.push({ key: '0', width: 100, alignment: TextAlignment.Left, title: 'title', fn: (l: string) => this.t(l) })
-    const moneyColumn = (key: string) => ({ key, width: 75, alignment: TextAlignment.Right, title: 'title' })
+    const moneyColumn = (key: string, width = 75) => ({ key, width, alignment: TextAlignment.Right, title: 'title' })
     let summary = []
     if (reportIsAdvance(this.report)) {
-      columns.push(moneyColumn('1'))
-      summary.push({ '0': this.t('labels.advance'), '1': this.drawer.formatter.detailedMoney(this.report.budget) })
-      summary.push({ '0': this.t('labels.balance'), '1': this.drawer.formatter.baseCurrency(this.report.balance.amount) })
+      columns.push(moneyColumn('1', 150))
+      summary.push({ '0': this.t('labels.advance'), '1': this.formatConvertedMoney(this.report.budget) })
+      summary.push({ '0': this.t('labels.balance'), '1': this.formatConvertedMoney(this.report.balance) })
     } else {
       for (let i = 0; i < this.report.addUp.length; i++) {
         columns.push(moneyColumn((i + 1).toString(10)))
       }
-      const tableData = getAddUpTableData(this.drawer.formatter, this.report.addUp, reportIsTravel(this.report))
+      const tableData = getAddUpTableData(
+        this.drawer.formatter,
+        this.report.addUp,
+        reportIsTravel(this.report),
+        reportIsExpenseReport(this.report) ? this.report.exchangeRate : undefined
+      )
       summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(10), value])))
     }
     const fontSize = options.fontSize + 2
@@ -345,7 +365,9 @@ class ReportPrint<idType extends _id> {
     if (!reportIsAdvance(this.report) && this.report.addUp.length > 1) {
       options.yStart = y
       y = this.drawer.drawMultilineText(
-        `${this.t('labels.totalBalance')}: ${this.drawer.formatter.baseCurrency(getTotalBalance(this.report.addUp))}`,
+        `${this.t('labels.totalBalance')}: ${this.drawer.formatter.baseCurrency(
+          reportIsExpenseReport(this.report) ? getTotalBaseCurrencyBalance(this.report) : getTotalBalance(this.report.addUp)
+        )}`,
         options
       )
     }
@@ -672,6 +694,7 @@ class ReportPrint<idType extends _id> {
     if (!reportIsAdvance(this.report) || this.report.offsetAgainst.length === 0) {
       return options.yStart
     }
+    const rows = this.report.offsetAgainst.map((offset) => ({ ...offset, formattedAmount: this.formatConvertedMoney(offset) }))
     const columns: Column[] = []
     columns.push({ key: 'subject', width: 280, alignment: TextAlignment.Left, title: this.t('labels.subject') })
     columns.push({
@@ -683,18 +706,23 @@ class ReportPrint<idType extends _id> {
         t === 'offsetEntry' ? this.t('labels.offsetEntry') : this.t(`labels.${getReportTypeFromModelName(t)}`)
     })
     columns.push({
-      key: 'amount',
+      key: 'formattedAmount',
       width: 100,
       alignment: TextAlignment.Right,
       title: this.t('labels.amount'),
-      fn: (a: number) => this.drawer.formatter.money({ amount: a })
+      fn: (amount: string) => amount
     })
 
     const fontSize = options.fontSize + 2
     this.drawer.drawText(this.t('labels.offsetAgainst'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
     options.yStart -= fontSize * 1.25
 
-    return await this.drawer.drawTable(this.report.offsetAgainst, columns, options)
+    return await this.drawer.drawTable(rows, columns, options)
+  }
+
+  formatConvertedMoney(money: Money) {
+    const parts = this.drawer.formatter.moneyDisplayParts(money)
+    return parts.secondary ? `${parts.primary} - ${parts.secondary}` : parts.primary
   }
   t(textIdentifier: string, interpolation: Record<string, string> = {}) {
     return this.translateFunc(textIdentifier, this.drawer.settings.language, interpolation)

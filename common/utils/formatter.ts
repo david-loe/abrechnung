@@ -144,6 +144,13 @@ class Formatter {
     }
     return this.currency(opts.func(amount), currency) + (opts.warning ? ' ⚠' : '')
   }
+  moneyDisplayParts(baseMoney: BaseCurrencyMoney | Money | Cost, locale?: Locale) {
+    const primary = this.money(baseMoney, { locale })
+    if ('currency' in baseMoney && idDocumentToId(baseMoney.currency) !== baseCurrency._id && baseMoney.exchangeRate) {
+      return { primary, secondary: this.money(baseMoney, { locale, useExchangeRate: false }) }
+    }
+    return { primary }
+  }
   detailedMoney(baseMoney: Money | BaseCurrencyMoney | Cost, printZero = false, locale?: Locale): string {
     this.setLocale(locale)
     if ('positions' in baseMoney) {

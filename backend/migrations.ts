@@ -1,6 +1,7 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
-import { ReportModelName, travelExpenseItems } from 'abrechnung-common/types.js'
+import { baseCurrency, ReportModelName, travelExpenseItems } from 'abrechnung-common/types.js'
+import { roundAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
@@ -363,6 +364,64 @@ export async function checkForMigrations() {
     if (semver.lte(migrateFrom, '2.7.0')) {
       logger.info('Apply migration from v2.7.0: add user and project creation access')
       await initializeUsersAndProjectsCreationAccess()
+    }
+    if (semver.lte(migrateFrom, '2.7.1')) {
+      logger.info('Apply migration from v2.7.1: add expense report currencies and currency-aware advances')
+      const ledgerAccounts = mongoose.connection.collection('ledgeraccounts')
+      await ledgerAccounts.updateOne(
+        { identifier: '2660' },
+        { $setOnInsert: { identifier: '2660', name: 'Kursdifferenzen' } },
+        { upsert: true }
+      )
+      const exchangeDifferencesAccount = await ledgerAccounts.findOne({ identifier: '2660' })
+      if (!exchangeDifferencesAccount) throw new Error('Failed to initialize currency exchange differences account 2660')
+      await mongoose.connection
+        .collection('organisations')
+        .updateMany({}, { $set: { 'accountingSettings.currencyExchangeDifferencesAccount': exchangeDifferencesAccount._id } })
+
+      await Promise.all(
+        ['travels', 'expensereports', 'healthcarecosts'].map((collectionName) =>
+          mongoose.connection
+            .collection(collectionName)
+            .updateMany({ 'addUp.currency': { $exists: false } }, { $set: { 'addUp.$[].currency': baseCurrency._id } })
+        )
+      )
+
+      const advances = mongoose.connection.collection<{
+        _id: mongoose.Types.ObjectId
+        createdAt: Date
+        budget: { currency: string; exchangeRate?: { date: Date; rate: number; amount: number } | null }
+        balance: { amount: number; currency?: string; exchangeRate?: { date: Date; rate: number; amount: number } | null }
+        offsetAgainst: { amount: number; [key: string]: unknown }[]
+      }>('advances')
+      for await (const advance of advances.find()) {
+        const currency = advance.budget.currency || baseCurrency._id
+        const rate = advance.budget.exchangeRate?.rate
+        if (currency !== baseCurrency._id && !rate) {
+          const hasAmounts = advance.balance.amount !== 0 || advance.offsetAgainst.some(({ amount }) => amount !== 0)
+          if (hasAmounts) {
+            throw new Error(`Cannot migrate foreign-currency advance ${advance._id.toString()} without a stored exchange rate`)
+          }
+        }
+        const convertFromEuro = (amount: number) => (currency === baseCurrency._id ? amount : rate ? roundAmount(amount / rate) : 0)
+        const exchangeRateFor = (amount: number) =>
+          currency === baseCurrency._id || !advance.budget.exchangeRate ? null : { ...advance.budget.exchangeRate, amount }
+        await advances.updateOne(
+          { _id: advance._id },
+          {
+            $set: {
+              ...(currency !== baseCurrency._id ? { exchangeRateDate: advance.budget.exchangeRate?.date ?? advance.createdAt } : {}),
+              balance: { amount: convertFromEuro(advance.balance.amount), currency, exchangeRate: exchangeRateFor(advance.balance.amount) },
+              offsetAgainst: advance.offsetAgainst.map((offset) => ({
+                ...offset,
+                amount: convertFromEuro(offset.amount),
+                currency,
+                exchangeRate: exchangeRateFor(offset.amount)
+              }))
+            }
+          }
+        )
+      }
     }
     settings.migrateFrom = undefined
     await settings.save()

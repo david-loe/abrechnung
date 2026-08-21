@@ -117,6 +117,10 @@ async function loadExportContext(
     projection.stages = 1
     projection.days = 1
     projection.professionalShare = 1
+  } else if (reportType === 'ExpenseReport') {
+    projection.currency = 1
+    projection.exchangeRateDate = 1
+    projection.exchangeRate = 1
   }
   const reports = (await reportModel.find(filter, projection).lean()) as ExportReport[]
   if (reports.length !== requestedIds.length) {

@@ -143,6 +143,7 @@ export async function initDB() {
   const ledgerAccounts = [
     { identifier: '1530', name: 'Forderungen gegen Personal aus Lohn- und Gehaltsabrechnung' },
     { identifier: '1740', name: 'Verbindlichkeiten aus Lohn und Gehalt' },
+    { identifier: '2660', name: 'Kursdifferenzen' },
     { identifier: '1200', name: 'Bank' },
     { identifier: '1571', name: 'Abziehbare Vorsteuer 7 %' },
     { identifier: '1576', name: 'Abziehbare Vorsteuer 19 %' },
@@ -153,6 +154,7 @@ export async function initDB() {
 
   const account1530 = await LedgerAccount.findOne({ identifier: '1530' }).lean()
   const account1740 = await LedgerAccount.findOne({ identifier: '1740' }).lean()
+  const account2660 = await LedgerAccount.findOne({ identifier: '2660' }).lean()
   const account1571 = await LedgerAccount.findOne({ identifier: '1571' }).lean()
   const account1576 = await LedgerAccount.findOne({ identifier: '1576' }).lean()
   const account4660 = await LedgerAccount.findOne({ identifier: '4660' }).lean()
@@ -162,6 +164,7 @@ export async function initDB() {
     accountingSettings: {
       employeeLiabilitiesAccount: account1740?._id,
       employeeClaimsAccount: account1530?._id,
+      currencyExchangeDifferencesAccount: account2660?._id,
       includeBankBookings: false,
       payoutAccounts: [],
       vatAccountingEnabled: true,

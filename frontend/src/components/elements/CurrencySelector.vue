@@ -1,10 +1,10 @@
 <template>
   <v-select
     v-if="APP_DATA"
-    :options="APP_DATA.user.settings.lastCurrencies.concat(APP_DATA.currencies)"
+    :options="options"
     :modelValue="props.modelValue"
     :placeholder="t('labels.currency')"
-    @update:modelValue="(v: Currency) => emits('update:modelValue', v)"
+    @update:modelValue="(v: Currency | null) => emits('update:modelValue', v)"
     @option:selected="setLastCurrency"
     :filter="filter"
     :getOptionKey="(option: Currency) => option._id"
@@ -37,7 +37,7 @@
 
 <script lang="ts" setup>
 import { Currency, Locale } from 'abrechnung-common/types.js'
-import { PropType } from 'vue'
+import { computed, PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { eventBus } from '../../eventBus.js'
@@ -47,10 +47,16 @@ const { t, locale } = useI18n()
 const APP_DATA = APP_LOADER.data
 const props = defineProps({
   modelValue: { type: Object as PropType<Currency> },
+  exclude: { type: Array as PropType<string[]>, default: () => [] },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false }
 })
-const emits = defineEmits<{ 'update:modelValue': [Currency] }>()
+const emits = defineEmits<{ 'update:modelValue': [Currency | null] }>()
+const options = computed(() => {
+  if (!APP_DATA.value) return []
+  const currencies = APP_DATA.value.user.settings.lastCurrencies.concat(APP_DATA.value.currencies)
+  return currencies.filter((currency, index) => !props.exclude.includes(currency._id) && currencies.findIndex((item) => item._id === currency._id) === index)
+})
 
 function filter(options: Currency[], search: string): Currency[] {
   return options.filter((option) => {

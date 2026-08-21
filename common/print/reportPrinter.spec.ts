@@ -24,7 +24,7 @@ const advance: Advance<string> = {
   history: [],
   historic: false,
   budget: { amount: 100, currency: baseCurrency },
-  balance: { amount: 100 },
+  balance: { amount: 100, currency: baseCurrency },
   reason: 'Test reason',
   offsetAgainst: []
 }
@@ -43,6 +43,51 @@ test('ReportPrinter renders configured report type icons and ignores unknown ico
   const bytes = await printer.print(advance, 'de', {
     reviewDates: false,
     metaInformation: false,
+    project: false,
+    comments: false,
+    notes: false,
+    bookingRemark: false,
+    additionalOwnerDetails: false
+  })
+  const pdf = await PDFDocument.load(bytes)
+
+  t.is(pdf.getPageCount(), 1)
+  t.true(bytes.length > 0)
+})
+
+test('ReportPrinter renders a foreign-currency advance with an offset', async (t) => {
+  const exchangeRateDate = new Date('2026-08-18')
+  const GBP = { _id: 'GBP', name: { de: 'Britisches Pfund', en: 'British Pound', fr: '', es: '', ru: '', kk: '' } }
+  const foreignAdvance: Advance<string> = {
+    ...advance,
+    state: AdvanceState.APPROVED,
+    exchangeRateDate,
+    budget: { amount: 100, currency: GBP, exchangeRate: { date: exchangeRateDate, rate: 1.2, amount: 120 } },
+    balance: { amount: 60, currency: GBP, exchangeRate: { date: exchangeRateDate, rate: 1.2, amount: 72 } },
+    offsetAgainst: [
+      {
+        type: 'ExpenseReport',
+        reportId: 'expense-report',
+        subject: 'Foreign expense report',
+        amount: 40,
+        currency: GBP,
+        exchangeRate: { date: exchangeRateDate, rate: 1.2, amount: 48 }
+      }
+    ]
+  }
+  const printer = new ReportPrinter<string>(
+    { ...printerSettings, _id: 'printerSettings' },
+    { distanceRefunds: { car: 0, halfCar: 0, motorcycle: 0 }, vehicleRegistrationWhenUsingOwnCar: 'none' },
+    new Formatter('de', 'givenNameFirst'),
+    (identifier) => identifier,
+    async () => null,
+    async () => null,
+    displaySettings.reportTypeIcons
+  )
+
+  const bytes = await printer.print(foreignAdvance, 'de', {
+    reviewDates: false,
+    metaInformation: true,
     project: false,
     comments: false,
     notes: false,

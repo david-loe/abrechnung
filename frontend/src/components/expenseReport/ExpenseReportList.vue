@@ -128,15 +128,21 @@
     <template #item-organisation="{ project }">
       <span v-if="APP_DATA">{{ getById(project.organisation, APP_DATA.organisations)?.name }}</span>
     </template>
-    <template #item-addUp.totalTotal="{ addUp }"><span class="tnum">{{ formatter.baseCurrency(getTotalTotal(addUp)) }}</span></template>
-    <template #item-addUp.totalAdvance="{ addUp }">
-      <span v-if="getTotalAdvance(addUp) > 0" class="tnum">{{ formatter.baseCurrency(getTotalAdvance(addUp)) }}</span>
+    <template #item-addUp.totalTotal="report"><span class="tnum">{{ formatReportAmount(getTotalTotal(report.addUp), report) }}</span></template>
+    <template #item-addUp.totalAdvance="report">
+      <span v-if="getTotalAdvance(report.addUp) > 0" class="tnum">{{ formatReportAmount(getTotalAdvance(report.addUp), report) }}</span>
     </template>
     <template #item-addUp.totalBalance="report">
       <TooltipElement>
-        <span class="tnum">{{ formatter.baseCurrency(getTotalBalance(report.addUp)) }}</span>
+        <span class="tnum">{{ formatReportBalance(report) }}</span>
         <template v-if="report.addUp.length > 1 || report.addUp[0].advance.amount > 0" #content>
-          <AddUpTable noBootstrapTable :add-up="report.addUp" :project="report.project" :showAdvanceOverflow="false" />
+          <AddUpTable
+            noBootstrapTable
+            :add-up="report.addUp"
+            :project="report.project"
+            :exchange-rate="report.exchangeRate"
+            :exchange-rate-date="report.exchangeRateDate"
+            :showAdvanceOverflow="false" />
         </template>
       </TooltipElement>
     </template>
@@ -165,8 +171,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ExpenseReportSimple, ExpenseReportState, expenseReportStates, refStringRegexLax } from 'abrechnung-common/types.js'
-import { getById, getTotalAdvance, getTotalBalance, getTotalTotal, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
+import { ExpenseReportSimple, ExpenseReportState, expenseReportStates, idDocumentToId, refStringRegexLax } from 'abrechnung-common/types.js'
+import { getById, getTotalAdvance, getTotalBalance, getTotalBaseCurrencyBalance, getTotalTotal, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
@@ -210,6 +216,17 @@ defineExpose({ loadFromServer })
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
+
+function formatReportAmount(amount: number, report: ExpenseReportSimple<string>) {
+  return formatter.currency(amount, idDocumentToId(report.addUp[0].currency))
+}
+
+function formatReportBalance(report: ExpenseReportSimple<string>) {
+  if (report.currency && typeof report.exchangeRate !== 'number') {
+    return formatReportAmount(getTotalBalance(report.addUp), report)
+  }
+  return formatter.baseCurrency(getTotalBaseCurrencyBalance(report))
+}
 
 const headers: Header[] = [
   { text: 'Ref', value: 'reference' },

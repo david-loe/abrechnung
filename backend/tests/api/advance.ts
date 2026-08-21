@@ -47,7 +47,7 @@ async function createAppliedAdvance(name: string, advanceProject = project) {
 
 async function approveAdvance(_id: string) {
   await loginUser(agent, 'advance')
-  return await agent.post('/approve/advance/approved').send({ _id })
+  return await agent.post('/approve/advance/approved').send({ _id, exchangeRateDate: new Date() })
 }
 
 async function createApprovedAdvanceByApprover(name: string, owner: string, advanceProject = project) {
@@ -87,6 +87,25 @@ test.serial('load shared fixtures', async (t) => {
   project = projectResponse.body.data[0]
   category = categoryResponse.body.data[0]
   insurance = insuranceResponse.body.data[0]
+})
+
+test.serial('foreign advance can be submitted without a date but approval requires one', async (t) => {
+  const createdResponse = await createAppliedAdvance('Exchange rate date required')
+  t.is(createdResponse.status, 200)
+  t.falsy(createdResponse.body.result.exchangeRateDate)
+  t.falsy(createdResponse.body.result.budget.exchangeRate)
+
+  await loginUser(agent, 'advance')
+  const missingDateResponse = await agent.post('/approve/advance/approved').send({ _id: createdResponse.body.result._id })
+  t.is(missingDateResponse.status, 422)
+  t.is(missingDateResponse.body.errors.exchangeRateDate.message, 'required')
+
+  const approvedResponse = await approveAdvance(createdResponse.body.result._id)
+  t.is(approvedResponse.status, 200)
+  t.truthy(approvedResponse.body.result.exchangeRateDate)
+  t.truthy(approvedResponse.body.result.budget.exchangeRate)
+  t.is(approvedResponse.body.result.balance.exchangeRate.rate, approvedResponse.body.result.budget.exchangeRate.rate)
+  t.is(approvedResponse.body.result.balance.exchangeRate.amount, approvedResponse.body.result.budget.exchangeRate.amount)
 })
 
 test.serial('DELETE /approve/advance deletes approved owner advance', async (t) => {

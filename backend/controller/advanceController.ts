@@ -8,10 +8,11 @@ import {
   idDocumentToId,
   State
 } from 'abrechnung-common/types.js'
+import { multiplyAmountAndRound } from 'abrechnung-common/utils/scripts.js'
 import { Document, model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
 import { createOperationServices } from '../factory.js'
-import { checkIfUserIsProjectSupervisor, setAdvanceBalance } from '../helper.js'
+import { checkIfUserIsProjectSupervisor } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
 import Advance, { AdvanceDoc } from '../models/advance.js'
@@ -29,6 +30,7 @@ interface AdvanceApplication {
   _id?: Types.ObjectId
   name?: string
   budget: MoneyPost
+  exchangeRateDate?: Date | string | null
   reason: string
   comment?: string
 }
@@ -219,13 +221,11 @@ export class AdvanceApproveController extends Controller {
   public async postAnyApproved(
     @Body() requestBody:
       | (AdvanceApplication & { owner: IdDocument; bookingRemark?: string | null })
-      | { _id: string; comment?: string; bookingRemark?: string | null },
+      | { _id: string; comment?: string; bookingRemark?: string | null; exchangeRateDate?: Date | string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      await createOperationServices().currencyConverter.addExchangeRate((extendedBody as AdvanceApplication).budget, new Date())
-      setAdvanceBalance(extendedBody as AdvanceApplication as IAdvance)
       if (!(extendedBody as AdvanceApplication).name) {
         const date = new Date()
         ;(extendedBody as AdvanceApplication).name =
@@ -305,7 +305,18 @@ export class AdvanceApproveController extends Controller {
     if (!advance || !checkIfUserIsProjectSupervisor(request.user, advance.project._id)) {
       throw new NotFoundError(`No advance with id: '${requestBody.advanceId}' found or not allowed`)
     }
-    await advance.offset(requestBody.amount, 'offsetEntry', null, requestBody.subject)
+    await advance.offset(
+      {
+        amount: requestBody.amount,
+        currency: advance.balance.currency,
+        exchangeRate: advance.balance.exchangeRate
+          ? { ...advance.balance.exchangeRate, amount: multiplyAmountAndRound(requestBody.amount, advance.balance.exchangeRate.rate) }
+          : null
+      },
+      'offsetEntry',
+      null,
+      requestBody.subject
+    )
     const result: IAdvance | null = await Advance.findOne(
       { _id: idDocumentToId(requestBody.advanceId), historic: false },
       { historic: 0, history: 0 }

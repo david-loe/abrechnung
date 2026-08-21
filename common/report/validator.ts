@@ -1,4 +1,4 @@
-import { Expense, ExpenseReport, HealthCareCost } from '../types.js'
+import { Expense, ExpenseReport, HealthCareCost, idDocumentToId } from '../types.js'
 
 export type ValidationSeverity = 'info' | 'warning' | 'error'
 
@@ -20,11 +20,12 @@ export interface ValidationSummary {
   canEnterReview: boolean
 }
 
-export type ValidatorSettings = { requireReceipts?: boolean }
+export type ValidatorSettings = { requireExchangeRate?: boolean; requireReceipts?: boolean }
 
 type ExpenseValidatorRuntimeSettings = Required<ValidatorSettings> & { pathPrefix?: string; reference?: ValidationReference }
 
-type ReportLike = Pick<ExpenseReport | HealthCareCost, 'expenses'>
+type ReportLike = Pick<ExpenseReport | HealthCareCost, 'expenses'> &
+  Partial<Pick<ExpenseReport, 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>>
 type ReportValidatorFn<TReport extends ReportLike, TSettings extends ValidatorSettings, TContext> = (
   report: TReport,
   settings: Required<TSettings>,
@@ -55,11 +56,35 @@ export class Validator<
 
   protected validators: ReportValidatorFn<TReport, TSettings, TContext>[] = [
     (report) => (report.expenses.length < 1 ? [{ code: 'noData.expense', severity: 'error' }] : []),
-    (report, settings) => this.getReportExpenseValidationResults(report, settings)
+    (report, settings) => this.getReportExpenseValidationResults(report, settings),
+    (report, settings) => {
+      if (!report.currency) return []
+      const currency = idDocumentToId(report.currency).toString()
+      const results: ValidationResult[] = []
+      if (settings.requireExchangeRate && !report.exchangeRateDate) {
+        results.push({ code: 'required', severity: 'error', path: 'exchangeRateDate' })
+      } else if (settings.requireExchangeRate && typeof report.exchangeRate !== 'number') {
+        results.push({ code: 'exchangeRateUnavailable', severity: 'error', path: 'exchangeRateDate' })
+      }
+      for (const [index, expense] of report.expenses.entries()) {
+        if (expense.cost && idDocumentToId(expense.cost.currency).toString() !== currency) {
+          results.push({
+            code: 'reportCurrencyMismatch',
+            severity: 'error',
+            path: `expenses.${index}.cost.currency`,
+            reference: { collection: 'expenses', index: [index] }
+          })
+        }
+      }
+      if (report.advances?.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)) {
+        results.push({ code: 'reportCurrencyMismatch', severity: 'error', path: 'advances' })
+      }
+      return results
+    }
   ]
 
   constructor(settings = {} as TSettings) {
-    this.settings = { requireReceipts: true, ...settings } as Required<TSettings>
+    this.settings = { requireExchangeRate: false, requireReceipts: true, ...settings } as Required<TSettings>
   }
 
   protected getReportExpenseValidationResults(report: TReport, _settings: Required<TSettings>): ValidationResult[] {

@@ -65,6 +65,13 @@ export class OrganisationAdminController extends Controller {
         }
       }
     }
+    if (!requestBody._id && !requestBody.accountingSettings?.currencyExchangeDifferencesAccount) {
+      const exchangeDifferencesAccount = await LedgerAccount.findOne({ identifier: '2660' })
+      requestBody.accountingSettings = {
+        ...requestBody.accountingSettings,
+        currencyExchangeDifferencesAccount: exchangeDifferencesAccount?._id
+      } as unknown as IOrganisation<Types.ObjectId>['accountingSettings']
+    }
     if (!requestBody._id && (!requestBody.accountingSettings?.vatRates || requestBody.accountingSettings.vatRates.length === 0)) {
       const [account7, account19] = await Promise.all([
         LedgerAccount.findOne({ identifier: '1571' }),
@@ -76,7 +83,7 @@ export class OrganisationAdminController extends Controller {
         includeBankBookings: false,
         payoutAccounts: [],
         vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account7?._id }, { rate: 19, inputTaxAccount: account19?._id }]
-      } as IOrganisation<Types.ObjectId>['accountingSettings']
+      } as unknown as IOrganisation<Types.ObjectId>['accountingSettings']
     }
     const payoutAccounts = requestBody.accountingSettings?.payoutAccounts as OrganisationBankAccount<Types.ObjectId>[] | undefined | null
     if (requestBody.accountingSettings?.includeBankBookings && payoutAccounts?.some(({ ledgerAccount }) => !ledgerAccount)) {

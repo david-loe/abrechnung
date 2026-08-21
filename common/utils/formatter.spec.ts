@@ -22,6 +22,9 @@ test('Formatter formats money', (t) => {
   const m = { amount: 10, currency: USD, exchangeRate: { rate: 0.85, amount: 8.5 } }
   t.is(f.money(m), '€8.50')
   t.is(f.money({ amount: 10, currency: USD }), '$10.00 ⚠')
+  t.deepEqual(f.moneyDisplayParts(m), { primary: '€8.50', secondary: '$10.00' })
+  t.deepEqual(f.moneyDisplayParts({ amount: 10, currency: USD }), { primary: '$10.00 ⚠' })
+  t.deepEqual(f.moneyDisplayParts({ amount: 10 }), { primary: '€10.00' })
   t.is(f.detailedMoney(m), '$10.00 * 0.85 = €8.50')
 })
 

@@ -2,19 +2,21 @@ import {
   AddUp,
   AdvanceBase,
   AnyState,
+  baseCurrency,
   Cost,
   FlatAddUp,
   hexColorRegex,
   IdDocument,
   idDocumentToId,
   Log,
+  MoneyNotNull,
   Project,
   ReportModelName,
   ReportModelNameWithoutAdvance,
   textColors,
   UserSimple
 } from 'abrechnung-common/types.js'
-import { roundAmount } from 'abrechnung-common/utils/scripts.js'
+import { getBaseCurrencyAmount, multiplyAmountAndRound, roundAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, Types } from 'mongoose'
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
@@ -265,6 +267,7 @@ export function requestBaseSchema<S extends AnyState = AnyState>(
 
   const addUp = {
     project: { type: Schema.Types.ObjectId, ref: 'Project', required: true, index: true },
+    currency: { type: String, ref: 'Currency', required: true, default: baseCurrency._id },
     balance: costObject({ exchangeRate: false, receipts: false, required: true, min: 0 }),
     total: costObject({ exchangeRate: false, receipts: false, required: true, min: 0 }),
     expenses: costObject({ exchangeRate: false, receipts: false, required: true }),
@@ -351,16 +354,43 @@ export function populateAll<DocType extends {}>(
 }
 
 export async function offsetAdvance(
-  report: { addUp: FlatAddUp<Types.ObjectId>[]; advances: AdvanceBase<Types.ObjectId>[]; _id: Types.ObjectId; name: string },
+  report: {
+    addUp: FlatAddUp<Types.ObjectId>[]
+    advances: AdvanceBase<Types.ObjectId>[]
+    exchangeRateDate?: Date | string | null
+    exchangeRate?: number | null
+    _id: Types.ObjectId
+    name: string
+  },
   modelName: ReportModelNameWithoutAdvance
 ) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {
-    report.advances.sort((a, b) => a.balance.amount - b.balance.amount)
     for (const addUp of report.addUp) {
-      let total = addUp.total.amount || 0
-      for (const advance of report.advances) {
+      const currency = idDocumentToId(addUp.currency).toString()
+      let total: MoneyNotNull = {
+        amount: addUp.total.amount || 0,
+        currency: addUp.currency,
+        ...(currency !== baseCurrency._id && typeof report.exchangeRate === 'number' && report.exchangeRateDate
+          ? {
+              exchangeRate: {
+                date: report.exchangeRateDate,
+                rate: report.exchangeRate,
+                amount: multiplyAmountAndRound(addUp.total.amount || 0, report.exchangeRate)
+              }
+            }
+          : {})
+      }
+      const matchingAdvances = report.advances
+        .filter((advance) => advance.project._id.equals(idDocumentToId(addUp.project)))
+        .sort((left, right) => {
+          const leftAmount = currency === idDocumentToId(left.balance.currency) ? left.balance.amount : getBaseCurrencyAmount(left.balance)
+          const rightAmount =
+            currency === idDocumentToId(right.balance.currency) ? right.balance.amount : getBaseCurrencyAmount(right.balance)
+          return leftAmount - rightAmount
+        })
+      for (const advance of matchingAdvances) {
         if (advance.project._id.equals(idDocumentToId(addUp.project))) {
           total = await (advance as AdvanceDoc).offset(total, modelName, report._id, report.name, session)
         }
@@ -377,12 +407,16 @@ export async function offsetAdvance(
   }
 }
 
-export async function addToProjectBalance(report: { addUp: AddUp[]; project: Project }) {
+export async function addToProjectBalance(report: { addUp: AddUp[]; project: Project; exchangeRate?: number | null }) {
   const session = await mongoose.startSession()
   // session.startTransaction() // needs Replica Set
   try {
     for (const addUp of report.addUp) {
-      await (addUp.project as ProjectDoc).addToBalance(addUp.total.amount, session)
+      const amount =
+        idDocumentToId(addUp.currency) !== baseCurrency._id && typeof report.exchangeRate === 'number'
+          ? multiplyAmountAndRound(addUp.total.amount, report.exchangeRate)
+          : addUp.total.amount
+      await (addUp.project as ProjectDoc).addToBalance(amount, session)
     }
     // await session.commitTransaction() // needs Replica Set
   } catch (error) {

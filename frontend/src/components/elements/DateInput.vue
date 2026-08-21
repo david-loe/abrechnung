@@ -4,7 +4,7 @@
     type="datetime-local"
     class="form-control"
     :value="datetimeToDatetimeString(props.modelValue)"
-    @input="emit('update:modelValue', htmlInputStringToDateTime(($event.target as HTMLInputElement).value))"
+    @input="updateDateTime"
     :disabled="props.disabled"
     :required="props.required"
     :min="datetimeToDatetimeString(props.min)"
@@ -14,7 +14,7 @@
     type="date"
     class="form-control"
     :value="datetimeToDateString(props.modelValue)"
-    @input="emit('update:modelValue', new Date(($event.target as HTMLInputElement).value))"
+    @input="updateDate"
     :disabled="props.disabled"
     :required="props.required"
     :min="datetimeToDateString(props.min)"
@@ -34,6 +34,16 @@ const props = defineProps({
   max: { type: [String, Date] as PropType<string | Date>, default: '' }
 })
 const emit = defineEmits<{ 'update:modelValue': [Date | null] }>()
+
+function updateDate(event: Event) {
+  const value = (event.target as HTMLInputElement).value
+  emit('update:modelValue', value ? new Date(value) : null)
+}
+
+function updateDateTime(event: Event) {
+  const value = (event.target as HTMLInputElement).value
+  emit('update:modelValue', value ? htmlInputStringToDateTime(value) : null)
+}
 </script>
 
 <style></style>
