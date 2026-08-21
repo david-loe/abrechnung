@@ -4728,6 +4728,81 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"TravelStageImportSource_mongoose.Types.ObjectId_": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"name": {
+						"type": "string"
+					},
+					"reference": {
+						"type": "number",
+						"format": "double"
+					},
+					"destinationPlace": {
+						"$ref": "#/components/schemas/Omit_Place.special_"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					}
+				},
+				"required": [
+					"_id",
+					"name",
+					"reference",
+					"destinationPlace",
+					"startDate",
+					"endDate"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"GETResponse_TravelStageImportSource_mongoose.Types.ObjectId_-or-TravelStageImportSource_mongoose.Types.ObjectId_-Array_": {
+				"properties": {
+					"data": {
+						"anyOf": [
+							{
+								"$ref": "#/components/schemas/TravelStageImportSource_mongoose.Types.ObjectId_"
+							},
+							{
+								"items": {
+									"$ref": "#/components/schemas/TravelStageImportSource_mongoose.Types.ObjectId_"
+								},
+								"type": "array"
+							}
+						]
+					},
+					"meta": {
+						"$ref": "#/components/schemas/Meta"
+					}
+				},
+				"required": [
+					"data",
+					"meta"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"ProjectSimple_mongoose.Types.ObjectId_": {
 				"properties": {
 					"identifier": {
@@ -5611,6 +5686,27 @@
 					"stages",
 					"expenses",
 					"days"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"TravelStageImportRequest_string_": {
+				"properties": {
+					"sourceTravelId": {
+						"type": "string"
+					},
+					"targetTravelId": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"sourceTravelId",
+					"targetTravelId"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -7150,11 +7246,6 @@
 				],
 				"type": "object",
 				"additionalProperties": false
-			},
-			"Required___id-mongoose.Types.ObjectId__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
 			},
 			"TravelBulkImportPost": {
 				"properties": {
@@ -17763,6 +17854,120 @@
 						"application/json": {
 							"schema": {
 								"$ref": "#/components/schemas/SetterBody__days-TravelPost-at-days--lastPlaceOfWork-TravelPost-at-lastPlaceOfWork--_id-TravelPost_91__id_93___"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/travel/stage/import": {
+			"get": {
+				"operationId": "GetOwnStageImportSources",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/GETResponse_TravelStageImportSource_mongoose.Types.ObjectId_-or-TravelStageImportSource_mongoose.Types.ObjectId_-Array_"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "targetTravelId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			},
+			"post": {
+				"operationId": "ImportStagesToOwn",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"user"
+						]
+					},
+					{
+						"httpBearer": [
+							"user"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/TravelStageImportRequest_string_"
 							}
 						}
 					}
