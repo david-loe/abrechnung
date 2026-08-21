@@ -68,6 +68,7 @@ export interface AdvanceBulkImportPost {
   name?: string
   reason: string
   budget: { amount: number; currency: string }
+  exchangeRateDate?: Date | string
   comment?: string
   bookingRemark?: string
 }
@@ -92,6 +93,7 @@ export interface ExpenseReportBulkImportPost {
   project: string
   name?: string
   advances?: string[]
+  currency?: CurrencyCode
 }
 
 export interface TravelPost extends Omit<TravelSimple<Types.ObjectId>, 'state' | 'comments' | 'comment' | 'progress' | 'log' | 'addUp'> {

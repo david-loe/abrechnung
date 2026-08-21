@@ -4,6 +4,7 @@ export const advanceImportTemplateFields = [
   'reason',
   'budget.amount',
   'budget.currency',
+  'exchangeRateDate',
   'project',
   'comment',
   'bookingRemark'
@@ -26,7 +27,7 @@ export const travelImportTemplateFields = [
   'a1Certificate.destinationName'
 ]
 
-export const expenseReportImportTemplateFields = ['owner', 'name', 'project', 'advances']
+export const expenseReportImportTemplateFields = ['owner', 'name', 'project', 'currency', 'advances']
 
 export function parseCsvNumber(value: string | undefined) {
   if (value === undefined || value.trim() === '') return undefined

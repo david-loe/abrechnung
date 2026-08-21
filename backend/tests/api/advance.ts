@@ -128,7 +128,8 @@ test.serial('POST /approve/advance/bulk creates approved advances from natural r
       project: project.identifier,
       name: 'CSV advance two',
       reason: 'Travel costs',
-      budget: { amount: 50, currency: 'EUR' }
+      budget: { amount: 50, currency: 'USD' },
+      exchangeRateDate: new Date()
     }
   ])
 
@@ -137,6 +138,9 @@ test.serial('POST /approve/advance/bulk creates approved advances from natural r
   t.true(response.body.result.every(({ state }: { state: AdvanceState }) => state === AdvanceState.APPROVED))
   t.true(response.body.result.every(({ owner: value }: { owner: { _id: string } }) => value._id === owner._id))
   t.is(response.body.result[0].bookingRemark, 'CSV booking remark')
+  t.is(response.body.result[1].budget.currency._id, 'USD')
+  t.truthy(response.body.result[1].budget.exchangeRate)
+  t.truthy(response.body.result[1].exchangeRateDate)
 })
 
 test.serial('POST /approve/advance/bulk rejects all rows when one row is invalid', async (t) => {

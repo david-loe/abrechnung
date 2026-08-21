@@ -18,12 +18,13 @@ import { createOperationServices } from '../factory.js'
 import { checkIfUserIsProjectSupervisor, documentFileHandler, fileHandler } from '../helper.js'
 import i18n from '../i18n.js'
 import { emitIntegrationEvent } from '../integrations/dispatcher.js'
+import Currency from '../models/currency.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
-import { bulkSaveImport, resolveImportReferences } from './reportImport.js'
+import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost, ExpenseReportBulkImportPost } from './types.js'
 
 const expenseReportReviewValidator = new Validator({ requireReceipts: true })
@@ -300,8 +301,20 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post('bulk')
   public async postManyInWork(@Body() requestBody: ExpenseReportBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
-    const resolvedReferences = await resolveImportReferences(requestBody)
-    const documents = requestBody.map((row, index) => {
+    const normalizedRows = requestBody.map((row) => ({ ...row, currency: row.currency?.trim() || undefined }))
+    const currencies = await Currency.find(
+      { _id: { $in: normalizedRows.map(({ currency }) => currency).filter((currency): currency is string => currency !== undefined) } },
+      { _id: 1 }
+    ).lean()
+    validateImportValues(
+      normalizedRows.map(({ currency }) => currency),
+      new Set(currencies.map(({ _id }) => _id)),
+      'currency',
+      'currency',
+      true
+    )
+    const resolvedReferences = await resolveImportReferences(normalizedRows)
+    const documents = normalizedRows.map((row, index) => {
       let name = row.name
       if (!name) {
         const date = new Date()
@@ -312,6 +325,7 @@ export class ExpenseReportExamineController extends Controller {
         owner: resolvedReferences[index].owner,
         project: resolvedReferences[index].project,
         advances: resolvedReferences[index].advances,
+        currency: row.currency,
         state: ExpenseReportState.IN_WORK,
         editor: request.user._id
       })

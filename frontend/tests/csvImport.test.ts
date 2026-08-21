@@ -15,6 +15,7 @@ describe('CSV import value parsing', () => {
       'reason',
       'budget.amount',
       'budget.currency',
+      'exchangeRateDate',
       'project',
       'comment',
       'bookingRemark'
@@ -22,7 +23,7 @@ describe('CSV import value parsing', () => {
     expect(travelImportTemplateFields).toContain('destinationPlace.country')
     expect(travelImportTemplateFields).toContain('a1Certificate.exactAddress')
     expect(travelImportTemplateFields).toContain('advances')
-    expect(expenseReportImportTemplateFields).toEqual(['owner', 'name', 'project', 'advances'])
+    expect(expenseReportImportTemplateFields).toEqual(['owner', 'name', 'project', 'currency', 'advances'])
   })
 
   it('parses decimal point and decimal comma numbers', () => {

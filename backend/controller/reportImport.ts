@@ -1,4 +1,4 @@
-import { AdvanceState, Advance as IAdvance, idDocumentToId, refStringRegexLax } from 'abrechnung-common/types.js'
+import { AdvanceState, baseCurrency, Advance as IAdvance, idDocumentToId, refStringRegexLax } from 'abrechnung-common/types.js'
 import { refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { HydratedDocument, Model, QueryFilter, Types } from 'mongoose'
 import { BACKEND_CACHE } from '../db.js'
@@ -11,6 +11,7 @@ interface ImportReferenceRow {
   owner: string
   project: string
   advances?: string[]
+  currency?: string
 }
 
 interface ResolvedImportReferences {
@@ -42,6 +43,10 @@ function parseAdvanceReference(reference: string) {
 
 function normalizeAdvanceSelection(advances: string[] | undefined) {
   return advances?.length === 1 && advances[0].trim() === '' ? [] : advances
+}
+
+function getImportCurrency(row: ImportReferenceRow) {
+  return row.currency?.trim() || baseCurrency._id
 }
 
 export async function resolveImportReferences(rows: ImportReferenceRow[], resolveAdvances = true) {
@@ -93,6 +98,10 @@ export async function resolveImportReferences(rows: ImportReferenceRow[], resolv
           addIssue(issues, rowIndex, `advances.${advanceIndex}`, `Advance '${referenceString}' belongs to another project.`)
           continue
         }
+        if (idDocumentToId(advance.budget.currency).toString() !== getImportCurrency(row)) {
+          addIssue(issues, rowIndex, `advances.${advanceIndex}`, `Advance '${referenceString}' uses another currency.`)
+          continue
+        }
         advances.push(advance._id)
       }
     }
@@ -120,13 +129,15 @@ export async function resolveImportReferences(rows: ImportReferenceRow[], resolv
         }
       } as unknown as QueryFilter<IAdvance<Types.ObjectId>>
       const availableAdvances = await Advance.find(filter).lean()
-      for (const { resolved } of rowsWithoutAdvanceSelection) {
+      for (const { row, resolved } of rowsWithoutAdvanceSelection) {
+        const currency = getImportCurrency(row)
         resolved.advances.push(
           ...availableAdvances
             .filter(
               (advance) =>
                 idDocumentToId(advance.owner).toString() === resolved.owner?.toString() &&
-                idDocumentToId(advance.project).toString() === resolved.project?.toString()
+                idDocumentToId(advance.project).toString() === resolved.project?.toString() &&
+                idDocumentToId(advance.budget.currency).toString() === currency
             )
             .map(({ _id }) => _id)
         )
@@ -137,9 +148,16 @@ export async function resolveImportReferences(rows: ImportReferenceRow[], resolv
   return partiallyResolved as unknown as ResolvedImportReferences[]
 }
 
-export function validateImportValues(values: (string | undefined)[], validValues: Set<string>, path: string, label: string) {
+export function validateImportValues(
+  values: (string | undefined)[],
+  validValues: Set<string>,
+  path: string,
+  label: string,
+  allowEmpty = false
+) {
   const issues: ImportValidationIssue[] = []
   for (const [rowIndex, value] of values.entries()) {
+    if (allowEmpty && !value) continue
     if (!value || !validValues.has(value)) {
       addIssue(issues, rowIndex, path, `No ${label} found for '${value ?? ''}'.`)
     }

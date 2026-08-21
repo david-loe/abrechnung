@@ -202,27 +202,25 @@ export class AdvanceApproveController extends Controller {
       'currency'
     )
 
-    const imports = requestBody.map((row, index) => ({
-      name: row.name,
-      reason: row.reason,
-      budget: { amount: row.budget?.amount, currency: row.budget?.currency, exchangeRate: undefined },
-      comment: row.comment,
-      bookingRemark: row.bookingRemark,
-      owner: resolvedReferences[index].owner,
-      project: resolvedReferences[index].project,
-      state: AdvanceState.APPROVED,
-      editor: request.user._id
-    }))
-    await Promise.all(
-      imports.map(async (advance) => {
-        await createOperationServices().currencyConverter.addExchangeRate(advance.budget, new Date())
-        setAdvanceBalance(advance as unknown as IAdvance)
-        if (!advance.name) {
-          const date = new Date()
-          advance.name = `${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
-        }
-      })
-    )
+    const imports = requestBody.map((row, index) => {
+      let name = row.name
+      if (!name) {
+        const date = new Date()
+        name = `${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
+      }
+      return {
+        name,
+        reason: row.reason,
+        budget: { amount: row.budget?.amount, currency: row.budget?.currency, exchangeRate: undefined },
+        exchangeRateDate: row.exchangeRateDate,
+        comment: row.comment,
+        bookingRemark: row.bookingRemark,
+        owner: resolvedReferences[index].owner,
+        project: resolvedReferences[index].project,
+        state: AdvanceState.APPROVED,
+        editor: request.user._id
+      }
+    })
     const documents = imports.map((advance) => new Advance(advance))
     const result = await bulkSaveImport(Advance, documents)
     await Promise.all(result.map((advance) => emitIntegrationEvent({ type: 'report.review_completed', report: advance })))
