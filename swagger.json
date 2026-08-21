@@ -3895,6 +3895,9 @@
 					"balance": {
 						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
 					"project": {
 						"$ref": "#/components/schemas/ProjectSimple__id_"
 					}
@@ -3906,6 +3909,7 @@
 					"advance",
 					"total",
 					"balance",
+					"currency",
 					"project"
 				],
 				"type": "object"
@@ -3983,11 +3987,23 @@
 					"budget": {
 						"$ref": "#/components/schemas/MoneyNotNull"
 					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project__id_"
 					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
 					"reason": {
 						"type": "string"
@@ -5131,6 +5147,9 @@
 					"balance": {
 						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
 					},
+					"currency": {
+						"$ref": "#/components/schemas/Currency"
+					},
 					"project": {
 						"$ref": "#/components/schemas/ProjectSimple_mongoose.Types.ObjectId_"
 					}
@@ -5142,6 +5161,7 @@
 					"advance",
 					"total",
 					"balance",
+					"currency",
 					"project"
 				],
 				"type": "object"
@@ -5202,11 +5222,23 @@
 					"budget": {
 						"$ref": "#/components/schemas/MoneyNotNull"
 					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"project": {
 						"$ref": "#/components/schemas/Project_mongoose.Types.ObjectId_"
 					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
 					"reason": {
 						"type": "string"
@@ -6762,6 +6794,17 @@
 												}
 											]
 										},
+										"exchangeRateDate": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -6799,6 +6842,16 @@
 												"amount": {
 													"type": "number",
 													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
 												}
 											},
 											"type": "object"
@@ -6954,6 +7007,17 @@
 												}
 											]
 										},
+										"exchangeRateDate": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -6991,6 +7055,16 @@
 												"amount": {
 													"type": "number",
 													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
 												}
 											},
 											"type": "object"
@@ -7192,6 +7266,17 @@
 												}
 											]
 										},
+										"exchangeRateDate": {
+											"anyOf": [
+												{
+													"type": "string"
+												},
+												{
+													"type": "string",
+													"format": "date-time"
+												}
+											]
+										},
 										"project": {
 											"anyOf": [
 												{
@@ -7229,6 +7314,16 @@
 												"amount": {
 													"type": "number",
 													"format": "double"
+												},
+												"currency": {
+													"anyOf": [
+														{
+															"$ref": "#/components/schemas/Currency"
+														},
+														{
+															"$ref": "#/components/schemas/IdDocument_string_"
+														}
+													]
 												}
 											},
 											"type": "object"
@@ -8745,6 +8840,9 @@
 					"employeeClaimsAccount": {
 						"$ref": "#/components/schemas/LedgerAccount__id_"
 					},
+					"currencyExchangeDifferencesAccount": {
+						"$ref": "#/components/schemas/LedgerAccount__id_"
+					},
 					"employeeSpecificTemplate": {
 						"type": "string",
 						"nullable": true
@@ -8802,6 +8900,7 @@
 				"required": [
 					"employeeLiabilitiesAccount",
 					"employeeClaimsAccount",
+					"currencyExchangeDifferencesAccount",
 					"accountMapping",
 					"vatAccountingEnabled",
 					"vatRates",
@@ -9089,6 +9188,9 @@
 					"employeeClaimsAccount": {
 						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
 					},
+					"currencyExchangeDifferencesAccount": {
+						"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+					},
 					"employeeSpecificTemplate": {
 						"type": "string",
 						"nullable": true
@@ -9146,6 +9248,7 @@
 				"required": [
 					"employeeLiabilitiesAccount",
 					"employeeClaimsAccount",
+					"currencyExchangeDifferencesAccount",
 					"accountMapping",
 					"vatAccountingEnabled",
 					"vatRates",
@@ -9422,6 +9525,16 @@
 							"employeeSpecificTemplate": {
 								"type": "string"
 							},
+							"currencyExchangeDifferencesAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
+							},
 							"employeeClaimsAccount": {
 								"anyOf": [
 									{
@@ -9631,6 +9744,16 @@
 							},
 							"employeeSpecificTemplate": {
 								"type": "string"
+							},
+							"currencyExchangeDifferencesAccount": {
+								"anyOf": [
+									{
+										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									},
+									{
+										"$ref": "#/components/schemas/LedgerAccount_mongoose.Types.ObjectId_"
+									}
+								]
 							},
 							"employeeClaimsAccount": {
 								"anyOf": [
@@ -10927,6 +11050,31 @@
 						},
 						"type": "array"
 					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRate": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"bookings": {
 						"items": {
 							"$ref": "#/components/schemas/Booking__id_"
@@ -11072,6 +11220,31 @@
 						},
 						"type": "array"
 					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRate": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"bookings": {
 						"items": {
 							"$ref": "#/components/schemas/Booking__id_"
@@ -11152,6 +11325,9 @@
 								"_id",
 								"addUp",
 								"advances",
+								"currency",
+								"exchangeRateDate",
+								"exchangeRate",
 								"name",
 								"reference",
 								"owner",
@@ -11291,6 +11467,31 @@
 							"$ref": "#/components/schemas/AdvanceBase_mongoose.Types.ObjectId_"
 						},
 						"type": "array"
+					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRate": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
 					},
 					"bookings": {
 						"items": {
@@ -11570,6 +11771,31 @@
 						},
 						"type": "array"
 					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Currency"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"exchangeRate": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"bookings": {
 						"items": {
 							"$ref": "#/components/schemas/Booking_mongoose.Types.ObjectId_"
@@ -11613,6 +11839,46 @@
 				],
 				"type": "object",
 				"additionalProperties": false
+			},
+			"ExpenseReportDetailsBody": {
+				"properties": {
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
+					"currency": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument_string_"
+							}
+						],
+						"nullable": true
+					},
+					"advances": {
+						"items": {
+							"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+						},
+						"type": "array"
+					},
+					"name": {
+						"type": "string"
+					},
+					"_id": {
+						"type": "string"
+					},
+					"project": {
+						"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+					}
+				},
+				"type": "object"
 			},
 			"NameDisplayFormat": {
 				"type": "string",
@@ -14531,8 +14797,20 @@
 					"budget": {
 						"$ref": "#/components/schemas/MoneyNotNull"
 					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
 					"reason": {
 						"type": "string"
@@ -14563,42 +14841,44 @@
 					},
 					"offsetAgainst": {
 						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/MoneyNotNull"
 								},
-								"subject": {
-									"type": "string"
-								},
-								"reportId": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/_id"
-										}
-									],
-									"nullable": true
-								},
-								"type": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+								{
+									"properties": {
+										"subject": {
+											"type": "string"
 										},
-										{
-											"type": "string",
-											"enum": [
-												"offsetEntry"
+										"reportId": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/_id"
+												}
+											],
+											"nullable": true
+										},
+										"type": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+												},
+												{
+													"type": "string",
+													"enum": [
+														"offsetEntry"
+													]
+												}
 											]
 										}
-									]
+									},
+									"required": [
+										"subject",
+										"type"
+									],
+									"type": "object"
 								}
-							},
-							"required": [
-								"amount",
-								"subject",
-								"type"
-							],
-							"type": "object"
+							]
 						},
 						"type": "array"
 					}
@@ -14733,8 +15013,20 @@
 					"budget": {
 						"$ref": "#/components/schemas/MoneyNotNull"
 					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
 					"reason": {
 						"type": "string"
@@ -14765,42 +15057,44 @@
 					},
 					"offsetAgainst": {
 						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/MoneyNotNull"
 								},
-								"subject": {
-									"type": "string"
-								},
-								"reportId": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/_id"
-										}
-									],
-									"nullable": true
-								},
-								"type": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+								{
+									"properties": {
+										"subject": {
+											"type": "string"
 										},
-										{
-											"type": "string",
-											"enum": [
-												"offsetEntry"
+										"reportId": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/_id"
+												}
+											],
+											"nullable": true
+										},
+										"type": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+												},
+												{
+													"type": "string",
+													"enum": [
+														"offsetEntry"
+													]
+												}
 											]
 										}
-									]
+									},
+									"required": [
+										"subject",
+										"type"
+									],
+									"type": "object"
 								}
-							},
-							"required": [
-								"amount",
-								"subject",
-								"type"
-							],
-							"type": "object"
+							]
 						},
 						"type": "array"
 					}
@@ -14880,6 +15174,7 @@
 								"_id",
 								"name",
 								"budget",
+								"exchangeRateDate",
 								"project",
 								"balance",
 								"reason",
@@ -15014,8 +15309,20 @@
 					"budget": {
 						"$ref": "#/components/schemas/MoneyNotNull"
 					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
+					},
 					"balance": {
-						"$ref": "#/components/schemas/BaseCurrencyMoneyNotNull"
+						"$ref": "#/components/schemas/MoneyNotNull"
 					},
 					"reason": {
 						"type": "string"
@@ -15046,42 +15353,44 @@
 					},
 					"offsetAgainst": {
 						"items": {
-							"properties": {
-								"amount": {
-									"type": "number",
-									"format": "double"
+							"allOf": [
+								{
+									"$ref": "#/components/schemas/MoneyNotNull"
 								},
-								"subject": {
-									"type": "string"
-								},
-								"reportId": {
-									"allOf": [
-										{
-											"$ref": "#/components/schemas/mongoose.Types.ObjectId"
-										}
-									],
-									"nullable": true
-								},
-								"type": {
-									"anyOf": [
-										{
-											"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+								{
+									"properties": {
+										"subject": {
+											"type": "string"
 										},
-										{
-											"type": "string",
-											"enum": [
-												"offsetEntry"
+										"reportId": {
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+												}
+											],
+											"nullable": true
+										},
+										"type": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/ReportModelNameWithoutAdvance"
+												},
+												{
+													"type": "string",
+													"enum": [
+														"offsetEntry"
+													]
+												}
 											]
 										}
-									]
+									},
+									"required": [
+										"subject",
+										"type"
+									],
+									"type": "object"
 								}
-							},
-							"required": [
-								"amount",
-								"subject",
-								"type"
-							],
-							"type": "object"
+							]
 						},
 						"type": "array"
 					}
@@ -15122,6 +15431,18 @@
 					},
 					"budget": {
 						"$ref": "#/components/schemas/MoneyPost"
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"nullable": true
 					},
 					"reason": {
 						"type": "string"
@@ -23115,6 +23436,9 @@
 									"_id",
 									"addUp",
 									"advances",
+									"currency",
+									"exchangeRateDate",
+									"exchangeRate",
 									"name",
 									"reference",
 									"owner",
@@ -23454,24 +23778,7 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"advances": {
-										"items": {
-											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-										},
-										"type": "array"
-									},
-									"name": {
-										"type": "string"
-									},
-									"_id": {
-										"type": "string"
-									},
-									"project": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									}
-								},
-								"type": "object"
+								"$ref": "#/components/schemas/ExpenseReportDetailsBody"
 							}
 						}
 					}
@@ -23705,6 +24012,9 @@
 									"_id",
 									"addUp",
 									"advances",
+									"currency",
+									"exchangeRateDate",
+									"exchangeRate",
 									"name",
 									"reference",
 									"owner",
@@ -23832,27 +24142,22 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"advances": {
-										"items": {
-											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ExpenseReportDetailsBody"
+									},
+									{
+										"properties": {
+											"_id": {
+												"type": "string"
+											}
 										},
-										"type": "array"
-									},
-									"name": {
-										"type": "string"
-									},
-									"_id": {
-										"type": "string"
-									},
-									"project": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										"required": [
+											"_id"
+										],
+										"type": "object"
 									}
-								},
-								"required": [
-									"_id"
-								],
-								"type": "object"
+								]
 							}
 						}
 					}
@@ -24117,30 +24422,22 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"properties": {
-									"comment": {
-										"type": "string"
+								"allOf": [
+									{
+										"$ref": "#/components/schemas/ExpenseReportDetailsBody"
 									},
-									"owner": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-									},
-									"advances": {
-										"items": {
-											"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+									{
+										"properties": {
+											"comment": {
+												"type": "string"
+											},
+											"owner": {
+												"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+											}
 										},
-										"type": "array"
-									},
-									"name": {
-										"type": "string"
-									},
-									"_id": {
-										"type": "string"
-									},
-									"project": {
-										"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+										"type": "object"
 									}
-								},
-								"type": "object"
+								]
 							}
 						}
 					}
@@ -24411,6 +24708,9 @@
 									"_id",
 									"addUp",
 									"advances",
+									"currency",
+									"exchangeRateDate",
+									"exchangeRate",
 									"name",
 									"reference",
 									"owner",
@@ -27384,6 +27684,7 @@
 									"_id",
 									"name",
 									"budget",
+									"exchangeRateDate",
 									"project",
 									"balance",
 									"reason",
@@ -27768,6 +28069,7 @@
 									"_id",
 									"name",
 									"budget",
+									"exchangeRateDate",
 									"project",
 									"balance",
 									"reason",
@@ -27901,6 +28203,7 @@
 									"_id",
 									"name",
 									"budget",
+									"exchangeRateDate",
 									"project",
 									"balance",
 									"reason",
@@ -28046,6 +28349,18 @@
 									},
 									{
 										"properties": {
+											"exchangeRateDate": {
+												"anyOf": [
+													{
+														"type": "string",
+														"format": "date-time"
+													},
+													{
+														"type": "string"
+													}
+												],
+												"nullable": true
+											},
 											"bookingRemark": {
 												"type": "string",
 												"nullable": true
@@ -28417,6 +28732,7 @@
 									"_id",
 									"name",
 									"budget",
+									"exchangeRateDate",
 									"project",
 									"balance",
 									"reason",
