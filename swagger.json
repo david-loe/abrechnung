@@ -7151,6 +7151,100 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"Required___id-mongoose.Types.ObjectId__": {
+				"properties": {},
+				"type": "object",
+				"description": "Make all properties in T required"
+			},
+			"TravelBulkImportPost": {
+				"properties": {
+					"owner": {
+						"type": "string"
+					},
+					"project": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"destinationPlace": {
+						"properties": {
+							"country": {
+								"type": "string"
+							},
+							"place": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"country",
+							"place"
+						],
+						"type": "object"
+					},
+					"startDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"endDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"claimSpouseRefund": {
+						"type": "boolean"
+					},
+					"fellowTravelersNames": {
+						"type": "string"
+					},
+					"advances": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"isCrossBorder": {
+						"type": "boolean"
+					},
+					"a1Certificate": {
+						"properties": {
+							"destinationName": {
+								"type": "string"
+							},
+							"exactAddress": {
+								"type": "string"
+							}
+						},
+						"type": "object"
+					}
+				},
+				"required": [
+					"owner",
+					"project",
+					"reason",
+					"destinationPlace",
+					"startDate",
+					"endDate"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"SetterPartial_TravelPost.NoPost_": {
 				"properties": {
 					"bookingRemark": {
@@ -11540,11 +11634,6 @@
 			"ExpenseSetterBody": {
 				"$ref": "#/components/schemas/SetterBody_Expense_mongoose.Types.ObjectId.Binary__"
 			},
-			"Required___id-mongoose.Types.ObjectId__": {
-				"properties": {},
-				"type": "object",
-				"description": "Make all properties in T required"
-			},
 			"Pick_CostPosition_mongoose.Types.ObjectId_.Exclude_keyofCostPosition_mongoose.Types.ObjectId_._id-or-project-or-category__": {
 				"properties": {
 					"description": {
@@ -11879,6 +11968,34 @@
 					}
 				},
 				"type": "object"
+			},
+			"ExpenseReportBulkImportPost": {
+				"properties": {
+					"owner": {
+						"type": "string"
+					},
+					"project": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"advances": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					},
+					"currency": {
+						"$ref": "#/components/schemas/CurrencyCode"
+					}
+				},
+				"required": [
+					"owner",
+					"project"
+				],
+				"type": "object",
+				"additionalProperties": false
 			},
 			"NameDisplayFormat": {
 				"type": "string",
@@ -15458,6 +15575,63 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+			"AdvanceBulkImportPost": {
+				"properties": {
+					"owner": {
+						"type": "string"
+					},
+					"project": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"reason": {
+						"type": "string"
+					},
+					"budget": {
+						"properties": {
+							"currency": {
+								"type": "string"
+							},
+							"amount": {
+								"type": "number",
+								"format": "double"
+							}
+						},
+						"required": [
+							"currency",
+							"amount"
+						],
+						"type": "object"
+					},
+					"exchangeRateDate": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"comment": {
+						"type": "string"
+					},
+					"bookingRemark": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"owner",
+					"project",
+					"reason",
+					"budget"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Partial__owner-IdDocument_string_--project-IdDocument_string_--name-string__": {
 				"properties": {
 					"owner": {
@@ -18232,6 +18406,86 @@
 						}
 					}
 				]
+			}
+		},
+		"/approve/travel/bulk": {
+			"post": {
+				"operationId": "PostManyApproved",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"allOf": [
+													{
+														"$ref": "#/components/schemas/Travel_mongoose.Types.ObjectId.Binary_"
+													},
+													{
+														"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+													},
+													{
+														"properties": {
+															"__v": {
+																"type": "number",
+																"format": "double"
+															}
+														},
+														"required": [
+															"__v"
+														],
+														"type": "object"
+													}
+												]
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Travel"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/travel"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/travel"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/TravelBulkImportPost"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/approve/travel/approved": {
@@ -24164,6 +24418,86 @@
 				}
 			}
 		},
+		"/examine/expenseReport/bulk": {
+			"post": {
+				"operationId": "PostManyInWork",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"allOf": [
+													{
+														"$ref": "#/components/schemas/ExpenseReport_mongoose.Types.ObjectId.Binary_"
+													},
+													{
+														"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+													},
+													{
+														"properties": {
+															"__v": {
+																"type": "number",
+																"format": "double"
+															}
+														},
+														"required": [
+															"__v"
+														],
+														"type": "object"
+													}
+												]
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Expense Report"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"examine/expenseReport"
+						]
+					},
+					{
+						"httpBearer": [
+							"examine/expenseReport"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/ExpenseReportBulkImportPost"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
+			}
+		},
 		"/examine/expenseReport/expense": {
 			"post": {
 				"operationId": "PostExpenseToAny",
@@ -28274,6 +28608,86 @@
 						}
 					}
 				]
+			}
+		},
+		"/approve/advance/bulk": {
+			"post": {
+				"operationId": "PostManyApproved",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"items": {
+												"allOf": [
+													{
+														"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+													},
+													{
+														"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+													},
+													{
+														"properties": {
+															"__v": {
+																"type": "number",
+																"format": "double"
+															}
+														},
+														"required": [
+															"__v"
+														],
+														"type": "object"
+													}
+												]
+											},
+											"type": "array"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Advance"
+				],
+				"security": [
+					{
+						"cookieAuth": [
+							"approve/advance"
+						]
+					},
+					{
+						"httpBearer": [
+							"approve/advance"
+						]
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"items": {
+									"$ref": "#/components/schemas/AdvanceBulkImportPost"
+								},
+								"type": "array"
+							}
+						}
+					}
+				}
 			}
 		},
 		"/approve/advance/approved": {
