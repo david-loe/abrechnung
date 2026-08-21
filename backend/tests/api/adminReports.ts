@@ -32,6 +32,7 @@ const reportFixtures: {
 ]
 const reportIds = reportFixtures.map(() => new Types.ObjectId())
 const historicalTravelId = new Types.ObjectId()
+const foreignExpenseReportExchangeRateDate = new Date('2026-01-15T00:00:00.000Z')
 
 for (const [index, fixture] of reportFixtures.entries()) {
   await fixture.model.collection.insertOne({
@@ -42,7 +43,10 @@ for (const [index, fixture] of reportFixtures.entries()) {
     editor: owner._id,
     project: project._id,
     state: fixture.state,
-    historic: false
+    historic: false,
+    ...(fixture.type === 'ExpenseReport'
+      ? { currency: 'USD', exchangeRateDate: foreignExpenseReportExchangeRateDate, exchangeRate: 1.2 }
+      : {})
   })
 }
 
@@ -106,6 +110,11 @@ test.serial('admin can read current report details for every report type', async
     t.is(response.body.data._id, reportIds[index].toString(), endpoint)
     t.is(response.body.data.owner._id, owner._id.toString(), `${endpoint} owner`)
     t.is(response.body.data.project._id, project._id.toString(), `${endpoint} project`)
+    if (fixture.type === 'ExpenseReport') {
+      t.is(response.body.data.currency._id, 'USD', `${endpoint} currency`)
+      t.is(response.body.data.exchangeRateDate, foreignExpenseReportExchangeRateDate.toISOString(), `${endpoint} exchange rate date`)
+      t.is(response.body.data.exchangeRate, 1.2, `${endpoint} exchange rate`)
+    }
   }
 })
 
