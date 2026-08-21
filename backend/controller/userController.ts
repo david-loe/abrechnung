@@ -12,6 +12,7 @@ import {
 import { DeleteResult } from 'mongodb'
 import { mongo, Types } from 'mongoose'
 import { PushSubscription } from 'web-push'
+import { getActionCounts } from '../actionCounts.js'
 import { generateBearerToken, hashToken } from '../authStrategies/http-bearer.js'
 import ENV from '../env.js'
 import { documentFileHandler, fileHandler } from '../helper.js'
@@ -38,6 +39,11 @@ export class UserController extends Controller {
   @Get()
   public getMe(@Request() request: AuthenticatedExpressRequest) {
     return { data: request.user as IUser }
+  }
+
+  @Get('actionCounts')
+  public async getActionCounts(@Request() request: AuthenticatedExpressRequest) {
+    return { data: await getActionCounts(request.user) }
   }
 
   @Get('token')

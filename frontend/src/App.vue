@@ -45,6 +45,7 @@
             <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
               <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
               <span class="ms-1">{{ t('accesses.' + access) }}</span>
+              <ActionCountBadge :count="getActionCount(access)" />
             </router-link>
           </li>
         </template>
@@ -52,10 +53,14 @@
       <template v-else>
         <li class="nav-item dropdown me-2">
           <a
-            class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable"
+            class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable position-relative"
             role="button"
             data-bs-toggle="dropdown">
-            <i class="fs-4 bi bi-menu-down"></i><span class="ms-1">{{ t('labels.menu') }}</span>
+            <i class="fs-4 bi bi-menu-down"></i>
+            <span class="ms-1">{{ t('labels.menu') }}</span>
+            <ActionCountBadge
+              :count="actionCountState.total.value"
+              class="menu-action-count position-absolute top-0 end-0" />
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <template v-for="(accesses,i) of orderdAccessList">
@@ -63,6 +68,7 @@
                 <router-link :to="'/' + access" class="d-flex align-items-center dropdown-item">
                   <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-5 bi bi-' + icon"></i>
                   <span class="ms-1">{{ t('accesses.' + access) }}</span>
+                  <ActionCountBadge :count="getActionCount(access)" class="ms-auto" />
                 </router-link>
               </li>
               <li v-if="i !== orderdAccessList.length - 1">
@@ -139,7 +145,9 @@
 
 <script lang="ts" setup>
 import {
+  ActionAccess,
   Access,
+  actionAccesses,
   AnyState,
   accesses,
   getReportTypeFromModelName,
@@ -153,10 +161,12 @@ import {
   User
 } from 'abrechnung-common/types.js'
 import { getById } from 'abrechnung-common/utils/scripts.js'
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { actionCountState, refreshActionCounts, startActionCountUpdates } from '@/actionCounts.js'
 import API from '@/api.js'
+import ActionCountBadge from '@/components/elements/ActionCountBadge.vue'
 import AlertComponent from '@/components/elements/AlertComponent.vue'
 import FooterComponent from '@/components/elements/FooterComponent.vue'
 import HeaderComponent from '@/components/elements/HeaderComponent.vue'
@@ -177,6 +187,7 @@ const APP_DATA = APP_LOADER.data
 const APP_LOGIN_DATA = APP_LOADER.loginData
 const loadState = APP_LOADER.state
 const alreadyInstalled = window.matchMedia('(display-mode: standalone)').matches
+const actionCounts = actionCountState.counts
 
 const installationBannerRef = useTemplateRef('installBanner')
 const offlineBannerRef = useTemplateRef('offlineBanner')
@@ -216,6 +227,11 @@ const orderdAccessList = computed(() => {
   return Object.values(groups)
 })
 const flatAccessList = computed(() => orderdAccessList.value.flat())
+
+function getActionCount(access: Access) {
+  if (!actionCounts.value || !actionAccesses.includes(access as ActionAccess)) return 0
+  return actionCounts.value[access as ActionAccess]
+}
 
 function showInstallBanner() {
   if (installationBannerRef.value) {
@@ -274,10 +290,25 @@ function getNameFromUserId(userId: string) {
 }
 
 onMounted(() => {
+  startActionCountUpdates()
   if (!offlineBannerRef.value?.isOffline) {
     subscribeToPush()
   }
 })
+
+watch(
+  APP_DATA,
+  (data) => {
+    if (data) void refreshActionCounts()
+  },
+  { immediate: true }
+)
 </script>
 
-<style></style>
+<style>
+.menu-action-count {
+  margin-left: 0 !important;
+  padding: 0.2em 0.45em;
+  font-size: 0.625rem;
+}
+</style>
