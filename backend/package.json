@@ -19,7 +19,7 @@
     "isolated-vm": "^6.1.2",
     "mongodb": "~7.5",
     "mongoose": "^9.8.0",
-    "multer": "^2.2.0",
+    "multer": "^2.3.0",
     "nodemailer": "^9.0.3",
     "openid-client": "^6.8.4",
     "passport": "^0.7.0",
