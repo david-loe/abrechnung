@@ -67,18 +67,48 @@
       </template>
       <template #fallback>Loading.. </template>
     </Suspense>
-    <Suspense v-else-if="activeSectionId === 'categories'">
-      <template #default>
-        <CategoryList />
-      </template>
-      <template #fallback>Loading.. </template>
-    </Suspense>
-    <Suspense v-else-if="activeSectionId === 'ledgerAccounts'">
-      <template #default>
-        <LedgerAccountList />
-      </template>
-      <template #fallback>Loading.. </template>
-    </Suspense>
+    <template v-else-if="activeSectionId === 'categories'">
+      <section id="category-list" class="section-anchor">
+        <h2 class="h4 mb-3">{{ t('labels.categoryList') }}</h2>
+        <Suspense>
+          <CategoryList ref="categoryList" />
+          <template #fallback>Loading.. </template>
+        </Suspense>
+      </section>
+      <section id="category-import" class="section-anchor">
+        <h2 class="h4 mb-3">{{ t('labels.categoryImport') }}</h2>
+        <p>{{ t('csvImportHints.categories') }}</p>
+        <CSVImport
+          endpoint="admin/category/bulk"
+          :template-file-name="t('labels.categoryImport')"
+          :template-fields="['name', 'ledgerAccount', 'for', 'isDefault', 'style.color', 'style.text']"
+          :transformers="[
+            { path: 'ledgerAccount', key: 'identifier', array: APP_DATA.ledgerAccounts ?? [] },
+            { path: 'isDefault', fn: parseCsvBoolean },
+            { path: 'style.color', fn: (value) => value?.trim() || '#6c757d' },
+            { path: 'style.text', fn: (value) => value?.trim() || 'white' }
+          ]"
+          @submitted="refreshCategoriesAfterImport" />
+      </section>
+    </template>
+    <template v-else-if="activeSectionId === 'ledgerAccounts'">
+      <section id="ledger-account-list" class="section-anchor">
+        <h2 class="h4 mb-3">{{ t('labels.ledgerAccountList') }}</h2>
+        <Suspense>
+          <LedgerAccountList ref="ledgerAccountList" />
+          <template #fallback>Loading.. </template>
+        </Suspense>
+      </section>
+      <section id="ledger-account-import" class="section-anchor">
+        <h2 class="h4 mb-3">{{ t('labels.ledgerAccountImport') }}</h2>
+        <p>{{ t('csvImportHints.ledgerAccounts') }}</p>
+        <CSVImport
+          endpoint="admin/ledgerAccount/bulk"
+          :template-file-name="t('labels.ledgerAccountImport')"
+          :template-fields="['identifier', 'name']"
+          @submitted="refreshLedgerAccountsAfterImport" />
+      </section>
+    </template>
     <Suspense v-else-if="activeSectionId === 'countries'">
       <template #default>
         <CountryList />
@@ -122,6 +152,7 @@ import { computed, nextTick, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import CSVImport from '@/components/elements/CSVImport.vue'
+import { parseCsvBoolean } from '@/csvImport.js'
 import APP_LOADER from '@/dataLoader.js'
 import { getAdminSectionById, type AdminSectionId } from './adminSections'
 import AdminTools from './elements/AdminTools.vue'
@@ -151,6 +182,18 @@ const APP_DATA = APP_LOADER.data
 
 const userListRef = useTemplateRef<{ loadFromServer: () => void }>('userList')
 const projectListRef = useTemplateRef<{ loadFromServer: () => void }>('projectList')
+const categoryListRef = useTemplateRef<{ loadFromServer: () => void }>('categoryList')
+const ledgerAccountListRef = useTemplateRef<{ loadFromServer: () => void }>('ledgerAccountList')
+
+function refreshCategoriesAfterImport() {
+  categoryListRef.value?.loadFromServer()
+  APP_LOADER.loadRequired('category')
+}
+
+function refreshLedgerAccountsAfterImport() {
+  ledgerAccountListRef.value?.loadFromServer()
+  APP_LOADER.loadOptional('admin/ledgerAccount')
+}
 
 function refreshUsersAfterImport() {
   userListRef.value?.loadFromServer()

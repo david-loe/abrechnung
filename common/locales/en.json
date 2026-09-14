@@ -124,6 +124,10 @@
     "startSpecial": "Start - special location",
     "yes": "Yes"
   },
+  "csvImportHints": {
+    "categories": "Only new categories are created. Import ledger accounts first. name and ledgerAccount (account number) are required. for: ExpenseReport (default), Travel or both. isDefault: true/false or 1/0 (default: false). style.color: hex color (default: #6c757d); style.text: black or white (default: white).",
+    "ledgerAccounts": "Only new ledger accounts are created. identifier (unique account number) and name are required. Format account numbers as text in your spreadsheet to preserve leading zeros. Existing accounts are not updated."
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Enter 0 to prevent automatic deletion",
     "deleteBookedAfterXDays": "Enter 0 to prevent automatic deletion",
@@ -307,6 +311,8 @@
     "cancel": "Cancel",
     "categories": "Categories",
     "category": "Category",
+    "categoryImport": "Import categories",
+    "categoryList": "Category list",
     "catering": "Catering",
     "cateringLumpSum": "Catering lump sum",
     "cateringNoRefund": "Catering refund cut",
@@ -473,6 +479,8 @@
     "lastPlaceOfWork": "Last place of work",
     "lastXMonths": "Last {X} Months",
     "ledgerAccount": "Ledger account",
+    "ledgerAccountImport": "Import ledger accounts",
+    "ledgerAccountList": "Ledger account list",
     "ledgerAccounts": "Ledger accounts",
     "left": "left",
     "link": "Link",

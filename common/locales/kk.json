@@ -124,6 +124,10 @@
     "startSpecial": "Бастапқы арнайы орын",
     "yes": "Иә"
   },
+  "csvImportHints": {
+    "categories": "Тек жаңа санаттар жасалады. Алдымен бухгалтерлік шоттарды импорттаңыз. name және ledgerAccount (шот нөмірі) міндетті. for: ExpenseReport (әдепкі), Travel немесе both. isDefault: true/false немесе 1/0 (әдепкі: false). style.color: он алтылық түс (әдепкі: #6c757d); style.text: black немесе white (әдепкі: white).",
+    "ledgerAccounts": "Тек жаңа бухгалтерлік шоттар жасалады. identifier (бірегей шот нөмірі) және name міндетті. Бастапқы нөлдерді сақтау үшін электрондық кестеде шот нөмірлерін мәтін ретінде пішімдеңіз. Бар шоттар жаңартылмайды."
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Автоматты түрде жою үшін 0 енгізіңіз",
     "deleteBookedAfterXDays": "Автоматты түрде жою үшін 0 енгізіңіз",
@@ -307,6 +311,8 @@
     "cancel": "Болдырмау",
     "categories": "Категориялар",
     "category": "Категория",
+    "categoryImport": "Санаттарды импорттау",
+    "categoryList": "Санаттар тізімі",
     "catering": "Тамақтану",
     "cateringLumpSum": "Тамақтану бойынша біржолғы төлем",
     "cateringNoRefund": "Тамақтануға ешқандай алым жоқ",
@@ -473,6 +479,8 @@
     "lastPlaceOfWork": "Соңғы жұмыс орны",
     "lastXMonths": "Соңғы {X} ай",
     "ledgerAccount": "Бухгалтерлік шот",
+    "ledgerAccountImport": "Бухгалтерлік шоттарды импорттау",
+    "ledgerAccountList": "Бухгалтерлік шоттар тізімі",
     "ledgerAccounts": "Бухгалтерлік шоттар",
     "left": "Қалған",
     "link": "Сілтеме",

@@ -124,6 +124,10 @@
     "startSpecial": "Startort - Besonderheit",
     "yes": "Ja"
   },
+  "csvImportHints": {
+    "categories": "Es werden nur neue Kategorien angelegt. Zuerst Sachkonten importieren. name und ledgerAccount (Kontonummer) sind erforderlich. for: ExpenseReport (Standard), Travel oder both. isDefault: true/false oder 1/0 (Standard: false). style.color: Hex-Farbe (Standard: #6c757d); style.text: black oder white (Standard: white).",
+    "ledgerAccounts": "Es werden nur neue Sachkonten angelegt. identifier (eindeutige Kontonummer) und name sind erforderlich. Kontonummern in der Tabellenkalkulation als Text formatieren, um führende Nullen zu erhalten. Bestehende Konten werden nicht aktualisiert."
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Um keine automatische Löschung durchzuführen 0 eingeben",
     "deleteBookedAfterXDays": "Um keine automatische Löschung durchzuführen 0 eingeben",
@@ -307,6 +311,8 @@
     "cancel": "Abbrechen",
     "categories": "Kategorien",
     "category": "Kategorie",
+    "categoryImport": "Kategorien importieren",
+    "categoryList": "Kategorieliste",
     "catering": "Verpflegung",
     "cateringLumpSum": "Verpflegungspauschale",
     "cateringNoRefund": "Keine Verpflegungspauschale",
@@ -473,6 +479,8 @@
     "lastPlaceOfWork": "Letzter Tätigkeitsort",
     "lastXMonths": "Letzte {X} Monate",
     "ledgerAccount": "Sachkonto",
+    "ledgerAccountImport": "Sachkonten importieren",
+    "ledgerAccountList": "Sachkontenliste",
     "ledgerAccounts": "Sachkonten",
     "left": "übrig",
     "link": "Link",

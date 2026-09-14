@@ -82,7 +82,11 @@ export const adminSections: readonly AdminSection[] = [
     routeName: 'admin-categories',
     group: 'data',
     labelKey: 'labels.categories',
-    keywordKey: 'settingsSearch.categories'
+    keywordKey: 'settingsSearch.categories',
+    subsections: [
+      { id: 'category-list', labelKey: 'labels.categoryList', keywords: ['directory', 'table'] },
+      { id: 'category-import', labelKey: 'labels.categoryImport', keywords: ['csv', 'bulk', 'upload'] }
+    ]
   },
   {
     id: 'ledgerAccounts',
@@ -90,7 +94,11 @@ export const adminSections: readonly AdminSection[] = [
     routeName: 'admin-ledger-accounts',
     group: 'data',
     labelKey: 'labels.ledgerAccounts',
-    keywordKey: 'settingsSearch.ledgerAccounts'
+    keywordKey: 'settingsSearch.ledgerAccounts',
+    subsections: [
+      { id: 'ledger-account-list', labelKey: 'labels.ledgerAccountList', keywords: ['directory', 'table'] },
+      { id: 'ledger-account-import', labelKey: 'labels.ledgerAccountImport', keywords: ['csv', 'bulk', 'upload'] }
+    ]
   },
   {
     id: 'countries',
