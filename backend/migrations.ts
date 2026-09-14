@@ -81,12 +81,17 @@ export async function checkForMigrations() {
       for await (const doc of cursor) {
         const newOffsetAgainst = []
         for (const offset of doc.offsetAgainst) {
+          if ('reportId' in offset || offset.type === 'offsetEntry') {
+            newOffsetAgainst.push(offset)
+            continue
+          }
           let subject = ''
           if (offset.report) {
-            const report = await mongoose
-              .model<{ name: string }>(offset.type as string)
-              .findOne({ _id: offset.report })
-              .lean()
+            const collectionName = reportCollections[offset.type as ReportModelName]
+            if (!collectionName) throw new Error(`Unknown report type in advance offset: ${offset.type}`)
+            const report = await mongoose.connection
+              .collection<{ name: string }>(collectionName)
+              .findOne({ _id: offset.report as mongoose.Types.ObjectId })
             subject = report?.name || ''
           }
           newOffsetAgainst.push({
@@ -107,7 +112,7 @@ export async function checkForMigrations() {
       await mongoose.connection
         .collection('connectionsettings')
         .updateMany(
-          { smtp: { $exists: true } },
+          { smtp: { $exists: true }, 'smtp.auth': { $exists: false } },
           { $set: { 'smtp.auth.authType': 'Login' }, $rename: { 'smtp.user': 'smtp.auth.user', 'smtp.password': 'smtp.auth.pass' } }
         )
 
@@ -161,15 +166,18 @@ export async function checkForMigrations() {
     }
     if (semver.lte(migrateFrom, '2.6.2')) {
       logger.info('Apply migration from v2.6.2: Drop exchange rate collection')
-      await mongoose.connection.collection('exchangerates').drop()
+      await mongoose.connection
+        .collection('exchangerates')
+        .drop()
+        .catch((error: unknown) => {
+          if (!(error instanceof mongoose.mongo.MongoServerError) || error.code !== 26) throw error
+        })
       await mongoose.connection.collection('settings').updateMany({}, { $set: { exchangeRateProvider: 'InforEuro' } })
     }
-    if (semver.lte(migrateFrom, '2.6.3')) {
-      logger.info('Apply migration from v2.6.3: initialize atomic report reference counters')
+    if (semver.lt(migrateFrom, '3.0.0')) {
+      logger.info('Apply migration to v3.0.0: initialize atomic report reference counters')
       await initializeReferenceCounters()
-    }
-    if (semver.lte(migrateFrom, '2.6.4')) {
-      logger.info('Apply migration from v2.6.4: introduce cost positions and VAT settings')
+      logger.info('Apply migration to v3.0.0: introduce cost positions and VAT settings')
       const ledgerAccounts = mongoose.connection.collection('ledgeraccounts')
       await Promise.all([
         ledgerAccounts.updateOne(
@@ -212,26 +220,19 @@ export async function checkForMigrations() {
 
       const accountMapping = Object.fromEntries(travelExpenseItems.map((item) => [item, account4660._id]))
 
-      await mongoose.connection
-        .collection('organisations')
-        .updateMany(
-          {},
-          {
-            $set: {
-              'accountingSettings.employeeLiabilitiesAccount': account1740._id,
-              'accountingSettings.employeeClaimsAccount': account1530._id,
-              'accountingSettings.accountMapping': accountMapping,
-              'accountingSettings.vatAccountingEnabled': false,
-              'accountingSettings.includeBankBookings': false,
-              'accountingSettings.payoutAccounts': [],
-              'accountingSettings.vatRates': [
-                { rate: 0 },
-                { rate: 7, inputTaxAccount: account1571._id },
-                { rate: 19, inputTaxAccount: account1576._id }
-              ]
-            }
-          }
-        )
+      const accountingDefaults = {
+        employeeLiabilitiesAccount: account1740._id,
+        employeeClaimsAccount: account1530._id,
+        accountMapping,
+        vatAccountingEnabled: false,
+        includeBankBookings: false,
+        payoutAccounts: [],
+        vatRates: [{ rate: 0 }, { rate: 7, inputTaxAccount: account1571._id }, { rate: 19, inputTaxAccount: account1576._id }]
+      }
+      for (const [key, value] of Object.entries(accountingDefaults)) {
+        const path = `accountingSettings.${key}`
+        await mongoose.connection.collection('organisations').updateMany({ [path]: { $exists: false } }, { $set: { [path]: value } })
+      }
 
       const categories = mongoose.connection.collection('categories')
       await Promise.all([
@@ -356,18 +357,15 @@ export async function checkForMigrations() {
       await migrateReports('expensereports')
       await migrateReports('healthcarecosts')
 
-      logger.info('Apply migration from v2.6.4: initialize SEPA payout settings')
+      logger.info('Apply migration to v3.0.0: initialize SEPA payout settings')
       await mongoose.connection
         .collection('ledgeraccounts')
         .updateOne({ identifier: '1200' }, { $setOnInsert: { identifier: '1200', name: 'Bank' } }, { upsert: true })
-    }
-    if (semver.lte(migrateFrom, '2.7.0')) {
-      logger.info('Apply migration from v2.7.0: add user and project creation access')
+
+      logger.info('Apply migration to v3.0.0: add user and project creation access')
       await initializeUsersAndProjectsCreationAccess()
-    }
-    if (semver.lte(migrateFrom, '2.7.1')) {
-      logger.info('Apply migration from v2.7.1: add expense report currencies and currency-aware advances')
-      const ledgerAccounts = mongoose.connection.collection('ledgeraccounts')
+
+      logger.info('Apply migration to v3.0.0: add expense report currencies and currency-aware advances')
       await ledgerAccounts.updateOne(
         { identifier: '2660' },
         { $setOnInsert: { identifier: '2660', name: 'Kursdifferenzen' } },
@@ -377,13 +375,20 @@ export async function checkForMigrations() {
       if (!exchangeDifferencesAccount) throw new Error('Failed to initialize currency exchange differences account 2660')
       await mongoose.connection
         .collection('organisations')
-        .updateMany({}, { $set: { 'accountingSettings.currencyExchangeDifferencesAccount': exchangeDifferencesAccount._id } })
+        .updateMany(
+          { 'accountingSettings.currencyExchangeDifferencesAccount': { $exists: false } },
+          { $set: { 'accountingSettings.currencyExchangeDifferencesAccount': exchangeDifferencesAccount._id } }
+        )
 
       await Promise.all(
         ['travels', 'expensereports', 'healthcarecosts'].map((collectionName) =>
           mongoose.connection
             .collection(collectionName)
-            .updateMany({ 'addUp.currency': { $exists: false } }, { $set: { 'addUp.$[].currency': baseCurrency._id } })
+            .updateMany(
+              { addUp: { $elemMatch: { currency: { $exists: false } } } },
+              { $set: { 'addUp.$[entry].currency': baseCurrency._id } },
+              { arrayFilters: [{ 'entry.currency': { $exists: false } }] }
+            )
         )
       )
 
@@ -394,10 +399,12 @@ export async function checkForMigrations() {
         balance: { amount: number; currency?: string; exchangeRate?: { date: Date; rate: number; amount: number } | null }
         offsetAgainst: { amount: number; [key: string]: unknown }[]
       }>('advances')
-      for await (const advance of advances.find()) {
+      // The balance currency is written atomically with all converted amounts.
+      // Its presence makes retries safe, including after a partial failure.
+      for await (const advance of advances.find({ 'balance.currency': { $exists: false } })) {
         const currency = advance.budget.currency || baseCurrency._id
         const rate = advance.budget.exchangeRate?.rate
-        if (currency !== baseCurrency._id && !rate) {
+        if (currency !== baseCurrency._id && !(typeof rate === 'number' && Number.isFinite(rate) && rate > 0)) {
           const hasAmounts = advance.balance.amount !== 0 || advance.offsetAgainst.some(({ amount }) => amount !== 0)
           if (hasAmounts) {
             throw new Error(`Cannot migrate foreign-currency advance ${advance._id.toString()} without a stored exchange rate`)
@@ -407,7 +414,7 @@ export async function checkForMigrations() {
         const exchangeRateFor = (amount: number) =>
           currency === baseCurrency._id || !advance.budget.exchangeRate ? null : { ...advance.budget.exchangeRate, amount }
         await advances.updateOne(
-          { _id: advance._id },
+          { _id: advance._id, 'balance.currency': { $exists: false } },
           {
             $set: {
               ...(currency !== baseCurrency._id ? { exchangeRateDate: advance.budget.exchangeRate?.date ?? advance.createdAt } : {}),
