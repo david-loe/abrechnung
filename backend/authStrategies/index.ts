@@ -1,5 +1,6 @@
 import { Contact, User as IUser, tokenAdminUser } from 'abrechnung-common/types.js'
 import { HydratedDocument } from 'mongoose'
+import { AuthorizationError } from '../controller/error.js'
 import { BACKEND_CACHE } from '../db.js'
 import User from '../models/user.js'
 
@@ -23,10 +24,16 @@ export async function findOrCreateUser(
   userData: Omit<NewUser, 'fk'>,
   cb: (error: unknown, user?: Express.User) => void
 ) {
-  const searchFilter: Record<string, string | null | undefined> = {}
+  const identities = Object.entries(filter)
+  if (identities.length === 0 || identities.some(([, value]) => typeof value !== 'string' || value.length === 0)) {
+    cb(new AuthorizationError('Missing or invalid authentication identity'))
+    return
+  }
+
+  const searchFilter: Record<string, string> = {}
   // find User with fk, regardless of other fks
-  for (const key in filter) {
-    searchFilter[`fk.${key}`] = filter[key as keyof IUser['fk']]
+  for (const [key, value] of identities) {
+    searchFilter[`fk.${key}`] = value as string
   }
   let user = await User.findOne(searchFilter)
   const email = userData.email
