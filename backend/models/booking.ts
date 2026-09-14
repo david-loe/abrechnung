@@ -220,7 +220,7 @@ export async function calculateBookings(
     )
     const vatAccountingEnabled = project.vatAccountingEnabled && position.kind !== 'ownCar'
     const vatAmount =
-      typeof position.vatAmountOverride === 'number'
+      vatAccountingEnabled && typeof position.vatAmountOverride === 'number'
         ? allocateRoundedProjectAmount(
             unroundedVatOverrideTotals,
             project,
