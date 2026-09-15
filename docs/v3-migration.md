@@ -3,6 +3,15 @@
 Run the v3 setup against a backup copy before upgrading production. Keep the
 original v2 backup until the migrated amounts, receipts and exports are verified.
 
+## Supported source versions
+
+Direct upgrades to v3 require v2.6.3 or newer. Upgrade older installations to
+v2.6.3 first. Setup rejects older source versions before updating settings or
+inserting defaults, including pending migrations from an unsupported version.
+Fresh installations do not require an intermediate release.
+
+All v3 migration steps and their helpers live in `backend/migrations.ts`.
+
 ## Recorded currency amounts
 
 Old costs can contain either exchange-rate direction. Migration preserves their

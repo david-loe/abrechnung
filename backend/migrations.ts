@@ -1,11 +1,8 @@
-import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
-import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
 import { baseCurrency, ReportModelName, travelExpenseItems } from 'abrechnung-common/types.js'
+import { divideAmount, multiplyAmountAndRound, roundAmount, subtractAmounts, sumAmounts } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
-import { convertLegacyAdvance, normalizeLegacyExchangeRate } from './migrations/financial.js'
-import { migrateSummaries } from './migrations/summaries.js'
 import Settings from './models/settings.js'
 
 const reportCollections: Record<ReportModelName, string> = {
@@ -49,132 +46,19 @@ export async function initializeUsersAndProjectsCreationAccess() {
   ])
 }
 
+export function assertSupportedMigration(migrateFrom: string, targetVersion: string) {
+  const minVersion = '2.6.3'
+  if (semver.lt(migrateFrom, minVersion)) {
+    throw new Error(`Migration from v${migrateFrom} to v${targetVersion} not supported. Migrate to v${minVersion} first.`)
+  }
+}
+
 export async function checkForMigrations() {
   const settings = await Settings.findOne()
   if (settings?.migrateFrom) {
     const migrateFrom = settings.migrateFrom
-    const minVersion = '2.3.3'
-    if (semver.lt(migrateFrom, minVersion)) {
-      throw new Error(`Migration from v${migrateFrom} to v${settings.version} not supported. Migrate to v${minVersion} first.`)
-    }
+    assertSupportedMigration(migrateFrom, settings.version)
 
-    if (semver.lte(migrateFrom, '2.3.3')) {
-      logger.info('Apply migration from v2.3.3: update country and currency names')
-
-      const countryCol = mongoose.connection.collection<{ name: { [key: string]: string }; _id: string }>('countries')
-      const countryBatch = []
-      for (const country of countries) {
-        countryBatch.push({ updateOne: { filter: { _id: country.code }, update: { $set: { name: country.name } } } })
-      }
-      await countryCol.bulkWrite(countryBatch)
-
-      const currencyCol = mongoose.connection.collection<{ name: { [key: string]: string }; _id: string }>('currencies')
-      const currencyBatch = []
-      for (const currency of currencies) {
-        currencyBatch.push({ updateOne: { filter: { _id: currency.code }, update: { $set: { name: currency.name } } } })
-      }
-      await currencyCol.bulkWrite(currencyBatch)
-
-      logger.info('Apply migration from v2.3.3: update advance offsetAgainst subject')
-      const advanceCol = mongoose.connection.collection<{ offsetAgainst: Record<string, unknown>[] }>('advances')
-      const advanceBatch = []
-      const cursor = advanceCol.find()
-      for await (const doc of cursor) {
-        const newOffsetAgainst = []
-        for (const offset of doc.offsetAgainst) {
-          if ('reportId' in offset || offset.type === 'offsetEntry') {
-            newOffsetAgainst.push(offset)
-            continue
-          }
-          let subject = ''
-          if (offset.report) {
-            const collectionName = reportCollections[offset.type as ReportModelName]
-            if (!collectionName) throw new Error(`Unknown report type in advance offset: ${offset.type}`)
-            const report = await mongoose.connection
-              .collection<{ name: string }>(collectionName)
-              .findOne({ _id: offset.report as mongoose.Types.ObjectId })
-            subject = report?.name || ''
-          }
-          newOffsetAgainst.push({
-            reportId: offset.report,
-            type: offset.report ? offset.type : 'offsetEntry',
-            subject,
-            amount: offset.amount
-          })
-        }
-        advanceBatch.push({ updateOne: { filter: { _id: doc._id }, update: { $set: { offsetAgainst: newOffsetAgainst } } } })
-      }
-      if (advanceBatch.length > 0) {
-        await advanceCol.bulkWrite(advanceBatch)
-      }
-    }
-    if (semver.lte(migrateFrom, '2.4.3')) {
-      logger.info('Apply migration from v2.4.3: add oauth2 option to smtp settings')
-      await mongoose.connection
-        .collection('connectionsettings')
-        .updateMany(
-          { smtp: { $exists: true }, 'smtp.auth': { $exists: false } },
-          { $set: { 'smtp.auth.authType': 'Login' }, $rename: { 'smtp.user': 'smtp.auth.user', 'smtp.password': 'smtp.auth.pass' } }
-        )
-
-      logger.info('Apply migration from v2.4.3: add bookingRemark option to printer settings')
-      await mongoose.connection
-        .collection('printersettings')
-        .updateMany(
-          {},
-          {
-            $set: {
-              'options.travel.bookingRemark': false,
-              'options.expenseReport.bookingRemark': false,
-              'options.healthCareCost.bookingRemark': false,
-              'options.advance.bookingRemark': false
-            }
-          }
-        )
-    }
-    if (semver.lte(migrateFrom, '2.5.0')) {
-      logger.info('Apply migration from v2.5.0: add additionalOwnerDetails option to printer settings')
-      await mongoose.connection
-        .collection('printersettings')
-        .updateMany(
-          {},
-          {
-            $set: {
-              'options.travel.additionalOwnerDetails': true,
-              'options.expenseReport.additionalOwnerDetails': true,
-              'options.healthCareCost.additionalOwnerDetails': true,
-              'options.advance.additionalOwnerDetails': true
-            }
-          }
-        )
-    }
-    if (semver.lte(migrateFrom, '2.5.3')) {
-      logger.info('Apply migration from v2.5.3: move retention policy to integration settings')
-
-      const settingsCol = mongoose.connection.collection('settings')
-      const integrationSettingsCol = mongoose.connection.collection('integrationsettings')
-
-      const currentSettings = await settingsCol.findOne({})
-
-      if (currentSettings && 'retentionPolicy' in currentSettings) {
-        await integrationSettingsCol.updateOne(
-          { integrationKey: 'retentionPolicy' },
-          { $set: { settings: currentSettings.retentionPolicy } }
-        )
-      }
-
-      await settingsCol.updateMany({}, { $unset: { retentionPolicy: '' } })
-    }
-    if (semver.lte(migrateFrom, '2.6.2')) {
-      logger.info('Apply migration from v2.6.2: Drop exchange rate collection')
-      await mongoose.connection
-        .collection('exchangerates')
-        .drop()
-        .catch((error: unknown) => {
-          if (!(error instanceof mongoose.mongo.MongoServerError) || error.code !== 26) throw error
-        })
-      await mongoose.connection.collection('settings').updateMany({}, { $set: { exchangeRateProvider: 'InforEuro' } })
-    }
     if (semver.lt(migrateFrom, '3.0.0')) {
       // Validate before changing any v3 report data. Each report is subsequently
       // converted atomically, so a retry can skip its already converted costs.
@@ -476,4 +360,88 @@ export async function checkForMigrations() {
     settings.migrateFrom = undefined
     await settings.save()
   }
+}
+
+interface LegacyExchangeRate {
+  rate: number
+  amount?: number | null
+  date?: unknown
+}
+
+// Old releases stored both rate directions. The recorded EUR amount is the
+// financial source of truth; a rate alone cannot establish its direction.
+function normalizeLegacyExchangeRate<T extends LegacyExchangeRate>(amount: number, exchangeRate: T | null | undefined, location: string) {
+  if (exchangeRate?.amount == null) return exchangeRate
+  const euroAmount = exchangeRate.amount
+  if (!Number.isFinite(amount) || !Number.isFinite(euroAmount)) {
+    throw new Error(`Invalid legacy currency amounts at ${location}`)
+  }
+  const reproducesEuroAmount = (rate: number) =>
+    Number.isFinite(rate) && rate > 0 && multiplyAmountAndRound(amount, rate) === roundAmount(euroAmount)
+  if (reproducesEuroAmount(exchangeRate.rate)) return exchangeRate
+  const rate = divideAmount(euroAmount, amount)
+  if (!reproducesEuroAmount(rate)) {
+    throw new Error(`Cannot preserve legacy EUR amount at ${location}`)
+  }
+  return { ...exchangeRate, rate }
+}
+
+function convertLegacyAdvance<T extends LegacyExchangeRate>(
+  advance: { budget: { amount: number; exchangeRate?: T | null }; balance: { amount: number }; offsetAgainst: { amount: number }[] },
+  location: string
+) {
+  const exchangeRate = normalizeLegacyExchangeRate(advance.budget.amount, advance.budget.exchangeRate, `${location}/budget`)
+  const euroAmounts = [advance.balance.amount, ...advance.offsetAgainst.map((offset) => offset.amount)]
+  if (!euroAmounts.every(Number.isFinite)) throw new Error(`Invalid legacy advance amounts at ${location}`)
+  const rate = exchangeRate?.rate
+  if (euroAmounts.some((amount) => amount !== 0) && !(exchangeRate?.amount != null && rate && Number.isFinite(rate) && rate > 0)) {
+    throw new Error(`Cannot migrate foreign-currency advance without recorded budget amounts at ${location}`)
+  }
+
+  const convert = (amount: number) => (rate ? roundAmount(divideAmount(amount, rate)) : 0)
+  let balance = convert(advance.balance.amount)
+  const offsets = advance.offsetAgainst.map((offset) => convert(offset.amount))
+  const sourceBalanced = exchangeRate?.amount != null && roundAmount(sumAmounts(...euroAmounts)) === roundAmount(exchangeRate.amount)
+  if (sourceBalanced) {
+    const offsetSum = sumAmounts(...offsets)
+    const difference = roundAmount(subtractAmounts(advance.budget.amount, sumAmounts(balance, offsetSum)))
+    if (Math.abs(difference) > 0.01) throw new Error(`Legacy advance rounding difference exceeds 0.01 at ${location}`)
+    if (difference !== 0) {
+      // Keep a spent advance at zero; assign its rounding remainder to the last nonzero offset.
+      if (advance.balance.amount !== 0) {
+        balance = roundAmount(subtractAmounts(advance.budget.amount, offsetSum))
+        if (balance < 0) throw new Error(`Legacy advance rounding would produce a negative balance at ${location}`)
+      } else {
+        let index = advance.offsetAgainst.length - 1
+        while (index >= 0 && advance.offsetAgainst[index].amount === 0) index -= 1
+        if (index < 0) throw new Error(`Legacy advance rounding has no offset to adjust at ${location}`)
+        offsets[index] = roundAmount(sumAmounts(offsets[index], difference))
+        if (offsets[index] < 0) throw new Error(`Legacy advance rounding would produce a negative offset at ${location}`)
+      }
+    }
+  }
+  return { exchangeRate, balance, offsets, sourceBalanced }
+}
+
+interface LegacySummary {
+  project?: unknown
+  currency?: unknown
+  expenses: { amount: number }
+  total: { amount: number }
+  balance: { amount: number }
+  advance?: { amount: number }
+  lumpSums?: { amount: number }
+  negativeTotal?: boolean
+  advanceOverflow?: boolean
+}
+
+function migrateSummaries(summary: LegacySummary | LegacySummary[], project: unknown) {
+  return (Array.isArray(summary) ? summary : [summary]).map((entry) => ({
+    ...entry,
+    project: entry.project ?? project,
+    currency: entry.currency ?? baseCurrency._id,
+    advance: entry.advance ?? { amount: 0 },
+    negativeTotal: entry.negativeTotal ?? sumAmounts(entry.expenses.amount, entry.lumpSums?.amount ?? 0) < 0,
+    advanceOverflow: entry.advanceOverflow ?? entry.total.amount < (entry.advance?.amount ?? 0)
+  }))
 }
