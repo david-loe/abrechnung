@@ -14,7 +14,7 @@ import {
   SuccessResponse,
   Tags
 } from '@tsoa/runtime'
-import { AuthContext, idDocumentToId, tokenAdminUser } from 'abrechnung-common/types.js'
+import { AuthContext, accesses, idDocumentToId, tokenAdminUser } from 'abrechnung-common/types.js'
 import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import { Request as ExRequest, Response as ExResponse, NextFunction } from 'express'
 import jwt from 'jsonwebtoken'
@@ -227,7 +227,11 @@ export class AuthController extends Controller {
     const sessionExpiresAt = req.session.cookie.expires ?? new Date(Date.now() + ENV.COOKIE_MAX_AGE_DAYS * 86_400_000)
     const accessExpiresAt = req.user.loseAccessAt ? new Date(req.user.loseAccessAt) : sessionExpiresAt
     const expiresAt = accessExpiresAt < sessionExpiresAt ? accessExpiresAt : sessionExpiresAt
-    const permissions = req.user.access
+    // Hydrating legacy access objects can generate a new subdocument ID on every request.
+    const permissions: AuthContext['permissions'] = {}
+    for (const access of accesses) {
+      permissions[access] = req.user.access[access] === true
+    }
     const projectIds = [
       ...req.user.projects.assigned.map((project) => String(idDocumentToId(project))),
       ...req.user.projects.supervised.map((project) => String(idDocumentToId(project)))
