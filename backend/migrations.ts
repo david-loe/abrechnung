@@ -1,11 +1,10 @@
 import countries from 'abrechnung-common/data/countries.json' with { type: 'json' }
 import currencies from 'abrechnung-common/data/currencies.json' with { type: 'json' }
 import { baseCurrency, ReportModelName, travelExpenseItems } from 'abrechnung-common/types.js'
-import { divideAmount, roundAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
-import { normalizeLegacyExchangeRate } from './migrations/financial.js'
+import { convertLegacyAdvance, normalizeLegacyExchangeRate } from './migrations/financial.js'
 import { migrateSummaries } from './migrations/summaries.js'
 import Settings from './models/settings.js'
 
@@ -196,11 +195,13 @@ export async function checkForMigrations() {
       }
       for await (const advance of mongoose.connection.collection('advances').find({ 'balance.currency': { $exists: false } })) {
         if (advance.budget.currency === baseCurrency._id) continue
-        const location = `advances/${advance._id}/budget`
-        const exchangeRate = normalizeLegacyExchangeRate(advance.budget.amount ?? 0, advance.budget.exchangeRate, location)
-        const hasAmounts = advance.balance.amount !== 0 || advance.offsetAgainst.some((offset: { amount: number }) => offset.amount !== 0)
-        if (hasAmounts && !(exchangeRate?.amount != null && Number.isFinite(exchangeRate.rate) && exchangeRate.rate > 0)) {
-          throw new Error(`Cannot migrate foreign-currency advance without recorded budget amounts at ${location}`)
+        const location = `advances/${advance._id}`
+        const converted = convertLegacyAdvance(
+          { budget: advance.budget, balance: advance.balance, offsetAgainst: advance.offsetAgainst },
+          location
+        )
+        if (!converted.sourceBalanced) {
+          logger.warn(`Preserving unmatched legacy advance totals without rounding adjustment: ${location}`)
         }
       }
       logger.info('Apply migration to v3.0.0: initialize atomic report reference counters')
@@ -446,19 +447,8 @@ export async function checkForMigrations() {
       // Its presence makes retries safe, including after a partial failure.
       for await (const advance of advances.find({ 'balance.currency': { $exists: false } })) {
         const currency = advance.budget.currency || baseCurrency._id
-        const normalizedRate =
-          currency === baseCurrency._id
-            ? advance.budget.exchangeRate
-            : normalizeLegacyExchangeRate(advance.budget.amount, advance.budget.exchangeRate, `advances/${advance._id}/budget`)
-        const rate = normalizedRate?.rate
-        if (currency !== baseCurrency._id && !(typeof rate === 'number' && Number.isFinite(rate) && rate > 0)) {
-          const hasAmounts = advance.balance.amount !== 0 || advance.offsetAgainst.some(({ amount }) => amount !== 0)
-          if (hasAmounts) {
-            throw new Error(`Cannot migrate foreign-currency advance ${advance._id.toString()} without a stored exchange rate`)
-          }
-        }
-        const convertFromEuro = (amount: number) =>
-          currency === baseCurrency._id ? amount : rate ? roundAmount(divideAmount(amount, rate)) : 0
+        const converted = currency === baseCurrency._id ? undefined : convertLegacyAdvance(advance, `advances/${advance._id}`)
+        const normalizedRate = currency === baseCurrency._id ? advance.budget.exchangeRate : converted?.exchangeRate
         const exchangeRateFor = (amount: number) =>
           currency === baseCurrency._id || !normalizedRate ? null : { ...normalizedRate, amount }
         await advances.updateOne(
@@ -467,10 +457,14 @@ export async function checkForMigrations() {
             $set: {
               ...(normalizedRate ? { 'budget.exchangeRate': normalizedRate } : {}),
               ...(currency !== baseCurrency._id ? { exchangeRateDate: advance.budget.exchangeRate?.date ?? advance.createdAt } : {}),
-              balance: { amount: convertFromEuro(advance.balance.amount), currency, exchangeRate: exchangeRateFor(advance.balance.amount) },
-              offsetAgainst: advance.offsetAgainst.map((offset) => ({
+              balance: {
+                amount: converted ? converted.balance : advance.balance.amount,
+                currency,
+                exchangeRate: exchangeRateFor(advance.balance.amount)
+              },
+              offsetAgainst: advance.offsetAgainst.map((offset, index) => ({
                 ...offset,
-                amount: convertFromEuro(offset.amount),
+                amount: converted ? converted.offsets[index] : offset.amount,
                 currency,
                 exchangeRate: exchangeRateFor(offset.amount)
               }))

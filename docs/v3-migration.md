@@ -29,6 +29,14 @@ in the same atomic update as the budget rate. Their recorded EUR counterparts ar
 retained. A nonzero balance or offset without a usable recorded budget pair blocks
 the migration before any report conversion; a rate alone is not sufficient evidence.
 
+For advances whose recorded EUR balance and offsets sum to their recorded EUR budget,
+migration reconciles a foreign-currency rounding difference of at most 0.01. A remaining
+balance becomes the budget minus the converted offsets. An already spent advance stays
+at zero, with the difference assigned to its last originally nonzero offset. Recorded
+EUR amounts and the normalized exchange rate are retained. Larger differences or an
+adjustment producing a negative amount stop the preflight before report conversion.
+Unmatched EUR source totals are reported and converted without a rounding adjustment.
+
 Legacy summary objects are converted to the current array shape for both current
 and historical reports. Recorded totals are retained; the report project, base
 currency and missing current fields are supplied without recalculating history.
