@@ -105,7 +105,7 @@ import ListElement from '@/components/elements/ListElement.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
-import { getSyncedMagicLogin } from './userForm.js'
+import { getSyncedMagicLogin, prepareUserForSubmit } from './userForm.js'
 
 const { t } = useI18n()
 
@@ -171,7 +171,11 @@ function showForm(user?: User, readOnly = false) {
   // biome-ignore lint/suspicious/noExplicitAny: reduce arrays of objects to arrays of _ids for vueform select elements
   let formUser: any = user
   if (formUser) {
-    const formUserSettings = Object.assign({}, formUser.settings)
+    const formUserSettings = {
+      ...formUser.settings,
+      bankAccountEnabled: Boolean(formUser.settings.bankAccount),
+      ...(formUser.settings.bankAccount ? { bankAccount: { ...formUser.settings.bankAccount } } : {})
+    }
     const formUserProjects = Object.assign({}, formUser.projects)
     formUser = Object.assign({}, formUser, { settings: formUserSettings, projects: formUserProjects })
     if (user?.settings.lastCurrencies) formUser.settings.lastCurrencies = user.settings.lastCurrencies.map((c) => c._id)
@@ -180,6 +184,8 @@ function showForm(user?: User, readOnly = false) {
     formUser.projects.supervised = user?.projects.supervised.map(idDocumentToId)
     formUser.settings.organisation = user?.settings.organisation ? idDocumentToId(user.settings.organisation) : user?.settings.organisation
     formUser.settings.insurance = user?.settings.insurance ? idDocumentToId(user.settings.insurance) : user?.settings.insurance
+  } else {
+    formUser = { settings: { bankAccountEnabled: false } }
   }
   userToEdit.value = formUser
   viewOnly.value = readOnly
@@ -193,7 +199,7 @@ function closeForm() {
 }
 async function postUser(user: User) {
   if (viewOnly.value) return
-  const result = await API.setter<User>(props.endpoint, user)
+  const result = await API.setter<User>(props.endpoint, prepareUserForSubmit(user))
   if (result.ok) {
     _showForm.value = false
     userToEdit.value = undefined
@@ -248,6 +254,20 @@ const { fk, loseAccessAt, ...generalSchema } = formSchema
 const schema = props.createOnly
   ? Object.assign({}, generalSchema, { fk, loseAccessAt, buttons0: buttons })
   : Object.assign({}, formSchema, { buttons0: buttons, buttons1: buttons })
+if (schema.settings?.schema?.bankAccount) {
+  const settingsSchema: Record<string, VueformSchema> = {}
+  for (const [key, value] of Object.entries(schema.settings.schema)) {
+    if (key === 'bankAccount') {
+      settingsSchema.bankAccountEnabled = {
+        type: 'checkbox', text: t('labels.addX', { X: t('labels.bankDetails') }), default: false, submit: false
+      }
+      settingsSchema[key] = { ...value, conditions: [['settings.bankAccountEnabled', true]] }
+    } else {
+      settingsSchema[key] = value
+    }
+  }
+  schema.settings.schema = settingsSchema
+}
 if (!props.createOnly && schema.fk?.schema) {
   Object.assign(schema.fk.schema, { genApiKey: { type: 'button', buttonLabel: 'Gen API Key', columns: { container: 3 }, secondary: true } })
 }
