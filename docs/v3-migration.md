@@ -22,3 +22,9 @@ copy, disable all delivery configuration, run no worker, and isolate the databas
 application and browser from external networks. Queued notification jobs are not
 proof of delivery; verify that no job was executed and stop the test environment
 when finished. Keep private snapshots and screenshots out of the repository.
+
+Advance budget rates are normalized from their recorded foreign/EUR amounts too.
+Balances and offsets are converted from the old EUR values into the budget currency
+in the same atomic update as the budget rate. Their recorded EUR counterparts are
+retained. A nonzero balance or offset without a usable recorded budget pair blocks
+the migration before any report conversion; a rate alone is not sufficient evidence.

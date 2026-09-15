@@ -8,7 +8,11 @@ export interface LegacyExchangeRate {
 
 // Old releases stored both rate directions. The recorded EUR amount is the
 // financial source of truth; a rate alone cannot establish its direction.
-export function normalizeLegacyExchangeRate(amount: number, exchangeRate: LegacyExchangeRate | null | undefined, location: string) {
+export function normalizeLegacyExchangeRate<T extends LegacyExchangeRate>(
+  amount: number,
+  exchangeRate: T | null | undefined,
+  location: string
+) {
   if (exchangeRate?.amount == null) return exchangeRate
   const euroAmount = exchangeRate.amount
   if (!Number.isFinite(amount) || !Number.isFinite(euroAmount)) {
