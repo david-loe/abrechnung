@@ -19,6 +19,19 @@ test('POST /admin/user', async (t) => {
   t.like(res2.body.result, user)
 })
 
+test.serial('admin can remove optional bank details while incomplete accounts remain invalid', async (t) => {
+  const userId = (await agent.get('/user')).body.data._id
+  const account = { accountHolder: 'Synthetic Admin', iban: 'DE89370400440532013000' }
+  const added = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: account } })
+  t.is(added.status, 200)
+  t.is(added.body.result.settings.bankAccount.iban, account.iban)
+  const incomplete = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: { accountHolder: 'Incomplete' } } })
+  t.is(incomplete.status, 422)
+  const removed = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: null } })
+  t.is(removed.status, 200)
+  t.is(removed.body.result.settings.bankAccount, null)
+})
+
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })
