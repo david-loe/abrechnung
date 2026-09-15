@@ -17,10 +17,12 @@
 </template>
 <script lang="ts" setup>
 import { Modal } from 'bootstrap'
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { onBeforeUnmount, onMounted, shallowRef, useTemplateRef } from 'vue'
+import { createModalLifecycle } from './modalLifecycle.js'
 
 const emit = defineEmits<{ afterClose: [] }>()
-const modalObj = ref(null as Modal | null)
+const modalObj = shallowRef<Modal | null>(null)
+let lifecycle: ReturnType<typeof createModalLifecycle> | undefined
 const modalRef = useTemplateRef('modal')
 
 defineExpose({ modal: modalObj, hideModal })
@@ -28,17 +30,13 @@ defineExpose({ modal: modalObj, hideModal })
 const props = defineProps({ header: String })
 
 function hideModal() {
-  modalObj.value?.hide()
+  return lifecycle?.close() ?? Promise.resolve()
 }
-const emitAfterClose = () => emit('afterClose')
 onMounted(() => {
   if (modalRef.value) {
     modalObj.value = new Modal(modalRef.value, {})
-    modalRef.value.addEventListener('hidden.bs.modal', emitAfterClose)
+    lifecycle = createModalLifecycle(modalRef.value, modalObj.value, () => emit('afterClose'))
   }
 })
-onUnmounted(() => {
-  modalRef.value?.removeEventListener('hidden.bs.modal', emitAfterClose)
-  modalObj.value?.dispose()
-})
+onBeforeUnmount(() => lifecycle?.dispose())
 </script>
