@@ -5,6 +5,7 @@ import { roundAmount } from 'abrechnung-common/utils/scripts.js'
 import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
+import { normalizeLegacyExchangeRate } from './migrations/financial.js'
 import Settings from './models/settings.js'
 
 const reportCollections: Record<ReportModelName, string> = {
@@ -175,6 +176,23 @@ export async function checkForMigrations() {
       await mongoose.connection.collection('settings').updateMany({}, { $set: { exchangeRateProvider: 'InforEuro' } })
     }
     if (semver.lt(migrateFrom, '3.0.0')) {
+      // Validate before changing any v3 report data. Each report is subsequently
+      // converted atomically, so a retry can skip its already converted costs.
+      for (const collectionName of ['travels', 'expensereports', 'healthcarecosts']) {
+        for await (const report of mongoose.connection.collection(collectionName).find()) {
+          for (const field of ['expenses', 'stages']) {
+            for (const [index, entry] of (report[field] ?? []).entries()) {
+              const cost = entry.cost
+              if (!cost || Array.isArray(cost.positions) || cost.currency === baseCurrency._id) continue
+              const location = `${collectionName}/${report._id}/${field}/${index}/cost`
+              normalizeLegacyExchangeRate(cost.amount ?? 0, cost.exchangeRate, location)
+              if (cost.amount && cost.exchangeRate?.amount == null) {
+                logger.warn(`Preserving foreign cost without a recorded EUR amount: ${location}`)
+              }
+            }
+          }
+        }
+      }
       logger.info('Apply migration to v3.0.0: initialize atomic report reference counters')
       await initializeReferenceCounters()
       logger.info('Apply migration to v3.0.0: introduce cost positions and VAT settings')
@@ -296,6 +314,13 @@ export async function checkForMigrations() {
                   ? travelCategoryId
                   : expenseCategoryId
             if (!Array.isArray(cost.positions)) {
+              if (cost.currency !== baseCurrency._id) {
+                cost.exchangeRate = normalizeLegacyExchangeRate(
+                  cost.amount ?? 0,
+                  cost.exchangeRate,
+                  `${collectionName}/${report._id}/expenses/${expense._id}`
+                )
+              }
               cost.positions = [
                 {
                   _id: new mongoose.Types.ObjectId(),
@@ -322,6 +347,13 @@ export async function checkForMigrations() {
               const cost = { ...stage.cost }
               const project = stage.project ?? report.project
               if (!Array.isArray(cost.positions)) {
+                if (cost.currency !== baseCurrency._id) {
+                  cost.exchangeRate = normalizeLegacyExchangeRate(
+                    cost.amount ?? 0,
+                    cost.exchangeRate,
+                    `travels/${report._id}/stages/${stage._id}`
+                  )
+                }
                 const isOwnCar = stage.transport?.type === 'ownCar'
                 const hasCost = isOwnCar || (typeof cost.amount === 'number' && cost.amount !== 0)
                 cost.positions = hasCost

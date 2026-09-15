@@ -178,6 +178,11 @@ export function multiplyAmount(left: number, right: number) {
   return new Big(left).times(right).toNumber()
 }
 
+export function divideAmount(left: number, right: number) {
+  if (!Number.isFinite(left) || !Number.isFinite(right) || right === 0) return left / right
+  return new Big(left).div(right).toNumber()
+}
+
 export function multiplyAmountAndRound(left: number, right: number) {
   if (!Number.isFinite(left) || !Number.isFinite(right)) {
     return left * right
