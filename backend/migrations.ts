@@ -6,6 +6,7 @@ import mongoose from 'mongoose'
 import semver from 'semver'
 import { logger } from './logger.js'
 import { normalizeLegacyExchangeRate } from './migrations/financial.js'
+import { migrateSummaries } from './migrations/summaries.js'
 import Settings from './models/settings.js'
 
 const reportCollections: Record<ReportModelName, string> = {
@@ -350,6 +351,7 @@ export async function checkForMigrations() {
           }
 
           const update: Record<string, unknown> = { expenses }
+          if (report.addUp) update.addUp = migrateSummaries(report.addUp, report.project)
           if (collectionName === 'travels') {
             const stages = []
             for (const stage of report.stages ?? []) {

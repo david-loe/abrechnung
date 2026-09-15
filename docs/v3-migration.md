@@ -28,3 +28,7 @@ Balances and offsets are converted from the old EUR values into the budget curre
 in the same atomic update as the budget rate. Their recorded EUR counterparts are
 retained. A nonzero balance or offset without a usable recorded budget pair blocks
 the migration before any report conversion; a rate alone is not sufficient evidence.
+
+Legacy summary objects are converted to the current array shape for both current
+and historical reports. Recorded totals are retained; the report project, base
+currency and missing current fields are supplied without recalculating history.
