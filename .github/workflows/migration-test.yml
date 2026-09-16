@@ -1,5 +1,8 @@
 name: Build, Test & Migrate
 
+env:
+  PREVIOUS_VERSION: "2.6.3"
+
 on:
   push:
     branches: ["main"]
@@ -24,8 +27,151 @@ jobs:
           cat > "$RUNNER_TEMP/previous-release.yml" <<'EOF'
           services:
             backend:
-              image: davidloe/abrechnung-backend:2.6.3
+              image: davidloe/abrechnung-backend:${PREVIOUS_VERSION}
           EOF
           docker compose -f deploy-compose.yml -f "$RUNNER_TEMP/previous-release.yml" run --rm backend npm run setup
       - name: Run Migration
         run: docker compose run backend node dist/setup.js
+
+  frontend-migration-test:
+    name: Frontend Service Worker Migration
+    needs: [build-and-test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build current production frontend
+        run: docker build -f frontend/Dockerfile.production -t abrechnung-frontend:ci .
+      - name: Install browser test tools on the runner
+        shell: bash
+        run: |
+          npm install --prefix "$RUNNER_TEMP/frontend-migration" --no-save --package-lock=false playwright@1.58.2
+          node "$RUNNER_TEMP/frontend-migration/node_modules/playwright/cli.js" install --with-deps firefox chromium
+      - name: Test production frontend upgrade in Firefox and Chromium
+        shell: bash
+        env:
+          FRONTEND_IMAGE: abrechnung-frontend:ci
+        run: |
+          set -euo pipefail
+          cleanup() {
+            if [ "$?" -ne 0 ]; then
+              docker logs frontend-migration-previous || true
+              docker logs frontend-migration-current || true
+            fi
+            docker rm -f frontend-migration-previous frontend-migration-current >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+          # Same source release as the backend migration above. These are the
+          # actual production images; no application source or dist is mounted.
+          docker run -d --name frontend-migration-previous -p 127.0.0.1:18765:8080 \
+            -e VITE_FRONTEND_URL=http://127.0.0.1:18767 -e VITE_BACKEND_URL=http://127.0.0.1:18767/api \
+            "davidloe/abrechnung-frontend:${PREVIOUS_VERSION}"
+          docker run -d --name frontend-migration-current -p 127.0.0.1:18766:8080 \
+            -e VITE_FRONTEND_URL=http://127.0.0.1:18767 -e VITE_BACKEND_URL=http://127.0.0.1:18767/api \
+            "$FRONTEND_IMAGE"
+          for port in 18765 18766; do
+            # Older production images compile their frontend on container startup.
+            for _ in {1..120}; do
+              curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null && break
+              sleep 2
+            done
+            curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null
+          done
+          cat > "$RUNNER_TEMP/frontend-migration/test.mjs" <<'EOF'
+          import assert from 'node:assert/strict'
+          import { createServer, request } from 'node:http'
+          import { chromium, firefox } from 'playwright'
+
+          const origin = 'http://127.0.0.1:18767'
+          let upgraded = false
+          let currentWorkerSource
+          let currentWorkerDelivered = false
+          const server = createServer((req, res) => {
+            // Open this observer before installing the old worker. It reads the
+            // registration and stays open while the real frontend reloads.
+            if (req.url === '/__sw-observer') {
+              res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Service worker observer</title>')
+              return
+            }
+            // No backend is needed to register or update the production worker.
+            if (req.url.startsWith('/api/')) {
+              res.writeHead(401, { 'Content-Type': 'application/json' }).end('{}')
+              return
+            }
+            const upstream = request({ hostname: '127.0.0.1', port: upgraded ? 18766 : 18765,
+              path: req.url, method: req.method, headers: { ...req.headers, 'accept-encoding': 'identity' } }, (response) => {
+              if (req.url === '/sw.js' && response.statusCode === 200) {
+                const chunks = []
+                response.on('data', (chunk) => chunks.push(chunk))
+                response.on('end', () => {
+                  if (Buffer.concat(chunks).toString() === currentWorkerSource) currentWorkerDelivered = true
+                })
+              }
+              res.writeHead(response.statusCode, response.headers)
+              response.pipe(res)
+            })
+            upstream.on('error', (error) => { res.writeHead(502).end(String(error)) })
+            req.pipe(upstream)
+          })
+          await new Promise((resolve) => server.listen(18767, '127.0.0.1', resolve))
+          const failures = []
+          try {
+            const workers = await Promise.all([18765, 18766].map(async (port) => {
+              const response = await fetch(`http://127.0.0.1:${port}/sw.js`)
+              assert.equal(response.status, 200)
+              return response.text()
+            }))
+            assert.notEqual(workers[0], workers[1], 'The images must contain different workers to exercise an update')
+            currentWorkerSource = workers[1]
+
+            for (const browserType of [firefox, chromium]) {
+              const browser = await browserType.launch()
+              try {
+                upgraded = false
+                currentWorkerDelivered = false
+                const context = await browser.newContext()
+                context.setDefaultTimeout(60_000)
+                const observer = await context.newPage()
+                await observer.goto(`${origin}/__sw-observer`)
+                await observer.exposeFunction('isCurrentWorkerDelivered', () => currentWorkerDelivered)
+                const page = await context.newPage()
+                await page.goto(`${origin}/login`)
+                await observer.waitForFunction(async () =>
+                  (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated', null, { polling: 100 })
+                await observer.evaluate(async () => {
+                  const registration = await navigator.serviceWorker.getRegistration()
+                  window.workerRegistration = registration
+                  window.workerUpdated = false
+                  registration.addEventListener('updatefound', async () => {
+                    const worker = registration.installing
+                    if (!worker || !(await window.isCurrentWorkerDelivered())) return
+                    const checkActivation = () => {
+                      if (worker.state === 'activated') window.workerUpdated = true
+                    }
+                    worker.addEventListener('statechange', checkActivation)
+                    checkActivation()
+                  })
+                })
+
+                // Simulate deployment on the same origin, preserving the registration
+                // and all browser storage. Only perform a normal frontend reload;
+                // the test never calls register(), update() or unregister().
+                upgraded = true
+                await page.reload({ waitUntil: 'domcontentloaded' })
+                await observer.waitForFunction(() => window.workerUpdated === true, null, { polling: 100 })
+                assert.ok(currentWorkerDelivered, 'The browser must load the worker from the current production image')
+                console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker automatically activated`)
+              } catch (error) {
+                console.error(`${browserType.name()}: automatic service worker update failed`, error)
+                failures.push(error)
+              } finally {
+                await browser.close()
+              }
+            }
+            if (failures.length) throw new AggregateError(failures, 'Automatic service worker update failed')
+          } finally {
+            server.close()
+            server.closeAllConnections()
+          }
+          EOF
+          node "$RUNNER_TEMP/frontend-migration/test.mjs"
