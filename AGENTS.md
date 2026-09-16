@@ -28,7 +28,7 @@ Treat this file as a living document: when code, tooling, workflows, commands, o
 Run checks only for impacted areas by default. Expand scope when changes are cross-cutting.
 
 ### Code Quality
-- Biome version must always match the version pinned in `backend/package.json` (`devDependencies.@biomejs/biome`).
+- Biome versions in CI, `biome.json`, and `dev-tools/biome/pre-commit` must always match the version pinned in `backend/package.json` (`devDependencies.@biomejs/biome`).
 - Run Biome checks aligned with CI:
 ```bash
 biome ci --changed --error-on-warnings --no-errors-on-unmatched .

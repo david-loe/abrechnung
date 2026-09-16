@@ -2,6 +2,6 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
-  resolve: { alias: { '@': resolve(__dirname, './src') } },
+  resolve: { alias: { '@': resolve(import.meta.dirname, './src') } },
   test: { setupFiles: ['./tests/setup.ts'], fileParallelism: false, clearMocks: true }
 })

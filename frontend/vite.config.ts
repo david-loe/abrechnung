@@ -66,7 +66,7 @@ export default defineConfig({
     fs: { allow: [searchForWorkspaceRoot(process.cwd()), '../common'] }
   },
   preview: { port: 8080, host: '0.0.0.0' },
-  resolve: { alias: { '@': resolve(__dirname, './src') } },
+  resolve: { alias: { '@': resolve(import.meta.dirname, './src') } },
   build: {
     manifest: true,
     rollupOptions: {

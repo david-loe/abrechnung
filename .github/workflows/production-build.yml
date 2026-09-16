@@ -17,7 +17,10 @@ jobs:
         with:
           working-dir: backend
       - name: Run Biome
-        run: biome ci --changed --error-on-warnings --no-errors-on-unmatched .
+        run: |
+          expected_version="$(node -p "require('./backend/package.json').devDependencies['@biomejs/biome']")"
+          test "$(biome --version)" = "Version: ${expected_version}"
+          biome ci --changed --error-on-warnings --no-errors-on-unmatched .
 
   production-build:
     name: Production Build
