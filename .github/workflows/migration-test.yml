@@ -84,16 +84,21 @@ jobs:
 
           const origin = 'http://127.0.0.1:18767'
           let upgraded = false
-          let currentWorkerSource
           let currentWorkerDelivered = false
+          const currentWorkerSource = await (await fetch('http://127.0.0.1:18766/sw.js')).text()
+          const previousWorkerSource = await (await fetch('http://127.0.0.1:18765/sw.js')).text()
+          assert.notEqual(previousWorkerSource, currentWorkerSource, 'The images must contain different workers')
+          const currentIndex = await (await fetch('http://127.0.0.1:18766/index.html')).text()
+          const currentEntry = currentIndex.match(/src="(\/app-[^"]+\.js)"/)?.[1]
+          assert.ok(currentEntry, 'The production HTML must reference its frontend entry point')
+
           const server = createServer((req, res) => {
-            // Open this observer before installing the old worker. It reads the
-            // registration and stays open while the real frontend reloads.
+            // This page observes the registration across frontend navigations.
             if (req.url === '/__sw-observer') {
-              res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Service worker observer</title>')
+              res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Worker observer</title>')
               return
             }
-            // No backend is needed to register or update the production worker.
+            // Authentication is not needed to register or update the worker.
             if (req.url.startsWith('/api/')) {
               res.writeHead(401, { 'Content-Type': 'application/json' }).end('{}')
               return
@@ -116,14 +121,6 @@ jobs:
           await new Promise((resolve) => server.listen(18767, '127.0.0.1', resolve))
           const failures = []
           try {
-            const workers = await Promise.all([18765, 18766].map(async (port) => {
-              const response = await fetch(`http://127.0.0.1:${port}/sw.js`)
-              assert.equal(response.status, 200)
-              return response.text()
-            }))
-            assert.notEqual(workers[0], workers[1], 'The images must contain different workers to exercise an update')
-            currentWorkerSource = workers[1]
-
             for (const browserType of [firefox, chromium]) {
               const browser = await browserType.launch()
               try {
@@ -135,12 +132,14 @@ jobs:
                 await observer.goto(`${origin}/__sw-observer`)
                 await observer.exposeFunction('isCurrentWorkerDelivered', () => currentWorkerDelivered)
                 const page = await context.newPage()
+                page.on('pageerror', (error) => console.error(`${browserType.name()}: ${error.message}`))
+                page.on('console', (message) => {
+                  if (message.type() === 'error') console.error(`${browserType.name()}: ${message.text()}`)
+                })
                 await page.goto(`${origin}/login`)
-                await observer.waitForFunction(async () =>
-                  (await navigator.serviceWorker.getRegistration())?.active?.state === 'activated', null, { polling: 100 })
+                await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated')
                 await observer.evaluate(async () => {
                   const registration = await navigator.serviceWorker.getRegistration()
-                  window.workerRegistration = registration
                   window.workerUpdated = false
                   registration.addEventListener('updatefound', async () => {
                     const worker = registration.installing
@@ -153,14 +152,18 @@ jobs:
                   })
                 })
 
-                // Simulate deployment on the same origin, preserving the registration
-                // and all browser storage. Only perform a normal frontend reload;
-                // the test never calls register(), update() or unregister().
+                // Leave the old page, deploy, and return without altering browser
+                // storage or calling register(), update() or unregister() from the test.
+                await page.goto('about:blank')
                 upgraded = true
-                await page.reload({ waitUntil: 'domcontentloaded' })
+                await page.goto(`${origin}/login`, { waitUntil: 'domcontentloaded' })
                 await observer.waitForFunction(() => window.workerUpdated === true, null, { polling: 100 })
-                assert.ok(currentWorkerDelivered, 'The browser must load the worker from the current production image')
-                console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker automatically activated`)
+                assert.ok(currentWorkerDelivered, 'The current production worker must have been delivered')
+                // Activation alone is insufficient: an old page can miss the reload and
+                // stay broken even though the registration reports an active new worker.
+                await page.waitForFunction((entry) =>
+                  [...document.scripts].some((script) => script.src === location.origin + entry), currentEntry)
+                console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend`)
               } catch (error) {
                 console.error(`${browserType.name()}: automatic service worker update failed`, error)
                 failures.push(error)
