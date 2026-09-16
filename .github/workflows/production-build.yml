@@ -23,19 +23,20 @@ jobs:
           biome ci --changed --error-on-warnings --no-errors-on-unmatched .
 
   production-build:
-    name: Production Build
+    name: Production Build (${{ matrix.package }})
     needs: [code-quality]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [backend, common, frontend]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-production-env
-      - name: Build common
-        run: docker compose build common
-      - name: Build backend
-        run: docker compose build backend
-      - name: Build frontend
-        run: docker compose build frontend
+      - name: Build ${{ matrix.package }}
+        run: docker compose build ${{ matrix.package }}
       - name: Smoke-test immutable frontend image with runtime configuration
+        if: matrix.package == 'frontend'
         shell: bash
         run: |
           set -euo pipefail
