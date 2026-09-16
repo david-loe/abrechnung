@@ -84,7 +84,8 @@ jobs:
 
           const origin = 'http://127.0.0.1:18767'
           let upgraded = false
-          let currentWorkerDelivered = false
+          let pageScriptsReady
+          let resumePageScripts
           const currentWorkerSource = await (await fetch('http://127.0.0.1:18766/sw.js')).text()
           const previousWorkerSource = await (await fetch('http://127.0.0.1:18765/sw.js')).text()
           assert.notEqual(previousWorkerSource, currentWorkerSource, 'The images must contain different workers')
@@ -104,15 +105,15 @@ jobs:
               return
             }
             const upstream = request({ hostname: '127.0.0.1', port: upgraded ? 18766 : 18765,
-              path: req.url, method: req.method, headers: { ...req.headers, 'accept-encoding': 'identity' } }, (response) => {
-              if (req.url === '/sw.js' && response.statusCode === 200) {
-                const chunks = []
-                response.on('data', (chunk) => chunks.push(chunk))
-                response.on('end', () => {
-                  if (Buffer.concat(chunks).toString() === currentWorkerSource) currentWorkerDelivered = true
-                })
-              }
+              path: req.url, method: req.method, headers: { ...req.headers, 'accept-encoding': 'identity' } }, async (response) => {
               res.writeHead(response.statusCode, response.headers)
+              // Let the update install while a page's module download is still
+              // pending. Worker precache requests have /sw.js as their referrer
+              // and must remain unblocked.
+              res.flushHeaders()
+              if (upgraded && req.url.endsWith('.js') && req.headers.referer?.includes('/app-')) {
+                await pageScriptsReady
+              }
               response.pipe(res)
             })
             upstream.on('error', (error) => { res.writeHead(502).end(String(error)) })
@@ -125,12 +126,13 @@ jobs:
               const browser = await browserType.launch()
               try {
                 upgraded = false
-                currentWorkerDelivered = false
                 const context = await browser.newContext()
                 context.setDefaultTimeout(60_000)
+                // Disable HTTP cache for the slow-download scenario; service
+                // worker registration, Cache Storage and IndexedDB stay intact.
+                await context.route('**/*', (route) => route.continue())
                 const observer = await context.newPage()
                 await observer.goto(`${origin}/__sw-observer`)
-                await observer.exposeFunction('isCurrentWorkerDelivered', () => currentWorkerDelivered)
                 const page = await context.newPage()
                 page.on('pageerror', (error) => console.error(`${browserType.name()}: ${error.message}`))
                 page.on('console', (message) => {
@@ -139,26 +141,24 @@ jobs:
                 await page.goto(`${origin}/login`)
                 await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated')
                 await observer.evaluate(async () => {
-                  const registration = await navigator.serviceWorker.getRegistration()
-                  window.workerUpdated = false
-                  registration.addEventListener('updatefound', async () => {
-                    const worker = registration.installing
-                    if (!worker || !(await window.isCurrentWorkerDelivered())) return
-                    const checkActivation = () => {
-                      if (worker.state === 'activated') window.workerUpdated = true
-                    }
-                    worker.addEventListener('statechange', checkActivation)
-                    checkActivation()
-                  })
+                  window.workerRegistration = await navigator.serviceWorker.getRegistration()
+                  window.previousWorker = window.workerRegistration.active
                 })
 
                 // Leave the old page, deploy, and return without altering browser
                 // storage or calling register(), update() or unregister() from the test.
                 await page.goto('about:blank')
+                pageScriptsReady = new Promise((resolve) => { resumePageScripts = resolve })
                 upgraded = true
-                await page.goto(`${origin}/login`, { waitUntil: 'domcontentloaded' })
-                await observer.waitForFunction(() => window.workerUpdated === true, null, { polling: 100 })
-                assert.ok(currentWorkerDelivered, 'The current production worker must have been delivered')
+                await page.goto(`${origin}/login`, { waitUntil: 'commit' })
+                await observer.waitForFunction(() =>
+                  window.workerRegistration.waiting?.state === 'installed' ||
+                  window.workerRegistration.active !== window.previousWorker, null, { polling: 100 })
+                resumePageScripts()
+                await observer.waitForFunction(() =>
+                  window.workerRegistration.active !== window.previousWorker &&
+                  window.workerRegistration.active?.state === 'activated', null, { polling: 100 })
+                console.log(`${browserType.name()}: replacement worker activated; checking frontend reload`)
                 // Activation alone is insufficient: an old page can miss the reload and
                 // stay broken even though the registration reports an active new worker.
                 await page.waitForFunction((entry) =>
@@ -168,6 +168,7 @@ jobs:
                 console.error(`${browserType.name()}: automatic service worker update failed`, error)
                 failures.push(error)
               } finally {
+                resumePageScripts?.()
                 await browser.close()
               }
             }
