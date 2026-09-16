@@ -8,22 +8,28 @@ jobs:
     uses: ./.github/workflows/production-build.yml
 
   tests:
-    name: Tests
+    name: Tests (${{ matrix.package }})
     needs: [build]
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [backend, common, frontend]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-development-env
-      - name: Start dev Environment
-        run: docker compose up -d common db redis ldap inbucket
-      - name: Run common tests
-        run: docker compose run common npm run test
+      - name: Build common
+        if: matrix.package != 'common'
+        run: docker compose run common npm run build
+      - name: Start backend test services
+        if: matrix.package == 'backend'
+        run: docker compose up -d db redis ldap inbucket
         # ensures setup runs without error, prevents migration test from failing in next release
       - name: Run backend setup
+        if: matrix.package == 'backend'
         run: docker compose run backend npm run setup
-      - name: Run backend tests
-        run: docker compose run backend npm run test
-      - name: Run frontend tests
-        run: docker compose run frontend npm run test
+      - name: Run ${{ matrix.package }} tests
+        run: docker compose run --no-deps ${{ matrix.package }} npm run test
       - name: Run frontend production build and bundle budgets
-        run: docker compose run -e NODE_ENV=production frontend npm run build
+        if: matrix.package == 'frontend'
+        run: docker compose run --no-deps -e NODE_ENV=production frontend npm run build
