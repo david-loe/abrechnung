@@ -1,7 +1,9 @@
 import { AuthContext, User } from 'abrechnung-common/types.js'
 import test from 'ava'
+import { Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import UserModel from '../../models/user.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -35,6 +37,28 @@ test.serial('GET /auth/authenticated returns the offline cache context', async (
   t.true(Date.parse(context.expiresAt) > Date.now())
   t.truthy(context.cacheScope)
   initialCacheScope = context.cacheScope
+})
+
+test.serial('cache scope remains stable for legacy access objects and changes with permissions', async (t) => {
+  const current = (await agent.get('/user')).body.data as User
+  const filter = { _id: new Types.ObjectId(current._id) }
+  await UserModel.collection.updateOne(filter, { $unset: { 'access._id': '' } })
+  const first = (await agent.get('/auth/authenticated')).body as AuthContext
+  const second = (await agent.get('/auth/authenticated')).body as AuthContext
+  t.is(second.cacheScope, first.cacheScope)
+  t.deepEqual(second.permissions, first.permissions)
+  t.false('_id' in second.permissions)
+
+  const previous = current.access['create/usersAndProjects'] === true
+  try {
+    await UserModel.collection.updateOne(filter, { $set: { 'access.create/usersAndProjects': !previous } })
+    const changed = (await agent.get('/auth/authenticated')).body as AuthContext
+    t.not(changed.cacheScope, first.cacheScope)
+    t.is(changed.permissions['create/usersAndProjects'], !previous)
+  } finally {
+    await UserModel.collection.updateOne(filter, { $set: { 'access.create/usersAndProjects': previous } })
+  }
+  t.is(((await agent.get('/auth/authenticated')).body as AuthContext).cacheScope, first.cacheScope)
 })
 
 test.serial('GET /user/token', async (t) => {

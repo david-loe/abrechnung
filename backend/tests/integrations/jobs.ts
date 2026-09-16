@@ -71,11 +71,13 @@ function stubQueue(
       return ids.slice(start, end === -1 ? undefined : end + 1)
     },
     toKey: (id: string) => id,
-    client: Promise.resolve({
-      hget: async (id: string, field: string) => {
-        if (field !== 'name') return null
-        return entries.find(({ job }) => job.id === id)?.job.name ?? null
-      }
+    getBackend: () => ({
+      client: Promise.resolve({
+        hget: async (id: string, field: string) => {
+          if (field !== 'name') return null
+          return entries.find(({ job }) => job.id === id)?.job.name ?? null
+        }
+      })
     })
   } as unknown as Queue<IntegrationJobData>)
   return { getJobsCalls, getRangesCalls, getJobCalls }

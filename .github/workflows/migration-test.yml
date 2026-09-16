@@ -2,9 +2,9 @@ name: Build, Test & Migrate
 
 on:
   push:
-    branches: ["main", "v2"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "v2"]
+    branches: ["main"]
   workflow_call:
 
 jobs:
@@ -12,13 +12,20 @@ jobs:
     uses: ./.github/workflows/build-and-test.yml
 
   migration-test:
-    name: Mirgation Test
+    name: Migration Test
     needs: [build-and-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-production-env
       - name: Start previous release
-        run: docker compose -f deploy-compose.yml run backend npm run setup
+        shell: bash
+        run: |
+          cat > "$RUNNER_TEMP/previous-release.yml" <<'EOF'
+          services:
+            backend:
+              image: davidloe/abrechnung-backend:2.6.3
+          EOF
+          docker compose -f deploy-compose.yml -f "$RUNNER_TEMP/previous-release.yml" run --rm backend npm run setup
       - name: Run Migration
         run: docker compose run backend node dist/setup.js

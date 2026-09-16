@@ -7,7 +7,7 @@ LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 WORKDIR /npm_cache
 COPY package*.json ./
-RUN npm install
+RUN npm ci
 RUN chown -R node:node /npm_cache
 
 WORKDIR /app

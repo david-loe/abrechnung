@@ -1,5 +1,5 @@
 <template>
-  <div v-if="LOGIN_APP_DATA.displaySettings && loginReady" class="text-center" id="loginPage">
+  <div v-if="LOGIN_APP_DATA?.displaySettings && loginReady" class="text-center" id="loginPage">
     <i class="bi bi-receipt" style="font-size: 8rem"></i>
     <h2 class="h3 mb-3 fw-normal">{{ t('login.signIn') }}</h2>
     <div v-if="strategy === 'ldapauth'">
@@ -103,12 +103,17 @@ const usernameLDAP = ref('')
 const magicLoginMail = ref('')
 const magicLoginSend = ref(false)
 const loginReady = ref(false)
+let loginGeneration = 0
 
 async function enableLogin() {
+  const generation = ++loginGeneration
+  loginReady.value = false
   try {
-    loginReady.value = await prepareLogin()
+    if (!(await prepareLogin()) || generation !== loginGeneration) return
+    await APP_LOADER.loadLoginData(true)
+    if (generation === loginGeneration) loginReady.value = true
   } catch {
-    loginReady.value = false
+    if (generation === loginGeneration) loginReady.value = false
   }
 }
 
@@ -157,7 +162,8 @@ function oidcLink() {
   return `${ENV.VITE_BACKEND_URL}/auth/oidc${route.query.redirect ? `?redirect=${route.query.redirect as string}` : ''}`
 }
 
-const LOGIN_APP_DATA = await APP_LOADER.loadLoginData()
+// Mount while offline so the online handler can finish a pending logout and load the public login settings.
+const LOGIN_APP_DATA = APP_LOADER.loginData
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

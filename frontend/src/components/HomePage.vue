@@ -262,7 +262,7 @@ function showModal(mode: ModalMode, type: ModalObjectType, object?: ModalObject)
 }
 
 function hideModal() {
-  modalComp.value?.hideModal()
+  return modalComp.value?.hideModal()
 }
 
 function resetModal() {
@@ -270,15 +270,15 @@ function resetModal() {
   modalMode.value = 'add'
 }
 
-function resetAndHide() {
+async function resetAndHide() {
+  await hideModal()
   resetModal()
-  hideModal()
 }
 
-function openReceiptModal(advance: AdvanceSimple<string>) {
+async function openReceiptModal(advance: AdvanceSimple<string>) {
   receiptAdvance.value = advance
   receiptFormIsLoading.value = false
-  modalComp.value?.hideModal()
+  await modalComp.value?.hideModal()
   receiptModalComp.value?.modal?.show()
 }
 
@@ -335,6 +335,7 @@ async function handleSubmit(
 
   modalFormIsLoading.value = false
   if (result) {
+    await resetAndHide()
     if (modalObjectType.value === 'travel') {
       travelList.value?.loadFromServer()
     } else if (modalObjectType.value === 'expenseReport') {
@@ -346,7 +347,6 @@ async function handleSubmit(
     } else {
       advanceList.value?.loadFromServer()
     }
-    resetAndHide()
   }
 }
 

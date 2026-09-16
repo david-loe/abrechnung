@@ -3,6 +3,7 @@ import { Request } from 'express'
 import * as openidClient from 'openid-client'
 import { Strategy as OidcStrategy } from 'openid-client/passport'
 import passport from 'passport'
+import { AuthorizationError } from '../controller/error.js'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import { displayNameSplit, findOrCreateUser } from './index.js'
@@ -36,6 +37,34 @@ export class CustomStrategy extends OidcStrategy {
   }
 }
 
+export async function verifyOidcTokens(
+  tokens: openidClient.TokenEndpointResponse & openidClient.TokenEndpointResponseHelpers,
+  verified: passport.AuthenticateCallback
+) {
+  try {
+    const claims = tokens.claims()
+    if (typeof claims?.sub !== 'string' || claims.sub.length === 0) {
+      throw new AuthorizationError('Missing or invalid OIDC sub claim')
+    }
+    if (claims.email && claims.name) {
+      const nameSplit = displayNameSplit(claims.name as string)
+      await findOrCreateUser(
+        { oidc: claims.sub },
+        {
+          email: claims.email as string,
+          name: {
+            familyName: (claims.family_name as string) || nameSplit.familyName,
+            givenName: (claims.given_name as string) || nameSplit.givenName
+          }
+        },
+        verified
+      )
+    }
+  } catch (error) {
+    verified(error)
+  }
+}
+
 export async function getOidcStrategy() {
   const { connectionSettings } = BACKEND_CACHE.getSnapshot()
   if (!connectionSettings.auth.oidc) {
@@ -45,25 +74,5 @@ export async function getOidcStrategy() {
 
   const config = await openidClient.discovery(new URL(server), clientId, clientSecret)
 
-  return new CustomStrategy({ callbackURL: `${ENV.VITE_BACKEND_URL}${callbackPath}`, config, scope }, async (tokens, verified) => {
-    try {
-      const claims = tokens.claims()
-      if (claims?.email && claims.name) {
-        const nameSplit = displayNameSplit(claims.name as string)
-        await findOrCreateUser(
-          { oidc: claims.sub },
-          {
-            email: claims.email as string,
-            name: {
-              familyName: (claims.family_name as string) || nameSplit.familyName,
-              givenName: (claims.given_name as string) || nameSplit.givenName
-            }
-          },
-          verified
-        )
-      }
-    } catch (error) {
-      verified(error)
-    }
-  })
+  return new CustomStrategy({ callbackURL: `${ENV.VITE_BACKEND_URL}${callbackPath}`, config, scope }, verifyOidcTokens)
 }

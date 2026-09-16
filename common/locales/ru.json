@@ -124,6 +124,10 @@
     "startSpecial": "Место отправления - особое место",
     "yes": "Да"
   },
+  "csvImportHints": {
+    "categories": "Создаются только новые категории. Сначала импортируйте бухгалтерские счета. Поля name и ledgerAccount (номер счёта) обязательны. for: ExpenseReport (по умолчанию), Travel или both. isDefault: true/false или 1/0 (по умолчанию: false). style.color: цвет в шестнадцатеричном формате (по умолчанию: #6c757d); style.text: black или white (по умолчанию: white).",
+    "ledgerAccounts": "Создаются только новые бухгалтерские счета. Поля identifier (уникальный номер счёта) и name обязательны. В электронной таблице задайте текстовый формат номеров счетов, чтобы сохранить начальные нули. Существующие счета не обновляются."
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Введите 0, чтобы избежать автоматического удаления.",
     "deleteBookedAfterXDays": "Введите 0, чтобы избежать автоматического удаления.",
@@ -307,6 +311,8 @@
     "cancel": "Отменить",
     "categories": "Категории",
     "category": "Категория",
+    "categoryImport": "Импорт категорий",
+    "categoryList": "Список категорий",
     "catering": "Питание",
     "cateringLumpSum": "Паушальная выплата на питание",
     "cateringNoRefund": "Нет компенсации за питание",
@@ -473,6 +479,8 @@
     "lastPlaceOfWork": "Последнее место работы",
     "lastXMonths": "Последние {X} месяца",
     "ledgerAccount": "Бухгалтерский счёт",
+    "ledgerAccountImport": "Импорт бухгалтерских счетов",
+    "ledgerAccountList": "Список бухгалтерских счетов",
     "ledgerAccounts": "Бухгалтерские счета",
     "left": "Осталось",
     "link": "Ссылка",

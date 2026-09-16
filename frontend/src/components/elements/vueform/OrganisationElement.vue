@@ -9,6 +9,7 @@
         v-if="APP_DATA"
         :options="APP_DATA.organisations"
         valueProp="_id"
+        label="name"
         searchable
         :searchFilter="customFilterFunction"
         v-model="value"

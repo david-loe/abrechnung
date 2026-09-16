@@ -1,5 +1,6 @@
 /// <reference lib="webworker" />
 
+import { Logger, LogLevel } from 'abrechnung-common/utils/logger.js'
 import { escapeRegExp } from 'abrechnung-common/utils/scripts.js'
 import { clientsClaim } from 'workbox-core'
 import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching'
@@ -13,7 +14,6 @@ import {
   readRequestFromDB,
   storeRequestToDB
 } from '@/indexedDB'
-import { logger } from '@/logger.js'
 
 declare let self: ServiceWorkerGlobalScope
 
@@ -22,6 +22,9 @@ declare let self: ServiceWorkerGlobalScope
 // -----------------------------------------------------------------------------
 
 const IS_DEV_SERVICE_WORKER = self.location.pathname.endsWith('/dev-sw.js') || self.location.search.includes('dev-sw')
+// A service worker has its own global scope; the window's runtime ENV is not
+// available here. In particular, do not import the window-bound logger.
+const logger = new Logger(IS_DEV_SERVICE_WORKER ? LogLevel.INFO : LogLevel.ERROR)
 const EMBEDDED_RUNTIME_CONFIG = '__ABRECHNUNG_SW_CONFIG__'
 const runtimeConfiguration = (
   IS_DEV_SERVICE_WORKER

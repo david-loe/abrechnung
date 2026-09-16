@@ -1,3 +1,10 @@
+import type { User } from 'abrechnung-common/types.js'
+
+export function prepareUserForSubmit(user: User & { settings: User['settings'] & { bankAccountEnabled?: boolean } }) {
+  const { bankAccountEnabled, bankAccount, ...settings } = user.settings
+  return { ...user, settings: { ...settings, ...(bankAccountEnabled ? { bankAccount } : user._id ? { bankAccount: null } : {}) } }
+}
+
 interface MagicLoginSyncOptions {
   email: string | null | undefined
   existingUser: boolean

@@ -31,6 +31,7 @@ import ENV from './env.js'
 import { genAuthenticatedLink } from './helper.js'
 import { syncLumpSums } from './integrations/lumpSums/sync.js'
 import { logger } from './logger.js'
+import { assertSupportedMigration } from './migrations.js'
 import Category from './models/category.js'
 import Country from './models/country.js'
 import Currency from './models/currency.js'
@@ -78,6 +79,11 @@ export function sessionStore() {
 export async function initDB() {
   const DBsettings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (DBsettings) {
+    // Reject unsupported source versions before changing settings or inserting defaults.
+    assertSupportedMigration(DBsettings.version, settings.version)
+    if (DBsettings.migrateFrom) {
+      assertSupportedMigration(DBsettings.migrateFrom, settings.version)
+    }
     if (DBsettings.version !== settings.version) {
       DBsettings.migrateFrom = DBsettings.version
     }

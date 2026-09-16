@@ -1,6 +1,6 @@
 services:
   backend:
-    image: davidloe/abrechnung-backend:2
+    image: davidloe/abrechnung-backend:3
     restart: unless-stopped
     depends_on:
       - db
@@ -17,7 +17,7 @@ services:
       - .env
 
   frontend:
-    image: davidloe/abrechnung-frontend:2
+    image: davidloe/abrechnung-frontend:3
     restart: unless-stopped
     depends_on:
       - backend
@@ -33,7 +33,7 @@ services:
       - .env
   
   worker:
-    image: davidloe/abrechnung-backend:2
+    image: davidloe/abrechnung-backend:3
     command: node dist/workers/start.js
     restart: unless-stopped
     depends_on:

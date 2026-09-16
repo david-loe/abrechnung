@@ -147,7 +147,8 @@ export async function sendNewMagicloginMail(user: IUser) {
   )
 }
 
-interface SetterBodyUser extends SetterBody<IUser<Types.ObjectId, mongo.Binary>> {
+interface SetterBodyUser extends Omit<SetterBody<IUser<Types.ObjectId, mongo.Binary>>, 'settings'> {
+  settings?: Omit<SetterBody<IUser<Types.ObjectId, mongo.Binary>['settings']>, 'bankAccount'> & { bankAccount?: BankAccount | null }
   loseAccessAt: null | Date | undefined
 }
 

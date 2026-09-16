@@ -81,7 +81,7 @@ async function getJobsByExactId(id: string, state: WorkerJobState | undefined, n
 
 async function getJobsByName(name: string, state: WorkerJobState | undefined, page: number, limit: number) {
   const queue = getIntegrationQueue()
-  const client = await queue.client
+  const client = await queue.getBackend().client
   const counts = emptyWorkerJobCounts()
   const pageReferences: WorkerJobReference[] = []
   const start = (page - 1) * limit

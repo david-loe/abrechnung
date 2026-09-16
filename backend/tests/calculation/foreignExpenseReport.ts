@@ -1,9 +1,22 @@
-import { Advance, BookingExportRow, Category, ExpenseReport, ExpenseReportState, User } from 'abrechnung-common/types.js'
+import {
+  Advance,
+  BookingExportRow,
+  Category,
+  ExpenseReport,
+  ExpenseReportState,
+  idDocumentToId,
+  Organisation as OrganisationType,
+  State,
+  User
+} from 'abrechnung-common/types.js'
 import test from 'ava'
+import { mongo, Types } from 'mongoose'
 import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
+import { calculateBookings } from '../../models/booking.js'
 import ExchangeRate from '../../models/exchangeRate.js'
 import ExpenseReportModel from '../../models/expenseReport.js'
+import Organisation from '../../models/organisation.js'
 import createAgent, { loginUser } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
@@ -212,6 +225,95 @@ test.serial('foreign advance keeps its remaining balance in the original currenc
     ]
   )
 })
+
+for (const keepInputTaxAccount of [true, false]) {
+  test.serial(
+    `foreign VAT override respects disabled VAT accounting ${keepInputTaxAccount ? 'with' : 'without'} input tax account`,
+    async (t) => {
+      const organisationId = new Types.ObjectId(idDocumentToId(project.organisation).toString())
+      const organisation = await Organisation.collection.findOne<OrganisationType<Types.ObjectId>>({ _id: organisationId })
+      if (!organisation) throw new Error('Missing test organisation')
+      const { accountingSettings } = organisation
+      const inputTaxAccount = accountingSettings.vatRates.find(({ rate }) => rate === 19)?.inputTaxAccount
+      if (!inputTaxAccount) throw new Error('Missing test input tax account')
+      const projectId = new Types.ObjectId(project._id)
+      const vatReport = new ExpenseReportModel({
+        name: 'USD expense report with VAT override',
+        owner: new Types.ObjectId(user._id.toString()),
+        project: projectId,
+        currency: 'USD',
+        exchangeRate: 0.8,
+        exchangeRateDate: reportDate,
+        reference: 12345,
+        state: ExpenseReportState.REVIEW_COMPLETED,
+        log: { [State.BOOKABLE]: { on: reportDate, by: new Types.ObjectId(user._id.toString()) } },
+        advances: [],
+        addUp: [{ project: projectId, currency: 'USD', advance: { amount: 0 }, balance: { amount: 125 } }],
+        expenses: [
+          {
+            description: 'Manually corrected VAT',
+            cost: {
+              currency: 'USD',
+              date: reportDate,
+              receipts: [],
+              positions: [
+                {
+                  kind: 'manual',
+                  description: 'Manually corrected VAT',
+                  grossAmount: 125,
+                  vatRate: 19,
+                  vatAmountOverride: 23.75,
+                  project: projectId,
+                  category: new Types.ObjectId(category._id.toString())
+                }
+              ]
+            }
+          }
+        ]
+      }).toObject()
+      try {
+        await Organisation.collection.updateOne({ _id: organisationId }, { $set: { 'accountingSettings.vatAccountingEnabled': true } })
+        await ExpenseReportModel.collection.insertOne(vatReport)
+        const storedReport = await ExpenseReportModel.collection.findOne<ExpenseReport<Types.ObjectId, mongo.Binary>>({
+          _id: vatReport._id
+        })
+        if (!storedReport) throw new Error('Missing test expense report')
+        const expenseAccount = idDocumentToId(category.ledgerAccount).toString()
+        const liabilitiesAccount = idDocumentToId(accountingSettings.employeeLiabilitiesAccount).toString()
+        const enabledBookings = await calculateBookings(storedReport, 'ExpenseReport')
+        t.deepEqual(
+          enabledBookings.map(({ side, amount, ledgerAccount }) => ({ side, amount, account: ledgerAccount.toString() })),
+          [
+            { side: 'debit', amount: 81, account: expenseAccount },
+            { side: 'debit', amount: 19, account: idDocumentToId(inputTaxAccount).toString() },
+            { side: 'credit', amount: 100, account: liabilitiesAccount }
+          ]
+        )
+
+        await Organisation.collection.updateOne(
+          { _id: organisationId },
+          {
+            $set: {
+              'accountingSettings.vatAccountingEnabled': false,
+              'accountingSettings.vatRates': keepInputTaxAccount ? accountingSettings.vatRates : [{ rate: 0 }, { rate: 19 }]
+            }
+          }
+        )
+        const disabledBookings = await calculateBookings(storedReport, 'ExpenseReport')
+        t.deepEqual(
+          disabledBookings.map(({ side, amount, ledgerAccount }) => ({ side, amount, account: ledgerAccount.toString() })),
+          [
+            { side: 'debit', amount: 100, account: expenseAccount },
+            { side: 'credit', amount: 100, account: liabilitiesAccount }
+          ]
+        )
+      } finally {
+        await Organisation.collection.updateOne({ _id: organisationId }, { $set: { accountingSettings } })
+        await ExpenseReportModel.collection.deleteOne({ _id: vatReport._id })
+      }
+    }
+  )
+}
 
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()

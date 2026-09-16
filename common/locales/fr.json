@@ -124,6 +124,10 @@
     "startSpecial": "Départ - lieu spécial",
     "yes": "Oui"
   },
+  "csvImportHints": {
+    "categories": "Seules de nouvelles catégories sont créées. Importez d’abord les comptes comptables. name et ledgerAccount (numéro de compte) sont obligatoires. for : ExpenseReport (par défaut), Travel ou both. isDefault : true/false ou 1/0 (par défaut : false). style.color : couleur hexadécimale (par défaut : #6c757d) ; style.text : black ou white (par défaut : white).",
+    "ledgerAccounts": "Seuls de nouveaux comptes comptables sont créés. identifier (numéro de compte unique) et name sont obligatoires. Dans le tableur, formatez les numéros de compte en texte pour conserver les zéros initiaux. Les comptes existants ne sont pas modifiés."
+  },
   "description": {
     "deleteApprovedTravelAfterXDaysUnused": "Entrez 0 pour ne pas effectuer de suppression automatique",
     "deleteBookedAfterXDays": "Entrez 0 pour ne pas effectuer de suppression automatique",
@@ -307,6 +311,8 @@
     "cancel": "Annuler",
     "categories": "Catégories",
     "category": "Catégorie",
+    "categoryImport": "Importer des catégories",
+    "categoryList": "Liste des catégories",
     "catering": "Restauration",
     "cateringLumpSum": "Indemnité forfaitaire de repas",
     "cateringNoRefund": "Pas de forfait de subsistance",
@@ -473,6 +479,8 @@
     "lastPlaceOfWork": "Dernier lieu d'activité",
     "lastXMonths": "Derniers {X} mois",
     "ledgerAccount": "Compte comptable",
+    "ledgerAccountImport": "Importer des comptes comptables",
+    "ledgerAccountList": "Liste des comptes comptables",
     "ledgerAccounts": "Comptes comptables",
     "left": "restant",
     "link": "Lien",
