@@ -63,7 +63,10 @@ const invalidFilters: { label: string; filter: IUser['fk'] }[] = [
   { label: 'inherited identity only', filter: Object.create({ oidc: 'inherited-subject' }) },
   { label: 'mixed valid and invalid identities', filter: { oidc: 'valid-subject', microsoft: null } },
   ...identityKeys.flatMap((key) =>
-    [undefined, null, '', 0, false, {}, []].map((value) => ({ label: `${key} ${JSON.stringify(value)}`, filter: { [key]: value } }))
+    [undefined, null, '', 0, false, {}, []].map((value) => ({
+      label: `${key} ${JSON.stringify(value)}`,
+      filter: { [key]: value } as IUser['fk']
+    }))
   )
 ]
 

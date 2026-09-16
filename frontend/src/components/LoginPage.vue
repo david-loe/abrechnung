@@ -103,15 +103,17 @@ const usernameLDAP = ref('')
 const magicLoginMail = ref('')
 const magicLoginSend = ref(false)
 const loginReady = ref(false)
+let loginGeneration = 0
 
 async function enableLogin() {
+  const generation = ++loginGeneration
   loginReady.value = false
   try {
-    if (!(await prepareLogin())) return
+    if (!(await prepareLogin()) || generation !== loginGeneration) return
     await APP_LOADER.loadLoginData(true)
-    loginReady.value = true
+    if (generation === loginGeneration) loginReady.value = true
   } catch {
-    loginReady.value = false
+    if (generation === loginGeneration) loginReady.value = false
   }
 }
 

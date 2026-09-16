@@ -20,16 +20,23 @@ test('POST /admin/user', async (t) => {
 })
 
 test.serial('admin can remove optional bank details while incomplete accounts remain invalid', async (t) => {
-  const userId = (await agent.get('/user')).body.data._id
+  const user = (await agent.get('/user')).body.data as User
+  const userId = user._id
+  const originalBankAccount = user.settings.bankAccount ?? null
   const account = { accountHolder: 'Synthetic Admin', iban: 'DE89370400440532013000' }
-  const added = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: account } })
-  t.is(added.status, 200)
-  t.is(added.body.result.settings.bankAccount.iban, account.iban)
-  const incomplete = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: { accountHolder: 'Incomplete' } } })
-  t.is(incomplete.status, 422)
-  const removed = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: null } })
-  t.is(removed.status, 200)
-  t.is(removed.body.result.settings.bankAccount, null)
+  try {
+    const added = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: account } })
+    t.is(added.status, 200)
+    t.is(added.body.result.settings.bankAccount.iban, account.iban)
+    const incomplete = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: { accountHolder: 'Incomplete' } } })
+    t.is(incomplete.status, 422)
+    const removed = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: null } })
+    t.is(removed.status, 200)
+    t.is(removed.body.result.settings.bankAccount, null)
+  } finally {
+    const restored = await agent.post('/admin/user').send({ _id: userId, settings: { bankAccount: originalBankAccount } })
+    t.is(restored.status, 200)
+  }
 })
 
 test.serial.after.always('Drop DB Connection', async () => {

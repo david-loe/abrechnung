@@ -64,6 +64,7 @@ test.serial('Redis failed jobs can be filtered, retried, and completed by a work
 
   await queue.add('webhooks.deliver', { integrationKey: 'test', operation: 'run', payload: null }, { jobId: 'retry-job', attempts: 1 })
   const failedJob = await worker.getNextJob('first-attempt', { block: false })
+  if (!failedJob) throw new Error('Expected retry-job to be available for the first attempt')
   await failedJob.moveToFailed(new Error('Expected test failure'), 'first-attempt', false)
 
   const failed = await getWorkerJobs({ name: 'webhooks.deliver', state: 'failed', page: 1, limit: 25 })
@@ -73,6 +74,7 @@ test.serial('Redis failed jobs can be filtered, retried, and completed by a work
   t.is((await queue.getJob('retry-job'))?.attemptsMade, 0)
 
   const retriedJob = await worker.getNextJob('second-attempt', { block: false })
+  if (!retriedJob) throw new Error('Expected retry-job to be available for the second attempt')
   t.is(retriedJob.id, 'retry-job')
   await retriedJob.moveToCompleted({ ok: true }, 'second-attempt', false)
 
