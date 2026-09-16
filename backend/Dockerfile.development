@@ -10,7 +10,7 @@ RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 WORKDIR /npm_cache
 COPY backend/package*.json ./
-RUN npm install && chown -R node:node /npm_cache && mkdir -p /app && chown node:node /app
+RUN npm ci && chown -R node:node /npm_cache && mkdir -p /app && chown node:node /app
 
 WORKDIR /app
 
