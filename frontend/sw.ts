@@ -57,15 +57,43 @@ configureNavigationDenylist()
 // Install & Activate
 // -----------------------------------------------------------------------------
 self.skipWaiting()
-clientsClaim()
 
 if (IS_DEV_SERVICE_WORKER) {
+  clientsClaim()
   self.addEventListener('activate', (event) => {
     event.waitUntil(caches.keys().then((cacheNames) => Promise.all(cacheNames.map((cacheName) => caches.delete(cacheName)))))
   })
 } else {
   precacheAndRoute(self.__WB_MANIFEST)
   cleanupOutdatedCaches()
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(
+      (async () => {
+        // Capture already controlled pages before claim(), so first installs
+        // do not reload pages that were previously uncontrolled.
+        const windows = await self.clients.matchAll({ type: 'window' })
+        await self.clients.claim()
+        for (const client of windows) {
+          if (!client.url.startsWith(self.registration.scope) || isBackendRequest(client.url)) continue
+          // Old frontends can miss the activation event while loading modules.
+          // Navigation waits for activation to finish: do not await it here,
+          // otherwise activation and navigation would wait for each other.
+          void reloadClient(client).catch((error: unknown) => logger.error('SW client reload failed:', error))
+        }
+      })()
+    )
+  })
+}
+
+function reloadClient(client: WindowClient) {
+  const originalUrl = client.url
+  const url = new URL(originalUrl)
+  // Firefox treats navigation to the same fragment as an anchor jump. Load
+  // the document first, then restore its fragment without another reload.
+  url.hash = ''
+  return client.navigate(url.href).then((reloadedClient) => {
+    if (reloadedClient && url.href !== originalUrl) return reloadedClient.navigate(originalUrl)
+  })
 }
 
 // -----------------------------------------------------------------------------

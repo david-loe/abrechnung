@@ -1,5 +1,5 @@
 import { AuthContext, GETResponse } from 'abrechnung-common/types.js'
-import { DBSchema, openDB, StoreKey, StoreNames, StoreValue } from 'idb'
+import { DBSchema, IDBPDatabase, openDB, StoreKey, StoreNames, StoreValue } from 'idb'
 
 const CACHE_PREFIX = 'abrechnung' as const
 const INDEXED_DB_NAME = `${CACHE_PREFIX}-db`
@@ -10,33 +10,40 @@ export interface IndexedDB extends DBSchema {
   columnOrder: { key: string; value: { value: string; text: string }[] }
   session: { key: 'authContext' | 'logoutTombstone'; value: AuthContext | true }
 }
-const dbPromise = openDB<IndexedDB>(INDEXED_DB_NAME, INDEXED_DB_VERSION, {
-  upgrade(db, oldVersion) {
-    // v2 entries were not partitioned by user/session and must never be reused.
-    if (oldVersion < 3 && db.objectStoreNames.contains('urls')) db.deleteObjectStore('urls')
-    if (!db.objectStoreNames.contains('urls')) db.createObjectStore('urls')
-    if (!db.objectStoreNames.contains('columnOrder')) {
-      db.createObjectStore('columnOrder')
+let dbPromise: Promise<IDBPDatabase<IndexedDB>> | undefined
+
+function getDB() {
+  // Installing a worker must not start a schema upgrade while old tabs still
+  // hold connections. Open the database only when the active app needs it.
+  dbPromise ??= openDB<IndexedDB>(INDEXED_DB_NAME, INDEXED_DB_VERSION, {
+    upgrade(db, oldVersion) {
+      // v2 entries were not partitioned by user/session and must never be reused.
+      if (oldVersion < 3 && db.objectStoreNames.contains('urls')) db.deleteObjectStore('urls')
+      if (!db.objectStoreNames.contains('urls')) db.createObjectStore('urls')
+      if (!db.objectStoreNames.contains('columnOrder')) {
+        db.createObjectStore('columnOrder')
+      }
+      if (!db.objectStoreNames.contains('session')) db.createObjectStore('session')
     }
-    if (!db.objectStoreNames.contains('session')) db.createObjectStore('session')
-  }
-})
+  })
+  return dbPromise
+}
 
 export async function storeToDB<Name extends StoreNames<IndexedDB>>(
   storeName: Name,
   value: StoreValue<IndexedDB, Name>,
   key?: StoreKey<IndexedDB, Name> | IDBKeyRange
 ) {
-  return (await dbPromise).put(storeName, value, key)
+  return (await getDB()).put(storeName, value, key)
 }
 export async function readFromDB<Name extends StoreNames<IndexedDB>>(storeName: Name, key: StoreKey<IndexedDB, Name> | IDBKeyRange) {
-  return (await dbPromise).get(storeName, key)
+  return (await getDB()).get(storeName, key)
 }
 export async function deleteFromDB<Name extends StoreNames<IndexedDB>>(storeName: Name, key: StoreKey<IndexedDB, Name> | IDBKeyRange) {
-  return (await dbPromise).delete(storeName, key)
+  return (await getDB()).delete(storeName, key)
 }
 export async function clearStore(storeName: StoreNames<IndexedDB>) {
-  return await (await dbPromise).clear(storeName)
+  return await (await getDB()).clear(storeName)
 }
 
 export async function storeRequestToDB(data: GETResponse<unknown>, key: string, context: AuthContext) {
@@ -84,7 +91,7 @@ export async function clearLogoutTombstone() {
 }
 
 export async function purgePrivateData() {
-  const db = await dbPromise
+  const db = await getDB()
   const transaction = db.transaction(['urls', 'session'], 'readwrite')
   await Promise.all([transaction.objectStore('urls').clear(), transaction.objectStore('session').delete('authContext')])
   await transaction.done
