@@ -94,8 +94,9 @@ jobs:
           assert.ok(currentEntry, 'The production HTML must reference its frontend entry point')
 
           const server = createServer((req, res) => {
-            // This page observes the registration across frontend navigations.
-            if (req.url === '/__sw-observer') {
+            // Observe from a backend URL: worker-driven frontend reloads must
+            // not navigate this test page and discard the observed registration.
+            if (req.url === '/api/__sw-observer') {
               res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Worker observer</title>')
               return
             }
@@ -132,7 +133,7 @@ jobs:
                 // worker registration, Cache Storage and IndexedDB stay intact.
                 await context.route('**/*', (route) => route.continue())
                 const observer = await context.newPage()
-                await observer.goto(`${origin}/__sw-observer`)
+                await observer.goto(`${origin}/api/__sw-observer`)
                 const page = await context.newPage()
                 page.on('pageerror', (error) => console.error(`${browserType.name()}: ${error.message}`))
                 page.on('console', (message) => {
