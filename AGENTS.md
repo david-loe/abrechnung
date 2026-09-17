@@ -41,8 +41,7 @@ docker compose run common npm run test
 
 ### Backend Package
 ```bash
-docker compose run backend npm run setup
-docker compose run backend npm run test
+docker compose run backend sh -c 'npm run setup && npm run test:built'
 ```
 
 ### Frontend Package

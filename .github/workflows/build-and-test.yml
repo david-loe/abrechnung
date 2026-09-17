@@ -1,16 +1,19 @@
-name: Build & Test
+name: Package Tests
 
 on:
   workflow_call:
 
-jobs:
-  build:
-    uses: ./.github/workflows/production-build.yml
+permissions:
+  contents: read
 
+env:
+  COMPOSE_PROJECT_NAME: abrechnung
+  DOCKER_BUILD_RECORD_UPLOAD: 'false'
+
+jobs:
   tests:
     name: Tests (${{ matrix.package }})
-    needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -18,18 +21,39 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-development-env
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      - name: Build common development image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: ./common
+          file: ./common/Dockerfile.development
+          load: true
+          tags: abrechnung-common
+          cache-from: type=gha,version=2,scope=development-common-amd64
+          # Only the common test job writes this shared cache.
+          cache-to: ${{ matrix.package == 'common' && 'type=gha,version=2,scope=development-common-amd64,mode=max' || '' }}
+      - name: Build package development image
+        if: matrix.package != 'common'
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./${{ matrix.package }}/Dockerfile.development
+          load: true
+          tags: abrechnung-${{ matrix.package }}
+          cache-from: type=gha,version=2,scope=development-${{ matrix.package }}-amd64
+          cache-to: type=gha,version=2,scope=development-${{ matrix.package }}-amd64,mode=max
       - name: Build common
         if: matrix.package != 'common'
-        run: docker compose run common npm run build
+        run: docker compose run --rm --no-deps --pull never common npm run build
       - name: Start backend test services
         if: matrix.package == 'backend'
         run: docker compose up -d db redis ldap inbucket
-        # ensures setup runs without error, prevents migration test from failing in next release
-      - name: Run backend setup
+      - name: Run backend setup and tests with one compilation
         if: matrix.package == 'backend'
-        run: docker compose run backend npm run setup
-      - name: Run ${{ matrix.package }} tests
-        run: docker compose run --no-deps ${{ matrix.package }} npm run test
-      - name: Run frontend production build and bundle budgets
-        if: matrix.package == 'frontend'
-        run: docker compose run --no-deps -e NODE_ENV=production frontend npm run build
+        run: docker compose run --rm --no-deps --pull never backend sh -c 'npm run setup && npm run test:built'
+      - name: Run package tests
+        if: matrix.package != 'backend'
+        run: docker compose run --rm --no-deps --pull never ${{ matrix.package }} npm run test
+      - name: Stop test services
+        if: ${{ always() && matrix.package == 'backend' }}
+        run: docker compose down --volumes

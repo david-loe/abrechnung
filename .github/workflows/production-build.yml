@@ -1,57 +1,73 @@
-name: Production Build
+name: Production Build & Migration
 
 on:
   workflow_call:
+    inputs:
+      previous-version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  COMPOSE_PROJECT_NAME: abrechnung
+  PREVIOUS_VERSION: ${{ inputs.previous-version }}
+  DOCKER_BUILD_RECORD_UPLOAD: 'false'
 
 jobs:
-  code-quality:
-    name: Code quality
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-      - name: Setup Biome
-        uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
-        with:
-          working-dir: backend
-      - name: Run Biome
-        run: |
-          expected_version="$(node -p "require('./backend/package.json').devDependencies['@biomejs/biome']")"
-          test "$(biome --version)" = "Version: ${expected_version}"
-          biome ci --changed --error-on-warnings --no-errors-on-unmatched .
-
   production-build:
-    name: Production Build (${{ matrix.package }})
-    needs: [code-quality]
-    runs-on: ubuntu-latest
+    name: Production Build & Migration (${{ matrix.package }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
     strategy:
       fail-fast: false
       matrix:
-        package: [backend, common, frontend]
+        package: [backend, frontend]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-production-env
-      - name: Build ${{ matrix.package }}
-        run: docker compose build ${{ matrix.package }}
+      - uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
+      - name: Build production image
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ./${{ matrix.package }}/Dockerfile.production
+          platforms: linux/amd64
+          load: true
+          tags: abrechnung-${{ matrix.package }}
+          cache-from: type=gha,version=2,scope=production-${{ matrix.package }}-amd64
+          cache-to: type=gha,version=2,scope=production-${{ matrix.package }}-amd64,mode=max
+      - name: Test backend migration
+        if: matrix.package == 'backend'
+        run: bash .github/scripts/backend-migration.sh
+      - name: Extract OpenAPI spec from the production image
+        if: matrix.package == 'backend'
+        run: |
+          container_id="$(docker create abrechnung-backend)"
+          trap 'docker rm "$container_id" >/dev/null' EXIT
+          docker cp "$container_id:/build/dist/swagger.json" "$RUNNER_TEMP/swagger.json"
+      - name: Upload OpenAPI spec
+        if: matrix.package == 'backend'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: openapi-spec
+          path: ${{ runner.temp }}/swagger.json
+          if-no-files-found: error
+          retention-days: 1
       - name: Smoke-test immutable frontend image with runtime configuration
         if: matrix.package == 'frontend'
-        shell: bash
+        run: bash .github/scripts/frontend-smoke.sh
+      - name: Install browser test tools on the runner
+        if: matrix.package == 'frontend'
         run: |
-          set -euo pipefail
-          cleanup() { docker rm -f frontend-smoke-a frontend-smoke-b >/dev/null 2>&1 || true; }
-          trap cleanup EXIT
-          image_id="$(docker image inspect abrechnung-frontend --format '{{.Id}}')"
-          docker run -d --name frontend-smoke-a -p 18080:8080 \
-            -e VITE_FRONTEND_URL=http://localhost:18080 -e VITE_BACKEND_URL=http://backend-a.test abrechnung-frontend
-          docker run -d --name frontend-smoke-b -p 18081:8080 \
-            -e VITE_FRONTEND_URL=http://localhost:18081 -e VITE_BACKEND_URL=http://backend-b.test abrechnung-frontend
-          for port in 18080 18081; do
-            for _ in {1..30}; do curl --fail --silent "http://127.0.0.1:${port}/" >/dev/null && break; sleep 1; done
-          done
-          test "$(docker inspect frontend-smoke-a --format '{{.Image}}')" = "$image_id"
-          test "$(docker inspect frontend-smoke-b --format '{{.Image}}')" = "$image_id"
-          curl --fail --silent http://127.0.0.1:18080/runtime-config.js | grep -q 'http://backend-a.test'
-          curl --fail --silent http://127.0.0.1:18081/runtime-config.js | grep -q 'http://backend-b.test'
-          curl --fail --silent --head http://127.0.0.1:18080/runtime-config.js | grep -qi 'cache-control: no-store'
+          npm install --prefix "$RUNNER_TEMP/frontend-migration" --no-save --package-lock=false playwright@1.58.2
+          node "$RUNNER_TEMP/frontend-migration/node_modules/playwright/cli.js" install --with-deps firefox chromium
+      - name: Test production frontend upgrade in Firefox and Chromium
+        if: matrix.package == 'frontend'
+        env:
+          FRONTEND_IMAGE: abrechnung-frontend
+        run: bash .github/scripts/frontend-migration.sh
+      - name: Stop migration services
+        if: ${{ always() && matrix.package == 'backend' }}
+        run: docker compose -f deploy-compose.yml down --volumes

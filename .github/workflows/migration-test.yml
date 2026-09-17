@@ -1,182 +1,72 @@
 name: Build, Test & Migrate
 
-env:
-  PREVIOUS_VERSION: "2.6.3"
-
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+    tags: ['**']
   pull_request:
-    branches: ["main"]
-  workflow_call:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# PR updates supersede old checks. Publishing runs finish before the next run of the same ref.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build-and-test:
+  code-quality:
+    name: Code quality
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
+        with:
+          working-dir: backend
+      - name: Run Biome
+        run: |
+          expected_version="$(node -p "require('./backend/package.json').devDependencies['@biomejs/biome']")"
+          test "$(biome --version)" = "Version: ${expected_version}"
+          biome ci --changed --error-on-warnings --no-errors-on-unmatched .
+
+  tests:
     uses: ./.github/workflows/build-and-test.yml
 
-  migration-test:
-    name: Migration Test
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup-production-env
-      - name: Start previous release
-        shell: bash
-        run: |
-          cat > "$RUNNER_TEMP/previous-release.yml" <<'EOF'
-          services:
-            backend:
-              image: davidloe/abrechnung-backend:${PREVIOUS_VERSION}
-          EOF
-          docker compose -f deploy-compose.yml -f "$RUNNER_TEMP/previous-release.yml" run --rm backend npm run setup
-      - name: Run Migration
-        run: docker compose run backend node dist/setup.js
+  production:
+    uses: ./.github/workflows/production-build.yml
+    with:
+      previous-version: '2.6.3'
 
-  frontend-migration-test:
-    name: Frontend Service Worker Migration
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  ci-success:
+    name: CI successful
+    if: ${{ always() }}
+    needs: [code-quality, tests, production]
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Build current production frontend
-        run: docker build -f frontend/Dockerfile.production -t abrechnung-frontend:ci .
-      - name: Install browser test tools on the runner
-        shell: bash
-        run: |
-          npm install --prefix "$RUNNER_TEMP/frontend-migration" --no-save --package-lock=false playwright@1.58.2
-          node "$RUNNER_TEMP/frontend-migration/node_modules/playwright/cli.js" install --with-deps firefox chromium
-      - name: Test production frontend upgrade in Firefox and Chromium
-        shell: bash
+      - name: Require every check to succeed
         env:
-          FRONTEND_IMAGE: abrechnung-frontend:ci
+          CHECK_RESULTS: ${{ toJSON(needs) }}
         run: |
-          set -euo pipefail
-          cleanup() {
-            if [ "$?" -ne 0 ]; then
-              docker logs frontend-migration-previous || true
-              docker logs frontend-migration-current || true
-            fi
-            docker rm -f frontend-migration-previous frontend-migration-current >/dev/null 2>&1 || true
-          }
-          trap cleanup EXIT
-          # Same source release as the backend migration above. These are the
-          # actual production images; no application source or dist is mounted.
-          docker run -d --name frontend-migration-previous -p 127.0.0.1:18765:8080 \
-            -e VITE_FRONTEND_URL=http://127.0.0.1:18767 -e VITE_BACKEND_URL=http://127.0.0.1:18767/api \
-            "davidloe/abrechnung-frontend:${PREVIOUS_VERSION}"
-          docker run -d --name frontend-migration-current -p 127.0.0.1:18766:8080 \
-            -e VITE_FRONTEND_URL=http://127.0.0.1:18767 -e VITE_BACKEND_URL=http://127.0.0.1:18767/api \
-            "$FRONTEND_IMAGE"
-          for port in 18765 18766; do
-            # Older production images compile their frontend on container startup.
-            for _ in {1..120}; do
-              curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null && break
-              sleep 2
-            done
-            curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null
-          done
-          cat > "$RUNNER_TEMP/frontend-migration/test.mjs" <<'EOF'
-          import assert from 'node:assert/strict'
-          import { createServer, request } from 'node:http'
-          import { chromium, firefox } from 'playwright'
+          jq -e 'all(.["code-quality"], .tests, .production; .result == "success")' <<< "$CHECK_RESULTS"
 
-          const origin = 'http://127.0.0.1:18767'
-          let upgraded = false
-          let pageScriptsReady
-          let resumePageScripts
-          const currentWorkerSource = await (await fetch('http://127.0.0.1:18766/sw.js')).text()
-          const previousWorkerSource = await (await fetch('http://127.0.0.1:18765/sw.js')).text()
-          assert.notEqual(previousWorkerSource, currentWorkerSource, 'The images must contain different workers')
-          const currentIndex = await (await fetch('http://127.0.0.1:18766/index.html')).text()
-          const currentEntry = currentIndex.match(/src="(\/app-[^"]+\.js)"/)?.[1]
-          assert.ok(currentEntry, 'The production HTML must reference its frontend entry point')
+  publish-images:
+    needs: [ci-success]
+    if: ${{ github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-images.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-          const server = createServer((req, res) => {
-            // Observe from a backend URL: worker-driven frontend reloads must
-            // not navigate this test page and discard the observed registration.
-            if (req.url === '/api/__sw-observer') {
-              res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Worker observer</title>')
-              return
-            }
-            // Authentication is not needed to register or update the worker.
-            if (req.url.startsWith('/api/')) {
-              res.writeHead(401, { 'Content-Type': 'application/json' }).end('{}')
-              return
-            }
-            const upstream = request({ hostname: '127.0.0.1', port: upgraded ? 18766 : 18765,
-              path: req.url, method: req.method, headers: { ...req.headers, 'accept-encoding': 'identity' } }, async (response) => {
-              res.writeHead(response.statusCode, response.headers)
-              // Let the update install while a page's module download is still
-              // pending. Worker precache requests have /sw.js as their referrer
-              // and must remain unblocked.
-              res.flushHeaders()
-              if (upgraded && req.url.endsWith('.js') && req.headers.referer?.includes('/app-')) {
-                await pageScriptsReady
-              }
-              response.pipe(res)
-            })
-            upstream.on('error', (error) => { res.writeHead(502).end(String(error)) })
-            req.pipe(upstream)
-          })
-          await new Promise((resolve) => server.listen(18767, '127.0.0.1', resolve))
-          const failures = []
-          try {
-            for (const browserType of [firefox, chromium]) {
-              const browser = await browserType.launch()
-              try {
-                upgraded = false
-                const context = await browser.newContext()
-                context.setDefaultTimeout(60_000)
-                // Disable HTTP cache for the slow-download scenario; service
-                // worker registration, Cache Storage and IndexedDB stay intact.
-                await context.route('**/*', (route) => route.continue())
-                const observer = await context.newPage()
-                await observer.goto(`${origin}/api/__sw-observer`)
-                const page = await context.newPage()
-                page.on('pageerror', (error) => console.error(`${browserType.name()}: ${error.message}`))
-                page.on('console', (message) => {
-                  if (message.type() === 'error') console.error(`${browserType.name()}: ${message.text()}`)
-                })
-                await page.goto(`${origin}/login`)
-                await page.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated')
-                await observer.evaluate(async () => {
-                  window.workerRegistration = await navigator.serviceWorker.getRegistration()
-                  window.previousWorker = window.workerRegistration.active
-                })
-
-                // Leave the old page, deploy, and return without altering browser
-                // storage or calling register(), update() or unregister() from the test.
-                await page.goto('about:blank')
-                pageScriptsReady = new Promise((resolve) => { resumePageScripts = resolve })
-                upgraded = true
-                await page.goto(`${origin}/login`, { waitUntil: 'commit' })
-                await observer.waitForFunction(() =>
-                  window.workerRegistration.waiting?.state === 'installed' ||
-                  window.workerRegistration.active !== window.previousWorker, null, { polling: 100 })
-                resumePageScripts()
-                await observer.waitForFunction(() =>
-                  window.workerRegistration.active !== window.previousWorker &&
-                  window.workerRegistration.active?.state === 'activated', null, { polling: 100 })
-                console.log(`${browserType.name()}: replacement worker activated; checking frontend reload`)
-                // Activation alone is insufficient: an old page can miss the reload and
-                // stay broken even though the registration reports an active new worker.
-                await page.waitForFunction((entry) =>
-                  [...document.scripts].some((script) => script.src === location.origin + entry), currentEntry)
-                console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend`)
-              } catch (error) {
-                console.error(`${browserType.name()}: automatic service worker update failed`, error)
-                failures.push(error)
-              } finally {
-                resumePageScripts?.()
-                await browser.close()
-              }
-            }
-            if (failures.length) throw new AggregateError(failures, 'Automatic service worker update failed')
-          } finally {
-            server.close()
-            server.closeAllConnections()
-          }
-          EOF
-          node "$RUNNER_TEMP/frontend-migration/test.mjs"
+  publish-docs:
+    needs: [ci-success]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-docs.yml
