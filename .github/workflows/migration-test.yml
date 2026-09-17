@@ -2,30 +2,71 @@ name: Build, Test & Migrate
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
+    tags: ['**']
   pull_request:
-    branches: ["main"]
-  workflow_call:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# PR updates supersede old checks. Publishing runs finish before the next run of the same ref.
+concurrency:
+  group: ci-${{ github.event_name == 'pull_request' && github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  build-and-test:
-    uses: ./.github/workflows/build-and-test.yml
-
-  migration-test:
-    name: Migration Test
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
+  code-quality:
+    name: Code quality
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup-production-env
-      - name: Start previous release
-        shell: bash
+        with:
+          fetch-depth: 0
+      - uses: biomejs/setup-biome@4c91541eaada48f67d7dbd7833600ce162b68f51 # v2.7.1
+        with:
+          working-dir: backend
+      - name: Run Biome
         run: |
-          cat > "$RUNNER_TEMP/previous-release.yml" <<'EOF'
-          services:
-            backend:
-              image: davidloe/abrechnung-backend:2.6.3
-          EOF
-          docker compose -f deploy-compose.yml -f "$RUNNER_TEMP/previous-release.yml" run --rm backend npm run setup
-      - name: Run Migration
-        run: docker compose run backend node dist/setup.js
+          expected_version="$(node -p "require('./backend/package.json').devDependencies['@biomejs/biome']")"
+          test "$(biome --version)" = "Version: ${expected_version}"
+          biome ci --changed --error-on-warnings --no-errors-on-unmatched .
+
+  tests:
+    uses: ./.github/workflows/build-and-test.yml
+
+  production:
+    uses: ./.github/workflows/production-build.yml
+    with:
+      previous-version: '2.6.3'
+
+  ci-success:
+    name: CI successful
+    if: ${{ always() }}
+    needs: [code-quality, tests, production]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require every check to succeed
+        env:
+          CHECK_RESULTS: ${{ toJSON(needs) }}
+        run: |
+          jq -e 'all(.["code-quality"], .tests, .production; .result == "success")' <<< "$CHECK_RESULTS"
+
+  publish-images:
+    needs: [ci-success]
+    if: ${{ github.event_name != 'pull_request' }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/publish-images.yml
+    secrets:
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+  publish-docs:
+    needs: [ci-success]
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/publish-docs.yml

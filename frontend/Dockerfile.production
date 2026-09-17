@@ -12,9 +12,11 @@ FROM node:24.14-alpine AS frontend-build
 
 WORKDIR /app
 
-COPY --from=common-build /common /common
+COPY common/package*.json /common/
 COPY frontend/package*.json ./
 RUN npm ci
+
+COPY --from=common-build /common /common
 
 COPY frontend/ ./
 RUN npm run build

@@ -1,27 +1,19 @@
 name: Publish Docs
 
 on:
-  push:
-    branches: ['main']
+  workflow_call:
+
+permissions:
+  contents: write
 
 jobs:
-  build-and-test:
-    uses: ./.github/workflows/build-and-test.yml
-
   publish-docs:
-    name: Publish Docs to Github Pages
-    needs: [build-and-test]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-
+    name: Publish Docs to GitHub Pages
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: ./.github/actions/setup-production-env
-      - name: Build
-        run: docker compose up -d --build backend
-      - name: Copy open api spec
-        run: docker compose cp backend:/build/dist/swagger.json swagger.json
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8
+        with:
+          name: openapi-spec
       - name: Generate Swagger UI
         uses: Legion2/swagger-ui-action@eff65dc3f193f0a749872be82f74baa35be0797d # v1.3.0
         with:
