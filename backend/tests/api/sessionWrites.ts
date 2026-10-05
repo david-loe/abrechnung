@@ -5,8 +5,10 @@ import { createApp, shutdown } from '../../app.js'
 import { sessionStore } from '../../db.js'
 import { initializeBackendRuntime } from '../../runtime.js'
 import { connectTestDatabase } from '../_database.js'
+import { snapshotSharedFixtures } from '../_fixtures.js'
 
 await connectTestDatabase()
+const restoreFixtures = await snapshotSharedFixtures()
 await initializeBackendRuntime()
 const app = await createApp()
 const store = await sessionStore()
@@ -123,6 +125,13 @@ test.serial('expired sessions cannot retain authentication and logout destroys l
 
 test.after.always(async () => {
   releaseSlow.resolve()
-  await sessions.deleteMany({ _id: { $in: [...ids] } })
-  await shutdown()
+  try {
+    await sessions.deleteMany({ _id: { $in: [...ids] } })
+  } finally {
+    try {
+      await restoreFixtures()
+    } finally {
+      await shutdown()
+    }
+  }
 })

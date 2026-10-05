@@ -23,13 +23,16 @@ test.serial('prepared applications do not repeat database setup or share session
   t.is(synchronize.mock.callCount(), 0)
 })
 
-test.serial('shared fixture restoration preserves existing users and their settings', async (t) => {
+test.serial('shared fixture restoration preserves existing users, settings and activity', async (t) => {
   const original = await User.collection.findOne({ 'fk.ldapauth': 'fry' })
   t.truthy(original)
   if (!original) return
   const restore = await snapshotSharedFixtures()
   try {
-    await User.collection.updateOne({ _id: original._id }, { $set: { 'settings.language': 'fr', 'access.admin': true } })
+    await User.collection.updateOne(
+      { _id: original._id },
+      { $set: { 'settings.language': 'fr', 'access.admin': true, lastActiveAt: new Date(0) } }
+    )
   } finally {
     await restore()
   }
