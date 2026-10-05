@@ -3,7 +3,7 @@
     :options="advances"
     :modelValue="modelValue"
     :placeholder="placeholder"
-    @update:modelValue="(v: AdvanceSimple | AdvanceSimple[] | null) => {setByUser = true; emit('update:modelValue', (v as AdvanceSimple[]))}"
+    @update:modelValue="updateSelection"
     :filter="filter"
     :getOptionKey="(option: AdvanceSimple) => option._id"
     :getOptionLabel="(option: AdvanceSimple) => option.name"
@@ -37,7 +37,16 @@
 </template>
 
 <script setup lang="ts">
-import { AdvanceSimple, Currency, IdDocument, idDocumentToId, Locale, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
+import {
+  AdvanceBase,
+  AdvanceSimple,
+  Currency,
+  IdDocument,
+  idDocumentToId,
+  Locale,
+  ProjectSimple,
+  UserSimple
+} from 'abrechnung-common/types.js'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
@@ -54,8 +63,8 @@ type BaseProps = {
   currency?: Currency
 }
 
-type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceSimple | null }
-type MultiProps = BaseProps & { multiple: true; modelValue: AdvanceSimple[] }
+type SingleProps = BaseProps & { multiple?: false; modelValue: AdvanceBase | null }
+type MultiProps = BaseProps & { multiple: true; modelValue: AdvanceBase[] }
 type Props = SingleProps | MultiProps
 
 const props = withDefaults(defineProps<Props>(), {
@@ -67,7 +76,7 @@ const props = withDefaults(defineProps<Props>(), {
   multiple: false
 })
 
-const emit = defineEmits<{ (e: 'update:modelValue', v: AdvanceSimple | null): void; (e: 'update:modelValue', v: AdvanceSimple[]): void }>()
+const emit = defineEmits<{ (e: 'update:modelValue', v: AdvanceBase | null): void; (e: 'update:modelValue', v: AdvanceBase[]): void }>()
 
 let setByUser = props.modelValue && (!props.multiple || (Array.isArray(props.modelValue) && props.modelValue.length > 0))
 let defaultFor = { userId: null as null | string, projectId: null as null | string }
@@ -85,6 +94,12 @@ function filter(options: AdvanceSimple[], search: string): AdvanceSimple[] {
       formatter.money(option.budget).includes(term) ||
       option.project.identifier.toString().includes(term)
   )
+}
+
+function updateSelection(value: AdvanceBase | AdvanceBase[] | null) {
+  setByUser = true
+  if (Array.isArray(value)) emit('update:modelValue', value)
+  else emit('update:modelValue', value)
 }
 
 function setDefaultAdvances(availableAdvances: AdvanceSimple[]) {

@@ -13,7 +13,10 @@ import { Integration } from '../integration.js'
 export async function getMailClient() {
   const { connectionSettings } = createOperationServices().snapshot
   if (connectionSettings.smtp?.host) {
-    return nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp))
+    return {
+      client: nodemailer.createTransport(mapSmtpConfig(connectionSettings.smtp)),
+      senderAddress: connectionSettings.smtp.senderAddress
+    }
   }
   throw new Error('SMTP not configured in Connection Settings')
 }
@@ -82,7 +85,7 @@ export async function sendMail(
   button?: { text: string; link: string },
   lastParagraph?: string | string[]
 ) {
-  const mailClient = await getMailClient()
+  const { client: mailClient, senderAddress } = await getMailClient()
   const salutation = i18n.t('mail.hiX', { lng: language, X: recipient.name.givenName })
   const regards = i18n.t('mail.regards', { lng: language })
   const app = {
@@ -96,7 +99,7 @@ export async function sendMail(
 
   logger.debug(`Send mail to ${recipient.email}`)
   return mailClient.sendMail({
-    from: `"${app.name}" <${mailClient.options.from}>`,
+    from: `"${app.name}" <${senderAddress}>`,
     to: recipient.email,
     subject,
     text: plainText,

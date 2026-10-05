@@ -141,7 +141,7 @@
           ref="fileUpload"
           id="stageFormVehicleRegistration"
           :model-value="props.vehicleRegistration"
-          @update:model-value="(f: DocumentFile<string>[]) => emit('update:vehicleRegistration', f)"
+          @update:model-value="updateVehicleRegistration"
           :disabled="disabled"
           :required="props.travelSettings.vehicleRegistrationWhenUsingOwnCar === 'required'"
           :endpointPrefix="endpointPrefix"
@@ -345,6 +345,10 @@ function defaultCostPosition(position?: CostPosition<string>) {
     project: position?.project ?? props.defaultProject,
     category: position?.category as Category<string>
   }
+}
+
+function updateVehicleRegistration(files: Partial<DocumentFile<string>> | Partial<DocumentFile<string>>[] | null) {
+  if (Array.isArray(files)) emit('update:vehicleRegistration', files as DocumentFile<string>[])
 }
 
 function defaultStage() {

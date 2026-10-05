@@ -17,10 +17,10 @@
           v-else
           :file="(modelValue as DocumentFile<string, Blob>)"
           :disabled="disabled"
-          :rotating="isRotating(modelValue as Partial<DocumentFile<string, Blob>>)"
-          @show="_showFile(modelValue as Partial<DocumentFile<string, Blob>>)"
-          @rotate="(degrees) => rotateFile(modelValue as Partial<DocumentFile<string, Blob>>, undefined, degrees)"
-          @deleted="deleteFile(modelValue as Partial<DocumentFile<string, Blob>>)" />
+          :rotating="isRotating(modelValue as Partial<DocumentFile<string>>)"
+          @show="_showFile(modelValue as Partial<DocumentFile<string>>)"
+          @rotate="(degrees) => rotateFile(modelValue as Partial<DocumentFile<string>>, undefined, degrees)"
+          @deleted="deleteFile(modelValue as Partial<DocumentFile<string>>)" />
       </template>
 
       <div v-if="props.showUploadFromPhone && !disabled" class="ms-auto col-auto d-none d-md-block">
@@ -55,7 +55,7 @@
       :id="id"
       :accept="accept"
       @change="changeFile"
-      :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile<string, Blob>>[]).length === 0"
+      :required="required && Boolean(modelValue) && (modelValue as Partial<DocumentFile<string>>[]).length === 0"
       :multiple="multiple"
       :disabled="disabled">
   </div>
@@ -77,7 +77,7 @@ import FileUploadFileElement from './FileUploadFileElement.vue'
 const { t } = useI18n()
 
 const APP_DATA = APP_LOADER.data
-type FileT = Partial<DocumentFile<string, Blob>>
+type FileT = Partial<DocumentFile<string>>
 
 type BaseProps = {
   required?: boolean
@@ -89,8 +89,8 @@ type BaseProps = {
   showUploadFromPhone?: boolean
 }
 
-type SingleProps = BaseProps & { multiple?: false; modelValue: FileT | null }
-type MultiProps = BaseProps & { multiple: true; modelValue: FileT[] }
+type SingleProps = BaseProps & { multiple: false; modelValue: FileT | null }
+type MultiProps = BaseProps & { multiple?: true; modelValue: FileT[] }
 type Props = SingleProps | MultiProps
 
 const props = withDefaults(defineProps<Props>(), {
@@ -127,10 +127,10 @@ let fetchTokenInterval = undefined as NodeJS.Timeout | undefined
 const expireAfterSeconds = APP_DATA.value?.settings.uploadTokenExpireAfterSeconds ?? 1
 const secondsLeft = ref(expireAfterSeconds)
 
-function keyForFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
+function keyForFile(file: Partial<DocumentFile<string>>, index?: number) {
   return `${index ?? ''}:${file._id || file.name || 'file'}`
 }
-function isRotating(file: Partial<DocumentFile<string, Blob>>, index?: number) {
+function isRotating(file: Partial<DocumentFile<string>>, index?: number) {
   return rotatingKey.value === keyForFile(file, index)
 }
 function currentFiles(): FileT[] {
@@ -155,16 +155,16 @@ watch(
   { deep: true }
 )
 
-async function _showFile(file: Partial<DocumentFile<string, Blob>>): Promise<void> {
-  if (file.data) {
-    await showFile(file.data as File)
+async function _showFile(file: Partial<DocumentFile<string>>): Promise<void> {
+  if (file.data instanceof Blob) {
+    await showFile(file.data)
   } else if (file._id) {
     await showFile({ params: { _id: file._id }, endpoint: `${props.endpointPrefix}documentFile`, filename: file.name as string })
   }
 }
-async function getImageBlob(file: Partial<DocumentFile<string, Blob>>): Promise<Blob | null> {
-  if (file.data) {
-    return file.data as Blob
+async function getImageBlob(file: Partial<DocumentFile<string>>): Promise<Blob | null> {
+  if (file.data instanceof Blob) {
+    return file.data
   }
   if (!file._id) {
     return null
@@ -172,7 +172,7 @@ async function getImageBlob(file: Partial<DocumentFile<string, Blob>>): Promise<
   const result = (await API.getter<Blob>(`${props.endpointPrefix}documentFile`, { _id: file._id }, { responseType: 'blob' })).ok
   return result?.data || null
 }
-async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: number, degrees: 90 | 180 | 270 = 90) {
+async function rotateFile(file: Partial<DocumentFile<string>>, index?: number, degrees: 90 | 180 | 270 = 90) {
   if (props.disabled || !file.type?.startsWith('image/')) {
     return
   }
@@ -201,7 +201,7 @@ async function rotateFile(file: Partial<DocumentFile<string, Blob>>, index?: num
     rotatingKey.value = ''
   }
 }
-async function deleteFile(file: Partial<DocumentFile<string, Blob>>, index?: number) {
+async function deleteFile(file: Partial<DocumentFile<string>>, index?: number) {
   if (confirm(t('alerts.areYouSureDelete'))) {
     if (!file.data && file._id) {
       const result = await API.deleter(`${props.endpointPrefix}documentFile`, { _id: file._id }, false)

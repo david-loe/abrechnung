@@ -34,7 +34,7 @@ services:
     env_file:
       - .env
   db:
-    image: mongo:8
+    image: mongo:9
     command: --quiet --logpath /dev/null
     restart: always
     volumes:

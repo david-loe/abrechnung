@@ -1,4 +1,4 @@
-FROM node:24.14-alpine AS common-build
+FROM node:24.21-alpine AS common-build
 
 WORKDIR /common
 
@@ -8,7 +8,7 @@ RUN npm ci
 COPY common/ ./
 RUN npm run build
 
-FROM node:24.14-alpine AS frontend-build
+FROM node:24.21-alpine AS frontend-build
 
 WORKDIR /app
 
@@ -21,7 +21,7 @@ COPY --from=common-build /common /common
 COPY frontend/ ./
 RUN npm run build
 
-FROM nginx:1.28.0-alpine AS runtime
+FROM nginx:1.30.5-alpine AS runtime
 
 LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 frontend"
