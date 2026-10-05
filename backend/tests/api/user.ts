@@ -51,6 +51,31 @@ test.serial('login and session activity are persisted with a five-minute interva
   t.true(new Date(loggedIn.lastActiveAt).valueOf() > recent.valueOf())
 })
 
+for (const activity of ['session activity', 'login']) {
+  test.serial(`${activity} replaces an explicitly null activity timestamp`, async (t) => {
+    const activityAgent = request.agent(await APP())
+    await loginUser(activityAgent, 'admin')
+    const current = (await activityAgent.get('/user')).body.data as User
+    await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: null } })
+    t.true((await UserModel.findById(current._id))?.lastActiveAt === null)
+
+    const startedAt = Date.now()
+    if (activity === 'login') {
+      t.is((await activityAgent.delete('/auth/logout')).status, 204)
+      t.is((await activityAgent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })).status, 204)
+    } else {
+      t.is((await activityAgent.get('/user')).status, 200)
+    }
+
+    const updated = await UserModel.findById(current._id).orFail()
+    assert(updated.lastActiveAt instanceof Date)
+    t.true(updated.lastActiveAt.valueOf() >= startedAt)
+    const response = await activityAgent.get('/user')
+    t.is(response.status, 200)
+    t.is(response.body.data.lastActiveAt, updated.lastActiveAt.toISOString())
+  })
+}
+
 test.serial('personal API key activity is persisted and throttled', async (t) => {
   const current = (await agent.get('/user')).body.data as User
   const keyResponse = await agent.post('/user/httpBearer')

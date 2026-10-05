@@ -11,7 +11,7 @@ export async function recordUserActivity(user: UserDoc, login = false) {
 
   try {
     const result = await User.updateOne(
-      { _id: user._id, $or: [{ lastActiveAt: { $exists: false } }, { lastActiveAt: { $lte: cutoff } }] },
+      { _id: user._id, $or: [{ lastActiveAt: { $exists: false } }, { lastActiveAt: null }, { lastActiveAt: { $lte: cutoff } }] },
       { $max: { lastActiveAt: now } }
     )
     if (result.modifiedCount) {
