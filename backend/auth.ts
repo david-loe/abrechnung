@@ -1,13 +1,18 @@
-import { User as IUser } from 'abrechnung-common/types.js'
 import express from 'express'
 import { Types } from 'mongoose'
 import passport from 'passport'
 import User from './models/user.js'
+import { recordUserActivity } from './userActivity.js'
 
 const router = express.Router()
 
-passport.serializeUser(async (user: IUser, cb) => {
-  cb(null, { _id: user._id })
+passport.serializeUser(async (user: Express.User, cb) => {
+  try {
+    if (await user.isActive()) await recordUserActivity(user, true)
+    cb(null, { _id: user._id })
+  } catch (error) {
+    cb(error)
+  }
 })
 
 passport.deserializeUser(async (sessionUser: { _id: Types.ObjectId }, cb) => {

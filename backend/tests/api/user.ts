@@ -1,9 +1,11 @@
 import { AuthContext, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { Types } from 'mongoose'
-import { shutdown } from '../../app.js'
+import request from 'supertest'
+import APP, { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import UserModel from '../../models/user.js'
+import { recordUserActivity } from '../../userActivity.js'
 import createAgent, { loginUser } from '../_agent.js'
 
 const agent = await createAgent()
@@ -26,6 +28,88 @@ test.serial('GET /user', async (t) => {
   } else {
     console.log(res.body)
   }
+})
+
+test.serial('login and session activity are persisted with a five-minute interval', async (t) => {
+  const current = (await agent.get('/user')).body.data as User
+  t.truthy(current.lastActiveAt)
+  t.is((await agent.get('/user')).body.data.lastActiveAt, current.lastActiveAt)
+  const previous = new Date(Date.now() - 600_000)
+  await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: previous } })
+  const active = (await agent.get('/user')).body.data as User
+  assert(active.lastActiveAt)
+  t.true(new Date(active.lastActiveAt).valueOf() > previous.valueOf())
+  t.deepEqual((await UserModel.findById(current._id))?.lastActiveAt, new Date(active.lastActiveAt))
+
+  const recent = new Date(Date.now() - 1000)
+  await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: recent } })
+  t.is((await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'wrong' })).status, 401)
+  t.deepEqual((await UserModel.findById(current._id))?.lastActiveAt, recent)
+  t.is((await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })).status, 204)
+  const loggedIn = await UserModel.findById(current._id).orFail()
+  assert(loggedIn.lastActiveAt)
+  t.true(new Date(loggedIn.lastActiveAt).valueOf() > recent.valueOf())
+})
+
+for (const activity of ['session activity', 'login']) {
+  test.serial(`${activity} replaces an explicitly null activity timestamp`, async (t) => {
+    const activityAgent = request.agent(await APP())
+    await loginUser(activityAgent, 'admin')
+    const current = (await activityAgent.get('/user')).body.data as User
+    await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: null } })
+    t.true((await UserModel.findById(current._id))?.lastActiveAt === null)
+
+    const startedAt = Date.now()
+    if (activity === 'login') {
+      t.is((await activityAgent.delete('/auth/logout')).status, 204)
+      t.is((await activityAgent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })).status, 204)
+    } else {
+      t.is((await activityAgent.get('/user')).status, 200)
+    }
+
+    const updated = await UserModel.findById(current._id).orFail()
+    assert(updated.lastActiveAt instanceof Date)
+    t.true(updated.lastActiveAt.valueOf() >= startedAt)
+    const response = await activityAgent.get('/user')
+    t.is(response.status, 200)
+    t.is(response.body.data.lastActiveAt, updated.lastActiveAt.toISOString())
+  })
+}
+
+test.serial('personal API key activity is persisted and throttled', async (t) => {
+  const current = (await agent.get('/user')).body.data as User
+  const keyResponse = await agent.post('/user/httpBearer')
+  t.is(keyResponse.status, 200)
+  const key = keyResponse.body.result as string
+  const api = request(await APP())
+  const previous = new Date(Date.now() - 600_000)
+  try {
+    await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: previous } })
+    const invalid = await api.get('/user').auth(`${current._id}:invalid`, { type: 'bearer' })
+    t.is(invalid.status, 401)
+    t.deepEqual((await UserModel.findById(current._id))?.lastActiveAt, previous)
+    const response = await api.get('/user').auth(key, { type: 'bearer' })
+    t.is(response.status, 200)
+    t.true(new Date(response.body.data.lastActiveAt).valueOf() > previous.valueOf())
+    const next = await api.get('/user').auth(key, { type: 'bearer' })
+    t.is(next.body.data.lastActiveAt, response.body.data.lastActiveAt)
+  } finally {
+    await UserModel.updateOne({ _id: current._id }, { $unset: { 'fk.httpBearer': '' } })
+  }
+})
+
+test.serial('concurrent activity updates cannot bypass throttling or overwrite newer activity on save', async (t) => {
+  const current = (await agent.get('/user')).body.data as User
+  await UserModel.updateOne({ _id: current._id }, { $unset: { lastActiveAt: '' } })
+  const first = await UserModel.findById(current._id).orFail()
+  const second = await UserModel.findById(current._id).orFail()
+  await Promise.all([recordUserActivity(first), recordUserActivity(second)])
+  t.is([first, second].filter((value) => value.lastActiveAt !== undefined).length, 1)
+  const newer = new Date(Date.now() + 1000)
+  await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: newer } })
+  await first.save()
+  await second.save()
+  t.deepEqual((await UserModel.findById(current._id))?.lastActiveAt, newer)
 })
 
 test.serial('GET /auth/authenticated returns the offline cache context', async (t) => {
@@ -166,3 +250,5 @@ test.serial('DELETE /auth/logout destroys the session and rotates the cache scop
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })
+
+import assert from 'node:assert/strict'
