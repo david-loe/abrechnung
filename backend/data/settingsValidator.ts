@@ -1,8 +1,7 @@
 import { ldapauthSettings, smtpSettings } from 'abrechnung-common/types.js'
 import ldap from 'ldapjs'
 import nodemailer from 'nodemailer'
-import SMTPConnection from 'nodemailer/lib/smtp-connection/index.js'
-import SMTPTransport from 'nodemailer/lib/smtp-transport/index.js'
+import type { SMTPTransportOptions } from 'nodemailer/lib/smtp-transport'
 import LdapStrategy from 'passport-ldapauth'
 
 export function verifyLdapauthConfig(config: ldapauthSettings) {
@@ -42,8 +41,8 @@ export function mapLdapauthConfig(config: ldapauthSettings): LdapStrategy.Option
   }
 }
 
-export function mapSmtpConfig(config: smtpSettings): SMTPTransport.Options {
-  let auth: SMTPConnection.AuthenticationType | undefined
+export function mapSmtpConfig(config: smtpSettings) {
+  let auth: SMTPTransportOptions['auth']
   if (config.auth.authType === 'Login') {
     auth = { user: config.auth.user, pass: config.auth.pass, type: 'login' }
   } else if (config.auth.authType === 'OAuth2') {
@@ -61,5 +60,5 @@ export function mapSmtpConfig(config: smtpSettings): SMTPTransport.Options {
       type: 'OAuth2'
     }
   }
-  return { host: config.host, port: config.port, secure: config.secure, auth, from: config.senderAddress, dnsTimeout: 1_500 }
+  return { host: config.host, port: config.port, secure: config.secure, auth, dnsTimeout: 1_500 } satisfies SMTPTransportOptions
 }

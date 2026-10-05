@@ -1,8 +1,8 @@
-import { AdvanceSimple, AdvanceState, IdDocument, idDocumentToId } from 'abrechnung-common/types.js'
+import { AdvanceBase, AdvanceSimple, AdvanceState, IdDocument, idDocumentToId } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import API from '@/api'
 
-export function filterAdvancesByCurrency(advances: AdvanceSimple[], currency?: IdDocument<string>) {
+export function filterAdvancesByCurrency<T extends AdvanceBase>(advances: T[], currency?: IdDocument<string>) {
   if (!currency) return advances
   const currencyId = idDocumentToId(currency)
   return advances.filter((advance) => idDocumentToId(advance.budget.currency) === currencyId)

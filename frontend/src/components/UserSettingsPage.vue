@@ -108,7 +108,8 @@ function updateBankAccount(bankAccount: BankAccount | null) {
   if (APP_DATA.value) APP_DATA.value.user.settings.bankAccount = bankAccount
 }
 
-async function saveVehicleRegistration(files: Partial<DocumentFile<string, Blob>>[]) {
+async function saveVehicleRegistration(files: Partial<DocumentFile<string>> | Partial<DocumentFile<string>>[] | null) {
+  if (!Array.isArray(files)) return
   savingVehicleRegistration.value = true
   vehicleRegistration.value = files as DocumentFile<string>[]
   const result = await API.setter<User<string>>(

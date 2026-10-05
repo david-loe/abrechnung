@@ -28,10 +28,7 @@
         </button>
         <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.reference" @click.stop>
-          <input
-            type="text"
-            class="form-control"
-            @input="(event : Event)=> filter.reference = refStringRegexLax.exec((event.target as HTMLInputElement).value)? refStringToNumber((event.target as HTMLInputElement).value).ref : undefined">
+          <input type="text" class="form-control" @input="updateReferenceFilter">
         </div>
       </div>
     </template>
@@ -312,6 +309,11 @@ const showFilter = ref({
   'project.organisation': false,
   'log.30.on': false
 })
+
+function updateReferenceFilter(event: Event) {
+  const value = (event.target as HTMLInputElement).value
+  filter.value.reference = refStringRegexLax.exec(value) ? refStringToNumber(value).ref : undefined
+}
 
 function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) {
   event?.stopPropagation()

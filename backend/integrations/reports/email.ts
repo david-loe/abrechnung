@@ -54,7 +54,7 @@ export async function sendReportViaMail(
   if (connectionSettings.PDFReportsViaEmail.sendPDFReportsToOrganisationEmail) {
     const org = await Organisation.findOne({ _id: idDocumentToId(report.project.organisation) })
     if (org?.reportEmail) {
-      const mailClient = await getMailClient()
+      const { client: mailClient, senderAddress } = await getMailClient()
       const lng = connectionSettings.PDFReportsViaEmail.locale
       const formatter = createFormatter(lng, displaySettings.nameDisplayFormat)
       let subject = '🧾 '
@@ -85,7 +85,7 @@ export async function sendReportViaMail(
         `${i18n.t('labels.balance', { lng })}: ${totalSum}\n`
 
       return await mailClient.sendMail({
-        from: `"${appName}" <${mailClient.options.from}>`,
+        from: `"${appName}" <${senderAddress}>`,
         to: org.reportEmail,
         subject,
         text,

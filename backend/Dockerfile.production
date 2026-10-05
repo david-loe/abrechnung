@@ -1,4 +1,4 @@
-FROM node:24.14-alpine AS common-build
+FROM node:24.21-alpine AS common-build
 
 WORKDIR /common
 
@@ -8,7 +8,7 @@ RUN npm ci
 COPY common/ ./
 RUN npm run build && npm prune --omit=dev && npm uninstall --no-save --omit=dev typescript
 
-FROM node:24.14-alpine AS backend-build
+FROM node:24.21-alpine AS backend-build
 
 WORKDIR /build
 
@@ -24,7 +24,7 @@ RUN npm run build \
   && npm prune --omit=dev \
   && npm uninstall --no-save --omit=dev typescript
 
-FROM node:24.14-alpine AS runtime
+FROM node:24.21-alpine AS runtime
 
 LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 backend"

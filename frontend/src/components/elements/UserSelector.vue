@@ -7,7 +7,7 @@
     @update:modelValue="(u: UserSimpleWithProject<string>) => $emit('update:modelValue', u)"
     :filter="filter"
     :getOptionKey="(option: UserSimpleWithProject<string>) => option._id"
-    :getOptionLabel="(option: UserSimpleWithProject<string>) => `${formatter.name(option.name)}`"
+    :getOptionLabel="getUserLabel"
     :disabled="disabled"
     style="min-width: 160px">
     <template #option="{ name }">
@@ -39,6 +39,10 @@ defineEmits<{ 'update:modelValue': [UserSimpleWithProject<string>] }>()
 
 await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
+
+function getUserLabel(option: UserSimpleWithProject<string>) {
+  return formatter.name(option.name)
+}
 
 function filter(options: UserSimpleWithProject<string>[], search: string): UserSimpleWithProject<string>[] {
   return options.filter((option) => {
