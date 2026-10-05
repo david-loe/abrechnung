@@ -21,7 +21,7 @@
         {{ t('labels.description') }}
         <span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required>
     </div>
 
     <div class="row mb-2">
@@ -106,14 +106,14 @@ import { baseCurrency, Currency, Expense, ProjectSimple } from 'abrechnung-commo
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import CostPositionsEditor from '@/components/elements/CostPositionsEditor.vue'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
-import { formatter } from '@/formatter.js'
 import CTextArea from '@/components/elements/TextArea.vue'
+import { formatter } from '@/formatter.js'
+import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 
 const { t } = useI18n()
 
@@ -143,7 +143,11 @@ const { confirmNavigation, resetInitialValue } = useUnsavedChangesGuard(formExpe
 const fileUploadRef = useTemplateRef('fileUpload')
 
 function defaultExpense() {
-  return { description: '', cost: { positions: [], currency: props.reportCurrency ?? baseCurrency, receipts: [], date: '' }, note: undefined }
+  return {
+    description: '',
+    cost: { positions: [], currency: props.reportCurrency ?? baseCurrency, receipts: [], date: '' },
+    note: undefined
+  }
 }
 function clear() {
   fileUploadRef.value?.clear()

@@ -2,7 +2,7 @@
   <div class="row gy-3">
     <div class="col">
       <h4>{{ t('labels.reportUsage') }}</h4>
-      <small class="chart-card__meta"> {{t('labels.lastXMonths', {X:COUNT_MONTH})}}</small>
+      <small class="chart-card__meta"> {{ t('labels.lastXMonths', { X: COUNT_MONTH }) }}</small>
 
       <div class="chart-wrapper">
         <canvas ref="reportUsageCanvas" />

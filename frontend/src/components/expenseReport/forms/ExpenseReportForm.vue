@@ -10,7 +10,7 @@
 
     <div class="mb-3">
       <label for="expenseReportFormName" class="form-label">{{ t('labels.expenseReportName') }}</label>
-      <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name" >
+      <input type="text" class="form-control" id="expenseReportFormName" v-model="formExpenseReport.name">
     </div>
 
     <div class="mb-3">

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <TravelApply :travel="travel" />
+    <TravelApply :travel="props.travel" />
     <div class="mb-3">
       <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
       <CTextArea id="comment" v-model="comment" />

@@ -13,7 +13,7 @@
             name="usernameLDAP"
             placeholder=""
             v-model="usernameLDAP"
-            required >
+            required>
           <label for="usernameLDAP">{{ t('labels.username') }}</label>
         </div>
         <div class="form-floating">
@@ -23,9 +23,9 @@
             id="passwordLDAP"
             name="passwordLDAP"
             placeholder=""
-            autocomplete="currentPassword"
+            autocomplete="current-password"
             v-model="passwordLDAP"
-            required >
+            required>
           <label for="passwordLDAP">{{ t('labels.password') }}</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
@@ -45,7 +45,7 @@
             name="magicLoginMail"
             placeholder=""
             v-model="magicLoginMail"
-            required >
+            required>
           <label for="magicLoginMail">{{ t('labels.email') }}</label>
         </div>
         <button class="w-100 btn btn-lg btn-primary" type="submit">
@@ -56,24 +56,28 @@
     </div>
 
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.ldapauth" class="mt-4">
-      <button class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
+      <button type="button" class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
         <i class="bi bi-people-fill me-1"></i>
         {{ t('labels.signInX', { X: 'LDAP' }) }}
       </button>
     </div>
 
-    <div v-if="LOGIN_APP_DATA.displaySettings.auth.microsoft" class="mt-4"><a class="btn btn-lg btn-primary" :href="microsoftLink()">
-      <i class="bi bi-microsoft me-1"></i>
-      {{ t('labels.signInX', { X: 'Microsoft' }) }}
-    </a></div>
+    <div v-if="LOGIN_APP_DATA.displaySettings.auth.microsoft" class="mt-4">
+      <a class="btn btn-lg btn-primary" :href="microsoftLink()">
+        <i class="bi bi-microsoft me-1"></i>
+        {{ t('labels.signInX', { X: 'Microsoft' }) }}
+      </a>
+    </div>
 
-    <div v-if="LOGIN_APP_DATA.displaySettings.auth.oidc" class="mt-4"><a class="btn btn-lg btn-primary" :href="oidcLink()">
-      <i :class="`bi bi-${LOGIN_APP_DATA.displaySettings.oidc.icon} me-1`"></i>
-      {{ t('labels.signInX', { X: LOGIN_APP_DATA.displaySettings.oidc.label }) }}
-    </a></div>
+    <div v-if="LOGIN_APP_DATA.displaySettings.auth.oidc" class="mt-4">
+      <a class="btn btn-lg btn-primary" :href="oidcLink()">
+        <i :class="`bi bi-${LOGIN_APP_DATA.displaySettings.oidc.icon} me-1`"></i>
+        {{ t('labels.signInX', { X: LOGIN_APP_DATA.displaySettings.oidc.label }) }}
+      </a>
+    </div>
 
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.magiclogin" class="mt-4">
-      <button class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
+      <button type="button" class="btn btn-lg btn-primary" @click="strategy = 'magiclogin'">
         <i class="bi bi-envelope-fill me-1"></i>
         {{ t('labels.signInX', { X: t('labels.email') }) }}
       </button>
@@ -135,7 +139,7 @@ async function login() {
       await APP_LOADER.loadData(true)
       await router.push(route.query.redirect ? (route.query.redirect as string) : '/')
     }
-  } catch (error) {
+  } catch {
     passwordLDAP.value = ''
     API.addAlert({ message: t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
   }
@@ -150,7 +154,7 @@ async function requestMagicLogin() {
       magicLoginSend.value = true
       API.addAlert({ message: t('alerts.mailSend'), title: '', type: 'success', ttl: 10000 })
     }
-  } catch (error) {
+  } catch {
     passwordLDAP.value = ''
     API.addAlert({ message: t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
   }

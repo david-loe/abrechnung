@@ -3,8 +3,8 @@
     :schema="schema"
     ref="form"
     :endpoint="false"
-    @submit="(form$: any) => save(form$.requestData)"
-    @keydown.ctrl.s.prevent="(event: KeyboardEvent) => { event.repeat ? null : save((formRef?.requestData ?? {}) as any) }" />
+    @submit="(form$: { requestData: Parameters<typeof save>[0] }) => save(form$.requestData)"
+    @keydown.ctrl.s.prevent="(event: KeyboardEvent) => { event.repeat ? null : save((formRef?.requestData ?? {}) as Parameters<typeof save>[0]) }" />
 </template>
 
 <script lang="ts" setup>

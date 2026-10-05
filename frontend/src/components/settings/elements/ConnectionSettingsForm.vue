@@ -3,8 +3,8 @@
     :schema="schema"
     ref="form"
     :endpoint="false"
-    @submit="(form$: any) => postConnectionSettings(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postConnectionSettings(formRef?.data as any)}" />
+    @submit="(form$: { data: Parameters<typeof postConnectionSettings>[0] }) => postConnectionSettings(form$.data)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postConnectionSettings(formRef?.data as Parameters<typeof postConnectionSettings>[0])}" />
 </template>
 
 <script lang="ts" setup>

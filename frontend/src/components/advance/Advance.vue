@@ -27,7 +27,9 @@
       </tr>
       <tr>
         <th scope="row">{{ t('labels.budget') }}</th>
-        <td><span class="tnum"><ConvertedMoney :money="advance.budget" /></span></td>
+        <td>
+          <span class="tnum"><ConvertedMoney :money="advance.budget" /></span>
+        </td>
       </tr>
       <tr v-if="isForeignCurrency">
         <th scope="row">{{ t('labels.exchangeRateDate') }}</th>
@@ -41,18 +43,22 @@
       <tr v-if="advance.offsetAgainst.length > 0">
         <th scope="row">{{ t('labels.offsetAgainst') }}</th>
         <td>
-          <div class="mb-1" v-for="report in advance.offsetAgainst"><small>
-            <span class="me-2 tnum"><ConvertedMoney :money="report" /></span>
-            <i
-              v-if="APP_DATA && report.type !== 'offsetEntry'"
-              :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
-            <span>{{ report.subject }}</span>
-          </small></div>
+          <div class="mb-1" v-for="(report, index) in advance.offsetAgainst" :key="index">
+            <small>
+              <span class="me-2 tnum"><ConvertedMoney :money="report" /></span>
+              <i
+                v-if="APP_DATA && report.type !== 'offsetEntry'"
+                :class="`bi bi-${APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(report.type)]} me-1`"></i>
+              <span>{{ report.subject }}</span>
+            </small>
+          </div>
         </td>
       </tr>
       <tr v-if="advance.state >= AdvanceState.APPROVED">
         <th scope="row">{{ t('labels.balance') }}</th>
-        <td><span class="tnum"><ConvertedMoney :money="advance.balance" /></span></td>
+        <td>
+          <span class="tnum"><ConvertedMoney :money="advance.balance" /></span>
+        </td>
       </tr>
       <tr v-if="advance.receivedOn">
         <th scope="row">{{ t('labels.receivedOn') }}</th>
@@ -65,10 +71,12 @@
       <tr v-if="advance.comments.length > 0">
         <th scope="row">{{ t('labels.comments') }}</th>
         <td>
-          <div class="mb-1" v-for="comment in advance.comments" :key="comment._id"><small>
-            <b>{{ `${formatter.name(comment.author.name, 'short')}: ` }}</b>
-            <span>{{ comment.text }}</span>
-          </small></div>
+          <div class="mb-1" v-for="comment in advance.comments" :key="comment._id">
+            <small>
+              <b>{{ `${formatter.name(comment.author.name, 'short')}: ` }}</b>
+              <span>{{ comment.text }}</span>
+            </small>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -76,6 +84,7 @@
   <div class="mb-1 d-flex align-items-center">
     <slot name="buttons"></slot>
     <button
+      type="button"
       v-if="advance.state >= State.BOOKABLE"
       class="btn btn-primary ms-auto"
       @click="
@@ -98,8 +107,8 @@
 import { AdvanceSimple, AdvanceState, baseCurrency, getReportTypeFromModelName, idDocumentToId, State } from 'abrechnung-common/types.js'
 import { computed, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import ConvertedMoney from '@/components/elements/ConvertedMoney.vue'
+import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import StatePipeline from '@/components/elements/StatePipeline.vue'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'

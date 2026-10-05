@@ -21,7 +21,7 @@
           <h2>{{ t('accesses.examine/healthCareCost') }}</h2>
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', undefined)">
+          <button type="button" class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.healthCareCost') }) }}</span>
           </button>
@@ -51,7 +51,7 @@
           <StateBadge :state="show" :StateEnum="HealthCareCostState" />
           <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" >
+        <hr class="hr">
         <HealthCareCostList
           endpoint="examine/healthCareCost"
           :stateFilter="show === HealthCareCostState.IN_WORK ? show : { $gte: show }"

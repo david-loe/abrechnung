@@ -1,20 +1,20 @@
 <template>
   <div class="container py-3">
-    <BookingExportDialog
-      ref="bookingExportDialog"
-      endpoint="book/healthCareCost"
-      :reports="selected"
-      @booked="handleBooked" />
+    <BookingExportDialog ref="bookingExportDialog" endpoint="book/healthCareCost" :reports="selected" @booked="handleBooked" />
     <div class="row justify-content-between">
       <div class="col-auto">
         <h2>{{ t('accesses.book/healthCareCost') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
+        <button type="button" class="btn btn-secondary" @click="handlePrint"><i class="bi bi-printer-fill"></i></button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
-      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="bookingExportDialog?.open()">
+      <button
+        type="button"
+        class="btn btn-secondary me-2"
+        :disabled="selected.length === 0 || loading"
+        @click="bookingExportDialog?.open()">
         <i class="bi bi-download me-1"></i>{{ t('labels.exportBookings') }}
       </button>
       <button type="button" class="btn btn-light btn-sm" :disabled="selected.length === 0 || loading" @click="book(selected)">
@@ -56,7 +56,7 @@
         <StateBadge :state="show" :StateEnum="HealthCareCostState" />
         <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" >
+      <hr class="hr">
       <HealthCareCostList
         class="mb-5"
         table-class-name="small-table"
@@ -78,8 +78,8 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useVueToPrint } from 'vue-to-print'
 import API from '@/api'
-import BookingExportDialog from '@/components/elements/BookingExportDialog.vue'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
+import BookingExportDialog from '@/components/elements/BookingExportDialog.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import HealthCareCostList from '@/components/healthCareCost/HealthCareCostList.vue'
 import { expandCollapseComments, hideExpandColumn as hideExpCol, showFile } from '@/helper'

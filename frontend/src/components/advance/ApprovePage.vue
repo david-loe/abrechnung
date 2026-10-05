@@ -25,7 +25,7 @@
                     type="button"
                     class="btn btn-secondary"
                     @click="isOffsetFormVisible = true">
-                    {{ t('labels.addX', {X: t('labels.offsetEntry')}) }}
+                    {{ t('labels.addX', { X: t('labels.offsetEntry') }) }}
                   </button>
                   <button
                     v-if="canDeleteAdvance(modalAdvance as AdvanceSimple<string>)"
@@ -51,7 +51,7 @@
                     <span class="text-danger">*</span>
                   </label>
                   <div class="col-auto">
-                    <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required >
+                    <input type="number" class="form-control" id="amount" step="0.01" v-model="offsetAmount" min="0" required>
                     <small class="text-secondary">{{ modalAdvance.balance?.currency?._id }}</small>
                   </div>
                   <label for="subject" class="col-form-label col-auto">
@@ -59,7 +59,7 @@
                     <span class="text-danger">*</span>
                   </label>
                   <div class="col-auto">
-                    <input type="text" class="form-control" id="subject" v-model="offsetSubject" required >
+                    <input type="text" class="form-control" id="subject" v-model="offsetSubject" required>
                   </div>
                   <div class="col-auto">
                     <div class="mb-1 d-flex align-items-center">
@@ -99,7 +99,7 @@
             @submitted="() => approvedAdvanceList?.loadFromServer()" />
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', undefined)">
+          <button type="button" class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.advance') }) }}</span>
           </button>
@@ -124,7 +124,7 @@
           <StateBadge :state="show" :StateEnum="AdvanceState" />
           <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" >
+        <hr class="hr">
         <AdvanceList
           ref="approvedAdvanceList"
           endpoint="approve/advance"

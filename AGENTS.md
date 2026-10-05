@@ -56,7 +56,7 @@ Note:
 - The development frontend image expects the repository to be mounted via Docker Compose. Do not rely on a plain `docker run abrechnung-frontend ...` invocation for validation in this repo layout.
 
 ## Coding Style & TypeScript
-- Follow repository formatter/linter settings (Biome + existing frontend ESLint usage where applicable).
+- Follow the repository Biome formatter/linter settings
 - Respect TypeScript strict mode in all packages; do not weaken compiler settings.
 - Do not add explicit function return type annotations (`func(): Type`) unless the task explicitly requires them.
 - Prefer normal static `import` statements. Do not introduce dynamic `import()` for application code unless the task explicitly requires lazy loading and the reason is documented in the change.

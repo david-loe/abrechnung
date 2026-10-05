@@ -1,6 +1,7 @@
 <template>
   <div>
-    <svg width="38" height="38">
+    <svg width="38" height="38" role="img" :aria-label="`${progress}%`">
+      <title>{{ progress }}%</title>
       <circle cx="19" cy="19" r="15.9" transform="rotate(-90 19 19)" />
       <text x="19" y="19" text-anchor="middle" dominant-baseline="central" font-size="11">{{ progress + '%' }}</text>
     </svg>

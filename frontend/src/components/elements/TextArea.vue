@@ -13,7 +13,7 @@
 import { nextTick, onMounted, useTemplateRef } from 'vue'
 
 const modelValue = defineModel<string | undefined | null>()
-const props = defineProps({ disabled: { type: Boolean, default: false }, required: { type: Boolean, default: false } })
+defineProps({ disabled: { type: Boolean, default: false }, required: { type: Boolean, default: false } })
 const textarea = useTemplateRef('textarea')
 
 function autoResize() {

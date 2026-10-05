@@ -112,7 +112,11 @@
           <h2>{{ t('headlines.home') }}</h2>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.travel && APP_DATA.user.access['appliedFor:travel']" class="col-auto">
-          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'travel', undefined)">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :disabled="!sessionState.isOnline.value"
+            @click="showModal('add', 'travel', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">
               {{ t(APP_DATA.user.access['approved:travel'] ? 'labels.addX' : 'labels.applyForX', { X: t('labels.travel') }) }}
@@ -120,19 +124,31 @@
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.expenseReport && APP_DATA.user.access['inWork:expenseReport']" class="col-auto">
-          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'expenseReport', undefined)">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :disabled="!sessionState.isOnline.value"
+            @click="showModal('add', 'expenseReport', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.addX', { X: t('labels.expenseReport') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.healthCareCost && APP_DATA.user.access['inWork:healthCareCost']" class="col-auto">
-          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'healthCareCost', undefined)">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :disabled="!sessionState.isOnline.value"
+            @click="showModal('add', 'healthCareCost', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.submitX', { X: t('labels.healthCareCost') }) }}</span>
           </button>
         </div>
         <div v-if="!APP_DATA.settings.disableReportType.advance && APP_DATA.user.access['appliedFor:advance']" class="col-auto">
-          <button class="btn btn-secondary" :disabled="!sessionState.isOnline.value" @click="showModal('add', 'advance', undefined)">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            :disabled="!sessionState.isOnline.value"
+            @click="showModal('add', 'advance', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.applyForX', { X: t('labels.advance') }) }}</span>
           </button>

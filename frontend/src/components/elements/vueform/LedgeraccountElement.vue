@@ -6,7 +6,7 @@
       <!-- @vueform/multiselect copmonent -->
       <Multiselect
         v-bind="fieldOptions"
-        v-if="APP_DATA && APP_DATA.ledgerAccounts"
+        v-if="APP_DATA?.ledgerAccounts"
         :options="APP_DATA.ledgerAccounts"
         valueProp="_id"
         searchable
@@ -30,6 +30,7 @@
         @paste="handlePaste"
         ref="input">
         <template
+          :key="slotKey"
           v-for="(slotName, slotKey) in {
             noresults: 'no-results',
             nooptions: 'no-options',
@@ -54,7 +55,7 @@
 
         <template v-slot:multiplelabel="{ values }">
           <span class="ms-2 mt-1 me-auto">
-            <span v-for="value of values" class="me-3">
+            <span v-for="value of values" :key="value._id" class="me-3">
               {{ `${value.identifier} - ${value.name}` }}
             </span>
           </span>
@@ -67,26 +68,24 @@
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]>
+    <template v-for="(component, slot) in elementSlots" :key="slot" #[slot]>
       <slot :name="slot" :el$="el$"><component :is="component" :el$="el$" /></slot>
     </template>
   </component>
 </template>
 
 <script>
-import APP_LOADER from '@/dataLoader.js'
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { SelectElement, defineElement } from '@vueform/vueform'
+import { defineElement, SelectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/bootstrap'
 import { ref } from 'vue'
+import APP_LOADER from '@/dataLoader.js'
 
 export default defineElement({
   ...SelectElement, // adding props, mixins, emits
   name: 'LedgeraccountElement',
   components: { Multiselect },
-  props: Object.assign(SelectElement.props, {
-    native: { type: Boolean, default: false }
-  }),
+  props: Object.assign(SelectElement.props, { native: { type: Boolean, default: false } }),
   data() {
     return { APP_DATA: APP_LOADER.data }
   },
@@ -103,13 +102,8 @@ export default defineElement({
   },
   setup(props, context) {
     const element = SelectElement.setup(props, context)
-    const defaultClasses = ref({
-      ...SelectElementTemplate.data().defaultClasses
-    })
-    return {
-      ...element,
-      defaultClasses
-    }
+    const defaultClasses = ref({ ...SelectElementTemplate.data().defaultClasses })
+    return { ...element, defaultClasses }
   },
   async created() {
     await APP_LOADER.loadData()

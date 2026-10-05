@@ -1,15 +1,12 @@
 <template>
   <div>
     <template v-if="userToEdit && !createOnly">
-      <ModalComponent
-        :header="`API Key (${formatter.name(userToEdit.name)})`"
-        @afterClose=";($refs.apiKeyForm as any).resetForm()"
-        ref="modal">
+      <ModalComponent :header="`API Key (${formatter.name(userToEdit.name)})`" @afterClose="apiKeyForm?.resetForm()" ref="modal">
         <ApiKeyForm
           :user="userToEdit"
           ref="apiKeyForm"
           endpoint="admin/user/httpBearer"
-          @cancel=";($refs.modal as any).hideModal()"
+          @cancel="apiKeyModal?.hideModal()"
           @new-key="
             () => {
               loadFromServer()
@@ -23,45 +20,57 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('name', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
             <input
               type="text"
               class="form-control"
-              v-model="(filter['name.givenName'] as any).$regex"
-              :placeholder="t('labels.givenName')" >
+              v-model="(filter['name.givenName'] as { $regex: string | undefined }).$regex"
+              :placeholder="t('labels.givenName')">
             <input
               type="text"
               class="form-control"
-              v-model="(filter['name.familyName'] as any).$regex"
-              :placeholder="t('labels.familyName')" >
+              v-model="(filter['name.familyName'] as { $regex: string | undefined }).$regex"
+              :placeholder="t('labels.familyName')">
           </div>
         </div>
       </template>
       <template #header-email="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('email', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.email"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('email', e)">
             <i v-if="showFilter.email" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.email" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.email as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.email as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
 
       <template #item-name="{ name }">{{ formatter.name(name) }}</template>
       <template #item-projects.assigned="{ projects }">
-        <span class="me-1" v-for="p in projects.assigned">{{ p.identifier }}</span>
+        <span class="me-1" v-for="p in projects.assigned" :key="p._id">{{ p.identifier }}</span>
       </template>
       <template #item-access="user">
-        <template v-for="access of accesses">
+        <template v-for="access of accesses" :key="access">
           <span v-if="user.access[access]" class="ms-3" :title="t('accesses.' + access)">
-            <i v-for="icon of APP_DATA!.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
+            <i v-for="icon of APP_DATA?.displaySettings.accessIcons[access]" :key="icon" :class="'bi bi-' + icon"></i>
           </span>
         </template>
       </template>
@@ -84,7 +93,7 @@
         :disabled="viewOnly"
         :endpoint="false"
         ref="form$"
-        @submit="(form$: any) => postUser(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postUser>[0] }) => postUser(form$.data)"
         @reset="_showForm = false"
         @mounted="setupForm" />
       <button v-if="viewOnly" type="button" class="btn btn-secondary mt-3" @click="closeForm">{{ t('labels.cancel') }}</button>
@@ -126,6 +135,8 @@ const headers = computed<Header[]>(() => [
   { text: '', value: 'buttons', width: createOnly.value ? 48 : 80 }
 ])
 
+const apiKeyForm = useTemplateRef('apiKeyForm')
+const apiKeyModal = useTemplateRef('modal')
 const list = useTemplateRef('list')
 async function loadFromServer() {
   if (list.value) {
@@ -259,7 +270,10 @@ if (schema.settings?.schema?.bankAccount) {
   for (const [key, value] of Object.entries(schema.settings.schema)) {
     if (key === 'bankAccount') {
       settingsSchema.bankAccountEnabled = {
-        type: 'checkbox', text: t('labels.addX', { X: t('labels.bankDetails') }), default: false, submit: false
+        type: 'checkbox',
+        text: t('labels.addX', { X: t('labels.bankDetails') }),
+        default: false,
+        submit: false
       }
       settingsSchema[key] = { ...value, conditions: [['settings.bankAccountEnabled', true]] }
     } else {
@@ -278,10 +292,7 @@ const tabs = props.createOnly
         label: t('labels.general'),
         elements: ['name', 'email', 'employeeId', 'additionalDetails', 'projects', 'settings', 'buttons0']
       },
-      tab1: {
-        label: `Login & ${t('labels.access')}`,
-        elements: ['fk', 'access', 'loseAccessAt', 'buttons1']
-      }
+      tab1: { label: `Login & ${t('labels.access')}`, elements: ['fk', 'access', 'loseAccessAt', 'buttons1'] }
     }
 </script>
 

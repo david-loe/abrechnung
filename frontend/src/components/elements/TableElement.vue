@@ -38,7 +38,7 @@
       :style="{ filter: showSettings ? 'blur(3px)' : 'none', transition: 'filter 0.2s ease-in-out' }">
       <template #header="header">{{ header.text ? t(header.text) : '' }}</template>
       <!-- Standard-Slot weiterleiten -->
-      <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+      <template v-for="(_, slot) in $slots" :key="slot" v-slot:[slot]="scope">
         <slot :name="slot" v-bind="scope"></slot>
       </template>
     </Vue3EasyDataTable>

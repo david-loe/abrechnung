@@ -1,3 +1,4 @@
+<!-- biome-ignore lint/correctness/useVueValidTemplateRoot: This route only redirects and intentionally renders no content. -->
 <template></template>
 
 <script setup lang="ts">

@@ -13,7 +13,7 @@
           <template #item-_reportModelName="{_reportModelName}">
             <span :title="t(`labels.${getReportTypeFromModelName(_reportModelName)}`)">
               <i
-                v-if="APP_DATA"
+                :key="icon"
                 v-for="icon in APP_DATA.displaySettings.reportTypeIcons[getReportTypeFromModelName(_reportModelName)]"
                 :class="`bi bi-${icon} me-1`"></i>
             </span>
@@ -35,7 +35,7 @@
             <div v-if="loadingSearch" class="z-1 position-absolute top-50 end-0 translate-middle-y">
               <span class="spinner-border spinner-border-sm me-2"></span>
             </div>
-            <input type="text" class="form-control" :placeholder="'🔍 ' + t('labels.search') + '...'" v-model="searchInput" >
+            <input type="text" class="form-control" :placeholder="'🔍 ' + t('labels.search') + '...'" v-model="searchInput">
           </div>
         </form>
       </li>
@@ -43,7 +43,7 @@
         <template v-for="access of flatAccessList" :key="access">
           <li class="nav-item d-flex align-items-center">
             <router-link :to="'/' + access" class="nav-link link-body-emphasis d-flex align-items-center">
-              <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'bi bi-' + icon"></i>
+              <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :key="icon" :class="'bi bi-' + icon"></i>
               <span class="ms-1">{{ t('accesses.' + access) }}</span>
               <ActionCountBadge :count="getActionCount(access)" />
             </router-link>
@@ -52,27 +52,27 @@
       </template>
       <template v-else>
         <li class="nav-item dropdown me-2">
-          <a
-            class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable position-relative"
-            role="button"
+          <button
+            aria-expanded="false"
+            :aria-label="t('labels.menu')"
+            type="button"
+            class="button-reset nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable position-relative"
             data-bs-toggle="dropdown">
             <i class="fs-4 bi bi-menu-down"></i>
             <span class="ms-1">{{ t('labels.menu') }}</span>
-            <ActionCountBadge
-              :count="actionCountState.total.value"
-              class="menu-action-count position-absolute top-0 end-0" />
-          </a>
+            <ActionCountBadge :count="actionCountState.total.value" class="menu-action-count position-absolute top-0 end-0" />
+          </button>
           <ul class="dropdown-menu dropdown-menu-end">
-            <template v-for="(accesses,i) of orderdAccessList">
+            <template v-for="(accesses, i) of orderdAccessList" :key="i">
               <li v-for="access of accesses" :key="access">
                 <router-link :to="'/' + access" class="d-flex align-items-center dropdown-item">
-                  <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :class="'fs-5 bi bi-' + icon"></i>
+                  <i v-for="icon of APP_DATA.displaySettings.accessIcons[access]" :key="icon" :class="'fs-5 bi bi-' + icon"></i>
                   <span class="ms-1">{{ t('accesses.' + access) }}</span>
                   <ActionCountBadge :count="getActionCount(access)" class="ms-auto" />
                 </router-link>
               </li>
               <li v-if="i !== orderdAccessList.length - 1">
-                <hr class="dropdown-divider" >
+                <hr class="dropdown-divider">
               </li>
             </template>
           </ul>
@@ -80,10 +80,15 @@
       </template>
 
       <li class="nav-item dropdown me-2">
-        <a class="nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable" data-bs-toggle="dropdown" role="button">
+        <button
+          aria-expanded="false"
+          :aria-label="t('labels.menu')"
+          type="button"
+          class="button-reset nav-link link-body-emphasis d-flex align-items-center dropdown-toggle clickable"
+          data-bs-toggle="dropdown">
           <i class="fs-4 bi bi-person-circle"></i>
           <span class="ms-1">{{ APP_DATA.user.name.givenName }}</span>
-        </a>
+        </button>
         <ul class="dropdown-menu dropdown-menu-end">
           <li>
             <router-link to="/user/settings" class="d-flex align-items-center dropdown-item">
@@ -93,22 +98,24 @@
           </li>
           <template v-if="isMobile && !alreadyInstalled && !offlineBannerRef?.isOffline">
             <li>
-              <hr class="dropdown-divider" >
+              <hr class="dropdown-divider">
             </li>
             <li>
-              <button @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
+              <button type="button" @click="showInstallBanner" class="d-flex align-items-center dropdown-item">
                 <i class="fs-4 bi bi-box-arrow-down"></i>
                 <span class="ms-1">{{ t('labels.installApp') }}</span>
               </button>
             </li>
           </template>
           <li>
-            <hr class="dropdown-divider" >
+            <hr class="dropdown-divider">
           </li>
-          <li><a class="d-flex align-items-center dropdown-item clickable" @click="logout">
-            <i class="fs-4 bi bi-box-arrow-left"></i>
-            <span class="ms-1">{{ t('headlines.logout') }}</span>
-          </a></li>
+          <li>
+            <button type="button" class="button-reset d-flex align-items-center dropdown-item clickable" @click="logout">
+              <i class="fs-4 bi bi-box-arrow-left"></i>
+              <span class="ms-1">{{ t('headlines.logout') }}</span>
+            </button>
+          </li>
         </ul>
       </li>
     </template>
@@ -145,11 +152,11 @@
 
 <script lang="ts" setup>
 import {
-  ActionAccess,
   Access,
-  actionAccesses,
+  ActionAccess,
   AnyState,
   accesses,
+  actionAccesses,
   getReportTypeFromModelName,
   getStateEnumFromModelName,
   IdDocument,
@@ -307,6 +314,7 @@ watch(
 
 <style>
 .menu-action-count {
+  /* biome-ignore lint/complexity/noImportantStyles: Override the badge’s Bootstrap margin utility when positioning the menu count. */
   margin-left: 0 !important;
   padding: 0.2em 0.45em;
   font-size: 0.625rem;

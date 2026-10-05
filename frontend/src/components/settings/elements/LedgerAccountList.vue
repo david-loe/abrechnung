@@ -4,24 +4,36 @@
       <template #header-identifier="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('identifier')">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.identifier"
+            class="button-reset"
+            type="button"
+            style="cursor: pointer"
+            @click="clickFilter('identifier')">
             <i v-if="showFilter.identifier" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
           <div v-if="showFilter.identifier">
-            <input type="text" class="form-control" v-model="(filter.identifier as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.identifier as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
       <template #header-name="header">
         <div class="filter-column">
           {{ header.text }}
-          <span style="cursor: pointer" @click="clickFilter('name')">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            class="button-reset"
+            type="button"
+            style="cursor: pointer"
+            @click="clickFilter('name')">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
           <div v-if="showFilter.name">
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" />
+            <input type="text" class="form-control" v-model="(filter.name as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
@@ -47,7 +59,7 @@
         v-model="ledgerAccountToEdit"
         :sync="true"
         :endpoint="false"
-        @submit="(form$: any) => postLedgerAccount(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postLedgerAccount>[0] }) => postLedgerAccount(form$.data)"
         @reset="_showForm = false"></Vueform>
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">
@@ -59,12 +71,12 @@
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
 import { LedgerAccount } from 'abrechnung-common/types.js'
-import API from '@/api.js'
-import APP_LOADER from '@/dataLoader.js'
-import ListElement from '@/components/elements/ListElement.vue'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
+import API from '@/api.js'
+import ListElement from '@/components/elements/ListElement.vue'
+import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()
 
@@ -86,10 +98,7 @@ const getEmptyFilter = () => ({ name: { $regex: undefined, $options: 'i' }, iden
 
 const filter = ref(getEmptyFilter())
 
-const showFilter = ref({
-  name: false,
-  identifier: false
-})
+const showFilter = ref({ name: false, identifier: false })
 
 function clickFilter(header: keyof typeof showFilter.value) {
   if (showFilter.value[header]) {

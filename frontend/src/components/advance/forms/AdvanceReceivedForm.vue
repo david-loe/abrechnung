@@ -1,7 +1,7 @@
 <template>
   <form @submit.prevent="submit">
     <div class="form-check mb-3">
-      <input class="form-check-input" type="checkbox" id="advanceReceivedCheck" v-model="confirmed" :disabled="loading" required >
+      <input class="form-check-input" type="checkbox" id="advanceReceivedCheck" v-model="confirmed" :disabled="loading" required>
       <label class="form-check-label" for="advanceReceivedCheck">
         {{ t('labels.advanceReceiptConfirmation', { amount: formatter.money(props.advance.budget) }) }}
         <span class="text-danger">*</span>

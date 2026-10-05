@@ -4,12 +4,18 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('name', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.name as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
@@ -37,7 +43,7 @@
         v-model="categoryToEdit"
         :sync="true"
         :endpoint="false"
-        @submit="(form$: any) => postCategory(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postCategory>[0] }) => postCategory(form$.data)"
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.category') }) }}</button>
@@ -46,8 +52,8 @@
 
 <script lang="ts" setup>
 import { VueformSchema } from '@vueform/vueform'
-import { getById } from 'abrechnung-common/utils/scripts.js'
 import { Category, getReportTypeFromModelName } from 'abrechnung-common/types.js'
+import { getById } from 'abrechnung-common/utils/scripts.js'
 import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'

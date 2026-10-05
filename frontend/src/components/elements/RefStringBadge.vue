@@ -1,11 +1,11 @@
 <template>
-  <span v-if="props.number > 0" class="badge text-bg-secondary clickable" @click="copyToClipboard">
+  <button type="button" v-if="props.number > 0" class="button-reset badge text-bg-secondary clickable" @click="copyToClipboard">
     {{ refString }}
     <span v-if="showCopy" class="icon ms-1">
       <i v-if="copied" class="bi bi-check-lg"></i>
       <i v-else class="bi bi-copy"></i>
     </span>
-  </span>
+  </button>
 </template>
 
 <script lang="ts" setup>

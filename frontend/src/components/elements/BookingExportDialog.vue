@@ -16,7 +16,7 @@
     <form v-else @submit.prevent="exportPackage">
       <div class="mb-3">
         <label for="booking-export-date" class="form-label">{{ t('labels.date') }}</label>
-        <input id="booking-export-date" v-model="executionDate" type="date" class="form-control" required >
+        <input id="booking-export-date" v-model="executionDate" type="date" class="form-control" required>
       </div>
 
       <div v-for="organisation in preview?.organisations" :key="organisation._id" class="border rounded p-3 mb-3">
@@ -25,11 +25,7 @@
           <span>{{ formatAmount(organisation.amount) }}</span>
         </div>
         <label class="form-label" :for="`booking-export-account-${organisation._id}`">{{ t('labels.payoutAccounts') }}</label>
-        <select
-          :id="`booking-export-account-${organisation._id}`"
-          v-model="selections[organisation._id]"
-          class="form-select"
-          required>
+        <select :id="`booking-export-account-${organisation._id}`" v-model="selections[organisation._id]" class="form-select" required>
           <option disabled value="">{{ t('labels.select') }}</option>
           <option v-for="account in organisation.accounts" :key="account._id" :value="account._id">
             {{ account.name }} · {{ account.maskedIban }}
@@ -75,9 +71,7 @@ const exportedReportIds = ref<string[]>([])
 
 const canExport = computed(
   () =>
-    Boolean(preview.value) &&
-    preview.value?.errors.length === 0 &&
-    preview.value.organisations.every(({ _id }) => Boolean(selections[_id]))
+    Boolean(preview.value) && preview.value?.errors.length === 0 && preview.value.organisations.every(({ _id }) => Boolean(selections[_id]))
 )
 
 function today() {
@@ -128,10 +122,7 @@ async function exportPackage() {
 async function markAsBooked() {
   if (exportedReportIds.value.length === 0) return
   loadingBooking.value = true
-  const result = await API.setter<{ status: 'fulfilled' | 'rejected' }[]>(
-    `${props.endpoint}/booked`,
-    exportedReportIds.value
-  )
+  const result = await API.setter<{ status: 'fulfilled' | 'rejected' }[]>(`${props.endpoint}/booked`, exportedReportIds.value)
   loadingBooking.value = false
   if (!result.ok) return
   const bookedReportIds = exportedReportIds.value.filter((_, index) => result.ok?.[index]?.status === 'fulfilled')
@@ -145,14 +136,10 @@ function formatAmount(amount: number) {
 
 function errorMessage(error: string) {
   const [code, organisation, account] = error.split(':')
-  if (code === 'missingEmployeeBankAccount')
-    return t('alerts.bookingExportMissingEmployeeBankAccount', { report: organisation })
-  if (code === 'missingPayoutAccount')
-    return t('alerts.bookingExportMissingPayoutAccount', { organisation })
-  if (code === 'missingBankLedgerAccount')
-    return t('alerts.bookingExportMissingBankLedgerAccount', { organisation, account })
-  if (code === 'invalidPayoutAccount')
-    return t('alerts.bookingExportInvalidPayoutAccount', { organisation, account })
+  if (code === 'missingEmployeeBankAccount') return t('alerts.bookingExportMissingEmployeeBankAccount', { report: organisation })
+  if (code === 'missingPayoutAccount') return t('alerts.bookingExportMissingPayoutAccount', { organisation })
+  if (code === 'missingBankLedgerAccount') return t('alerts.bookingExportMissingBankLedgerAccount', { organisation, account })
+  if (code === 'invalidPayoutAccount') return t('alerts.bookingExportInvalidPayoutAccount', { organisation, account })
   return error
 }
 

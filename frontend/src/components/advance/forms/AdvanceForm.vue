@@ -10,7 +10,7 @@
 
     <div class="mb-2">
       <label for="advanceFormName" class="form-label">{{ t('labels.label') }}</label>
-      <input type="text" class="form-control" id="advanceFormName" v-model="formAdvance.name" :disabled="disabled" >
+      <input type="text" class="form-control" id="advanceFormName" v-model="formAdvance.name" :disabled="disabled">
     </div>
 
     <div class="mb-2">
@@ -18,7 +18,7 @@
         {{ t('labels.reason') }}
         <span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="advanceFormReason" v-model="formAdvance.reason" :disabled="disabled" required >
+      <input type="text" class="form-control" id="advanceFormReason" v-model="formAdvance.reason" :disabled="disabled" required>
     </div>
 
     <div class="mb-3">
@@ -27,7 +27,7 @@
         <span class="text-danger">*</span>
       </label>
       <div class="input-group" id="advanceFormBudget">
-        <input type="number" class="form-control" step="0.01" v-model="formAdvance.budget.amount" min="0" :disabled="disabled" required >
+        <input type="number" class="form-control" step="0.01" v-model="formAdvance.budget.amount" min="0" :disabled="disabled" required>
         <CurrencySelector v-model="formAdvance.budget.currency" :disabled="disabled" :required="true" />
       </div>
     </div>
@@ -56,8 +56,8 @@
     </div>
 
     <div class="mb-3" v-if="!disabled">
-      <label class="form-label me-2">{{ t('labels.comment') }}</label>
-      <CTextArea v-model="formAdvance.comment" />
+      <label :for="commentId" class="form-label me-2">{{ t('labels.comment') }}</label>
+      <CTextArea :id="commentId" v-model="formAdvance.comment" />
     </div>
 
     <div v-if="askBookingRemark" class="mb-3">
@@ -74,7 +74,7 @@
         class="btn btn-danger me-2"
         :disabled="loading"
         v-if="mode === 'edit' && !disabled"
-        @click="disabled ? null : emit('deleted', (formAdvance as any)._id)">
+        @click="disabled || !formAdvance._id ? null : emit('deleted', formAdvance._id)">
         {{ t('labels.delete') }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
@@ -85,7 +85,7 @@
 
 <script lang="ts" setup>
 import { AdvanceSimple, baseCurrency, idDocumentToId } from 'abrechnung-common/types.js'
-import { computed, PropType, ref, watch } from 'vue'
+import { computed, PropType, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -94,6 +94,7 @@ import ProjectSelector from '@/components/elements/ProjectSelector.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import UserSelector from '@/components/elements/UserSelector.vue'
 
+const commentId = useId()
 const { t } = useI18n()
 
 const props = defineProps({

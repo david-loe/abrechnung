@@ -90,7 +90,7 @@
       </div>
     </template>
 
-    <template v-if="formStage.transport.type == 'ownCar'">
+    <template v-if="formStage.transport.type === 'ownCar'">
       <div class="mb-3">
         <label for="stageFormTransport" class="form-label">
           {{ t('labels.distanceRefundType') }}
@@ -103,12 +103,14 @@
           :disabled="disabled"
           required>
           <option v-for="distanceRefundType of distanceRefundTypes" :value="distanceRefundType" :key="distanceRefundType">
-            {{ t('distanceRefundTypes.' + distanceRefundType) +
-              ' (' +
-              props.travelSettings.distanceRefunds[distanceRefundType as DistanceRefundType] +
-              ' ' +
-              baseCurrency.symbol +
-              '/km)' }}
+            {{
+              t('distanceRefundTypes.' + distanceRefundType) +
+                ' (' +
+                props.travelSettings.distanceRefunds[distanceRefundType as DistanceRefundType] +
+                ' ' +
+                baseCurrency.symbol +
+                '/km)'
+            }}
           </option>
         </select>
       </div>
@@ -127,7 +129,7 @@
           v-model="formStage.transport.distance"
           id="stageFormDistance"
           :disabled="disabled"
-          required >
+          required>
       </div>
       <div class="mb-3" v-if="props.vehicleRegistration && props.travelSettings.vehicleRegistrationWhenUsingOwnCar !== 'none'">
         <label for="stageFormVehicleRegistration" class="form-label me-2">
@@ -183,7 +185,7 @@
     <template
       v-if="
         formStage.transport.type !== 'ownCar' ||
-        (formStage.transport.type == 'ownCar' && formStage.cost.receipts && formStage.cost.receipts.length > 0)
+        (formStage.transport.type === 'ownCar' && formStage.cost.receipts && formStage.cost.receipts.length > 0)
       ">
       <div class="mb-3">
         <label for="stageFormFile" class="form-label me-2">
@@ -271,9 +273,9 @@ import { computed, PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 import { formatter } from '../../../formatter'
+import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import CountrySelector from '../../elements/CountrySelector.vue'
 import CurrencySelector from '../../elements/CurrencySelector.vue'
-import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
 import DateInput from '../../elements/DateInput.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
@@ -474,7 +476,8 @@ watch(
   ],
   ([distance, refundType]) => {
     const position = formStage.value.cost.positions.find(({ kind }) => kind === 'ownCar')
-    if (position && refundType) position.grossAmount = multiplyAmountAndRound(distance || 0, props.travelSettings.distanceRefunds[refundType])
+    if (position && refundType)
+      position.grossAmount = multiplyAmountAndRound(distance || 0, props.travelSettings.distanceRefunds[refundType])
   }
 )
 watch(() => formStage.value.startLocation?.country, calcMidnightCountries)

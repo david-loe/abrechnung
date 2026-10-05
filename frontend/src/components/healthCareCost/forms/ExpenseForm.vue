@@ -21,7 +21,7 @@
         {{ t('labels.preciseServiceDescription') }}
         <span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required>
     </div>
 
     <div class="row mb-2">
@@ -102,14 +102,14 @@ import { baseCurrency, Expense, ProjectSimple } from 'abrechnung-common/types.js
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
-import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import CostPositionsEditor from '@/components/elements/CostPositionsEditor.vue'
+import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import DateInput from '@/components/elements/DateInput.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
-import { formatter } from '@/formatter.js'
 import CTextArea from '@/components/elements/TextArea.vue'
+import { formatter } from '@/formatter.js'
+import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
 
 const { t } = useI18n()
 

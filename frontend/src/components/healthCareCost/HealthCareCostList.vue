@@ -15,41 +15,61 @@
     <template #header-reference="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('reference', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter.reference"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('reference', e)">
           <i v-if="showFilter.reference" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.reference" @click.stop>
           <input
             type="text"
             class="form-control"
-            @input="(event : Event)=> filter.reference = refStringRegexLax.exec((event.target as HTMLInputElement).value)? refStringToNumber((event.target as HTMLInputElement).value).ref : undefined" >
+            @input="(event : Event)=> filter.reference = refStringRegexLax.exec((event.target as HTMLInputElement).value)? refStringToNumber((event.target as HTMLInputElement).value).ref : undefined">
         </div>
       </div>
     </template>
     <template #header-name="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('name', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter.name"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('name', e)">
           <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.name" @click.stop>
-          <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+          <input type="text" class="form-control" v-model="(filter.name as { $regex: string | undefined }).$regex">
         </div>
       </div>
     </template>
     <template #header-state="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('state', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter.state"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('state', e)">
           <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.state" @click.stop>
           <select class="form-select" v-model="filter.state">
             <option disabled value=""></option>
-            <option v-for="state of healthCareCostStates" :value="state">{{ t('states.' + HealthCareCostState[state]) }}</option>
+            <option v-for="state of healthCareCostStates" :key="state" :value="state">
+              {{ t('states.' + HealthCareCostState[state]) }}
+            </option>
           </select>
         </div>
       </div>
@@ -57,36 +77,58 @@
     <template #header-insurance.name="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('insurance', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter.insurance"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('insurance', e)">
           <i v-if="showFilter.insurance" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.insurance" @click.stop>
-          <HealthInsuranceSelector v-model="filter.insurance as any" />
+          <HealthInsuranceSelector v-model="filter.insurance as InstanceType<typeof HealthInsuranceSelector>['$props']['modelValue']" />
         </div>
       </div>
     </template>
     <template #header-project.identifier="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('project', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter.project"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('project', e)">
           <i v-if="showFilter.project" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.project" @click.stop>
-          <ProjectSelector v-model="(filter.project as any).$in[0]" :orgSelectSplit="5" />
+          <ProjectSelector
+            v-model="(filter.project as { $in: InstanceType<typeof ProjectSelector>['$props']['modelValue'][] }).$in[0]"
+            :orgSelectSplit="5" />
         </div>
       </div>
     </template>
     <template #header-organisation="header">
       <div class="filter-column">
         {{ t(header.text) }}
-        <span class="clickable" @click="(e) => clickFilter('project.organisation', e)">
+        <button
+          :aria-label="t('labels.filter')"
+          :aria-expanded="showFilter['project.organisation']"
+          type="button"
+          class="button-reset clickable"
+          @click="(e) => clickFilter('project.organisation', e)">
           <i v-if="showFilter['project.organisation']" class="bi bi-funnel-fill"></i>
           <i v-else class="bi bi-funnel"></i>
-        </span>
+        </button>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter['project.organisation']" @click.stop>
-          <ProjectsOfOrganisationSelector v-model="(filter.project as any).$in" reduce-to-id />
+          <ProjectsOfOrganisationSelector
+            v-model="(filter.project as { $in: InstanceType<typeof ProjectsOfOrganisationSelector>['$props']['modelValue'] }).$in"
+            reduce-to-id />
         </div>
       </div>
     </template>
@@ -94,13 +136,19 @@
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('owner', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.owner"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('owner', e)">
             <i v-if="showFilter.owner" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
-          </span>
+          </button>
         </div>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.owner" @click.stop>
-          <UserSelector v-model="(filter.owner as any)" />
+          <UserSelector v-model="(filter.owner as InstanceType<typeof UserSelector>['$props']['modelValue'])" />
         </div>
       </div>
     </template>
@@ -108,13 +156,19 @@
       <div class="filter-column">
         <div class="d-flex align-items-stretch">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('updatedAt', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.updatedAt"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('updatedAt', e)">
             <i v-if="showFilter.updatedAt" class="bi bi-funnel-fill mx-1"></i>
             <i v-else class="bi bi-funnel mx-1"></i>
-          </span>
+          </button>
         </div>
+        <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
         <div v-if="showFilter.updatedAt" @click.stop>
-          <DateInput v-model="(filter.updatedAt as any).$gt" :max="new Date()" with-time />
+          <DateInput v-model="(filter.updatedAt as { $gt: Date | string | undefined }).$gt" :max="new Date()" with-time />
         </div>
       </div>
     </template>
@@ -154,6 +208,7 @@
     </template>
     <template #item-report="{ _id, name }">
       <button
+        type="button"
         class="btn btn-primary btn-sm"
         @click="
           showFile({ endpoint: `${props.endpoint}/report`, params: { _id }, filename: `${name}.pdf`, isDownloading: isDownloadingFn() })
@@ -165,12 +220,14 @@
       </button>
     </template>
     <template #item-updatedAt="{ updatedAt }">{{ formatter.dateTime(updatedAt) }}</template>
-    <template #item-bookingRemark="{ bookingRemark }"><span v-if="bookingRemark">
-      <TooltipElement :text="bookingRemark"><i class="bi bi-chat-left-text"></i></TooltipElement>
-    </span></template>
+    <template #item-bookingRemark="{ bookingRemark }"
+      ><span v-if="bookingRemark">
+        <TooltipElement :text="bookingRemark"><i class="bi bi-chat-left-text"></i></TooltipElement>
+      </span></template
+    >
     <!-- Standard-Slot weiterleiten -->
 
-    <template v-for="(_, slot) in $slots" v-slot:[slot]="scope">
+    <template v-for="(_, slot) in $slots" :key="slot" v-slot:[slot]="scope">
       <slot :name="slot" v-bind="scope"></slot>
     </template>
   </ListElement>

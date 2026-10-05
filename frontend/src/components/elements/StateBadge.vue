@@ -5,9 +5,9 @@
 <script lang="ts" setup>
 import { AnyState, AnyStateEnum } from 'abrechnung-common/types.js'
 import { PropType } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Badge from '@/components/elements/Badge.vue'
 import APP_LOADER from '@/dataLoader.js'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

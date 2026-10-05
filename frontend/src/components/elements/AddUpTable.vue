@@ -7,26 +7,28 @@
           <ProgressCircle :progress="progress" />
         </td>
       </tr>
-      <tr v-for="row of addUpTableData">
+      <tr v-for="(row, rowIndex) of addUpTableData" :key="rowIndex">
         <th class="align-top">
           {{ t(row[0]) }}
           <small class="fw-normal" v-if="row[0] === 'labels.lumpSums' && claimSpouseRefund">
-            <br >
+            <br>
             {{ t('labels.includingSpouseRefund') }}
           </small>
         </th>
-        <template v-for="(col, index) of row">
+        <template v-for="(col, index) of row" :key="index">
           <td v-if="index !== 0" class="text-end tnum">
             {{ col }}
             <small v-if="row[0] === 'labels.advance' && showAdvanceOverflow && addUp[index - 1].advanceOverflow">
-              <br >
+              <br>
               {{ `(${formatAddUpAmount(getAdvanceOverflowAmount(addUp[index - 1]), addUp[index - 1])} ${t('labels.left')})` }}
             </small>
             <template v-if="row[0] === 'labels.balance' && addUp[index - 1].negativeTotal">
-              <TooltipElement :text="t('alerts.negativeTotal')"><small class="fw-light">
-                <br >
-                {{ `(⚠️ ${formatAddUpAmount(getNegativeTotalWarningAmount(addUp[index - 1]), addUp[index - 1])})` }}
-              </small></TooltipElement>
+              <TooltipElement :text="t('alerts.negativeTotal')"
+                ><small class="fw-light">
+                  <br>
+                  {{ `(⚠️ ${formatAddUpAmount(getNegativeTotalWarningAmount(addUp[index - 1]), addUp[index - 1])})` }}
+                </small></TooltipElement
+              >
             </template>
           </td>
         </template>
@@ -43,12 +45,12 @@
           </span>
           <span v-else>⚠️ {{ t('alerts.exchangeRateUnavailable') }}</span>
           <template v-if="showExchangeRateDate">
-            <br >
+            <br>
             <small class="text-secondary">{{ formatter.date(exchangeRateDate) }}</small>
           </template>
         </td>
       </tr>
-      <tr v-if="project.budget && project.budget.amount">
+      <tr v-if="project.budget?.amount">
         <td><small>{{ t('labels.project') }}</small></td>
         <td class="text-end">
           <small>{{ formatter.money(project.balance) + ' ' + t('labels.from') + ' ' + formatter.money(project.budget) }}</small>

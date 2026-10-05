@@ -4,29 +4,41 @@
       <template #header-identifier="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('identifier', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.identifier"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('identifier', e)">
             <i v-if="showFilter.identifier" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.identifier" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.identifier as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.identifier as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('name', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.name as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
 
-      <template #item-organisation="{ organisation }">{{ getById(organisation, APP_DATA!.organisations)?.name }}</template>
+      <template #item-organisation="{ organisation }">{{ getById(organisation, APP_DATA?.organisations ?? [])?.name }}</template>
       <template #item-buttons="project">
         <button v-if="createOnly" type="button" class="btn btn-light btn-sm" @click="showForm(project, true)">
           <i class="bi bi-eye"></i>
@@ -44,7 +56,7 @@
         :sync="true"
         :disabled="viewOnly"
         :endpoint="false"
-        @submit="(form$: any) => postProject(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postProject>[0] }) => postProject(form$.data)"
         @reset="_showForm = false" />
       <button v-if="viewOnly" type="button" class="btn btn-secondary mt-3" @click="closeForm">{{ t('labels.cancel') }}</button>
     </div>
@@ -149,9 +161,7 @@ const schema = Object.assign({}, (await API.getter<{ [key: string]: VueformSchem
     }
   }
 })
-const readOnlySchema = Object.fromEntries(
-  Object.entries(schema).filter(([field]) => field !== 'assignees' && field !== 'supervisors')
-)
+const readOnlySchema = Object.fromEntries(Object.entries(schema).filter(([field]) => field !== 'assignees' && field !== 'supervisors'))
 const formSchema = computed(() => (viewOnly.value ? readOnlySchema : schema))
 </script>
 

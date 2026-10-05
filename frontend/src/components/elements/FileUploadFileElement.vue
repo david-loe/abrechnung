@@ -1,6 +1,13 @@
 <template>
   <div class="col-auto" style="max-width: 110px" :title="props.file.name">
-    <div class="border rounded p-2 clickable" role="button" tabindex="0" @click="onCardClick" @keydown.enter="onCardClick">
+    <!-- biome-ignore lint/a11y/useSemanticElements: The file card contains separate rotate/delete buttons, which cannot be nested in a native button. -->
+    <div
+      class="border rounded p-2 clickable"
+      role="button"
+      tabindex="0"
+      @click="onCardClick"
+      @keydown.enter.self="onCardClick"
+      @keydown.space.self.prevent="onCardClick">
       <div class="row justify-content-between m-0">
         <div class="col-auto p-0 dropup-center dropup file-action" v-if="isImage">
           <button
@@ -16,7 +23,8 @@
           <ul class="dropdown-menu p-1">
             <li class="d-flex gap-1">
               <button
-                v-for="angle in ([90, 180, 270] as const)"
+                v-for="angle in [90, 180, 270] as const"
+                :key="angle"
                 type="button"
                 class="btn btn-sm btn-light dropdown-item p-0"
                 :title="t('labels.rotate') + ' '+ angle + '°'"
@@ -46,10 +54,10 @@
 
 <script lang="ts" setup>
 import { DocumentFile } from 'abrechnung-common/types.js'
+import { Dropdown } from 'bootstrap'
 import { computed, PropType, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import RotationDegreePreview from './RotationDegreePreview.vue'
-import { Dropdown } from 'bootstrap'
 
 const { t } = useI18n()
 

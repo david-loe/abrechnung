@@ -66,7 +66,7 @@
           :travel="(modalTravel as TravelSimple)"
           :loading="modalFormIsLoading"
           @cancel="resetAndHide()"
-          @decision="(d, c) => approveTravel((modalTravel as TravelSimple)!, d, c)" />
+          @decision="(d, c) => approveTravel(modalTravel as TravelSimple, d, c)" />
         <template v-else-if="modalTravel.state === TravelState.APPROVED">
           <TravelApply :travel="(modalTravel as TravelSimple)" />
           <div class="mb-3">
@@ -109,7 +109,7 @@
             @submitted="() => approvedTravelList?.loadFromServer()" />
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', undefined)">
+          <button type="button" class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.travel') }) }}</span>
           </button>
@@ -146,7 +146,7 @@
           <i class="bi bi-file-earmark-pdf"></i>
           <span class="ms-1">{{ t('labels.approvedTravelReport') }}</span>
         </button>
-        <hr class="hr" >
+        <hr class="hr">
         <TravelList
           ref="approvedTravelList"
           endpoint="approve/travel"
@@ -165,8 +165,8 @@ import { onMounted, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import API from '@/api.js'
-import DateInput from '@/components/elements/DateInput.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
+import DateInput from '@/components/elements/DateInput.vue'
 import ModalComponent from '@/components/elements/ModalComponent.vue'
 import RefStringBadge from '@/components/elements/RefStringBadge.vue'
 import StateBadge from '@/components/elements/StateBadge.vue'
@@ -175,8 +175,8 @@ import TravelApply from '@/components/travel/elements/TravelApplication.vue'
 import TravelApplyForm from '@/components/travel/forms/TravelApplyForm.vue'
 import TravelApproveForm from '@/components/travel/forms/TravelApproveForm.vue'
 import TravelList from '@/components/travel/TravelList.vue'
-import APP_LOADER from '@/dataLoader.js'
 import { parseCsvBoolean, travelImportTemplateFields } from '@/csvImport.js'
+import APP_LOADER from '@/dataLoader.js'
 import { showFile } from '@/helper.js'
 import OrganisationSelector from '../elements/OrganisationSelector.vue'
 

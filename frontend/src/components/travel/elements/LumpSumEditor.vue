@@ -33,30 +33,42 @@
         </tr>
         <tr>
           <td></td>
-          <td class="py-0 px-2 text-nowrap" v-for="meal in lumpSums" :key="meal"><span v-if="!disabled" class="d-sm-inline d-none">
-            <span class="clickable text-primary" @click="setAll(meal, true)"> <i class="bi bi-check-square"></i> </span>
-            <span class="ms-2 clickable text-danger" @click="setAll(meal, false)"> <i class="bi bi-x-square"></i> </span>
-          </span></td>
-          <td v-if="professionalShare !== null" class="py-0"><small>
-            <span class="d-lg-inline d-none"> {{ t('labels.professionalShare') + ': ' }}</span>
-            <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
-              {{ Math.round(professionalShare * 100) + '%' }}
+          <td class="py-0 px-2 text-nowrap" v-for="meal in lumpSums" :key="meal">
+            <span v-if="!disabled" class="d-sm-inline d-none">
+              <button :aria-label="t('labels.all')" type="button" class="button-reset clickable text-primary" @click="setAll(meal, true)">
+                <i class="bi bi-check-square"></i>
+              </button>
+              <button
+                :aria-label="t('labels.none')"
+                type="button"
+                class="button-reset ms-2 clickable text-danger"
+                @click="setAll(meal, false)">
+                <i class="bi bi-x-square"></i>
+              </button>
             </span>
-          </small></td>
+          </td>
+          <td v-if="professionalShare !== null" class="py-0">
+            <small>
+              <span class="d-lg-inline d-none"> {{ t('labels.professionalShare') + ': ' }}</span>
+              <span :class="'d-sm-inline d-none' + (professionalShare <= props.travelSettings.minProfessionalShare ? ' text-danger' : '')">
+                {{ Math.round(professionalShare * 100) + '%' }}
+              </span>
+            </small>
+          </td>
         </tr>
       </thead>
       <tbody class="table-group-divider">
-        <tr v-for="day of localDays">
+        <tr v-for="day of localDays" :key="day._id">
           <th scope="row" class="text-nowrap">
             {{ formatter.dateWithYearIfNotCurrent(day.date) }}
             <span class="ms-1">{{ day.country.flag || '' }}</span>
           </th>
           <template v-if="day.purpose === 'professional'">
             <td v-for="meal of meals" :key="meal">
-              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.cateringRefund[meal]" :disabled="disabled" >
+              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.cateringRefund[meal]" :disabled="disabled">
             </td>
             <td>
-              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.overnightRefund" :disabled="disabled" >
+              <input class="form-check-input m-0 p-2" type="checkbox" v-model="day.overnightRefund" :disabled="disabled">
             </td>
           </template>
           <template v-else>
@@ -73,9 +85,9 @@
 
     <div class="mb-3 row">
       <div class="col">
-        <label class="form-label me-2">{{ t('labels.lastPlaceOfWork') }}</label>
+        <label :for="lastPlaceId" class="form-label me-2">{{ t('labels.lastPlaceOfWork') }}</label>
         <div class="d-inline-flex flex-shrink-1 me-2">
-          <select class="form-select form-select-sm" v-model="localLastPlaceOfWork" :disabled="disabled">
+          <select :id="lastPlaceId" class="form-select form-select-sm" v-model="localLastPlaceOfWork" :disabled="disabled">
             <option v-for="place of lastPlaceOfWorkList" :value="place" :key="place.country._id + place.special">
               <PlaceElement :place="place" :showPlace="false" :showSpecial="true" />
             </option>
@@ -100,7 +112,7 @@
 import { TravelCalculator } from 'abrechnung-common/travel/calculator.js'
 import { meals, Place, Travel, TravelDay, TravelSettings } from 'abrechnung-common/types.js'
 import { getLumpSumsSum, mergeDeep } from 'abrechnung-common/utils/scripts.js'
-import { computed, PropType, ref, watch } from 'vue'
+import { computed, PropType, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { formatter } from '../../../formatter.js'
 import InfoPoint from '../../elements/InfoPoint.vue'
@@ -108,6 +120,7 @@ import PlaceElement from '../../elements/PlaceElement.vue'
 
 const emojis = { breakfast: '🥐', lunch: '🥪', dinner: '🍽️', overnight: '🛏️' } as const
 
+const lastPlaceId = useId()
 const { t } = useI18n()
 
 const props = defineProps({

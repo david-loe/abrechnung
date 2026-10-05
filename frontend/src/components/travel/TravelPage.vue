@@ -111,19 +111,31 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
+              <button
+                aria-expanded="false"
+                :aria-label="t('labels.menu')"
+                type="button"
+                class="button-reset nav-link link-body-emphasis clickable"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
-              </a>
+              </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <CopyReportLinkMenuItem :reference="travel.reference" report-model-name="Travel" />
                 <li>
-                  <hr class="dropdown-divider" >
+                  <hr class="dropdown-divider">
                 </li>
                 <template v-if="endpointPrefix === 'examine/' && travel.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editTravel" v-model="isReadOnlySwitchOn" >
+                        <input
+                          :aria-checked="isReadOnlySwitchOn"
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="editTravel"
+                          v-model="isReadOnlySwitchOn">
                         <label class="form-check-label text-nowrap" for="editTravel">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
@@ -132,39 +144,51 @@
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" >
+                    <hr class="dropdown-divider">
                   </li>
                 </template>
-                <li><a class="dropdown-item clickable" @click="downloadCSV">
-                  <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
-                  <span>{{ t('csv.download') }}</span>
-                </a></li>
                 <li>
-                  <hr class="dropdown-divider" >
+                  <button type="button" class="button-reset dropdown-item clickable" @click="downloadCSV">
+                    <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
+                    <span>{{ t('csv.download') }}</span>
+                  </button>
                 </li>
-                <li><a
-                  :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
-                  @click="viewOnly ? null : showModal('edit', 'travel', travel)">
-                  <span class="me-1"><i class="bi bi-pencil"></i></span>
-                  <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
-                </a></li>
-                <li><a
-                  :class="
+                <li>
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
+                    :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
+                    @click="viewOnly ? null : showModal('edit', 'travel', travel)">
+                    <span class="me-1"><i class="bi bi-pencil"></i></span>
+                    <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.travel') }) }) }}</span>
+                  </button>
+                </li>
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
+                    :class="
                       'dropdown-item clickable' +
                       (viewOnly || (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE) ? ' disabled' : '')
                     "
-                  @click="viewOnly || (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE) ? null : deleteTravel()">
-                  <span class="me-1"><i class="bi bi-trash"></i></span>
-                  <span>{{ t('labels.delete') }}</span>
-                </a></li>
+                    @click="viewOnly || (isReadOnly && endpointPrefix === 'examine/' && travel.state < State.BOOKABLE) ? null : deleteTravel()">
+                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span>{{ t('labels.delete') }}</span>
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(travel.owner.name) + ' - ' : '') +
-            travel.project.identifier +
-            (travel.project.name ? ' ' + travel.project.name : '') }}
+          {{
+            (endpointPrefix === 'examine/' || viewOnly ? formatter.name(travel.owner.name) + ' - ' : '') +
+              travel.project.identifier +
+              (travel.project.name ? ' ' + travel.project.name : '')
+          }}
         </div>
       </div>
 
@@ -175,6 +199,7 @@
           <div class="row g-1 mb-4">
             <div class="col-auto">
               <button
+                type="button"
                 class="btn btn-secondary"
                 @click="isReadOnly ? null : showModal('add', 'stage', travel.stages.length === 0 ? { departure: travel.startDate } : undefined)"
                 :disabled="isReadOnly">
@@ -185,6 +210,7 @@
             </div>
             <div v-if="endpointPrefix === '' && travel.stages.length === 0" class="col-auto">
               <button
+                type="button"
                 class="btn btn-outline-secondary"
                 @click="isReadOnly ? null : showModal('add', 'stageImport')"
                 :disabled="isReadOnly">
@@ -194,7 +220,11 @@
               </button>
             </div>
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="isReadOnly ? null : showModal('add', 'expense', undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
@@ -202,6 +232,7 @@
             </div>
             <div class="col-auto">
               <button
+                type="button"
                 class="btn btn-outline-secondary"
                 @click="viewOnly || travel.days.length < 1 ? null : showModal('edit', 'lumpSums', undefined)"
                 :disabled="viewOnly || travel.days.length < 1">
@@ -221,8 +252,10 @@
             role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
-              {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(travel.owner.name)}) }}
-              <a class="clickable" role="button" @click="goToSettings(travel)">{{ t('labels.goToSettings') }}</a>
+              {{ t('alerts.XHasUnusedAdvance', { X: formatter.name(travel.owner.name) }) }}
+              <button type="button" class="button-reset clickable link-primary text-decoration-underline" @click="goToSettings(travel)">
+                {{ t('labels.goToSettings') }}
+              </button>
             </div>
           </div>
           <ValidationIssuesAlert
@@ -243,12 +276,14 @@
                   :project="travel.project"
                   withLumpSums
                   :showAdvanceOverflow="travel.state < State.BOOKABLE" />
-                <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
-                  <p v-for="comment of travel.comments" :key="comment._id">
-                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                    <span>{{ comment.text }}</span>
-                  </p>
-                </small></div>
+                <div v-if="travel.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
+                  <small>
+                    <p v-for="comment of travel.comments" :key="comment._id">
+                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                      <span>{{ comment.text }}</span>
+                    </p>
+                  </small>
+                </div>
                 <div v-if="travel.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -266,25 +301,31 @@
                 <template v-if="travel.state < State.BOOKABLE">
                   <div v-if="travel.state === TravelState.APPROVED">
                     <TooltipElement v-if="travelErrorCount > 0" :text="reviewDisabledTooltip">
-                      <button class="btn btn-primary" disabled>
+                      <button type="button" class="btn btn-primary" disabled>
                         <i class="bi bi-pencil-square"></i>
                         <span class="ms-1">{{ t('labels.toExamination') }}</span>
                       </button>
                     </TooltipElement>
-                    <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                    <button
+                      type="button"
+                      v-else
+                      @click="isReadOnly ? null : toExamination()"
+                      class="btn btn-primary"
+                      :disabled="isReadOnly">
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
                   </div>
                   <template v-else-if="travel.state === State.IN_REVIEW">
                     <div v-if="endpointPrefix === 'examine/'" class="mb-3">
-                      <button class="btn btn-success" @click="completeReview()">
+                      <button type="button" class="btn btn-success" @click="completeReview()">
                         <i class="bi bi-check2-square"></i>
                         <span class="ms-1">{{ t('labels.completeReview') }}</span>
                       </button>
                     </div>
                     <div>
                       <button
+                        type="button"
                         class="btn btn-secondary"
                         @click="viewOnly || (travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/') ? null : backToApproved()"
                         :disabled="viewOnly || (travel.editor._id !== travel.owner._id && endpointPrefix !== 'examine/')">
@@ -296,6 +337,7 @@
                 </template>
                 <div v-else>
                   <button
+                    type="button"
                     class="btn btn-primary"
                     @click="
                       showFile({
@@ -322,6 +364,9 @@
 </template>
 
 <script lang="ts" setup>
+import type { ValidationResult } from 'abrechnung-common/report/validator.js'
+import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
+import { combineTravelValidationResults } from 'abrechnung-common/travel/validator.js'
 import {
   type AddUp,
   DocumentFile,
@@ -338,8 +383,6 @@ import {
   User,
   UserSimple
 } from 'abrechnung-common/types.js'
-import type { ValidationResult } from 'abrechnung-common/report/validator.js'
-import { combineTravelValidationResults } from 'abrechnung-common/travel/validator.js'
 import { placeToSimpleString, refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
@@ -356,6 +399,7 @@ import StatePipeline from '@/components/elements/StatePipeline.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
 import LumpSumEditor from '@/components/travel/elements/LumpSumEditor.vue'
 import TravelTable from '@/components/travel/elements/TravelTable.vue'
@@ -369,8 +413,6 @@ import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { downloadReportCSV } from '@/reportExport.js'
 import { sessionState } from '@/session.js'
-import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
-import { getStagesOutOfBounds } from 'abrechnung-common/travel/utils.js'
 
 type Gap = { departure: Stage['arrival']; startLocation: Stage['endLocation'] }
 type ModalMode = 'add' | 'edit'
@@ -660,10 +702,7 @@ async function postStage(stage: Partial<Stage>) {
 
 async function importStages(sourceTravelId: string) {
   modalFormIsLoading.value = true
-  const request: TravelStageImportRequest<string> = {
-    sourceTravelId,
-    targetTravelId: travel.value._id
-  }
+  const request: TravelStageImportRequest<string> = { sourceTravelId, targetTravelId: travel.value._id }
   const result = await API.setter<Travel<string>>('travel/stage/import', request)
   modalFormIsLoading.value = false
   if (result.ok) {
@@ -758,7 +797,7 @@ async function getExaminerMails(): Promise<string[]> {
 
 try {
   await getTravel()
-} catch (e) {
+} catch {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
 const examinerMails = await getExaminerMails()

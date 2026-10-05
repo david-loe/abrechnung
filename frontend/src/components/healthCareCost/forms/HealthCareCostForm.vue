@@ -10,7 +10,7 @@
 
     <div class="mb-3">
       <label for="healthCareCostFormName" class="form-label">{{ t('labels.healthCareCostName') }}</label>
-      <input type="text" class="form-control" id="healthCareCostFormName" v-model="formHealthCareCost.name" >
+      <input type="text" class="form-control" id="healthCareCostFormName" v-model="formHealthCareCost.name">
     </div>
     <div class="mb-3">
       <label for="healthCareCostFormPatient" class="form-label me-2">
@@ -18,7 +18,7 @@
         <span class="text-danger">*</span>
       </label>
       <InfoPoint :text="t('info.patientName')" />
-      <input type="text" class="form-control" id="healthCareCostFormPatient" v-model="formHealthCareCost.patientName" required >
+      <input type="text" class="form-control" id="healthCareCostFormPatient" v-model="formHealthCareCost.patientName" required>
     </div>
     <div class="mb-3">
       <label for="healthCareCostFormInsurance" class="form-label me-2">

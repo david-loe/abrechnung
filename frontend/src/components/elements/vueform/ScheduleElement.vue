@@ -41,7 +41,7 @@
       </div>
     </template>
 
-    <template v-for="(component, slot) in elementSlots" #[slot]>
+    <template v-for="(component, slot) in elementSlots" :key="slot" #[slot]>
       <slot :name="slot" :el$="el$">
         <component :is="component" :el$="el$" />
       </slot>
@@ -51,7 +51,7 @@
 
 <script>
 import Multiselect from '@vueform/multiselect/src/Multiselect.vue'
-import { ObjectElement, defineElement } from '@vueform/vueform'
+import { defineElement, ObjectElement } from '@vueform/vueform'
 import { SelectElement as SelectElementTemplate } from '@vueform/vueform/dist/bootstrap'
 
 const weekdays = [0, 1, 2, 3, 4, 5, 6]

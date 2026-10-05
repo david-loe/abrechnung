@@ -14,17 +14,17 @@
           </div>
 
           <div class="mb-3">
-            <label class="form-label">{{ t('labels.organisation') }}</label>
-            <OrganisationSelector v-model="generalSettings.organisation" />
+            <label for="user-settings-organisation" class="form-label">{{ t('labels.organisation') }}</label>
+            <OrganisationSelector id="user-settings-organisation" v-model="generalSettings.organisation" />
           </div>
 
           <div v-if="!APP_DATA.settings.disableReportType.healthCareCost" class="mb-3">
-            <label class="form-label">{{ t('labels.healthInsurance') }}</label>
-            <HealthInsuranceSelector v-model="generalSettings.insurance" />
+            <label for="user-settings-insurance" class="form-label">{{ t('labels.healthInsurance') }}</label>
+            <HealthInsuranceSelector input-id="user-settings-insurance" v-model="generalSettings.insurance" />
           </div>
 
           <div class="form-check mb-3">
-            <input id="user-settings-install-banner" v-model="generalSettings.showInstallBanner" class="form-check-input" type="checkbox" >
+            <input id="user-settings-install-banner" v-model="generalSettings.showInstallBanner" class="form-check-input" type="checkbox">
             <label for="user-settings-install-banner" class="form-check-label">{{ t('labels.showInstallBanner') }}</label>
           </div>
 
@@ -36,9 +36,7 @@
     <section class="card mb-4">
       <div class="card-body">
         <h3 class="h5 card-title mb-3">{{ t('labels.bankAccount') }}</h3>
-        <BankAccountForm
-          :model-value="APP_DATA.user.settings.bankAccount"
-          @update:model-value="updateBankAccount" />
+        <BankAccountForm :model-value="APP_DATA.user.settings.bankAccount" @update:model-value="updateBankAccount" />
       </div>
     </section>
 
@@ -57,11 +55,7 @@
     <section class="card">
       <div class="card-body">
         <h3 class="h5 card-title mb-3">API Key</h3>
-        <ApiKeyForm
-          :user="APP_DATA.user"
-          endpoint="user/httpBearer"
-          :show-cancel="false"
-          @new-key="markApiKeyConfigured" />
+        <ApiKeyForm :user="APP_DATA.user" endpoint="user/httpBearer" :show-cancel="false" @new-key="markApiKeyConfigured" />
       </div>
     </section>
   </div>
@@ -80,18 +74,18 @@ import OrganisationSelector from '@/components/elements/OrganisationSelector.vue
 import APP_LOADER from '@/dataLoader.js'
 
 const { t, locale } = useI18n()
-await APP_LOADER.loadData()
+const appData = await APP_LOADER.loadData()
 const APP_DATA = APP_LOADER.data
 const savingGeneralSettings = ref(false)
 const savingVehicleRegistration = ref(false)
-const currentSettings = APP_DATA.value!.user.settings
+const currentSettings = appData.user.settings
 const generalSettings = reactive({
   language: currentSettings.language,
   organisation: currentSettings.organisation ?? null,
   insurance: currentSettings.insurance,
   showInstallBanner: currentSettings.showInstallBanner
 })
-const vehicleRegistration = ref([...(APP_DATA.value!.user.vehicleRegistration ?? [])])
+const vehicleRegistration = ref([...(appData.user.vehicleRegistration ?? [])])
 
 async function saveGeneralSettings() {
   savingGeneralSettings.value = true

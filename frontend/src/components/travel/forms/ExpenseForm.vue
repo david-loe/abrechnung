@@ -21,7 +21,7 @@
         {{ t('labels.description') }}
         <span class="text-danger">*</span>
       </label>
-      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required >
+      <input type="text" class="form-control" id="travelFormDescription" v-model="formExpense.description" :disabled="disabled" required>
     </div>
 
     <div class="row mb-2">
@@ -111,13 +111,13 @@ import { baseCurrency, ProjectSimple, TravelExpense } from 'abrechnung-common/ty
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { formatter } from '@/formatter.js'
 import { cloneFormValue, useUnsavedChangesGuard } from '@/useUnsavedChangesGuard.js'
-import CurrencySelector from '../../elements/CurrencySelector.vue'
 import CostPositionsEditor from '../../elements/CostPositionsEditor.vue'
+import CurrencySelector from '../../elements/CurrencySelector.vue'
 import DateInput from '../../elements/DateInput.vue'
 import FileUpload from '../../elements/FileUpload.vue'
 import InfoPoint from '../../elements/InfoPoint.vue'
-import { formatter } from '@/formatter.js'
 import CTextArea from '../../elements/TextArea.vue'
 
 const { t } = useI18n()
@@ -153,7 +153,7 @@ function defaultExpense() {
     description: '',
     cost: { positions: [], currency: baseCurrency, receipts: [], date: '' },
     purpose: 'professional' as TravelExpense['purpose'],
-    note: undefined,
+    note: undefined
   }
 }
 function clear() {

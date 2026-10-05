@@ -4,12 +4,18 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="clickFilter(nameFilterKey)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter[nameFilterKey]"
+            type="button"
+            class="button-reset clickable"
+            @click="clickFilter(nameFilterKey)">
             <i v-if="showFilter[nameFilterKey]" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter[nameFilterKey]" @click.stop>
-            <input type="text" class="form-control" v-model="(filter[nameFilterKey] as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter[nameFilterKey] as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
@@ -17,12 +23,18 @@
       <template #header-_id="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('_id', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter._id"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('_id', e)">
             <i v-if="showFilter._id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter._id" @click.stop>
-            <input type="text" class="form-control" v-model="(filter._id as any).$regex" style="max-width: 80px" >
+            <input type="text" class="form-control" v-model="(filter._id as { $regex: string | undefined }).$regex" style="max-width: 80px">
           </div>
         </div>
       </template>
@@ -39,7 +51,7 @@
         v-model="countryToEdit"
         :sync="true"
         :endpoint="false"
-        @submit="(form$: any) => postCountry(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postCountry>[0] }) => postCountry(form$.data)"
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.country') }) }}</button>

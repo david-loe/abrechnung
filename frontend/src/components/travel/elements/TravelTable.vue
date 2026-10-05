@@ -49,7 +49,12 @@
       </div>
     </div>
     <!-- Stage -->
+    <!-- biome-ignore lint/a11y/useSemanticElements: The interactive row contains block layout; Enter and Space provide button keyboard behavior. -->
     <div
+      role="button"
+      tabindex="0"
+      @keydown.enter.self="emit('showModal', 'edit', 'stage', row.data as Stage)"
+      @keydown.space.self.prevent="emit('showModal', 'edit', 'stage', row.data as Stage)"
       v-else-if="row.type === 'stage'"
       :id="`travel-stage-${row.stageIndex}`"
       :class="[
@@ -74,7 +79,12 @@
       </div>
     </div>
     <!-- expense -->
+    <!-- biome-ignore lint/a11y/useSemanticElements: The interactive row contains block layout; Enter and Space provide button keyboard behavior. -->
     <div
+      role="button"
+      tabindex="0"
+      @keydown.enter.self="emit('showModal', 'edit', 'expense', row.data as TravelExpense)"
+      @keydown.space.self.prevent="emit('showModal', 'edit', 'expense', row.data as TravelExpense)"
       v-else-if="row.type === 'expense'"
       class="row align-items-center clickable ps-lg-4 mb-1"
       @click="emit('showModal', 'edit', 'expense', row.data as TravelExpense)">
@@ -89,7 +99,11 @@
     <!-- gap -->
     <div v-else-if="row.type === 'gap'" class="row ps-5">
       <div class="col-auto">
-        <button class="btn btn-sm btn-light" @click="emit('showModal', 'add', 'stage', row.data as Gap)" style="border-radius: 50%">
+        <button
+          type="button"
+          class="btn btn-sm btn-light"
+          @click="emit('showModal', 'add', 'stage', row.data as Gap)"
+          style="border-radius: 50%">
           <i class="bi bi-plus-lg"></i>
         </button>
       </div>
