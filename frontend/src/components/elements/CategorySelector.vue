@@ -17,7 +17,7 @@
       <Badge :text="category.name" :style="category.style" />
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events">
     </template>
   </v-select>
 </template>
@@ -44,7 +44,9 @@ function filter(options: Category[], search: string): Category[] {
 }
 
 const categories = computed(() =>
-  props.reportType ? APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? [] : APP_DATA.value?.categories ?? []
+  props.reportType
+    ? (APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? [])
+    : (APP_DATA.value?.categories ?? [])
 )
 
 await APP_LOADER.loadData()

@@ -1,22 +1,22 @@
 <template>
   <div class="container py-3">
-    <BookingExportDialog
-      ref="bookingExportDialog"
-      endpoint="book/expenseReport"
-      :reports="selected"
-      @booked="handleBooked" />
+    <BookingExportDialog ref="bookingExportDialog" endpoint="book/expenseReport" :reports="selected" @booked="handleBooked" />
     <div class="row justify-content-between">
       <div class="col-auto">
         <h2>{{ t('accesses.book/expenseReport') }}</h2>
       </div>
       <div class="col-auto">
-        <button class="btn btn-secondary" @click="handlePrint">
+        <button type="button" class="btn btn-secondary" @click="handlePrint">
           <i class="bi bi-printer-fill"></i>
         </button>
       </div>
     </div>
     <div class="mb-3 d-flex align-items-center">
-      <button type="button" class="btn btn-secondary me-2" :disabled="selected.length === 0 || loading" @click="bookingExportDialog?.open()">
+      <button
+        type="button"
+        class="btn btn-secondary me-2"
+        :disabled="selected.length === 0 || loading"
+        @click="bookingExportDialog?.open()">
         <i class="bi bi-download me-1"></i>{{ t('labels.exportBookings') }}
       </button>
       <button type="button" class="btn btn-light btn-sm" :disabled="selected.length === 0 || loading" @click="book(selected)">
@@ -60,7 +60,7 @@
         <StateBadge :state="show" :StateEnum="ExpenseReportState" />
         <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" >
+      <hr class="hr">
       <ExpenseReportList
         class="mb-5"
         table-class-name="small-table"

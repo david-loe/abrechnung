@@ -95,10 +95,10 @@
 <script lang="ts" setup>
 import { User } from 'abrechnung-common/types.js'
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
 import { isMobile } from '@/helper.js'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

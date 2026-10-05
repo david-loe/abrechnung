@@ -20,12 +20,18 @@
       <template #header-id="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(event) => clickFilter('id', event)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.id"
+            type="button"
+            class="button-reset clickable"
+            @click="(event) => clickFilter('id', event)">
             <i v-if="showFilter.id" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.id" @click.stop>
-            <input v-model="selectedId" type="text" class="form-control" @input="scheduleIdFilter" >
+            <input v-model="selectedId" type="text" class="form-control" @input="scheduleIdFilter">
           </div>
         </div>
       </template>
@@ -33,10 +39,16 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(event) => clickFilter('name', event)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="(event) => clickFilter('name', event)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
             <select v-model="selectedName" class="form-select" @change="applyFilters">
               <option value="">{{ t('labels.all') }}</option>
@@ -49,10 +61,16 @@
       <template #header-state="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(event) => clickFilter('state', event)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.state"
+            type="button"
+            class="button-reset clickable"
+            @click="(event) => clickFilter('state', event)">
             <i v-if="showFilter.state" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.state" @click.stop>
             <select v-model="selectedState" class="form-select" @change="applyFilters">
               <option value="">{{ t('labels.all') }} ({{ totalCount }})</option>
@@ -119,9 +137,9 @@ import {
   Meta,
   WorkerJobCounts,
   WorkerJobDetails,
-  WorkerJobsResponse,
   WorkerJobState,
   WorkerJobSummary,
+  WorkerJobsResponse,
   workerJobStates
 } from 'abrechnung-common/types.js'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
@@ -254,6 +272,7 @@ function formatDuration(job: WorkerJobSummary) {
   return `${Math.floor(milliseconds / 60_000)} min ${Math.floor((milliseconds % 60_000) / 1_000)} s`
 }
 
+// biome-ignore lint/correctness/noUnusedVariables: Biome 2.5.15 does not track interpolation references inside pre elements.
 function formatValue(value: unknown) {
   if (typeof value === 'string') return value
   return JSON.stringify(value, null, 2) ?? String(value)

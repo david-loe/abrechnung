@@ -1,7 +1,7 @@
 <template>
   <div class="mb-3">
     <div v-if="modelValue.length !== 1" class="d-flex align-items-center mb-2">
-      <label class="form-label mb-0">{{ t('labels.position') }} <span v-if="required || ownCar" class="text-danger">*</span></label>
+      <span class="form-label mb-0">{{ t('labels.position') }} <span v-if="required || ownCar" class="text-danger">*</span></span>
       <button v-if="!disabled && !ownCar" type="button" class="btn btn-sm btn-outline-secondary ms-auto" @click="addPosition">
         <i class="bi bi-plus-lg"></i> {{ t('labels.add') }}
       </button>
@@ -12,26 +12,44 @@
       :class="modelValue.length > 1 ? 'border rounded p-3 mb-2' : 'mb-2'">
       <div class="row g-2 position-relative">
         <div v-if="positionDescriptionRequired(position)" :class="canRemovePosition(position) ? 'col-md-5' : 'col-md-6'">
-          <label class="form-label">{{ t('labels.description') }} <span class="text-danger">*</span></label>
-          <input v-model="position.description" type="text" class="form-control" required :disabled="disabled" @change="changed" >
+          <label :for="`${editorId}-${index}-description`" class="form-label"
+            >{{ t('labels.description') }} <span class="text-danger">*</span></label
+          >
+          <input
+            :id="`${editorId}-${index}-description`"
+            v-model="position.description"
+            type="text"
+            class="form-control"
+            required
+            :disabled="disabled"
+            @change="changed">
         </div>
         <div :class="amountColumn(position)">
-          <label class="form-label">
+          <label :for="`${editorId}-${index}-amount`" class="form-label">
             {{ t('labels.amount') }}<template v-if="vatEnabled(position)"> ({{ t('labels.grossAmount') }})</template>
             <span v-if="amountRequired" class="text-danger">*</span>
           </label>
           <input
+            :id="`${editorId}-${index}-amount`"
             v-model.number="position.grossAmount"
             type="number"
             step="0.01"
             class="form-control tnum"
             :required="amountRequired"
             :disabled="disabled || position.kind === 'ownCar'"
-            @change="amountChanged(position)" >
+            @change="amountChanged(position)">
         </div>
         <div v-if="vatEnabled(position)" class="col-md-3">
-          <label class="form-label">{{ t('labels.vatRate') }} <span class="text-danger">*</span></label>
-          <select v-model.number="position.vatRate" class="form-select" required :disabled="disabled" @change="vatRateChanged(position)">
+          <label :for="`${editorId}-${index}-vatRate`" class="form-label"
+            >{{ t('labels.vatRate') }} <span class="text-danger">*</span></label
+          >
+          <select
+            :id="`${editorId}-${index}-vatRate`"
+            v-model.number="position.vatRate"
+            class="form-select"
+            required
+            :disabled="disabled"
+            @change="vatRateChanged(position)">
             <option v-for="rate in vatRates(position)" :key="rate" :value="rate">{{ rate }} %</option>
           </select>
         </div>
@@ -41,25 +59,36 @@
           </button>
         </div>
         <div class="col-md-6">
-          <label class="form-label">{{ t('labels.project') }} <span class="text-danger">*</span></label>
+          <label :for="`${editorId}-${index}-project`" class="form-label"
+            >{{ t('labels.project') }} <span class="text-danger">*</span></label
+          >
           <ProjectSelector
+            :input-id="`${editorId}-${index}-project`"
             :model-value="position.project"
             :disabled="disabled"
             @update:model-value="(project) => setProject(position, project)" />
         </div>
         <div class="col-md-6">
-          <label class="form-label">{{ t('labels.category') }} <span class="text-danger">*</span></label>
-          <CategorySelector v-model="position.category" :report-type="reportType" :disabled="disabled" required @update:model-value="changed" />
+          <label :for="`${editorId}-${index}-category`" class="form-label"
+            >{{ t('labels.category') }} <span class="text-danger">*</span></label
+          >
+          <CategorySelector
+            :input-id="`${editorId}-${index}-category`"
+            v-model="position.category"
+            :report-type="reportType"
+            :disabled="disabled"
+            required
+            @update:model-value="changed" />
         </div>
       </div>
       <div v-if="vatEnabled(position)" class="d-flex align-items-center gap-1 mt-2">
         <small class="text-secondary tnum"> {{ t('labels.netAmount') }}: {{ money(getCostPositionNetAmount(position, true)) }} · </small>
         <template v-if="editedVatPosition === position">
-          <label class="visually-hidden" :for="`vatAmount-${position._id || index}`">{{ t('labels.vatAmount') }}</label>
+          <label class="visually-hidden" :for="`${editorId}-${index}-vatAmount`">{{ t('labels.vatAmount') }}</label>
           <div class="input-group input-group-sm w-auto">
             <span class="input-group-text">{{ t('labels.vatAmount') }}</span>
             <input
-              :id="`vatAmount-${position._id || index}`"
+              :id="`${editorId}-${index}-vatAmount`"
               v-model.number="vatAmountDraft"
               type="number"
               step="0.01"
@@ -67,7 +96,7 @@
               :max="Math.max(0, position.grossAmount)"
               class="form-control tnum"
               required
-              @input="saveVatAmountOverride(position)" >
+              @input="saveVatAmountOverride(position)">
           </div>
           <button type="button" class="btn btn-sm btn-link py-0" @click="resetVatAmountOverride(position)">{{ t('labels.reset') }}</button>
         </template>
@@ -83,11 +112,7 @@
         </template>
       </div>
     </div>
-    <button
-      v-if="modelValue.length === 1 && !disabled && !ownCar"
-      type="button"
-      class="btn btn-sm btn-link px-0"
-      @click="addPosition">
+    <button v-if="modelValue.length === 1 && !disabled && !ownCar" type="button" class="btn btn-sm btn-link px-0" @click="addPosition">
       {{ t('labels.addX', { X: t('labels.position') }) }}
     </button>
   </div>
@@ -96,13 +121,14 @@
 <script setup lang="ts">
 import { Category, CostPosition, Currency, idDocumentToId, ProjectSimple } from 'abrechnung-common/types.js'
 import { getCostPositionNetAmount, getCostPositionVatAmount } from 'abrechnung-common/utils/scripts.js'
-import { PropType, ref, watch } from 'vue'
+import { PropType, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import CategorySelector from './CategorySelector.vue'
 import ProjectSelector from './ProjectSelector.vue'
 
+const editorId = useId()
 const { t } = useI18n()
 const APP_DATA = APP_LOADER.data
 const props = defineProps({
@@ -187,7 +213,10 @@ function addPosition() {
   emit('update:modelValue', [...props.modelValue, createPosition()])
 }
 function removePosition(index: number) {
-  emit('update:modelValue', props.modelValue.filter((_, positionIndex) => positionIndex !== index))
+  emit(
+    'update:modelValue',
+    props.modelValue.filter((_, positionIndex) => positionIndex !== index)
+  )
 }
 function canRemovePosition(position: CostPosition<string>) {
   return !props.disabled && position.kind === 'manual' && (props.modelValue.length > 1 || !props.required)

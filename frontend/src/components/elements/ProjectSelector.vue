@@ -9,6 +9,7 @@
 
     <v-select
       v-if="projects"
+      :input-id="props.inputId"
       :options="projects"
       :modelValue="props.modelValue === undefined ? null : props.modelValue"
       :placeholder="t('labels.project')"
@@ -25,7 +26,7 @@
         <span>{{ identifier + (name ? ' ' + name : '') }}</span>
       </template>
       <template v-if="props.required" #search="{ attributes, events }">
-        <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
+        <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events">
       </template>
     </v-select>
   </div>
@@ -45,6 +46,7 @@ const APP_DATA = APP_LOADER.data
 
 const props = defineProps({
   modelValue: { type: Object as PropType<ProjectSimple<string> | null> },
+  inputId: { type: String },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   updateUserOrg: { type: Boolean, default: false },

@@ -17,7 +17,7 @@
           class="mb-5"
           endpoint="admin/user/bulk"
           :transformers="[
-            { path: 'projects.assigned', key: 'identifier', array: APP_DATA.projects! },
+            { path: 'projects.assigned', key: 'identifier', array: APP_DATA.projects ?? [] },
             { path: 'settings.organisation', key: 'name', array: APP_DATA.organisations },
             { path: 'loseAccessAt', fn: convertGermanDateToHTMLDate }
           ]"
@@ -154,7 +154,7 @@ import { useRoute } from 'vue-router'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import { parseCsvBoolean } from '@/csvImport.js'
 import APP_LOADER from '@/dataLoader.js'
-import { getAdminSectionById, type AdminSectionId } from './adminSections'
+import { type AdminSectionId, getAdminSectionById } from './adminSections'
 import AdminTools from './elements/AdminTools.vue'
 import CategoryList from './elements/CategoryList.vue'
 import ConnectionSettingsForm from './elements/ConnectionSettingsForm.vue'

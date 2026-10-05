@@ -64,19 +64,31 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
+              <button
+                aria-expanded="false"
+                :aria-label="t('labels.menu')"
+                type="button"
+                class="button-reset nav-link link-body-emphasis clickable"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
-              </a>
+              </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <CopyReportLinkMenuItem :reference="healthCareCost.reference" report-model-name="HealthCareCost" />
                 <li>
-                  <hr class="dropdown-divider" >
+                  <hr class="dropdown-divider">
                 </li>
                 <template v-if="endpointPrefix === 'examine/' && healthCareCost.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editHealthCareCost" v-model="isReadOnlySwitchOn" >
+                        <input
+                          :aria-checked="isReadOnlySwitchOn"
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="editHealthCareCost"
+                          v-model="isReadOnlySwitchOn">
                         <label class="form-check-label text-nowrap" for="editHealthCareCost">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
@@ -85,41 +97,51 @@
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" >
+                    <hr class="dropdown-divider">
                   </li>
                 </template>
-                <li><a class="dropdown-item clickable" @click="downloadCSV">
-                  <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
-                  <span>{{ t('csv.download') }}</span>
-                </a></li>
                 <li>
-                  <hr class="dropdown-divider" >
+                  <button type="button" class="button-reset dropdown-item clickable" @click="downloadCSV">
+                    <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
+                    <span>{{ t('csv.download') }}</span>
+                  </button>
                 </li>
                 <li>
-                  <a
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
                     :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
                     @click="viewOnly ? null : showModal('edit', 'healthCareCost', healthCareCost)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.healthCareCost') }) }) }}</span>
-                  </a>
+                  </button>
                 </li>
-                <li><a
-                  :class="
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
+                    :class="
                       'dropdown-item clickable' +
                       (viewOnly || (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE) ? ' disabled' : '')
                     "
-                  @click="viewOnly || (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE) ? null : deleteHealthCareCost()">
-                  <span class="me-1"><i class="bi bi-trash"></i></span>
-                  <span>{{ t('labels.delete') }}</span>
-                </a></li>
+                    @click="viewOnly || (isReadOnly && endpointPrefix !== '' && healthCareCost.state < State.BOOKABLE) ? null : deleteHealthCareCost()">
+                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span>{{ t('labels.delete') }}</span>
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
-            healthCareCost.project.identifier +
-            (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '') }}
+          {{
+            (endpointPrefix === 'examine/' || viewOnly ? formatter.name(healthCareCost.owner.name) + ' - ' : '') +
+              healthCareCost.project.identifier +
+              (healthCareCost.project.name ? ' ' + healthCareCost.project.name : '')
+          }}
         </div>
       </div>
 
@@ -129,7 +151,11 @@
         <div class="col-lg-8 col-12">
           <div class="row mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="isReadOnly ? null : showModal('add', 'expense', undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.healthCareCost') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.healthCareCost') }}</span>
@@ -160,6 +186,7 @@
                 <div class="text-end tnum">{{ formatter.money(cost) }}</div>
               </template>
               <template #item-note="{ note }: Expense">
+                <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
                 <span v-if="note?.trim()" @click.stop>
                   <TooltipElement :text="note"><i class="bi bi-chat-left-text"></i></TooltipElement>
                 </span>
@@ -174,8 +201,13 @@
             role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
-              {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(healthCareCost.owner.name)}) }}
-              <a class="clickable" role="button" @click="goToSettings(healthCareCost)">{{ t('labels.goToSettings') }}</a>
+              {{ t('alerts.XHasUnusedAdvance', { X: formatter.name(healthCareCost.owner.name) }) }}
+              <button
+                type="button"
+                class="button-reset clickable link-primary text-decoration-underline"
+                @click="goToSettings(healthCareCost)">
+                {{ t('labels.goToSettings') }}
+              </button>
             </div>
           </div>
           <ValidationIssuesAlert
@@ -192,12 +224,14 @@
                   :add-up="healthCareCost.addUp"
                   :project="healthCareCost.project"
                   :showAdvanceOverflow="healthCareCost.state < State.BOOKABLE" />
-                <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
-                  <p v-for="comment of healthCareCost.comments" :key="comment._id">
-                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                    <span>{{ comment.text }}</span>
-                  </p>
-                </small></div>
+                <div v-if="healthCareCost.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
+                  <small>
+                    <p v-for="comment of healthCareCost.comments" :key="comment._id">
+                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                      <span>{{ comment.text }}</span>
+                    </p>
+                  </small>
+                </div>
                 <div v-if="healthCareCost.state < State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -214,12 +248,12 @@
                 </div>
                 <div v-if="healthCareCost.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="!canEnterReview" :text="reviewDisabledTooltip">
-                    <button class="btn btn-primary" disabled>
+                    <button type="button" class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
                   </TooltipElement>
-                  <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                  <button type="button" v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
@@ -233,6 +267,7 @@
                   </div>
                   <div>
                     <button
+                      type="button"
                       class="btn btn-secondary"
                       @click="
                         viewOnly || (healthCareCost.editor._id !== healthCareCost.owner._id && endpointPrefix !== 'examine/')
@@ -248,6 +283,7 @@
                 <template v-else-if="healthCareCost.state >= State.BOOKABLE">
                   <div>
                     <button
+                      type="button"
                       class="btn btn-primary"
                       @click="
                         showFile({
@@ -264,10 +300,12 @@
                       <span class="ms-1">{{ t('labels.showX', { X: t('labels.report') }) }}</span>
                     </button>
                   </div>
-                  <div class="mt-2"><a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
-                    <i class="bi bi-envelope"></i>
-                    <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
-                  </a></div>
+                  <div class="mt-2">
+                    <a v-if="endpointPrefix === 'examine/'" class="btn btn-secondary" :href="mailToInsuranceLink">
+                      <i class="bi bi-envelope"></i>
+                      <span class="ms-1">{{ t('labels.mailToInsurance') }}</span>
+                    </a>
+                  </div>
                 </template>
               </div>
             </div>
@@ -290,10 +328,12 @@ import {
   UserSimple
 } from 'abrechnung-common/types.js'
 import { getById, getTotalTotal, mailToLink, refNumberToString } from 'abrechnung-common/utils/scripts.js'
+import { sortByPath } from 'abrechnung-common/utils/sort.js'
 import type { PropType } from 'vue'
 import { computed, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { UpdateSortArgument } from 'vue3-easy-data-table'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
@@ -305,6 +345,7 @@ import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import ExpenseForm from '@/components/healthCareCost/forms/ExpenseForm.vue'
 import HealthCareCostForm from '@/components/healthCareCost/forms/HealthCareCostForm.vue'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
@@ -314,9 +355,6 @@ import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { downloadReportCSV } from '@/reportExport.js'
 import { sessionState } from '@/session.js'
-import { UpdateSortArgument } from 'vue3-easy-data-table'
-import { sortByPath } from 'abrechnung-common/utils/sort.js'
-import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 
 type ModalObject = Partial<Expense> | HealthCareCostSimple
 type ModalObjectType = 'expense' | 'healthCareCost'
@@ -562,7 +600,7 @@ await APP_LOADER.loadData()
 
 try {
   await getHealthCareCost()
-} catch (e) {
+} catch {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
 

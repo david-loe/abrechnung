@@ -30,6 +30,7 @@
         @paste="handlePaste"
         ref="input">
         <template
+          :key="slotKey"
           v-for="(slotName, slotKey) in {
             noresults: 'no-results',
             nooptions: 'no-options',
@@ -54,7 +55,9 @@
 
         <template v-slot:multiplelabel="{ values }">
           <span class="ms-2 mt-1 me-auto">
-            <span v-for="value of values" class="me-3"> {{ value.identifier + (value.name ? ' ' + value.name : '') }}</span>
+            <span v-for="value of values" :key="value._id" class="me-3">
+              {{ value.identifier + (value.name ? ' ' + value.name : '') }}</span
+            >
           </span>
         </template>
 
@@ -65,7 +68,7 @@
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]>
+    <template v-for="(component, slot) in elementSlots" :key="slot" #[slot]>
       <slot :name="slot" :el$="el$">
         <component :is="component" :el$="el$" />
       </slot>

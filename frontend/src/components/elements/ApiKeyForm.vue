@@ -1,5 +1,5 @@
 <template>
-  <div v-if="props.user.fk && props.user.fk.httpBearer && !token" class="alert alert-warning d-flex align-items-center" role="alert">
+  <div v-if="props.user.fk?.httpBearer && !token" class="alert alert-warning d-flex align-items-center" role="alert">
     <i class="bi bi-exclamation-triangle-fill me-2"></i>
     <div>{{ t('alerts.apiKeyAlreadyExists') }}</div>
   </div>
@@ -10,7 +10,7 @@
       <div>{{ t('alerts.apiKeyShownOnlyOnce') }}</div>
     </div>
     <div class="input-group mb-3">
-      <input class="form-control" type="text" v-model="token" readonly >
+      <input class="form-control" type="text" v-model="token" readonly>
       <button class="btn btn-outline-secondary" type="button" @click="copyToClipboard">
         <i class="bi bi-copy"></i><i v-if="copied" class="bi bi-check-lg ms-2"></i>
       </button>

@@ -26,7 +26,7 @@
             @submitted="refreshImportedExpenseReports" />
         </div>
         <div class="col-auto">
-          <button class="btn btn-secondary" @click="showModal('add', undefined)">
+          <button type="button" class="btn btn-secondary" @click="showModal('add', undefined)">
             <i class="bi bi-plus-lg"></i>
             <span class="ms-1">{{ t('labels.createX', { X: t('labels.expenseReport') }) }}</span>
           </button>
@@ -34,7 +34,6 @@
       </div>
       <ExpenseReportList
         class="mb-5"
-        ref="expenseReportList"
         endpoint="examine/expenseReport"
         :stateFilter="ExpenseReportState.IN_REVIEW"
         :columns-to-hide="['state', 'editor', 'updatedAt', 'report', 'addUp.totalTotal', 'addUp.totalAdvance', 'organisation', 'bookingRemark', 'reference']"
@@ -57,7 +56,7 @@
           <StateBadge :state="show" :StateEnum="ExpenseReportState" />
           <i class="bi bi-chevron-up"></i>
         </button>
-        <hr class="hr" >
+        <hr class="hr">
         <ExpenseReportList
           ref="expandedExpenseReportList"
           endpoint="examine/expenseReport"
@@ -92,7 +91,6 @@ const modalMode = ref('add' as ModalMode)
 const modalFormIsLoading = ref(false)
 
 const modalCompRef = useTemplateRef('modalComp')
-const expenseReportList = useTemplateRef('expenseReportList')
 const expandedExpenseReportList = useTemplateRef('expandedExpenseReportList')
 
 function refreshImportedExpenseReports() {

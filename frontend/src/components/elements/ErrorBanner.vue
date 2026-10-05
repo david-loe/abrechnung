@@ -1,12 +1,12 @@
 <template>
   <div v-if="isValidationError(props.error)" class="alert alert-warning alert-dismissible fade show" role="alert">
     <strong>{{ t('alerts.' + props.error.name) + ':' }}</strong>
-    <span v-for="e in props.error.errors">
-      <br >
+    <span v-for="(e, errorIndex) in props.error.errors" :key="errorIndex">
+      <br>
       {{ t('alerts.' + e.message) }}
       <small>
         (
-        <span v-for="(part, index) of e.path.split('.')">
+        <span v-for="(part, index) of e.path.split('.')" :key="index">
           <span v-if="index !== 0"> ➡ </span>
           {{ /^\d+$/.test(part) ? '#' + (Number(part) + 1) : t('labels.' + part) }}
         </span>

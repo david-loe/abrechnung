@@ -10,7 +10,7 @@
 
     <div class="mb-2">
       <label for="travelFormName" class="form-label">{{ t('labels.travelName') }}</label>
-      <input type="text" class="form-control" id="travelFormName" v-model="formTravel.name" >
+      <input type="text" class="form-control" id="travelFormName" v-model="formTravel.name">
     </div>
 
     <div class="mb-2">
@@ -29,12 +29,11 @@
         <span class="text-danger">*</span>
       </label>
       <InfoPoint :text="t('info.reason')" />
-      <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required >
+      <input type="text" class="form-control" id="travelFormReason" v-model="formTravel.reason" required>
     </div>
-    <template
-      v-if="formTravel.destinationPlace && formTravel.destinationPlace.country && formTravel.destinationPlace.country.needsA1Certificate">
+    <template v-if="formTravel.destinationPlace?.country?.needsA1Certificate">
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder" >
+        <input class="form-check-input" type="checkbox" v-model="formTravel.isCrossBorder" id="travelFormIsCrossBorder">
         <label class="form-check-label me-2" for="travelFormIsCrossBorder">{{ t('labels.isCrossBorder') }}</label>
         <InfoPoint :text="t('info.isCrossBorder')" />
       </div>
@@ -45,7 +44,7 @@
             <span class="text-danger">*</span>
           </label>
           <InfoPoint :text="t('info.exactAddress')" />
-          <input type="text" class="form-control" id="travelFormExactAddress" v-model="formTravel.a1Certificate.exactAddress" required >
+          <input type="text" class="form-control" id="travelFormExactAddress" v-model="formTravel.a1Certificate.exactAddress" required>
         </div>
         <div class="mb-3">
           <label for="travelFormDestinationName" class="form-label me-2">
@@ -58,7 +57,7 @@
             class="form-control"
             id="travelFormDestinationName"
             v-model="formTravel.a1Certificate.destinationName"
-            required >
+            required>
         </div>
       </template>
     </template>
@@ -86,7 +85,7 @@
 
     <template v-if="APP_DATA.travelSettings.allowSpouseRefund">
       <div class="form-check mb-3">
-        <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund" >
+        <input class="form-check-input" type="checkbox" id="travelFormClaimSpouseRefund" v-model="formTravel.claimSpouseRefund">
         <label class="form-check-label me-2" for="travelFormClaimSpouseRefund">{{ t('labels.claimSpouseRefund') }}</label>
         <InfoPoint :text="t('info.claimSpouseRefund')" />
       </div>
@@ -102,7 +101,7 @@
           class="form-control"
           id="travelFormFellowTravelersNames"
           v-model="formTravel.fellowTravelersNames"
-          :required="Boolean(formTravel.claimSpouseRefund)" >
+          :required="Boolean(formTravel.claimSpouseRefund)">
       </div>
     </template>
 
@@ -130,11 +129,13 @@
 
     <div class="mb-1 d-flex align-items-center">
       <button type="submit" class="btn btn-primary me-2" :disabled="loading">
-        {{ mode === 'add' && !createNotApply
+        {{
+          mode === 'add' && !createNotApply
             ? t('labels.applyForX', { X: t('labels.travel') })
             : (travel.state === TravelState.REJECTED || travel.state === TravelState.APPROVED) && !createNotApply
-            ? t('labels.reapplyForX', { X: t('labels.travel') })
-            : t('labels.save') }}
+              ? t('labels.reapplyForX', { X: t('labels.travel') })
+              : t('labels.save')
+        }}
       </button>
       <span v-if="loading" class="spinner-border spinner-border-sm ms-1 me-3"></span>
       <button type="button" class="btn btn-light" v-on:click="$emit('cancel')">{{ t('labels.cancel') }}</button>

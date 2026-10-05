@@ -26,7 +26,7 @@
         <StateBadge :state="show" :StateEnum="TravelState" />
         <i class="bi bi-chevron-up"></i>
       </button>
-      <hr class="hr" >
+      <hr class="hr">
       <TravelList
         endpoint="examine/travel"
         :stateFilter="show === TravelState.APPROVED ? show : { $gte: show }"
@@ -39,9 +39,9 @@
 <script lang="ts" setup>
 import { TravelState } from 'abrechnung-common/types.js'
 import { Ref, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import StateBadge from '@/components/elements/StateBadge.vue'
 import TravelList from '@/components/travel/TravelList.vue'
-import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 

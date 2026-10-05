@@ -65,19 +65,31 @@
           </div>
           <div class="col-auto">
             <div class="dropdown">
-              <a class="nav-link link-body-emphasis clickable" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button">
+              <button
+                aria-expanded="false"
+                :aria-label="t('labels.menu')"
+                type="button"
+                class="button-reset nav-link link-body-emphasis clickable"
+                data-bs-toggle="dropdown"
+                data-bs-auto-close="outside">
                 <i class="bi bi-three-dots-vertical fs-3"></i>
-              </a>
+              </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <CopyReportLinkMenuItem :reference="expenseReport.reference" report-model-name="ExpenseReport" />
                 <li>
-                  <hr class="dropdown-divider" >
+                  <hr class="dropdown-divider">
                 </li>
                 <template v-if="endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE">
                   <li>
                     <div class="ps-3">
                       <div class="form-check form-switch">
-                        <input class="form-check-input" type="checkbox" role="switch" id="editExpenseReport" v-model="isReadOnlySwitchOn" >
+                        <input
+                          :aria-checked="isReadOnlySwitchOn"
+                          class="form-check-input"
+                          type="checkbox"
+                          role="switch"
+                          id="editExpenseReport"
+                          v-model="isReadOnlySwitchOn">
                         <label class="form-check-label text-nowrap" for="editExpenseReport">
                           <span class="me-1"><i class="bi bi-lock"></i></span>
                           <span>{{ t('labels.readOnly') }}</span>
@@ -86,47 +98,57 @@
                     </div>
                   </li>
                   <li>
-                    <hr class="dropdown-divider" >
+                    <hr class="dropdown-divider">
                   </li>
                 </template>
-                <li><a class="dropdown-item clickable" @click="downloadCSV">
-                  <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
-                  <span>{{ t('csv.download') }}</span>
-                </a></li>
                 <li>
-                  <hr class="dropdown-divider" >
+                  <button type="button" class="button-reset dropdown-item clickable" @click="downloadCSV">
+                    <span class="me-1"><i class="bi bi-filetype-csv"></i></span>
+                    <span>{{ t('csv.download') }}</span>
+                  </button>
                 </li>
                 <li>
-                  <a
+                  <hr class="dropdown-divider">
+                </li>
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
                     :class="'dropdown-item clickable' + (isReadOnly ? ' disabled' : '')"
                     @click="viewOnly ? null : showModal('edit', 'expenseReport', expenseReport)">
                     <span class="me-1"><i class="bi bi-pencil"></i></span>
                     <span>{{ t('labels.editX', { X: t('labels.XDetails', { X: t('labels.expenseReport') }) }) }}</span>
-                  </a>
+                  </button>
                 </li>
-                <li><a
-                  :class="
+                <li>
+                  <button
+                    class="button-reset"
+                    type="button"
+                    :class="
                       'dropdown-item clickable' +
                       (viewOnly || (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE)
                         ? ' disabled'
                         : '')
                     "
-                  @click="
+                    @click="
                     viewOnly || (isReadOnly && endpointPrefix === 'examine/' && expenseReport.state < State.BOOKABLE)
                       ? null
                       : deleteExpenseReport()
                   ">
-                  <span class="me-1"><i class="bi bi-trash"></i></span>
-                  <span>{{ t('labels.delete') }}</span>
-                </a></li>
+                    <span class="me-1"><i class="bi bi-trash"></i></span>
+                    <span>{{ t('labels.delete') }}</span>
+                  </button>
+                </li>
               </ul>
             </div>
           </div>
         </div>
         <div class="text-secondary">
-          {{ (endpointPrefix === 'examine/' || viewOnly ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
-            expenseReport.project.identifier +
-            (expenseReport.project.name ? ' ' + expenseReport.project.name : '') }}
+          {{
+            (endpointPrefix === 'examine/' || viewOnly ? formatter.name(expenseReport.owner.name) + ' - ' : '') +
+              expenseReport.project.identifier +
+              (expenseReport.project.name ? ' ' + expenseReport.project.name : '')
+          }}
         </div>
       </div>
 
@@ -136,7 +158,11 @@
         <div class="col-lg-8 col-12">
           <div class="row mb-3">
             <div class="col-auto">
-              <button class="btn btn-secondary" @click="isReadOnly ? null : showModal('add', 'expense', undefined)" :disabled="isReadOnly">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                @click="isReadOnly ? null : showModal('add', 'expense', undefined)"
+                :disabled="isReadOnly">
                 <i class="bi bi-plus-lg"></i>
                 <span class="ms-1 d-none d-md-inline">{{ t('labels.addX', { X: t('labels.expense') }) }}</span>
                 <span class="ms-1 d-md-none">{{ t('labels.expense') }}</span>
@@ -195,6 +221,7 @@
                 <div class="text-end tnum">{{ formatter.money(cost, { useExchangeRate: !expenseReport.currency }) }}</div>
               </template>
               <template #item-note="{ note }: Expense">
+                <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
                 <span v-if="note?.trim()" @click.stop>
                   <TooltipElement :text="note"><i class="bi bi-chat-left-text"></i></TooltipElement>
                 </span>
@@ -209,8 +236,13 @@
             role="alert">
             <i class="bi bi-info-circle-fill me-2"></i>
             <div>
-              {{ t('alerts.XHasUnusedAdvance', {X: formatter.name(expenseReport.owner.name)}) }}
-              <a class="clickable" role="button" @click="goToSettings(expenseReport)">{{ t('labels.goToSettings') }}</a>
+              {{ t('alerts.XHasUnusedAdvance', { X: formatter.name(expenseReport.owner.name) }) }}
+              <button
+                type="button"
+                class="button-reset clickable link-primary text-decoration-underline"
+                @click="goToSettings(expenseReport)">
+                {{ t('labels.goToSettings') }}
+              </button>
             </div>
           </div>
           <ValidationIssuesAlert
@@ -246,12 +278,14 @@
                     {{ expenseReport.exchangeRateDate ? formatter.date(expenseReport.exchangeRateDate) : '—' }}
                   </div>
                 </div>
-                <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle"><small>
-                  <p v-for="comment of expenseReport.comments" :key="comment._id">
-                    <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
-                    <span>{{ comment.text }}</span>
-                  </p>
-                </small></div>
+                <div v-if="expenseReport.comments.length > 0" class="mb-3 p-2 pb-0 bg-light-subtle">
+                  <small>
+                    <p v-for="comment of expenseReport.comments" :key="comment._id">
+                      <span class="fw-bold">{{ comment.author.name.givenName + ': ' }}</span>
+                      <span>{{ comment.text }}</span>
+                    </p>
+                  </small>
+                </div>
                 <div v-if="expenseReport.state <= State.BOOKABLE" class="mb-3">
                   <label for="comment" class="form-label">{{ t('labels.comment') }}</label>
                   <CTextArea
@@ -268,12 +302,12 @@
                 </div>
                 <div v-if="expenseReport.state === State.EDITABLE_BY_OWNER">
                   <TooltipElement v-if="!canEnterReview" :text="reviewDisabledTooltip">
-                    <button class="btn btn-primary" disabled>
+                    <button type="button" class="btn btn-primary" disabled>
                       <i class="bi bi-pencil-square"></i>
                       <span class="ms-1">{{ t('labels.toExamination') }}</span>
                     </button>
                   </TooltipElement>
-                  <button v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
+                  <button type="button" v-else @click="isReadOnly ? null : toExamination()" class="btn btn-primary" :disabled="isReadOnly">
                     <i class="bi bi-pencil-square"></i>
                     <span class="ms-1">{{ t('labels.toExamination') }}</span>
                   </button>
@@ -281,6 +315,7 @@
                 <template v-else-if="expenseReport.state === State.IN_REVIEW">
                   <div v-if="endpointPrefix === 'examine/'" class="mb-3">
                     <button
+                      type="button"
                       class="btn btn-success"
                       :disabled="!canCompleteReview || exchangeRateDateSaving"
                       @click="completeReview()">
@@ -290,6 +325,7 @@
                   </div>
                   <div>
                     <button
+                      type="button"
                       class="btn btn-secondary"
                       @click="
                         viewOnly || (expenseReport.editor._id !== expenseReport.owner._id && endpointPrefix !== 'examine/')
@@ -304,6 +340,7 @@
                 </template>
                 <div v-else-if="expenseReport.state >= State.BOOKABLE">
                   <button
+                    type="button"
                     class="btn btn-primary"
                     @click="
                       showFile({
@@ -333,9 +370,11 @@
 import { type ValidationResult, Validator } from 'abrechnung-common/report/validator.js'
 import { Expense, ExpenseReport, ExpenseReportSimple, ExpenseReportState, State, UserSimple } from 'abrechnung-common/types.js'
 import { convertGermanDateToHTMLDate, getById, refNumberToString } from 'abrechnung-common/utils/scripts.js'
+import { sortByPath } from 'abrechnung-common/utils/sort.js'
 import { computed, PropType, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { UpdateSortArgument } from 'vue3-easy-data-table'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
@@ -349,6 +388,7 @@ import TableElement from '@/components/elements/TableElement.vue'
 import CTextArea from '@/components/elements/TextArea.vue'
 import TooltipElement from '@/components/elements/TooltipElement.vue'
 import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.vue'
+import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
@@ -358,9 +398,6 @@ import { showFile } from '@/helper.js'
 import { logger } from '@/logger.js'
 import { downloadReportCSV } from '@/reportExport.js'
 import { sessionState } from '@/session.js'
-import { UpdateSortArgument } from 'vue3-easy-data-table'
-import { sortByPath } from 'abrechnung-common/utils/sort.js'
-import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 
 type ModalObject = Partial<Expense<string>> | ExpenseReportSimple<string>
 type ModalObjectType = 'expense' | 'expenseReport'
@@ -418,7 +455,11 @@ const exchangeRateDateSaving = ref(false)
 const canEditExchangeRateDate = computed(() => {
   const examinerCanEditDuringReview =
     props.endpointPrefix === 'examine/' && expenseReport.value.state === State.IN_REVIEW && sessionState.isOnline.value
-  return Boolean(expenseReport.value.currency) && expenseReport.value.state <= State.IN_REVIEW && (!isReadOnly.value || examinerCanEditDuringReview)
+  return (
+    Boolean(expenseReport.value.currency) &&
+    expenseReport.value.state <= State.IN_REVIEW &&
+    (!isReadOnly.value || examinerCanEditDuringReview)
+  )
 })
 
 await APP_LOADER.loadData()
@@ -649,7 +690,7 @@ function goToSettings(expenseReport: ExpenseReport<string>) {
 
 try {
   await getExpenseReport()
-} catch (e) {
+} catch {
   router.push({ path: props.parentPages[props.parentPages.length - 1].link })
 }
 const examinerMails = await getExaminerMails()

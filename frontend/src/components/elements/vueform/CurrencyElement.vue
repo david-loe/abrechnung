@@ -30,6 +30,7 @@
         @paste="handlePaste"
         ref="input">
         <template
+          :key="slotKey"
           v-for="(slotName, slotKey) in {
             noresults: 'no-results',
             nooptions: 'no-options',
@@ -48,18 +49,22 @@
           </slot>
         </template>
 
-        <template v-slot:singlelabel="{ value }"><span class="text-truncate ms-2 me-auto" :title="value.name[$i18n.locale]">
-          <span v-if="value.flag" class="me-1">{{ value.flag }}</span>
-          <span>{{ value._id }}</span>
-          <span v-if="value.symbol" class="ms-1 text-secondary">{{ value.symbol }}</span>
-        </span></template>
-
-        <template v-slot:multiplelabel="{ values }">
-          <span class="ms-2 mt-1 me-auto"> <span v-for="value of values" :key="value._id" class="me-3" :title="value.name[$i18n.locale]">
+        <template v-slot:singlelabel="{ value }"
+          ><span class="text-truncate ms-2 me-auto" :title="value.name[$i18n.locale]">
             <span v-if="value.flag" class="me-1">{{ value.flag }}</span>
             <span>{{ value._id }}</span>
             <span v-if="value.symbol" class="ms-1 text-secondary">{{ value.symbol }}</span>
-          </span> </span>
+          </span></template
+        >
+
+        <template v-slot:multiplelabel="{ values }">
+          <span class="ms-2 mt-1 me-auto">
+            <span v-for="value of values" :key="value._id" class="me-3" :title="value.name[$i18n.locale]">
+              <span v-if="value.flag" class="me-1">{{ value.flag }}</span>
+              <span>{{ value._id }}</span>
+              <span v-if="value.symbol" class="ms-1 text-secondary">{{ value.symbol }}</span>
+            </span>
+          </span>
         </template>
 
         <template v-slot:option="{ option }">
@@ -67,7 +72,7 @@
             <div v-if="option.flag" class="col-auto px-1"><span class="fs-2">{{ option.flag }}</span></div>
             <div class="col p-1 lh-1 text-truncate" :title="option.name[$i18n.locale]">
               <span>{{ option._id }}</span>
-              <br >
+              <br>
               <span class="text-secondary"> <small>{{ option.name[$i18n.locale] }}</small> </span>
             </div>
             <div v-if="option.symbol" class="col-auto ms-auto ps-0">{{ option.symbol }}</div>
@@ -77,7 +82,7 @@
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]>
+    <template v-for="(component, slot) in elementSlots" :key="slot" #[slot]>
       <slot :name="slot" :el$="el$">
         <component :is="component" :el$="el$" />
       </slot>

@@ -9,3 +9,14 @@
 .tnum {
   font-feature-settings: "tnum";
 }
+
+/* Preserve the appearance of inline controls while using native keyboard-accessible buttons. */
+:where(.button-reset) {
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+}

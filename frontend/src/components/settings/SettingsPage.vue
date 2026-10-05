@@ -1,6 +1,13 @@
 <template>
   <div v-if="APP_DATA" class="d-lg-flex settings-page">
-    <div class="settings-backdrop" :class="{ 'settings-backdrop--open': mobileNavigationOpen }" @click="mobileNavigationOpen = false"></div>
+    <button
+      type="button"
+      :aria-label="t('labels.cancel')"
+      :tabindex="mobileNavigationOpen ? 0 : -1"
+      :aria-hidden="!mobileNavigationOpen"
+      class="settings-backdrop button-reset"
+      :class="{ 'settings-backdrop--open': mobileNavigationOpen }"
+      @click="mobileNavigationOpen = false"></button>
 
     <aside
       class="settings-sidebar"
@@ -29,7 +36,7 @@
             class="form-control"
             type="search"
             :placeholder="`${t('labels.search')}...`"
-            :tabindex="sidebarHidden ? -1 : undefined" >
+            :tabindex="sidebarHidden ? -1 : undefined">
         </div>
 
         <div class="settings-sidebar__content">
@@ -100,19 +107,19 @@
 </template>
 
 <script lang="ts" setup>
-import APP_LOADER from '@/dataLoader.js'
-import { bp } from '@/helper'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterView, useRoute, useRouter } from 'vue-router'
+import APP_LOADER from '@/dataLoader.js'
+import { bp } from '@/helper'
 import {
   type AdminSearchKeywordKey,
+  type AdminSection,
+  type AdminSectionId,
   adminSectionGroups,
   adminSections,
   defaultAdminSection,
-  getAdminSectionById,
-  type AdminSection,
-  type AdminSectionId
+  getAdminSectionById
 } from './adminSections'
 
 const { t, tm } = useI18n()

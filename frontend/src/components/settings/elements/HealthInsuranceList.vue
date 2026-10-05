@@ -4,12 +4,18 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('name', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('name', e)">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.name as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.name as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
@@ -17,12 +23,18 @@
       <template #header-email="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="(e) => clickFilter('email', e)">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.email"
+            type="button"
+            class="button-reset clickable"
+            @click="(e) => clickFilter('email', e)">
             <i v-if="showFilter.email" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.email" @click.stop>
-            <input type="text" class="form-control" v-model="(filter.email as any).$regex" >
+            <input type="text" class="form-control" v-model="(filter.email as { $regex: string | undefined }).$regex">
           </div>
         </div>
       </template>
@@ -40,7 +52,7 @@
         v-model="healthInsuranceToEdit"
         :sync="true"
         :endpoint="false"
-        @submit="(form$: any) => postHealthInsurance(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postHealthInsurance>[0] }) => postHealthInsurance(form$.data)"
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">

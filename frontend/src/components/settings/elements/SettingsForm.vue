@@ -3,8 +3,8 @@
     :schema="schema"
     ref="form"
     :endpoint="false"
-    @submit="(form$: any) => postSettings(form$.data)"
-    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postSettings(formRef?.data as any)}" />
+    @submit="(form$: { data: Parameters<typeof postSettings>[0] }) => postSettings(form$.data)"
+    @keydown.ctrl.s.prevent="(e: KeyboardEvent) => {e.repeat ? null: postSettings(formRef?.data as Parameters<typeof postSettings>[0])}" />
 </template>
 
 <script lang="ts" setup>

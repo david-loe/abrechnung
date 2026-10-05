@@ -24,9 +24,9 @@
       </div>
     </template>
     <template v-if="required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events" >
+      <input class="vs__search" :required="!modelValue" v-bind="attributes" v-on="events">
     </template>
-    <template #no-options="{ search, searching, loading }">
+    <template #no-options="{ search }">
       <span v-if="search">{{ t('alerts.noData.searchX', { X: search }) }}</span>
       <span v-else-if="currency">
         {{ t('alerts.noData.advanceForUserXInCurrencyY', { X: formatter.name((owner as UserSimple | undefined)?.name), Y: currencyName }) }}
@@ -37,11 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
-import { formatter } from '@/formatter.js'
 import { AdvanceSimple, Currency, IdDocument, idDocumentToId, Locale, ProjectSimple, UserSimple } from 'abrechnung-common/types.js'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { filterAdvancesByCurrency, getAdvances } from '@/components/advance/scripts.js'
+import { formatter } from '@/formatter.js'
 
 type BaseProps = {
   required?: boolean

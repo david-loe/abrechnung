@@ -10,7 +10,7 @@
           <div v-if="loadingSearch" class="z-1 position-absolute top-50 end-0 translate-middle-y">
             <span class="spinner-border spinner-border-sm me-2"></span>
           </div>
-          <input type="text" class="form-control" placeholder="Ref" v-model="searchInput" @input="search" >
+          <input type="text" class="form-control" placeholder="Ref" v-model="searchInput" @input="search">
         </div>
       </form>
       <form v-if="showForm" @submit.prevent="updateReport">
@@ -19,7 +19,7 @@
             {{ t('labels.label') }}
             <span class="text-danger">*</span>
           </label>
-          <input type="text" class="form-control" id="expenseReportFormName" v-model="report.name" required >
+          <input type="text" class="form-control" id="expenseReportFormName" v-model="report.name" required>
         </div>
         <div class="mb-3">
           <label for="expenseReportFormOwner" class="form-label">
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { idDocumentToId, ProjectSimple, ReportModelName, refStringRegexLax, User, UserSimple } from 'abrechnung-common/types.js'
+import { ProjectSimple, ReportModelName, refStringRegexLax, UserSimple } from 'abrechnung-common/types.js'
 import { refNumberToString, refStringToNumber } from 'abrechnung-common/utils/scripts.js'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'

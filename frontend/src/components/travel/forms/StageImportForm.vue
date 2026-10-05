@@ -17,7 +17,9 @@
           <div>
             <div>{{ sourceLabel(source) }}</div>
             <small class="text-secondary">
-              {{ `${placeToSimpleString(source.destinationPlace)} · ${formatter.simpleDate(source.startDate)} – ${formatter.simpleDate(source.endDate)}` }}
+              {{
+                `${placeToSimpleString(source.destinationPlace)} · ${formatter.simpleDate(source.startDate)} – ${formatter.simpleDate(source.endDate)}`
+              }}
             </small>
           </div>
         </template>
@@ -25,7 +27,7 @@
           <span>{{ t('alerts.noData.stageImportSource') }}</span>
         </template>
         <template #search="{ attributes, events }">
-          <input class="vs__search" :required="!selectedSource" v-bind="attributes" v-on="events" >
+          <input class="vs__search" :required="!selectedSource" v-bind="attributes" v-on="events">
         </template>
       </v-select>
     </div>
@@ -60,9 +62,7 @@ function sourceLabel(source: TravelStageImportSource<string>) {
 }
 
 onMounted(async () => {
-  const result = await API.getter<TravelStageImportSource<string>[]>('travel/stage/import', {
-    targetTravelId: props.targetTravelId
-  })
+  const result = await API.getter<TravelStageImportSource<string>[]>('travel/stage/import', { targetTravelId: props.targetTravelId })
   if (result.ok) {
     sources.value = result.ok.data
   }

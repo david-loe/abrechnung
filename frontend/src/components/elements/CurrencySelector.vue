@@ -16,7 +16,7 @@
         <div v-if="flag" class="col-auto px-1"><span class="fs-2">{{ flag }}</span></div>
         <div class="col p-1 lh-1 text-truncate" :title="name[locale as Locale]">
           <span>{{ _id }}</span>
-          <br >
+          <br>
           <span class="text-secondary"> <small>{{ name[locale as Locale] }}</small> </span>
         </div>
         <div v-if="symbol" class="col-auto ms-auto ps-0">{{ symbol }}</div>
@@ -30,7 +30,7 @@
       </div>
     </template>
     <template v-if="props.required" #search="{ attributes, events }">
-      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events" >
+      <input class="vs__search" :required="!props.modelValue" v-bind="attributes" v-on="events">
     </template>
   </v-select>
 </template>
@@ -55,7 +55,9 @@ const emits = defineEmits<{ 'update:modelValue': [Currency | null] }>()
 const options = computed(() => {
   if (!APP_DATA.value) return []
   const currencies = APP_DATA.value.user.settings.lastCurrencies.concat(APP_DATA.value.currencies)
-  return currencies.filter((currency, index) => !props.exclude.includes(currency._id) && currencies.findIndex((item) => item._id === currency._id) === index)
+  return currencies.filter(
+    (currency, index) => !props.exclude.includes(currency._id) && currencies.findIndex((item) => item._id === currency._id) === index
+  )
 })
 
 function filter(options: Currency[], search: string): Currency[] {

@@ -8,7 +8,7 @@
         @input="update({ place: ($event.target as HTMLInputElement).value })"
         :placeholder="t('labels.place')"
         :disabled="disabled"
-        :required="required" >
+        :required="required">
       <CountrySelector
         :modelValue="modelValue.country"
         @update:modelValue="(v) => update({ country: v })"
@@ -16,9 +16,10 @@
         :required="required" />
     </div>
     <div class="mt-2" v-if="withSpecialLumpSumInput && modelValue.country && APP_DATA?.specialLumpSums[modelValue.country._id]">
-      <label class="form-label me-2">{{ t('labels.city') }}</label>
+      <label :for="cityId" class="form-label me-2">{{ t('labels.city') }}</label>
       <InfoPoint :text="t('info.special')" />
       <select
+        :id="cityId"
         class="form-select form-select-sm"
         @change="update({ special: ($event.target as HTMLInputElement).value })"
         :disabled="disabled">
@@ -27,7 +28,7 @@
           v-for="special of APP_DATA.specialLumpSums[modelValue.country._id]"
           :value="special"
           :key="special"
-          :selected="special == modelValue.special">
+          :selected="special === modelValue.special">
           {{ special }}
         </option>
       </select>
@@ -37,12 +38,13 @@
 
 <script lang="ts" setup>
 import { Place } from 'abrechnung-common/types.js'
-import { PropType, watch } from 'vue'
+import { PropType, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import CountrySelector from './CountrySelector.vue'
 import InfoPoint from './InfoPoint.vue'
 
+const cityId = useId()
 const { t } = useI18n()
 
 const APP_DATA = APP_LOADER.data

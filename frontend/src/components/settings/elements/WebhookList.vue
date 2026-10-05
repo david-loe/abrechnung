@@ -4,21 +4,29 @@
       <template #header-name="header">
         <div class="filter-column">
           {{ t(header.text) }}
-          <span class="clickable" @click="clickFilter('name')">
+          <button
+            :aria-label="t('labels.filter')"
+            :aria-expanded="showFilter.name"
+            type="button"
+            class="button-reset clickable"
+            @click="clickFilter('name')">
             <i v-if="showFilter.name" class="bi bi-funnel-fill"></i>
             <i v-else class="bi bi-funnel"></i>
-          </span>
+          </button>
+          <!-- biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: Only stops clicks from bubbling to the enclosing row; child controls handle keyboard interaction. -->
           <div v-if="showFilter.name" @click.stop>
-            <input type="text" class="form-control" v-model="filter.name.$regex" >
+            <input type="text" class="form-control" v-model="filter.name.$regex">
           </div>
         </div>
       </template>
 
-      <template #item-isActive="{isActive}:Webhook">{{ isActive? '✅' : '❌' }}</template>
+      <template #item-isActive="{isActive}:Webhook">{{ isActive ? '✅' : '❌' }}</template>
       <template #item-reportType="{reportType}: Webhook">
-        <span v-if="APP_DATA" v-for="r of reportType" :title="t('labels.' + r)" class="me-2">
-          <i v-for="icon of APP_DATA.displaySettings.reportTypeIcons[r]" :class="`bi bi-${icon}`"></i>
-        </span>
+        <template v-if="APP_DATA"
+          ><span v-for="r of reportType" :key="r" :title="t('labels.' + r)" class="me-2">
+            <i v-for="icon of APP_DATA.displaySettings.reportTypeIcons[r]" :key="icon" :class="`bi bi-${icon}`"></i>
+          </span></template
+        >
       </template>
 
       <template #item-buttons="webhook">
@@ -32,7 +40,7 @@
         v-model="webhookToEdit"
         :sync="true"
         :endpoint="false"
-        @submit="(form$: any) => postWebhook(form$.data)"
+        @submit="(form$: { data: Parameters<typeof postWebhook>[0] }) => postWebhook(form$.data)"
         @reset="_showForm = false" />
     </div>
     <button v-else type="button" class="btn btn-secondary" @click="showForm()">{{ t('labels.addX', { X: t('labels.webhook') }) }}</button>
@@ -46,7 +54,7 @@ import { Ref, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { Header } from 'vue3-easy-data-table'
 import API from '@/api.js'
-import ListElement, { Filter } from '@/components/elements/ListElement.vue'
+import ListElement from '@/components/elements/ListElement.vue'
 import APP_LOADER from '@/dataLoader.js'
 
 const { t } = useI18n()

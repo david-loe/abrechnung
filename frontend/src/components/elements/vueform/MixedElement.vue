@@ -5,7 +5,7 @@
     </template>
 
     <!-- Default element slots -->
-    <template v-for="(component, slot) in elementSlots" #[slot]>
+    <template v-for="(component, slot) in elementSlots" :key="slot" #[slot]>
       <slot :name="slot" :el$="el$">
         <component :is="component" :el$="el$" />
       </slot>

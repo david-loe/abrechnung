@@ -4,7 +4,7 @@
       <StateBadge :state="state" :StateEnum="StateEnum" class="fs-6" />
     </div>
     <div v-else class="row align-items-center justify-content-around m-0 flex-nowrap">
-      <template v-for="(value, index) of states">
+      <template v-for="(value, index) of states" :key="value">
         <template v-if="value !== State.REJECTED">
           <div class="col-auto p-0" :key="value">
             <StateBadge :state="value" :StateEnum="StateEnum" :class="state === value ? 'fs-6' : 'fw-normal'" />
@@ -17,7 +17,7 @@
                 ', ' +
                 APP_DATA?.displaySettings.stateColors[states[index + 1]].color +
                 '); height: 5px; border: 0px'
-              " >
+              ">
           </div>
         </template>
       </template>
