@@ -1135,6 +1135,18 @@
 						],
 						"nullable": true
 					},
+					"lastActiveAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"description": "Last authenticated activity; regular requests update this at most every five minutes."
+					},
 					"additionalDetails": {
 						"type": "string",
 						"nullable": true
@@ -1761,6 +1773,18 @@
 						],
 						"nullable": true
 					},
+					"lastActiveAt": {
+						"anyOf": [
+							{
+								"type": "string",
+								"format": "date-time"
+							},
+							{
+								"type": "string"
+							}
+						],
+						"description": "Last authenticated activity; regular requests update this at most every five minutes."
+					},
 					"additionalDetails": {
 						"type": "string",
 						"nullable": true
@@ -1823,6 +1847,7 @@
 								"projects",
 								"settings",
 								"loseAccessAt",
+								"lastActiveAt",
 								"additionalDetails",
 								"vehicleRegistration",
 								"token"
@@ -2150,7 +2175,7 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"Pick_SetterBody_IUser_mongoose.Types.ObjectId.Binary__.Exclude_keyofSetterBody_IUser_mongoose.Types.ObjectId.Binary__.settings__": {
+			"Pick_SetterBody_IUser_mongoose.Types.ObjectId.Binary__.Exclude_keyofSetterBody_IUser_mongoose.Types.ObjectId.Binary__.settings-or-lastActiveAt__": {
 				"properties": {
 					"name": {
 						"properties": {
@@ -16819,6 +16844,7 @@
 									"projects",
 									"settings",
 									"loseAccessAt",
+									"lastActiveAt",
 									"additionalDetails",
 									"vehicleRegistration",
 									"token"
@@ -16925,6 +16951,7 @@
 									"projects",
 									"settings",
 									"loseAccessAt",
+									"lastActiveAt",
 									"additionalDetails",
 									"vehicleRegistration",
 									"token"
@@ -26230,6 +26257,7 @@
 									"projects",
 									"settings",
 									"loseAccessAt",
+									"lastActiveAt",
 									"additionalDetails",
 									"vehicleRegistration",
 									"token"
