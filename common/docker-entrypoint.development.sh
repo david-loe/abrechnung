@@ -19,7 +19,7 @@ if ! cmp -s /npm_cache/.dependency-id /app/node_modules/.dependency-id; then
   echo "Synchronizing $DEPENDENCY_SERVICE dependencies"
   rm -rf /app/.dependency-sync/new /app/.dependency-sync/old
   mkdir /app/.dependency-sync/new
-  cp -a /npm_cache/node_modules/. /app/.dependency-sync/new/
+  cp -R /npm_cache/node_modules/. /app/.dependency-sync/new/
   cp /npm_cache/.dependency-id /app/.dependency-sync/new/.dependency-id
   if [ -e /app/node_modules ]; then
     mv /app/node_modules /app/.dependency-sync/old
