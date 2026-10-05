@@ -39,6 +39,16 @@ test.serial('admin can remove optional bank details while incomplete accounts re
   }
 })
 
+test.serial('last activity is read-only and absent from user forms', async (t) => {
+  const user = (await agent.get('/user')).body.data as User
+  const response = await agent.post('/admin/user').send({ _id: user._id, lastActiveAt: '2000-01-01T00:00:00Z' })
+  t.is(response.status, 200)
+  t.is(response.body.result.lastActiveAt, user.lastActiveAt)
+  const form = await agent.get('/admin/user/form')
+  t.is(form.status, 200)
+  t.false('lastActiveAt' in form.body.data)
+})
+
 test.serial.after.always('Drop DB Connection', async () => {
   await shutdown()
 })

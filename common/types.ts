@@ -438,6 +438,8 @@ export interface User<idType extends _id = _id, dataType extends binary = binary
     showInstallBanner: boolean
   }
   loseAccessAt?: null | Date | string
+  /** Last authenticated activity; regular requests update this at most every five minutes. */
+  lastActiveAt?: Date | string
   additionalDetails?: string | null
   vehicleRegistration?: DocumentFile<idType, dataType>[] | null
   token?: Token<idType, dataType> | null
