@@ -66,6 +66,18 @@ docker compose run --rm --no-deps --pull never -e NODE_ENV=production frontend n
 
 The common tests also build the shared package. For an individual backend or frontend check, first run `docker compose run --rm --no-deps --pull never common npm run build`. Backend tests use and modify the configured development database. `--no-deps` prevents test containers from starting application services implicitly; `--rm` removes the finished test containers. Existing development services are left running.
 
+Backend `npm test` compiles once and runs database preparation and the five LDAP user fixtures once before AVA. `npm run test:built -- dist/tests/api/user.js` runs a selected compiled test file with the same preparation; `npm run test:debug` also prepares fixtures. Do not prepend `npm run setup` to these test commands. Shared fixture changes are restored at teardown.
+
+For changes to development dependency synchronization, build the common image and run `python3 dev-tools/tests/dependency-sync.py`.
+
+### List and session performance
+
+Report schemas include partial indexes for current-document owner/date and modification-date lists. The existing database setup and application startup install these indexes. Own travel lists retain their `startDate` sort; other own report lists retain `createdAt`.
+
+List filters coalesce changes for 250 ms and return to page one. Pagination, sorting and explicit refresh stay immediate. Superseded requests are canceled and cannot replace newer results.
+
+Unchanged sessions use lazy MongoDB touches with a five-minute interval; changes to session contents are saved immediately. Cookie lifetime and logout behavior remain unchanged. Existing sessions without touch metadata acquire it on their next save or login.
+
 ## Contributing
 
 Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</a> oder <a href="https://github.com/david-loe/abrechnung/pulls">PR's</a> ([Contributing Guidelines](./CONTRIBUTING.md))!

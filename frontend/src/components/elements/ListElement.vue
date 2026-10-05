@@ -22,12 +22,14 @@
 
 <script lang="ts" setup>
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
-import { PropType, ref, watch } from 'vue'
+import { onBeforeUnmount, PropType, ref } from 'vue'
 import type { Header, Item, ServerOptions, SortType } from 'vue3-easy-data-table'
 import API from '@/api.js'
 import '@/vendor/vue3-easy-data-table.css'
 import { useI18n } from 'vue-i18n'
 import TableElement from '@/components/elements/TableElement.vue'
+import { logger } from '@/logger.js'
+import { createListRequests, watchListRequests } from './listRequests.js'
 
 import '@/vue3-easy-data-table.css'
 
@@ -69,13 +71,24 @@ const loading = ref(false)
 const serverItemsLength = ref(0)
 const serverOptions = ref<ServerOptions>({ page: 1, rowsPerPage: props.rowsPerPage, sortBy: props.sortBy, sortType: props.sortType })
 
-// initial load
-loadFromServer()
+const requests = createListRequests({
+  request: requestItems,
+  apply: (response) => {
+    items.value = response.ok?.data ?? []
+    serverItemsLength.value = response.ok?.meta.count ?? 0
+    emits('loaded')
+  },
+  setLoading: (value) => {
+    loading.value = value
+  },
+  onError: (error) => logger.error(error)
+})
 
-let oldFilterValue = ''
-async function loadFromServer() {
-  loading.value = true
+function loadFromServer() {
+  return requests.load()
+}
 
+async function requestItems(signal: AbortSignal) {
   const params = Object.assign({}, props.params, { page: serverOptions.value.page, limit: serverOptions.value.rowsPerPage })
 
   if (serverOptions.value.sortBy && serverOptions.value.sortType && typeof serverOptions.value.sortBy === 'string') {
@@ -88,17 +101,9 @@ async function loadFromServer() {
     params.filterJSON = Base64.encode(JSON.stringify(filter))
   }
 
-  const result = (await API.getter<Item[]>(props.endpoint, params)).ok
-  if (result) {
-    items.value = result.data
-    serverItemsLength.value = result.meta.count
-  } else {
-    items.value = []
-    serverItemsLength.value = 0
-  }
-  loading.value = false
-  emits('loaded')
+  return await API.getter<Item[]>(props.endpoint, params, { signal })
 }
+
 function prepareFilter(filter: Filter) {
   const filterCopy: Filter = JSON.parse(JSON.stringify(filter))
   for (const filterKey in filterCopy) {
@@ -121,25 +126,12 @@ function prepareFilter(filter: Filter) {
   return filterCopy
 }
 
-watch(
-  serverOptions,
-  () => {
-    loadFromServer()
-  },
-  { deep: true }
-)
-watch(
-  props.filter,
-  (value) => {
-    const preparedFilter = prepareFilter(value)
-    const filterJSON = JSON.stringify(preparedFilter)
-    if (oldFilterValue !== filterJSON) {
-      oldFilterValue = filterJSON
-      loadFromServer()
-    }
-  },
-  { deep: true }
-)
+const stopWatching = watchListRequests(serverOptions, () => JSON.stringify(prepareFilter(props.filter)), requests)
+onBeforeUnmount(() => {
+  stopWatching()
+  requests.dispose()
+})
+void loadFromServer()
 </script>
 
 <style></style>

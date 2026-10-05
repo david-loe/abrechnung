@@ -65,7 +65,7 @@ export async function createApp() {
       store: await sessionStore(),
       secret: ENV.COOKIE_SECRET,
       cookie: { maxAge: ENV.COOKIE_MAX_AGE_DAYS * 86_400_000, secure: useSecureCookie, sameSite: useSecureCookie ? 'none' : 'lax' },
-      resave: true,
+      resave: false,
       saveUninitialized: false,
       name: i18n.t('headlines.title').replace(/[^!#$%&'*+\-.^_`|~0-9A-Za-z]/g, '_')
     })

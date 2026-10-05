@@ -67,7 +67,7 @@ export function sessionStore() {
   if (!sessionStorePromise) {
     if (connectionPromise) {
       sessionStorePromise = (async () => {
-        return MongoStore.create({ client: (await connectionPromise).getClient() })
+        return MongoStore.create({ client: (await connectionPromise).getClient(), touchAfter: 300 })
       })()
     } else {
       throw Error('No connection to database started')
