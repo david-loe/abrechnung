@@ -2,26 +2,27 @@ import cors from 'cors'
 import express, { NextFunction as ExNextFunction, Request as ExRequest, Response as ExResponse } from 'express'
 import { rateLimit } from 'express-rate-limit'
 import session from 'express-session'
-import mongoose from 'mongoose'
 import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { errorHandler, RateLimitExceededError, ReadOnlyError } from './controller/error.js'
-import { BACKEND_CACHE, connectDB, disconnectDB, sessionStore } from './db.js'
+import { prepareDatabase } from './databaseSetup.js'
+import { BACKEND_CACHE, disconnectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
 import swaggerDocument from './dist/swagger.json' with { type: 'json' }
 import ENV from './env.js'
 import i18n from './i18n.js'
 import { closeIntegrationQueue } from './integrations/queue.js'
 import { logger } from './logger.js'
-import { checkForMigrations } from './migrations.js'
 import { initializeBackendRuntime, shutdownBackendRuntime } from './runtime.js'
 
 export default async function () {
-  await connectDB()
-  await checkForMigrations()
-  await mongoose.syncIndexes()
+  await prepareDatabase()
   await initializeBackendRuntime()
+  return await createApp()
+}
 
+/** Build an application after database preparation and runtime initialization. */
+export async function createApp() {
   const app = express()
 
   if (ENV.TRUST_PROXY) {

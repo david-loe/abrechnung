@@ -2,11 +2,11 @@ import { AuthContext, User } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { Types } from 'mongoose'
 import request from 'supertest'
-import APP, { shutdown } from '../../app.js'
+import { createApp } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import UserModel from '../../models/user.js'
 import { recordUserActivity } from '../../userActivity.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'user')
@@ -53,7 +53,7 @@ test.serial('login and session activity are persisted with a five-minute interva
 
 for (const activity of ['session activity', 'login']) {
   test.serial(`${activity} replaces an explicitly null activity timestamp`, async (t) => {
-    const activityAgent = request.agent(await APP())
+    const activityAgent = await createAgent()
     await loginUser(activityAgent, 'admin')
     const current = (await activityAgent.get('/user')).body.data as User
     await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: null } })
@@ -81,7 +81,7 @@ test.serial('personal API key activity is persisted and throttled', async (t) =>
   const keyResponse = await agent.post('/user/httpBearer')
   t.is(keyResponse.status, 200)
   const key = keyResponse.body.result as string
-  const api = request(await APP())
+  const api = request(await createApp())
   const previous = new Date(Date.now() - 600_000)
   try {
     await UserModel.updateOne({ _id: current._id }, { $set: { lastActiveAt: previous } })

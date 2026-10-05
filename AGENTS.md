@@ -47,8 +47,10 @@ docker compose run --rm --no-deps --pull never common npm run test
 docker compose build common backend ldap inbucket
 docker compose run --rm --no-deps --pull never common npm run build
 docker compose up -d db redis ldap inbucket
-docker compose run --rm --no-deps --pull never backend sh -c 'npm run setup && npm run test:built'
+docker compose run --rm --no-deps --pull never backend npm test
 ```
+
+Backend `npm test` builds once; `npm run test:built` prepares the configured database and LDAP fixtures once before AVA. Do not prepend `npm run setup`. Individual files can be selected with `npm run test:built -- dist/tests/api/user.js`; `test:debug` also prepares fixtures. Tests retain the configured development database and must restore shared fixture changes.
 
 ### Frontend Package
 Use the same validation intent as CI production build:

@@ -1,8 +1,7 @@
 import test from 'ava'
 import { type Job, type Queue } from 'bullmq'
-import { shutdown } from '../../app.js'
 import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 let state: 'failed' | 'waiting' = 'failed'

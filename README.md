@@ -59,7 +59,7 @@ With `NODE_ENV=development` in `.env`, run checks sequentially from the reposito
 docker compose build common backend frontend ldap inbucket
 docker compose run --rm --no-deps --pull never common npm run test
 docker compose up -d db redis ldap inbucket
-docker compose run --rm --no-deps --pull never backend sh -c 'npm run setup && npm run test:built'
+docker compose run --rm --no-deps --pull never backend npm test
 docker compose run --rm --no-deps --pull never frontend npm run test
 docker compose run --rm --no-deps --pull never -e NODE_ENV=production frontend npm run build
 ```

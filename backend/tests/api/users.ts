@@ -1,6 +1,5 @@
 import test from 'ava'
-import { shutdown } from '../../app.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 

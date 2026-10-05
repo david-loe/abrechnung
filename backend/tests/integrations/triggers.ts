@@ -1,6 +1,6 @@
 import test, { ExecutionContext } from 'ava'
 import { type Queue } from 'bullmq'
-import { connectDB, disconnectDB } from '../../db.js'
+import { disconnectDB } from '../../db.js'
 import {
   closeIntegrationQueue,
   getIntegrationJobRetentionOptions,
@@ -9,8 +9,11 @@ import {
 } from '../../integrations/queue.js'
 import { syncIntegrationSchedules } from '../../integrations/scheduler.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
+import { connectTestDatabase } from '../_database.js'
+import { snapshotSharedFixtures } from '../_fixtures.js'
 
-await connectDB()
+await connectTestDatabase()
+const restoreFixtures = await snapshotSharedFixtures()
 
 function stubQueue(
   t: ExecutionContext,
@@ -47,6 +50,7 @@ function stubQueue(
 
 test.after.always(async () => {
   await closeIntegrationQueue()
+  await restoreFixtures()
   await disconnectDB()
 })
 

@@ -1,14 +1,15 @@
 import test from 'ava'
 import mongoose, { Model, Types } from 'mongoose'
-import { connectDB, disconnectDB } from '../db.js'
+import { disconnectDB } from '../db.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
 import { nextReference } from '../models/referenceCounter.js'
 import Travel from '../models/travel.js'
+import { connectTestDatabase } from './_database.js'
 
 test.serial.before(async () => {
-  await connectDB(false)
+  await connectTestDatabase()
 })
 
 test.serial('reference allocation is atomic and independent per report model', async (t) => {

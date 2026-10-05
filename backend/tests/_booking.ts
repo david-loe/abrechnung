@@ -6,6 +6,7 @@ import request from 'supertest'
 import LedgerAccount from '../models/ledgerAccount.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
+import { users } from './_users.js'
 
 export async function requestBookingExport(
   agent: request.Agent,
@@ -22,7 +23,7 @@ export async function requestBookingExport(
     : undefined
   await Promise.all([
     User.updateMany(
-      {},
+      { 'fk.ldapauth': { $in: Object.values(users).map(({ username }) => username) } },
       { $set: { 'settings.bankAccount': { accountHolder: 'Test Employee', iban: 'DE89370400440532013000', bic: 'COBADEFFXXX' } } }
     ),
     Organisation.updateMany(

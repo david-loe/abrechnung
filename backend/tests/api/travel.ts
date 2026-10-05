@@ -11,11 +11,10 @@ import {
 } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { Types } from 'mongoose'
-import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import TravelModel from '../../models/travel.js'
 import UserModel from '../../models/user.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()

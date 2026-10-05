@@ -1,8 +1,7 @@
 import { BookingExportRow, Category, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()

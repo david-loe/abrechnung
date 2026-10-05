@@ -2,12 +2,11 @@ import { accesses, User as IUser } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import test from 'ava'
 import { Types } from 'mongoose'
-import { shutdown } from '../../app.js'
 import { BACKEND_CACHE } from '../../db.js'
 import Project from '../../models/project.js'
 import Settings from '../../models/settings.js'
 import User from '../../models/user.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 const uniqueSuffix = new Types.ObjectId().toHexString()

@@ -9,13 +9,12 @@ import {
 import { refNumberToString } from 'abrechnung-common/utils/scripts.js'
 import test from 'ava'
 import { Types } from 'mongoose'
-import { shutdown } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import ExpenseReportModel from '../../models/expenseReport.js'
 import LedgerAccount from '../../models/ledgerAccount.js'
 import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()

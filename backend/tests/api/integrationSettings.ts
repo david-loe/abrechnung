@@ -1,8 +1,7 @@
 import test from 'ava'
-import { shutdown } from '../../app.js'
 import { IntegrationSettingsPayload } from '../../integrations/settings.js'
 import IntegrationSettingsModel from '../../models/integrationSettings.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'admin')
