@@ -21,7 +21,7 @@
     "mongodb": "~7.6",
     "mongoose": "^9.10.1",
     "multer": "^2.4.0",
-    "nodemailer": "^9.1.1",
+    "nodemailer": "^10.0.9",
     "openid-client": "^6.8.8",
     "passport": "^0.7.0",
     "passport-http-bearer": "^1.0.1",
