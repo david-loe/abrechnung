@@ -8,3 +8,5 @@ backend/dist
 # copy from frontend/.gitignore
 frontend/node_modules
 frontend/dist
+# Development dependency synchronization
+**/.dependency-sync/

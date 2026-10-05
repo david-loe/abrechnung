@@ -9,3 +9,5 @@
 **/.cache
 **/.vite
 **/*.log
+
+**/.dependency-sync

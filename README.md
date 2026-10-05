@@ -49,6 +49,23 @@ Auswahl zwischen
 
 > ℹ You can change ports and URLs in the `.env` file
 
+### Development dependencies and checks
+
+Development containers keep dependencies in the local `node_modules` directories for editor and local npm usage. The first start synchronizes dependencies from the image; unchanged starts skip copying. Rebuild the affected image after changing `package.json` or `package-lock.json`. If dependencies were manually changed or damaged, remove that package's `node_modules/.dependency-id` marker and restart its container.
+
+With `NODE_ENV=development` in `.env`, run checks sequentially from the repository root:
+
+```sh
+docker compose build common backend frontend ldap inbucket
+docker compose run --rm --no-deps --pull never common npm run test
+docker compose up -d db redis ldap inbucket
+docker compose run --rm --no-deps --pull never backend sh -c 'npm run setup && npm run test:built'
+docker compose run --rm --no-deps --pull never frontend npm run test
+docker compose run --rm --no-deps --pull never -e NODE_ENV=production frontend npm run build
+```
+
+The common tests also build the shared package. For an individual backend or frontend check, first run `docker compose run --rm --no-deps --pull never common npm run build`. Backend tests use and modify the configured development database. `--no-deps` prevents test containers from starting application services implicitly; `--rm` removes the finished test containers. Existing development services are left running.
+
 ## Contributing
 
 Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</a> oder <a href="https://github.com/david-loe/abrechnung/pulls">PR's</a> ([Contributing Guidelines](./CONTRIBUTING.md))!

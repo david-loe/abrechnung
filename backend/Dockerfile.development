@@ -5,12 +5,18 @@ LABEL org.opencontainers.image.description="abrechnung🧾 backend DEVELOPMENT"
 LABEL org.opencontainers.image.licenses=AGPL-3.0-only
 
 RUN apk add --no-cache tini
-COPY backend/docker-entrypoint.development.sh /usr/local/bin/docker-entrypoint.sh
+
+COPY common/docker-entrypoint.development.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+ENV DEPENDENCY_SERVICE=backend
 
 WORKDIR /npm_cache
 COPY backend/package*.json ./
-RUN npm ci && chown -R node:node /npm_cache && mkdir -p /app && chown node:node /app
+RUN npm ci \
+  && sha256sum package.json package-lock.json > .dependency-manifests \
+  && cat /proc/sys/kernel/random/uuid > .dependency-id \
+  && chown -R node:node /npm_cache \
+  && mkdir -p /app && chown node:node /app
 
 WORKDIR /app
 
