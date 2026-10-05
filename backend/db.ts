@@ -20,7 +20,7 @@ import {
 } from 'abrechnung-common/types.js'
 import { mergeDeep } from 'abrechnung-common/utils/scripts.js'
 import MongoStore from 'connect-mongo'
-import mongoose, { Connection, Model } from 'mongoose'
+import mongoose, { Connection, ConnectOptions, Model } from 'mongoose'
 import { CACHE } from './data/cache.js'
 import connectionSettingsDev from './data/connectionSettings.development.js'
 import connectionSettingsProd from './data/connectionSettings.production.js'
@@ -42,12 +42,12 @@ import Project from './models/project.js'
 
 let connectionPromise: Promise<Connection> | null = null
 
-export function connectDB(init = true) {
+export function connectDB(init = true, options: Pick<ConnectOptions, 'autoIndex' | 'autoCreate'> = {}) {
   if (!connectionPromise) {
     mongoose.connection.on('connected', () => logger.debug('Connected to Database'))
     mongoose.connection.on('disconnected', () => logger.debug('Disconnected from Database'))
     connectionPromise = (async () => {
-      const mongoDB = await mongoose.connect(ENV.MONGO_URL)
+      const mongoDB = await mongoose.connect(ENV.MONGO_URL, options)
       if (init) {
         await initDB()
       }
@@ -67,7 +67,7 @@ export function sessionStore() {
   if (!sessionStorePromise) {
     if (connectionPromise) {
       sessionStorePromise = (async () => {
-        return MongoStore.create({ client: (await connectionPromise).getClient() })
+        return MongoStore.create({ client: (await connectionPromise).getClient(), touchAfter: 300 })
       })()
     } else {
       throw Error('No connection to database started')

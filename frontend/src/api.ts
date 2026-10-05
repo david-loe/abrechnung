@@ -42,6 +42,7 @@ class API {
       }
       return { ok: res.data }
     } catch (error: unknown) {
+      if (axios.isCancel(error)) return { error }
       if (
         config.responseType === 'blob' &&
         axios.isAxiosError(error) &&

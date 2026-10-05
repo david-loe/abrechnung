@@ -24,6 +24,8 @@ Treat this file as a living document: when code, tooling, workflows, commands, o
 - Prefer existing service names from `docker-compose.yml`.
 - Local package commands (`npm run ...`) are allowed for fast package-local iteration when equivalent, but final validation should align with repo CI intent.
 
+Development dependencies remain in bind-mounted `node_modules`. Container starts synchronize them only when the dependency image changes or the marker is missing. After changing package manifests, rebuild the affected development image. Remove `node_modules/.dependency-id` to repair a manually changed installation. Run package checks sequentially locally and reuse a completed common build.
+
 ## Quality Gate (Repo-Standard)
 Run checks only for impacted areas by default. Expand scope when changes are cross-cutting.
 
@@ -36,20 +38,27 @@ biome ci --changed --error-on-warnings --no-errors-on-unmatched .
 
 ### Common Package
 ```bash
-docker compose run common npm run test
+docker compose build common
+docker compose run --rm --no-deps --pull never common npm run test
 ```
 
 ### Backend Package
 ```bash
-docker compose run backend sh -c 'npm run setup && npm run test:built'
+docker compose build common backend ldap inbucket
+docker compose run --rm --no-deps --pull never common npm run build
+docker compose up -d db redis ldap inbucket
+docker compose run --rm --no-deps --pull never backend npm test
 ```
+
+Backend `npm test` builds once; `npm run test:built` prepares the configured database and LDAP fixtures once before AVA. Do not prepend `npm run setup`. Individual files can be selected with `npm run test:built -- dist/tests/api/user.js`; `test:debug` also prepares fixtures. Tests retain the configured development database and must restore shared fixture changes.
 
 ### Frontend Package
 Use the same validation intent as CI production build:
 ```bash
-docker compose build frontend
-docker compose run frontend npm run test
-docker compose run -e NODE_ENV=production frontend npm run build
+docker compose build common frontend
+docker compose run --rm --no-deps --pull never common npm run build
+docker compose run --rm --no-deps --pull never frontend npm run test
+docker compose run --rm --no-deps --pull never -e NODE_ENV=production frontend npm run build
 ```
 
 Note:

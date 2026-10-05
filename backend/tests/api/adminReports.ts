@@ -1,7 +1,6 @@
 import { AdvanceState, ExpenseReportState, HealthCareCostState, ReportModelName, TravelState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { mongo, Types } from 'mongoose'
-import { shutdown } from '../../app.js'
 import Advance from '../../models/advance.js'
 import DocumentFile from '../../models/documentFile.js'
 import ExpenseReport from '../../models/expenseReport.js'
@@ -9,7 +8,7 @@ import HealthCareCost from '../../models/healthCareCost.js'
 import Project from '../../models/project.js'
 import Travel from '../../models/travel.js'
 import User from '../../models/user.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 const owner = await User.findOne({ 'fk.ldapauth': 'leela' })

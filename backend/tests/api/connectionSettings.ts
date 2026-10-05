@@ -1,9 +1,8 @@
 import { ConnectionSettings as IConnectionSettings } from 'abrechnung-common/types.js'
 import test, { ExecutionContext } from 'ava'
-import { shutdown } from '../../app.js'
 import { SECRET_PLACEHOLDER } from '../../controller/connectionSettingsController.js'
 import ConnectionSettings from '../../models/connectionSettings.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'admin')

@@ -68,8 +68,13 @@
     "start": "node dist/server.js",
     "worker": "node dist/workers/start.js",
     "test": "npm run build && npm run test:built",
-    "test:built": "LOG_LEVEL=WARN ava --serial --timeout=20s \"dist/tests/**/*.js\"",
-    "test:debug": "LOG_LEVEL=DEBUG ava debug --host 0.0.0.0 --port 9229 --serial dist/tests/api/travel.js",
+    "test:built": "LOG_LEVEL=WARN node dist/tests/_setup.js && LOG_LEVEL=WARN ava",
+    "test:debug": "LOG_LEVEL=DEBUG node dist/tests/_setup.js && LOG_LEVEL=DEBUG ava debug --host 0.0.0.0 --port 9229 dist/tests/api/travel.js",
     "setup": "npm run build && node dist/setup.js"
+  },
+  "ava": {
+    "files": ["dist/tests/**/*.js"],
+    "serial": true,
+    "timeout": "20s"
   }
 }

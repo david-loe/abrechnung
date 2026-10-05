@@ -1,11 +1,8 @@
-import mongoose from 'mongoose'
-import { connectDB, disconnectDB } from './db.js'
-import { checkForMigrations } from './migrations.js'
+import { prepareDatabase } from './databaseSetup.js'
+import { disconnectDB } from './db.js'
 
 try {
-  await connectDB()
-  await checkForMigrations()
-  await mongoose.syncIndexes()
+  await prepareDatabase()
 } finally {
   await disconnectDB()
 }

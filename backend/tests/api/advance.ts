@@ -2,10 +2,9 @@ import { AdvanceState, BookingExportRow } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import test from 'ava'
 import { type Queue } from 'bullmq'
-import { shutdown } from '../../app.js'
 import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForTests } from '../../integrations/queue.js'
 import Advance from '../../models/advance.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 
 const agent = await createAgent()

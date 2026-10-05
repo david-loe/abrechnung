@@ -1,9 +1,8 @@
 import test from 'ava'
 import mongoose, { Types } from 'mongoose'
-import { shutdown } from '../../app.js'
 import Category from '../../models/category.js'
 import LedgerAccount from '../../models/ledgerAccount.js'
-import createAgent, { loginUser } from '../_agent.js'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'admin')
