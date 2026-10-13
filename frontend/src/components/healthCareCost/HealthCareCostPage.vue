@@ -41,7 +41,7 @@
     <div class="container py-3" v-if="healthCareCost._id">
       <div class="row">
         <div class="col">
-          <nav v-if="parentPages && parentPages.length > 0" aria-label="breadcrumb">
+          <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
               <li class="breadcrumb-item" v-for="page of parentPages" :key="page.link">
                 <router-link :to="page.link">{{ t(page.title) }}</router-link>
