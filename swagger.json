@@ -15794,7 +15794,7 @@
 	},
 	"info": {
 		"title": "abrechnung-backend",
-		"version": "3.0.1",
+		"version": "3.0.2",
 		"contact": {}
 	},
 	"paths": {
@@ -29167,7 +29167,26 @@
 								"schema": {
 									"properties": {
 										"result": {
-											"$ref": "#/components/schemas/Advance__id_"
+											"allOf": [
+												{
+													"$ref": "#/components/schemas/Advance_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Required___id-mongoose.Types.ObjectId__"
+												},
+												{
+													"properties": {
+														"__v": {
+															"type": "number",
+															"format": "double"
+														}
+													},
+													"required": [
+														"__v"
+													],
+													"type": "object"
+												}
+											]
 										},
 										"message": {
 											"type": "string"
