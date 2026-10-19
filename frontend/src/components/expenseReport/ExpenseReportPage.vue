@@ -16,6 +16,7 @@
           :loading="modalFormIsLoading"
           :mode="modalMode"
           :default-project="expenseReport.project"
+          :category="expenseReport.category || undefined"
           :report-currency="expenseReport.currency || undefined"
           :endpointPrefix="endpointPrefix"
           :ownerId="endpointPrefix === 'examine/' || viewOnly ? expenseReport.owner._id : undefined"
@@ -62,6 +63,7 @@
         <div class="row justify-content-between align-items-end">
           <div class="col-auto d-flex align-items-center">
             <h2 class="m-0">{{ expenseReport.name }}</h2>
+            <Badge v-if="expenseReport.category" class="ms-2" :text="expenseReport.category.name" :style="expenseReport.category.style" />
           </div>
           <div class="col-auto">
             <div class="dropdown">
@@ -192,7 +194,7 @@
                     path: 'cost.positions.0.project',
                     fn: (v) => (v ? getById(v as string, APP_DATA?.projects || [])?._id : expenseReport.project._id)
                   },
-                  { path: 'cost.positions.0.category', fn: (v) => (v ? getById(v as string, APP_DATA?.categories || [])?._id : v) }
+                  { path: 'cost.positions.0.category', fn: (v) => (v ? (getById(v as string, APP_DATA?.categories || [])?._id ?? v) : expenseReport.category?._id) }
                 ]"
                 @submitted="() => (isReadOnly ? null : getExpenseReport())" />
             </div>
@@ -377,6 +379,7 @@ import { useRouter } from 'vue-router'
 import { UpdateSortArgument } from 'vue3-easy-data-table'
 import API from '@/api.js'
 import AddUpTable from '@/components/elements/AddUpTable.vue'
+import Badge from '@/components/elements/Badge.vue'
 import CopyReportLinkMenuItem from '@/components/elements/CopyReportLinkMenuItem.vue'
 import CSVImport from '@/components/elements/CSVImport.vue'
 import DateInput from '@/components/elements/DateInput.vue'
@@ -391,6 +394,7 @@ import ValidationIssuesAlert from '@/components/elements/ValidationIssuesAlert.v
 import type { ValidationIssueActionPayload } from '@/components/elements/validationIssueTypes'
 import ExpenseForm from '@/components/expenseReport/forms/ExpenseForm.vue'
 import ExpenseReportForm from '@/components/expenseReport/forms/ExpenseReportForm.vue'
+import { saveExpense, saveExpenseReportDetails } from '@/components/expenseReport/scripts.js'
 import { getHasUnusedAdvances } from '@/components/scripts.js'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
@@ -573,17 +577,8 @@ async function saveExchangeRateDate(exchangeRateDate: Date | null) {
 }
 
 async function postExpense(expense: Partial<Expense>, closeModal = true, showAlert = true) {
-  let headers: Record<string, string> = {}
-  if (expense.cost?.receipts && expense.cost.receipts.length > 0) {
-    headers = { 'Content-Type': 'multipart/form-data' }
-  }
   modalFormIsLoading.value = true
-  const result = await API.setter<ExpenseReport<string>>(
-    `${props.endpointPrefix}expenseReport/expense`,
-    expense,
-    { headers, params: { parentId: expenseReport.value._id } },
-    showAlert
-  )
+  const result = await saveExpense(expenseReport.value._id, expense, props.endpointPrefix, showAlert)
   modalFormIsLoading.value = false
   if (result.ok) {
     setExpenseReport(result.ok)
@@ -607,18 +602,18 @@ async function deleteExpense(_id?: string) {
   }
 }
 
-async function editExpenseReportDetails(updatedExpenseReport: Partial<ExpenseReport>) {
+async function editExpenseReportDetails(updatedExpenseReport: Partial<ExpenseReport<string>>) {
   modalFormIsLoading.value = true
-  const result = await API.setter<ExpenseReport<string>>(
-    `${props.endpointPrefix}expenseReport${props.endpointPrefix === 'examine/' ? '' : '/inWork'}`,
-    updatedExpenseReport
-  )
-  modalFormIsLoading.value = false
-  if (result.ok) {
-    setExpenseReport(result.ok)
-    resetAndHide()
-  } else {
-    await getExpenseReport()
+  try {
+    const result = await saveExpenseReportDetails(expenseReport.value, updatedExpenseReport, props.endpointPrefix)
+    if (result.ok) {
+      setExpenseReport(result.ok)
+      resetAndHide()
+    } else {
+      await getExpenseReport()
+    }
+  } finally {
+    modalFormIsLoading.value = false
   }
 }
 

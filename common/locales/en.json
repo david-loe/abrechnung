@@ -158,6 +158,7 @@
     "destinationName": "Enter the name of the accommodation, company or conference venue here.",
     "destinationPlace": "Specify here the place that is the destination of your trip.",
     "exactAddress": "Enter the exact address of your destination here.",
+    "expenseReportCategory": "Select the type of expenses you are claiming.",
     "fellowTravelersNames": "Enter here all names of the persons traveling with you (e.g.: spouse, children)",
     "insurance": "Select your health insurance company, which will be asked to reimburse your health costs.",
     "isCrossBorder": "Specify whether the trip is a cross-border trip.",

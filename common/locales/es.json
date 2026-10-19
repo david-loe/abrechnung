@@ -158,6 +158,7 @@
     "destinationName": "Nombre del alojamiento o empresa",
     "destinationPlace": "Indica aquí el lugar que es el destino de tu viaje.",
     "exactAddress": "Indica aquí la dirección exacta de tu destino de viaje.",
+    "expenseReportCategory": "Selecciona el tipo de gastos que quieres que se te reembolsen.",
     "fellowTravelersNames": "Incluye aquí los nombres de las personas que viajan contigo (por ejemplo: cónyuge, hijos)",
     "insurance": "Elige tu compañía de seguros. Será contactada para el reembolso de gastos médicos.",
     "isCrossBorder": "Indica si el viaje es transfronterizo.",

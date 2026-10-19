@@ -153,7 +153,7 @@ class ReportPrint<idType extends _id> {
       await this.drawer.drawMultilineText(refNumberToString(this.report.reference, modelName), {
         alignment: TextAlignment.Center,
         xStart: 0,
-        yStart: pageTop - this.drawer.settings.pagePadding / 5,
+        yStart: pageTop - 2,
         width: this.drawer.currentPage.getSize().width,
         fontSize: this.drawer.settings.fontSizes.S
       })
@@ -161,7 +161,7 @@ class ReportPrint<idType extends _id> {
 
     await this.drawer.drawOrganisationLogo(this.report.project.organisation, {
       xStart: this.drawer.currentPage.getSize().width - 166,
-      yStart: pageTop - 66,
+      yStart: pageTop - 16,
       maxHeight: 50,
       maxWidth: 150
     })
@@ -173,9 +173,9 @@ class ReportPrint<idType extends _id> {
 
     y =
       this.drawNameAndProject(
-        { xStart: this.drawer.settings.pagePadding, yStart: y - 24, fontSize: this.drawer.settings.fontSizes.M },
+        { xStart: this.drawer.settings.pagePadding, yStart: y - 16, fontSize: this.drawer.settings.fontSizes.M },
         opts.project
-      ) - 10
+      ) - 6
     if (opts.metaInformation) {
       y = await this.drawMetaInformation(
         {
@@ -201,7 +201,7 @@ class ReportPrint<idType extends _id> {
       Object.assign(receiptMap, optionalMapTravel.map, getReceiptMap(this.report.expenses, optionalMapTravel.number).map)
     }
     let yDates = y
-    y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y, fontSize: this.drawer.settings.fontSizes.M })
+    y = await this.drawSummary({ xStart: this.drawer.settings.pagePadding, yStart: y - 10, fontSize: this.drawer.settings.fontSizes.M })
 
     if (opts.reviewDates) {
       yDates = await this.drawDates({
@@ -238,16 +238,31 @@ class ReportPrint<idType extends _id> {
   }
 
   drawNameAndProject(options: Options, drawProject = true) {
-    let y = options.yStart
-    y = this.drawer.drawMultilineText(this.report.name, { xStart: options.xStart, yStart: y, fontSize: options.fontSize * 1.5 })
-    if (drawProject) {
-      y = this.drawer.drawMultilineText(
-        `${this.t('labels.project')}: ${this.report.project.identifier}${this.report.project.name ? ` - ${this.report.project.name}` : ''}`,
-        { xStart: options.xStart, yStart: y, fontSize: options.fontSize }
-      )
+    const y = this.drawer.drawMultilineText(this.report.name, { ...options, fontSize: options.fontSize * 1.5 })
+    const projectText = `${this.t('labels.project')}: ${this.report.project.identifier}${this.report.project.name ? ` - ${this.report.project.name}` : ''}`
+    const category = reportIsExpenseReport(this.report) ? this.report.category : undefined
+    if (!category) {
+      return drawProject ? this.drawer.drawMultilineText(projectText, { ...options, yStart: y }) : y
     }
 
-    return y
+    const rowTop = y - 4
+    let projectBottom = rowTop
+    let categoryX = options.xStart
+    if (drawProject) {
+      const width = this.drawer.currentPage.getWidth() - this.drawer.settings.pagePadding - options.xStart
+      const projectWidth = Math.min(this.drawer.font.widthOfTextAtSize(projectText, options.fontSize), width * 0.6)
+      projectBottom = this.drawer.drawMultilineText(projectText, { ...options, yStart: rowTop, width: projectWidth })
+      categoryX += projectWidth + 16
+    }
+
+    const label = `${this.t('labels.category')}: `
+    const labelBottom = this.drawer.drawText(label, { ...options, xStart: categoryX, yStart: rowTop })
+    const badgeBottom = this.drawer.drawBadge(category.name, category.style, {
+      ...options,
+      xStart: categoryX + this.drawer.font.widthOfTextAtSize(label, options.fontSize),
+      yStart: rowTop
+    })
+    return Math.min(projectBottom, labelBottom, badgeBottom)
   }
 
   async drawMetaInformation(options: Options & { width: number }, drawAdditionalOwnerDetails = true) {
@@ -315,9 +330,6 @@ class ReportPrint<idType extends _id> {
         width
       })
     }
-    if (placeLines.length > 0) {
-      yLeft -= options.fontSize
-    }
     for (const place of placeLines) {
       yLeft = await this.drawer.drawMultilineTextWithPlace(place.text, place.place, {
         xStart: x,
@@ -357,13 +369,13 @@ class ReportPrint<idType extends _id> {
       summary = tableData.map((row) => Object.fromEntries(row.map((value, index) => [index.toString(10), value])))
     }
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.summary'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
+    const headingBottom = this.drawer.drawText(this.t('labels.summary'), { ...options, fontSize })
     const tableOptions: TableOptions = options
-    tableOptions.yStart -= fontSize * 1.25
+    tableOptions.yStart = headingBottom - fontSize / 4
     tableOptions.firstRow = false
     let y = await this.drawer.drawTable(summary, columns, tableOptions)
     if (!reportIsAdvance(this.report) && this.report.addUp.length > 1) {
-      options.yStart = y
+      options.yStart = y - 4
       y = this.drawer.drawMultilineText(
         `${this.t('labels.totalBalance')}: ${this.drawer.formatter.baseCurrency(
           reportIsExpenseReport(this.report) ? getTotalBaseCurrencyBalance(this.report) : getTotalBalance(this.report.addUp)
@@ -441,8 +453,8 @@ class ReportPrint<idType extends _id> {
     columns.push({ key: 'text', width: 300, alignment: TextAlignment.Left, title: 'value' })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.comments'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
-    options.yStart -= fontSize * 1.25
+    const headingBottom = this.drawer.drawText(this.t('labels.comments'), { ...options, fontSize })
+    options.yStart = headingBottom - fontSize / 4
 
     const tableOptions: TableOptions = options
     tableOptions.firstRow = false
@@ -562,8 +574,8 @@ class ReportPrint<idType extends _id> {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.stages'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
-    options.yStart -= fontSize * 1.25
+    const headingBottom = this.drawer.drawText(this.t('labels.stages'), { ...options, fontSize })
+    options.yStart = headingBottom - fontSize / 4
 
     return await this.drawer.drawTable(rows, columns, options)
   }
@@ -623,8 +635,8 @@ class ReportPrint<idType extends _id> {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.expenses'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
-    options.yStart -= fontSize * 1.25
+    const headingBottom = this.drawer.drawText(this.t('labels.expenses'), { ...options, fontSize })
+    options.yStart = headingBottom - fontSize / 4
 
     return await this.drawer.drawTable(rows, columns, options)
   }
@@ -680,12 +692,11 @@ class ReportPrint<idType extends _id> {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.lumpSums') + (this.report.claimSpouseRefund ? ` (${this.t('labels.claimSpouseRefund')})` : ''), {
-      xStart: options.xStart,
-      yStart: options.yStart - fontSize,
-      fontSize: fontSize
-    })
-    options.yStart -= fontSize * 1.25
+    const headingBottom = this.drawer.drawText(
+      this.t('labels.lumpSums') + (this.report.claimSpouseRefund ? ` (${this.t('labels.claimSpouseRefund')})` : ''),
+      { xStart: options.xStart, yStart: options.yStart, fontSize: fontSize }
+    )
+    options.yStart = headingBottom - fontSize / 4
 
     return await this.drawer.drawTable(this.report.days, columns, options)
   }
@@ -714,8 +725,8 @@ class ReportPrint<idType extends _id> {
     })
 
     const fontSize = options.fontSize + 2
-    this.drawer.drawText(this.t('labels.offsetAgainst'), { xStart: options.xStart, yStart: options.yStart - fontSize, fontSize: fontSize })
-    options.yStart -= fontSize * 1.25
+    const headingBottom = this.drawer.drawText(this.t('labels.offsetAgainst'), { ...options, fontSize })
+    options.yStart = headingBottom - fontSize / 4
 
     return await this.drawer.drawTable(rows, columns, options)
   }

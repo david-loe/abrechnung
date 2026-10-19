@@ -23,6 +23,16 @@
     </div>
 
     <div class="mb-3">
+      <label for="expenseReportFormCategory" class="form-label me-2">{{ t('labels.category') }}</label>
+      <InfoPoint :text="t('info.expenseReportCategory')" />
+      <CategorySelector
+        input-id="expenseReportFormCategory"
+        :model-value="formExpenseReport.category || undefined"
+        @update:model-value="(category) => (formExpenseReport.category = category || null)"
+        report-type="ExpenseReport" />
+    </div>
+
+    <div class="mb-3">
       <template v-if="showCurrencySelector">
         <label for="expenseReportFormCurrency" class="form-label">{{ t('labels.expenseReportCurrency') }}</label>
         <CurrencySelector
@@ -69,6 +79,7 @@ import { baseCurrency, ExpenseReport, ExpenseReportSimple, idDocumentToId, UserS
 import { computed, PropType, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AdvanceSelector from '@/components/elements/AdvanceSelector.vue'
+import CategorySelector from '@/components/elements/CategorySelector.vue'
 import CurrencySelector from '@/components/elements/CurrencySelector.vue'
 import InfoPoint from '@/components/elements/InfoPoint.vue'
 import ProjectSelector from '@/components/elements/ProjectSelector.vue'
@@ -100,7 +111,7 @@ const currencyConflict = computed(() => {
 })
 
 function defaultExpenseReport() {
-  return { name: '', advances: [], owner: props.owner }
+  return { name: '', advances: [], owner: props.owner, category: null }
 }
 function output() {
   return formExpenseReport.value

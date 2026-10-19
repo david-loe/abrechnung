@@ -31,6 +31,7 @@ const expenseReportReviewValidator = new Validator({ requireReceipts: true })
 const expenseReportCompletionValidator = new Validator({ requireExchangeRate: true, requireReceipts: true })
 type ExpenseSetterBody = SetterBody<Expense<Types.ObjectId, mongo.Binary>>
 type ExpenseReportDetailsBody = {
+  category?: IdDocument<Types.ObjectId> | null
   project?: IdDocument<Types.ObjectId>
   _id?: string
   name?: string

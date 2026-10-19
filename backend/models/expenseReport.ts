@@ -34,6 +34,7 @@ interface Methods {
 const expenseReportSchema = () =>
   new Schema<ExpenseReport<Types.ObjectId, mongo.Binary>, Model<ExpenseReport<Types.ObjectId, mongo.Binary>>, Methods>(
     Object.assign(requestBaseSchema(expenseReportStates, ExpenseReportState.IN_WORK, 'ExpenseReport', true, false), {
+      category: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
       currency: {
         type: String,
         ref: 'Currency',
@@ -61,6 +62,7 @@ const expenseReportSchema = () =>
 const schema = expenseReportSchema()
 
 const populates = {
+  category: [{ path: 'category' }],
   currency: [{ path: 'currency' }],
   expenses: [
     { path: 'expenses.cost.currency' },

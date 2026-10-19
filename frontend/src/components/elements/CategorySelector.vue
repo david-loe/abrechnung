@@ -4,10 +4,10 @@
     :options="categories"
     :modelValue="props.modelValue"
     :placeholder="props.placeholder"
-    @update:modelValue="(c: Category) => emit('update:modelValue', c)"
+    @update:modelValue="(c: Category<string>) => emit('update:modelValue', c)"
     :filter="filter"
-    :getOptionKey="(option: Category) => option._id"
-    :getOptionLabel="(option: Category) => option.name"
+    :getOptionKey="(option: Category<string>) => option._id"
+    :getOptionLabel="(option: Category<string>) => option.name"
     :disabled="props.disabled"
     style="min-width: 160px">
     <template #option="category">
@@ -31,15 +31,15 @@ import APP_LOADER from '@/dataLoader.js'
 const APP_DATA = APP_LOADER.data
 
 const props = defineProps({
-  modelValue: { type: Object as PropType<Category> },
+  modelValue: { type: Object as PropType<Category<string>> },
   required: { type: Boolean, default: false },
   disabled: { type: Boolean, default: false },
   placeholder: { type: String, default: '' },
   reportType: { type: String as PropType<'Travel' | 'ExpenseReport'> }
 })
-const emit = defineEmits<{ 'update:modelValue': [Category] }>()
+const emit = defineEmits<{ 'update:modelValue': [Category<string>] }>()
 
-function filter(options: Category[], search: string): Category[] {
+function filter(options: Category<string>[], search: string): Category<string>[] {
   return options.filter((option) => option.name.toLowerCase().indexOf(search.toLowerCase()) > -1)
 }
 

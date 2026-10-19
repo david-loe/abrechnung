@@ -158,6 +158,7 @@
     "destinationName": "Gib hier den Namen der Unterkunft, Firma oder des Tagungsortes an.",
     "destinationPlace": "Gib hier den Ort an, der das Ziel deiner Reise darstellt.",
     "exactAddress": "Gib hier die genaue Adresse deines Reiseziels an.",
+    "expenseReportCategory": "Wähle aus, um welche Art von Ausgaben es sich handelt.",
     "fellowTravelersNames": "Gib hier alle Namen der mitreisenden Personen an (z.B.: Ehepartner, Kinder)",
     "insurance": "Wähle deine Krankenkasse. Diese wird zur Erstattung der Krankenkosten angefragt.",
     "isCrossBorder": "Gib an ob es sich bei der Reise um eine grenzüberschreitende Reise handelt.",

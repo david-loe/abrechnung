@@ -357,6 +357,29 @@ export async function checkForMigrations() {
         )
       }
     }
+    if (semver.lte(migrateFrom, '3.0.1')) {
+      logger.info('Apply migration from v3.0.1: backfill expense report categories')
+      const categories = await mongoose.connection
+        .collection('categories')
+        .find({ for: { $in: ['ExpenseReport', 'both'] } }, { projection: { _id: 1 } })
+        .toArray()
+      const validCategoryIds = new Set(categories.map(({ _id }) => _id.toString()))
+      const reports = mongoose.connection.collection('expensereports')
+      const filter = { historic: { $ne: true }, category: { $exists: false } }
+      for await (const report of reports.find(filter, { projection: { expenses: 1 } })) {
+        const positions = (report.expenses ?? []).flatMap(
+          (expense: { cost?: { positions?: { category?: mongoose.Types.ObjectId }[] } }) => expense.cost?.positions ?? []
+        )
+        const firstCategory = positions[0]?.category
+        const category =
+          firstCategory &&
+          validCategoryIds.has(firstCategory.toString()) &&
+          positions.every((position: { category?: mongoose.Types.ObjectId }) => position.category?.toString() === firstCategory.toString())
+            ? firstCategory
+            : null
+        await reports.updateOne({ _id: report._id, ...filter }, { $set: { category } })
+      }
+    }
     settings.migrateFrom = undefined
     await settings.save()
   }
