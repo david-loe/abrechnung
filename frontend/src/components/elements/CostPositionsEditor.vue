@@ -126,6 +126,7 @@ import { useI18n } from 'vue-i18n'
 import APP_LOADER from '@/dataLoader.js'
 import { formatter } from '@/formatter.js'
 import CategorySelector from './CategorySelector.vue'
+import { getPositionCategory } from './costPositionCategory.js'
 import ProjectSelector from './ProjectSelector.vue'
 
 const editorId = useId()
@@ -134,6 +135,7 @@ const APP_DATA = APP_LOADER.data
 const props = defineProps({
   modelValue: { type: Array as PropType<CostPosition<string>[]>, required: true },
   defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true },
+  defaultCategory: { type: Object as PropType<Category<string>> },
   reportType: { type: String as PropType<'Travel' | 'ExpenseReport'>, required: true },
   disabled: { type: Boolean, default: false },
   ownCar: { type: Boolean, default: false },
@@ -146,9 +148,8 @@ const emit = defineEmits<{ 'update:modelValue': [CostPosition<string>[]] }>()
 const editedVatPosition = ref<CostPosition<string>>()
 const vatAmountDraft = ref(0)
 
-function defaultCategory() {
-  const categories = APP_DATA.value?.categories.filter(({ for: value }) => value === 'both' || value === props.reportType) ?? []
-  return categories.find(({ isDefault }) => isDefault) ?? (categories.length === 1 ? categories[0] : undefined)
+function selectedCategory() {
+  return getPositionCategory(APP_DATA.value?.categories ?? [], props.reportType, props.defaultCategory)
 }
 
 function createPosition(kind: CostPosition['kind'] = 'manual') {
@@ -158,7 +159,7 @@ function createPosition(kind: CostPosition['kind'] = 'manual') {
     grossAmount: 0,
     vatRate: 0,
     project: props.defaultProject,
-    category: defaultCategory() as Category<string>
+    category: selectedCategory() as Category<string>
   }
 }
 
@@ -169,7 +170,7 @@ function ensurePosition() {
   }
   let changedPosition = false
   const positions = props.modelValue.map((position) => {
-    const category = position.category ?? defaultCategory()
+    const category = position.category ?? selectedCategory()
     const vatRate = position.kind === 'ownCar' || !vatRates(position).includes(position.vatRate) ? 0 : position.vatRate
     const clearVatOverride = typeof position.vatAmountOverride === 'number' && (!vatEnabled(position) || vatRate === 0)
     if (category === position.category && vatRate === position.vatRate && !clearVatOverride) return position

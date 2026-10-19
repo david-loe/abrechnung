@@ -42,7 +42,7 @@ export interface MoneyPlusPost extends MoneyPost {
 interface ExpenseBulkImportPositionPost extends Omit<CostPosition<Types.ObjectId>, '_id' | 'project' | 'category'> {
   _id?: string
   project: string
-  category: string
+  category?: string
 }
 
 export interface ExpenseBulkImportCostPost {

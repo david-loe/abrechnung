@@ -653,6 +653,7 @@ export interface Travel<idType extends _id = _id, dataType extends binary = bina
 }
 
 export interface ExpenseReportSimple<idType extends _id = _id> extends ReportSimple<idType, ExpenseReportState> {
+  category?: Category<idType> | null
   addUp: AddUp<idType, ExpenseReport<_id, binary>>[]
   advances: AdvanceBase<idType>[]
   currency?: Currency | null

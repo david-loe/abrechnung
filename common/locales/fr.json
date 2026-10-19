@@ -158,6 +158,7 @@
     "destinationName": "Nom de l'hébergement ou de l'entreprise",
     "destinationPlace": "Indiquez ici le lieu qui représente la destination de votre voyage.",
     "exactAddress": "Indiquez ici l'adresse précise de votre destination.",
+    "expenseReportCategory": "Sélectionnez le type de dépenses que vous souhaitez vous faire rembourser.",
     "fellowTravelersNames": "Indiquez ici tous les noms des personnes voyageant avec vous (par exemple : conjoint, enfants)",
     "insurance": "Choisissez votre caisse d'assurance maladie. Elle sera sollicitée pour le remboursement des frais de santé.",
     "isCrossBorder": "Indiquez s'il s'agit d'un voyage transfrontalier.",

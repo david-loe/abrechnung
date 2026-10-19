@@ -29,7 +29,7 @@ export class ApprovedTravelsPrinter<idType extends _id> extends Printer<idType> 
 
     if (from && to) {
       const text = `${this.formatter.date(from, language)} - ${this.formatter.date(to, language)}`
-      y = drawer.drawMultilineText(text, { xStart: drawer.settings.pagePadding, yStart: y, fontSize: this.settings.fontSizes.M })
+      y = drawer.drawMultilineText(text, { xStart: drawer.settings.pagePadding, yStart: y, fontSize: this.settings.fontSizes.M }) - 4
     }
 
     const columns: Column<ApprovedTravel>[] = []

@@ -26,7 +26,14 @@ async function validateCategoryScopeChange(requestBody: SetterBody<ICategory<Typ
     )
   } else {
     const references = await Promise.all([
-      ExpenseReport.exists({ historic: false, 'expenses.cost.positions.category': categoryId }),
+      ExpenseReport.exists({
+        historic: false,
+        $or: [
+          // biome-ignore lint/suspicious/noExplicitAny: Populated reference is stored as an ObjectId.
+          { category: categoryId as any },
+          { 'expenses.cost.positions.category': categoryId }
+        ]
+      }),
       HealthCareCost.exists({ historic: false, 'expenses.cost.positions.category': categoryId })
     ])
     isReferenced = references.some(Boolean)
@@ -70,7 +77,7 @@ export class CategoryAdminController extends Controller {
     return await this.deleter(Category, {
       _id: _id,
       referenceChecks: [
-        { model: ExpenseReport, paths: ['expenses.cost.positions.category'], conditions: { historic: false } },
+        { model: ExpenseReport, paths: ['category', 'expenses.cost.positions.category'], conditions: { historic: false } },
         { model: HealthCareCost, paths: ['expenses.cost.positions.category'], conditions: { historic: false } },
         { model: Travel, paths: ['expenses.cost.positions.category', 'stages.cost.positions.category'], conditions: { historic: false } }
       ],

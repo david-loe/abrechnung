@@ -57,6 +57,7 @@
     <CostPositionsEditor
       v-model="formExpense.cost.positions"
       :default-project="defaultProject"
+      :default-category="category"
       report-type="ExpenseReport"
       :currency="formExpense.cost.currency"
       :disabled="disabled"
@@ -102,7 +103,7 @@
 </template>
 
 <script lang="ts" setup>
-import { baseCurrency, Currency, Expense, ProjectSimple } from 'abrechnung-common/types.js'
+import { baseCurrency, Category, Currency, Expense, ProjectSimple } from 'abrechnung-common/types.js'
 import { getCostGrossAmount } from 'abrechnung-common/utils/scripts.js'
 import { PropType, ref, useTemplateRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -135,6 +136,7 @@ const props = defineProps({
   showNextButton: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
   defaultProject: { type: Object as PropType<ProjectSimple<string>>, required: true },
+  category: { type: Object as PropType<Category<string>> },
   reportCurrency: { type: Object as PropType<Currency> }
 })
 

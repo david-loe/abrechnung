@@ -1,22 +1,9 @@
 import pdf_fontkit from 'pdf-fontkit'
-import {
-  Color,
-  componentsToColor,
-  LayoutTextOptions,
-  MultilineTextLayout,
-  PDFDocument,
-  PDFFont,
-  PDFImage,
-  PDFPage,
-  PDFPageDrawLineOptions,
-  PDFString,
-  rgb,
-  TextAlignment,
-  TextPosition
-} from 'pdf-lib'
+import { Color, componentsToColor, PDFDocument, PDFFont, PDFImage, PDFPage, PDFString, rgb, TextAlignment } from 'pdf-lib'
 import fontsBASE64 from '../fonts/base64.json' with { type: 'json' }
 import {
   _id,
+  BadgeStyle,
   binary,
   CountryCode,
   CountrySimple,
@@ -30,6 +17,7 @@ import Formatter from '../utils/formatter.js'
 import { hexToRGB } from '../utils/scripts.js'
 import { embedBootstrapIconFont, getBootstrapIconGlyph } from './bootstrapIcons.js'
 import flagsPNG from './flags.json' with { type: 'json' }
+import { embedFontWithMetrics, getTextMetrics } from './fontMetrics.js'
 
 export interface PrintSettings extends PrintSettingsBase {
   language: Locale
@@ -44,6 +32,7 @@ interface PrintSettingsWithColorObjects extends Omit<PrintSettings, 'textColor' 
 export interface Options {
   fontSize: number
   xStart: number
+  /** Upper edge of the text or layout area, in PDF coordinates (Y increases upwards). */
   yStart: number
 }
 
@@ -116,76 +105,50 @@ const lastIndexOfWhitespace = (line: string) => {
   return undefined
 }
 const splitOutLines = (input: string, maxWidth: number, font: PDFFont, fontSize: number) => {
-  let lastWhitespaceIdx = input.length
-  while (lastWhitespaceIdx > 0) {
-    const line = input.substring(0, lastWhitespaceIdx)
-    const encoded = font.encodeText(line)
-    const width = font.widthOfTextAtSize(line, fontSize)
-    if (width < maxWidth) {
-      const remainder = input.substring(lastWhitespaceIdx) || undefined
-      return { line, encoded, width, remainder }
-    }
-    lastWhitespaceIdx = lastIndexOfWhitespace(line) ?? 0
+  const fullWidth = font.widthOfTextAtSize(input, fontSize)
+  if (fullWidth <= maxWidth) {
+    return { line: input, width: fullWidth, remainder: undefined }
   }
 
-  // We were unable to split the input enough to get a chunk that would fit
-  // within the specified `maxWidth` so we'll just return everything
-  return { line: input, encoded: font.encodeText(input), width: font.widthOfTextAtSize(input, fontSize), remainder: undefined }
+  const characters = Array.from(input)
+  let start = 1
+  let end = characters.length
+  while (start < end) {
+    const middle = Math.ceil((start + end) / 2)
+    const width = font.widthOfTextAtSize(characters.slice(0, middle).join(''), fontSize)
+    if (width <= maxWidth) start = middle
+    else end = middle - 1
+  }
+
+  const fittingText = characters.slice(0, start).join('')
+  const whitespace = /\s/u.test(input[fittingText.length] ?? '') ? fittingText.length : lastIndexOfWhitespace(fittingText)
+  const line = whitespace ? fittingText.slice(0, whitespace) : fittingText
+  return { line, width: font.widthOfTextAtSize(line, fontSize), remainder: input.slice(line.length) || undefined }
 }
 
+// Every line stores its upper edge. Only drawText converts it to a PDF baseline.
 const layoutMultilineText = (
   text: string,
-  { alignment, fontSize, font, bounds, lineHeightFactor }: LayoutTextOptions & { lineHeightFactor?: number }
-): MultilineTextLayout => {
-  const lines = lineSplit(cleanText(text))
-
-  if (fontSize === undefined || fontSize === 0) {
-    fontSize = 12
-  }
-  if (lineHeightFactor === undefined) {
-    lineHeightFactor = 0.2
-  }
-  const height = font.heightAtSize(fontSize)
-  const lineHeight = height + height * lineHeightFactor
-
-  const textLines: TextPosition[] = []
-
-  let minX = bounds.x
-  let minY = bounds.y
-  let maxX = bounds.x + bounds.width
-  let maxY = bounds.y + bounds.height
-
-  let y = bounds.y + bounds.height
-  for (let idx = 0, len = lines.length; idx < len; idx++) {
-    let prevRemainder: string | undefined = lines[idx]
-    while (prevRemainder !== undefined) {
-      const { line, encoded, width, remainder } = splitOutLines(prevRemainder, bounds.width, font, fontSize)
-
+  { alignment, fontSize, font, width, xStart, yStart }: Options & { alignment: TextAlignment; font: PDFFont; width: number }
+) => {
+  const lineHeight = getTextMetrics(font, fontSize).height
+  const textLines: { text: string; width: number; x: number; y: number }[] = []
+  for (const inputLine of lineSplit(cleanText(text))) {
+    let remainder: string | undefined = inputLine
+    while (remainder !== undefined) {
+      const line = splitOutLines(remainder, width, font, fontSize)
       const x =
-        alignment === TextAlignment.Left
-          ? bounds.x
-          : alignment === TextAlignment.Center
-            ? bounds.x + bounds.width / 2 - width / 2
-            : alignment === TextAlignment.Right
-              ? bounds.x + bounds.width - width
-              : bounds.x
-
-      y -= lineHeight
-
-      if (x < minX) minX = x
-      if (y < minY) minY = y
-      if (x + width > maxX) maxX = x + width
-      if (y + height > maxY) maxY = y + height
-
-      textLines.push({ text: line, encoded, width, height, x, y })
-
-      // Only trim lines that we had to split ourselves. So we won't trim lines
-      // that the user provided themselves with whitespace.
-      prevRemainder = remainder?.trim()
+        alignment === TextAlignment.Center
+          ? xStart + (width - line.width) / 2
+          : alignment === TextAlignment.Right
+            ? xStart + width - line.width
+            : xStart
+      textLines.push({ text: line.line, width: line.width, x, y: yStart - textLines.length * lineHeight })
+      // Preserve whitespace in explicit lines, trimming only automatically wrapped remainders.
+      remainder = line.remainder?.trim()
     }
   }
-
-  return { fontSize, lineHeight, lines: textLines, bounds: { x: minX, y: minY, width: maxX - minX, height: maxY - minY } }
+  return { lines: textLines, height: textLines.length * lineHeight }
 }
 
 const FLAG_PSEUDO_SUFFIX = 'mim'
@@ -237,7 +200,7 @@ export class PDFDrawer<idType extends _id> {
     const doc = await PDFDocument.create()
     doc.registerFontkit(pdf_fontkit)
     const [font, bootstrapIconFont] = await Promise.all([
-      doc.embedFont(fontsBASE64[settings.fontName], { subset: true }),
+      embedFontWithMetrics(doc, fontsBASE64[settings.fontName]),
       embedBootstrapIconFont(doc)
     ])
     const printSettings = { ...settings, language, defaultPageOrientation }
@@ -258,9 +221,7 @@ export class PDFDrawer<idType extends _id> {
     this.currentPage = this.doc.addPage(size)
   }
 
-  /**
-   * returns bottom y end
-   */
+  /** Draw from the first line's upper edge and return the text block's lower edge, including descenders. */
   drawMultilineText(text: string, options: Options & { alignment?: TextAlignment; width?: number }) {
     const opts = {
       alignment: TextAlignment.Left,
@@ -271,15 +232,17 @@ export class PDFDrawer<idType extends _id> {
       alignment: opts.alignment,
       font: this.font,
       fontSize: opts.fontSize,
-      bounds: { width: opts.width, height: opts.fontSize, x: opts.xStart, y: opts.yStart },
-      lineHeightFactor: 0
+      width: opts.width,
+      xStart: opts.xStart,
+      yStart: opts.yStart
     })
     for (const line of multiLineText.lines) {
       this.drawText(line.text, { xStart: line.x, yStart: line.y, fontSize: opts.fontSize })
     }
-    return opts.yStart - multiLineText.bounds.height
+    return opts.yStart - multiLineText.height
   }
 
+  /** Like drawMultilineText, with a flag centered in the final text line. */
   async drawMultilineTextWithPlace(
     text: string,
     place: { country: CountrySimple; place?: string },
@@ -303,8 +266,9 @@ export class PDFDrawer<idType extends _id> {
       alignment: opts.alignment,
       font: this.font,
       fontSize: opts.fontSize,
-      bounds: { width: opts.width, height: opts.fontSize, x: opts.xStart, y: opts.yStart },
-      lineHeightFactor: 0
+      width: opts.width,
+      xStart: opts.xStart,
+      yStart: opts.yStart
     })
     const len = multiLineText.lines.length
     if (len > 0) {
@@ -320,11 +284,54 @@ export class PDFDrawer<idType extends _id> {
         fontSize: opts.fontSize
       })
     }
-    return opts.yStart - multiLineText.bounds.height
+    return opts.yStart - multiLineText.height
   }
 
-  drawText(text: string, options: Options, font = this.font) {
-    this.currentPage.drawText(text, { x: options.xStart, y: options.yStart, size: options.fontSize, font, color: this.settings.textColor })
+  /** Draw from the text's upper edge and return its lower edge, including descenders. */
+  drawText(text: string, options: Options & { color?: Color }, font = this.font) {
+    const { height, ascent } = getTextMetrics(font, options.fontSize)
+    this.currentPage.drawText(text, {
+      x: options.xStart,
+      y: options.yStart - ascent,
+      size: options.fontSize,
+      font,
+      color: options.color ?? this.settings.textColor
+    })
+    return options.yStart - height
+  }
+
+  /** yStart is the text's upper edge; the background extends by padding. Returns the background's lower edge. */
+  drawBadge(text: string, style: BadgeStyle, options: Options & { width?: number; padding?: { x: number; y: number } }) {
+    const paddingX = options.padding?.x ?? 3
+    const paddingY = options.padding?.y ?? 2
+    const top = options.yStart + paddingY
+    const maxWidth = options.width ?? this.currentPage.getWidth() - this.settings.pagePadding - options.xStart
+    const layout = layoutMultilineText(text.replace(/\s+/gu, ' ').trim(), {
+      alignment: TextAlignment.Left,
+      font: this.font,
+      fontSize: options.fontSize,
+      xStart: options.xStart + paddingX,
+      yStart: options.yStart,
+      width: maxWidth - 2 * paddingX
+    })
+    const width = Math.min(maxWidth, Math.max(0, ...layout.lines.map((line) => line.width)) + 2 * paddingX)
+    const height = layout.height + 2 * paddingY
+    const radius = Math.min(3, width / 2, height / 2)
+    const background = hexToRGB(style.color).map((component) => component / 255)
+    this.currentPage.drawSvgPath(
+      `M ${radius} 0 H ${width - radius} Q ${width} 0 ${width} ${radius} V ${height - radius} Q ${width} ${height} ${width - radius} ${height} H ${radius} Q 0 ${height} 0 ${height - radius} V ${radius} Q 0 0 ${radius} 0 Z`,
+      { x: options.xStart, y: top, color: rgb(background[0], background[1], background[2]), borderWidth: 0 }
+    )
+    const foreground = style.text === 'white' ? 1 : 0
+    for (const line of layout.lines) {
+      this.drawText(line.text, {
+        xStart: line.x,
+        yStart: line.y,
+        fontSize: options.fontSize,
+        color: rgb(foreground, foreground, foreground)
+      })
+    }
+    return top - height
   }
 
   drawReceiptNumber(receipt: ReceiptMapEntry<idType>) {
@@ -333,19 +340,16 @@ export class PDFDrawer<idType extends _id> {
     }
     const text = `#${receipt.number}${receipt.date ? ` - ${this.formatter.date(receipt.date)}` : ''}`
     const width = this.font.widthOfTextAtSize(text, this.settings.fontSizes.L)
+    const height = getTextMetrics(this.font, this.settings.fontSizes.L).height
     this.currentPage.drawRectangle({
       x: 2,
-      y: this.currentPage.getSize().height - (this.settings.fontSizes.L + 2),
+      y: this.currentPage.getHeight() - height - 4,
       width: width,
-      height: this.settings.fontSizes.L + 4,
+      height: height + 4,
       color: rgb(1, 1, 1), //white
       opacity: 0.5
     })
-    this.drawText(text, {
-      xStart: 2,
-      yStart: this.currentPage.getSize().height - (this.settings.fontSizes.L + 2),
-      fontSize: this.settings.fontSizes.L
-    })
+    this.drawText(text, { xStart: 2, yStart: this.currentPage.getHeight() - 2, fontSize: this.settings.fontSizes.L })
   }
 
   async attachReceipts(receiptMap: ReceiptMap<idType>) {
@@ -420,7 +424,7 @@ export class PDFDrawer<idType extends _id> {
       const linkAnnotation = this.doc.context.obj({
         Type: 'Annot',
         Subtype: 'Link',
-        Rect: [link.xStart, link.yStart, link.xStart + link.width, link.yStart + link.height],
+        Rect: [link.xStart, link.yStart - link.height, link.xStart + link.width, link.yStart],
         Border: [0, 0, 0],
         C: [0, 0, 1],
         A: { Type: 'Action', S: 'GoTo', D: [targetPage.ref, 'Fit'] }
@@ -431,6 +435,7 @@ export class PDFDrawer<idType extends _id> {
     this.pendingInternalLinks = []
   }
 
+  /** yStart is the associated text line's upper edge; center the flag within its full font height. */
   async drawFlag(countryCode: CountryCode, options: Options) {
     const opts = options
 
@@ -446,7 +451,7 @@ export class PDFDrawer<idType extends _id> {
 
     this.currentPage.drawImage(flag, {
       x: opts.xStart,
-      y: opts.yStart - opts.fontSize / 9,
+      y: opts.yStart - (getTextMetrics(this.font, opts.fontSize).height + opts.fontSize) / 2,
       height: opts.fontSize,
       width: opts.fontSize * (3 / 2)
     })
@@ -461,11 +466,11 @@ export class PDFDrawer<idType extends _id> {
 
   drawIconLabel(iconNames: string[], label: string, options: Options) {
     const glyphs = iconNames.map(getBootstrapIconGlyph).filter((glyph) => glyph !== undefined)
-    const textHeight = this.font.heightAtSize(options.fontSize, { descender: false })
-    const iconHeight = glyphs.length > 0 ? this.bootstrapIconFont.heightAtSize(options.fontSize, { descender: false }) : 0
+    const textHeight = getTextMetrics(this.font, options.fontSize).height
+    const iconHeight = glyphs.length > 0 ? getTextMetrics(this.bootstrapIconFont, options.fontSize).height : 0
     const lineHeight = Math.max(textHeight, iconHeight)
-    const textY = options.yStart - (lineHeight + textHeight) / 2
-    const iconY = options.yStart - (lineHeight + iconHeight) / 2
+    const textY = options.yStart - (lineHeight - textHeight) / 2
+    const iconY = options.yStart - (lineHeight - iconHeight) / 2
 
     let x = options.xStart
     for (const glyph of glyphs) {
@@ -477,6 +482,7 @@ export class PDFDrawer<idType extends _id> {
     return options.yStart - lineHeight
   }
 
+  /** Place the logo at the upper right of the area starting at (xStart, yStart). */
   async drawOrganisationLogo(organisationId: idType, options: { xStart: number; yStart: number; maxWidth: number; maxHeight: number }) {
     const orga = await this.getOrganisationLogoIdById(organisationId)
     if (!orga) {
@@ -503,19 +509,20 @@ export class PDFDrawer<idType extends _id> {
     }
     // align on right side
     const x = options.xStart + (options.maxWidth - size.width)
-    const y = options.yStart + (options.maxHeight - size.height)
+    const y = options.yStart - size.height
 
     if (orga.website) {
-      this.drawLink(orga.website, { xStart: x, yStart: y, width: size.width, height: size.height })
+      this.drawLink(orga.website, { xStart: x, yStart: options.yStart, width: size.width, height: size.height })
     }
     this.currentPage.drawImage(image, { x: x, y: y, width: size.width, height: size.height })
   }
 
+  /** yStart is the upper edge of the clickable rectangle. */
   drawLink(url: string, options: { xStart: number; yStart: number; width: number; height: number }) {
     const linkAnnotation = this.doc.context.obj({
       Type: 'Annot',
       Subtype: 'Link',
-      Rect: [options.xStart, options.yStart, options.xStart + options.width, options.yStart + options.height],
+      Rect: [options.xStart, options.yStart - options.height, options.xStart + options.width, options.yStart],
       Border: [0, 0, 0],
       C: [0, 0, 1],
       A: { Type: 'Action', S: 'URI', URI: PDFString.of(url) }
@@ -524,142 +531,83 @@ export class PDFDrawer<idType extends _id> {
     this.currentPage.node.addAnnot(linkAnnotationRef)
   }
 
+  /** Draw from the table's upper edge and return its lower edge on the final page, without extra spacing. */
   async drawTable<Type extends {}>(data: Type[], columns: Column<Type>[], options: TableOptions) {
-    if (data.length === 0) {
-      return options.yStart
-    }
+    if (data.length === 0) return options.yStart
+    const opts = { cellHeight: options.fontSize * 1.5, firstRow: true, ...options }
+    // cellPadding.bottom is the last baseline's inset, as in the original table layout.
+    const paddingTop = opts.fontSize / 4
     const flagPseudoSuffixWidth =
-      this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, options.fontSize) - this.font.widthOfTextAtSize(' ', options.fontSize)
-    const opts = {
-      cellHeight: options.fontSize * 1.5,
-      defaultCellWidth: 100,
-      newPageXStart: this.settings.pagePadding,
-      newPageYStart: this.currentPage.getSize().height - this.settings.pagePadding,
-      firstRow: true,
-      ...options
-    }
-
-    opts.yStart = opts.yStart - opts.cellHeight
-    opts.newPageYStart = opts.newPageYStart - opts.cellHeight
-
-    let alreadyOnCompletelyNewPage = false
-    let x = opts.xStart
+      this.font.widthOfTextAtSize(FLAG_PSEUDO_SUFFIX, opts.fontSize) - this.font.widthOfTextAtSize(' ', opts.fontSize)
     let y = opts.yStart
-    for (let i = 0; i < data.length; i++) {
-      x = opts.xStart
-      let yMin = y
-      const columnBorders: PDFPageDrawLineOptions[] = []
-      const cellTexts: {
-        text: string
-        options: { xStart: number; yStart: number; width: number; fontSize: number }
-        countryCodeForFlag?: CountryCode
-      }[] = []
-      const cellLinks: { targetId: string; options: { xStart: number; yStart: number; width: number; height: number } }[] = []
+    let xStart = opts.xStart
+    let onFreshPage = y === this.currentPage.getHeight() - this.settings.pagePadding
+    for (let i = opts.firstRow ? -1 : 0; i < data.length; i++) {
+      const isHeader = i === -1
+      let x = xStart
+      let rowHeight = opts.cellHeight
+      const cellTexts: { text: string; options: Options & { width: number }; countryCodeForFlag?: CountryCode }[] = []
+      const cellLinks: { targetId: string; xStart: number; yStart: number; width: number; height: number }[] = []
+      const borders = [xStart]
       for (const column of columns) {
-        const datum = data[i][column.key]
-        let cell: string
-        let internalPdfLinkSegments: { text: string; targetId: string }[] = []
-        if (opts.firstRow) {
-          cell = column.title
-        } else {
-          if (datum === undefined) {
-            cell = EMPTY_CELL
-          } else {
-            cell = String(datum)
-            if (column.fn) {
-              cell = column.fn(datum)
-            }
-            if (column.internalPdfLinkSegments) {
-              internalPdfLinkSegments = column.internalPdfLinkSegments(datum)
-            }
-          }
-        }
-        const fontSize = opts.firstRow ? opts.fontSize + 1 : opts.fontSize
-        const multiText = layoutMultilineText(cell + (column.countryCodeForFlag && !opts.firstRow ? FLAG_PSEUDO_SUFFIX : ''), {
-          alignment: opts.firstRow ? TextAlignment.Center : column.alignment,
+        const datum = isHeader ? undefined : data[i][column.key]
+        let cell = column.title
+        if (!isHeader) cell = datum === undefined ? EMPTY_CELL : column.fn ? column.fn(datum) : String(datum)
+        const countryCodeForFlag = !isHeader && datum !== undefined ? column.countryCodeForFlag?.(datum) : undefined
+        const fontSize = isHeader ? opts.fontSize + 1 : opts.fontSize
+        const { descent } = getTextMetrics(this.font, fontSize)
+        const paddingBottom = Math.max(0, this.settings.cellPadding.bottom - descent)
+        const layout = layoutMultilineText(cell + (countryCodeForFlag ? FLAG_PSEUDO_SUFFIX : ''), {
+          alignment: isHeader ? TextAlignment.Center : column.alignment,
           font: this.font,
-          fontSize: fontSize,
-          bounds: { width: column.width - this.settings.cellPadding.x * 3, height: fontSize, x: x, y: y },
-          lineHeightFactor: 0
+          fontSize,
+          width: column.width - this.settings.cellPadding.x * 3,
+          xStart: x + this.settings.cellPadding.x,
+          yStart: y - paddingTop
         })
-        for (const line of multiText.lines) {
-          cellTexts.push({
-            text: line.text,
-            options: {
-              xStart: line.x + this.settings.cellPadding.x,
-              yStart: line.y + this.settings.cellPadding.bottom,
-              width: line.width,
-              fontSize: fontSize
-            }
-          })
+        rowHeight = Math.max(rowHeight, layout.height + paddingTop + paddingBottom)
+        for (const line of layout.lines) {
+          cellTexts.push({ text: line.text, options: { xStart: line.x, yStart: line.y, width: line.width, fontSize } })
         }
-        if (!opts.firstRow && internalPdfLinkSegments.length > 0) {
+        if (!isHeader && datum !== undefined && column.internalPdfLinkSegments) {
+          const segments = column.internalPdfLinkSegments(datum)
           let segmentIndex = 0
-          for (const line of multiText.lines) {
+          for (const line of layout.lines) {
             let lineSearchIndex = 0
-            while (segmentIndex < internalPdfLinkSegments.length) {
-              const segment = internalPdfLinkSegments[segmentIndex]
+            while (segmentIndex < segments.length) {
+              const segment = segments[segmentIndex]
               const segmentTextIndex = line.text.indexOf(segment.text, lineSearchIndex)
-              if (segmentTextIndex === -1) {
-                break
-              }
+              if (segmentTextIndex === -1) break
               const prefix = line.text.slice(0, segmentTextIndex)
-              const width = this.font.widthOfTextAtSize(segment.text, fontSize)
-              const xStart = line.x + this.settings.cellPadding.x + this.font.widthOfTextAtSize(prefix, fontSize)
-              const yStart = line.y + this.settings.cellPadding.bottom
-              cellLinks.push({ targetId: segment.targetId, options: { xStart, yStart, width, height: fontSize } })
+              cellLinks.push({
+                targetId: segment.targetId,
+                xStart: line.x + this.font.widthOfTextAtSize(prefix, fontSize),
+                yStart: line.y,
+                width: this.font.widthOfTextAtSize(segment.text, fontSize),
+                height: getTextMetrics(this.font, fontSize).height
+              })
               lineSearchIndex = segmentTextIndex + segment.text.length
               segmentIndex++
             }
           }
         }
-        if (multiText.lines.length > 0 && !opts.firstRow) {
-          if (column.countryCodeForFlag && datum !== undefined) {
-            cellTexts[cellTexts.length - 1].text = cellTexts[cellTexts.length - 1].text.slice(
-              0,
-              cellTexts[cellTexts.length - 1].text.length - FLAG_PSEUDO_SUFFIX.length
-            )
-            cellTexts[cellTexts.length - 1].countryCodeForFlag = column.countryCodeForFlag(datum)
-          }
+        if (countryCodeForFlag && layout.lines.length > 0) {
+          const lastText = cellTexts[cellTexts.length - 1]
+          lastText.text = lastText.text.slice(0, -FLAG_PSEUDO_SUFFIX.length)
+          lastText.countryCodeForFlag = countryCodeForFlag
         }
-
-        columnBorders.push({
-          // vertical border ╫
-          start: { x: x - this.settings.borderThickness, y: y + opts.cellHeight - this.settings.borderThickness },
-          end: { x: x - this.settings.borderThickness, y: 0 },
-          thickness: this.settings.borderThickness,
-          color: this.settings.borderColor
-        })
-        yMin = multiText.bounds.y < yMin ? multiText.bounds.y : yMin
-        x = x + column.width
+        x += column.width
+        borders.push(x)
       }
-      if (yMin < this.settings.pagePadding && !alreadyOnCompletelyNewPage) {
-        this.currentPage.drawLine({
-          // top border ╤
-          start: { x: opts.xStart - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-          end: { x: x - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-          thickness: this.settings.borderThickness,
-          color: this.settings.borderColor
-        })
-        this.currentPage.drawLine({
-          // right border ╢
-          start: { x: x - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-          end: { x: x - this.settings.borderThickness, y: y + opts.cellHeight - this.settings.borderThickness },
-          thickness: this.settings.borderThickness,
-          color: this.settings.borderColor
-        })
+      const bottom = y - rowHeight
+      // Keep rows together. An oversized row is drawn once on a fresh page, as before.
+      if (bottom < this.settings.pagePadding && !onFreshPage) {
         this.newPage()
-        alreadyOnCompletelyNewPage = true
-        x = opts.newPageXStart
-        y = opts.newPageYStart
-        opts.xStart = opts.newPageXStart
-        opts.yStart = opts.newPageYStart
+        xStart = this.settings.pagePadding
+        y = this.currentPage.getHeight() - this.settings.pagePadding
+        onFreshPage = true
         i--
         continue
-      }
-      if (opts.firstRow) {
-        opts.firstRow = false
-        i--
       }
       for (const text of cellTexts) {
         this.drawText(text.text, text.options)
@@ -671,45 +619,18 @@ export class PDFDrawer<idType extends _id> {
           })
         }
       }
-      for (const link of cellLinks) {
-        this.pendingInternalLinks.push({
-          page: this.currentPage,
-          targetId: link.targetId,
-          xStart: link.options.xStart,
-          yStart: link.options.yStart,
-          width: link.options.width,
-          height: link.options.height
-        })
+      for (const link of cellLinks) this.pendingInternalLinks.push({ page: this.currentPage, ...link })
+      const lineStyle = { thickness: this.settings.borderThickness, color: this.settings.borderColor }
+      if (i === (opts.firstRow ? -1 : 0) || onFreshPage) {
+        this.currentPage.drawLine({ start: { x: xStart, y }, end: { x, y }, ...lineStyle })
       }
-      alreadyOnCompletelyNewPage = false
-      for (const border of columnBorders) {
-        border.end.y = yMin - this.settings.borderThickness
-        this.currentPage.drawLine(border)
+      for (const borderX of borders) {
+        this.currentPage.drawLine({ start: { x: borderX, y }, end: { x: borderX, y: bottom }, ...lineStyle })
       }
-      y = yMin
-      this.currentPage.drawLine({
-        // horizontal border ╪
-        start: { x: opts.xStart - this.settings.borderThickness, y: y - this.settings.borderThickness },
-        end: { x: x - this.settings.borderThickness, y: y - this.settings.borderThickness },
-        thickness: this.settings.borderThickness,
-        color: this.settings.borderColor
-      })
-      y = y - opts.cellHeight
+      this.currentPage.drawLine({ start: { x: xStart, y: bottom }, end: { x, y: bottom }, ...lineStyle })
+      y = bottom
+      onFreshPage = false
     }
-    this.currentPage.drawLine({
-      // top border ╤
-      start: { x: opts.xStart - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-      end: { x: x - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-      thickness: this.settings.borderThickness,
-      color: this.settings.borderColor
-    })
-    this.currentPage.drawLine({
-      // right border ╢
-      start: { x: x - this.settings.borderThickness, y: opts.yStart + opts.cellHeight - this.settings.borderThickness },
-      end: { x: x - this.settings.borderThickness, y: y + opts.cellHeight - this.settings.borderThickness },
-      thickness: this.settings.borderThickness,
-      color: this.settings.borderColor
-    })
     return y
   }
 }
