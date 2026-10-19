@@ -145,7 +145,7 @@ const layoutMultilineText = (
             : xStart
       textLines.push({ text: line.line, width: line.width, x, y: yStart - textLines.length * lineHeight })
       // Preserve whitespace in explicit lines, trimming only automatically wrapped remainders.
-      remainder = line.remainder?.trim()
+      remainder = line.remainder?.trim() || undefined
     }
   }
   return { lines: textLines, height: textLines.length * lineHeight }

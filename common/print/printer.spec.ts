@@ -190,6 +190,28 @@ test('multiline text preserves explicit blank lines and makes progress with widt
   t.deepEqual(lines, ['A', 'B', 'C'])
 })
 
+test('multiline text discards whitespace-only wrapped remainders while preserving explicit blank lines', async (t) => {
+  const drawer = await createDrawer()
+  const rendered = mock.method(drawer.currentPage, 'drawText')
+  t.teardown(() => rendered.mock.restore())
+  const fontSize = 11
+  const width = drawer.font.widthOfTextAtSize('ABC', fontSize)
+  const height = fontMetrics('Inter', fontSize).height
+  for (const [input, expected] of [
+    ['ABC   ', ['ABC']],
+    ['ABC   \n', ['ABC', '']],
+    ['ABC   \n\nABC', ['ABC', '', 'ABC']]
+  ] as const) {
+    rendered.mock.resetCalls()
+    const bottom = drawer.drawMultilineText(input, { xStart: 30, yStart: 700, fontSize, width })
+    t.deepEqual(
+      rendered.mock.calls.map(({ arguments: [text] }) => text),
+      [...expected]
+    )
+    t.is(bottom, 700 - expected.length * height)
+  }
+})
+
 test('badge text keeps its upper edge for different paddings and its background contains every line', async (t) => {
   const drawer = await createDrawer()
   const lines: { text: string; x: number; y: number }[] = []
