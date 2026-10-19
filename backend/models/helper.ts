@@ -132,7 +132,8 @@ export async function getCostPositionValidationIssues(
   const organisationIds = Array.from(new Set(projects.map(({ organisation }) => organisation.toString())))
   const organisations = await mongoose
     .model<{ _id: Types.ObjectId; accountingSettings: { vatAccountingEnabled: boolean; vatRates: { rate: number }[] } }>('Organisation')
-    .find({ _id: { $in: organisationIds } }, { 'accountingSettings.vatAccountingEnabled': 1, 'accountingSettings.vatRates.rate': 1 })
+    .find({ _id: { $in: organisationIds } })
+    .select({ 'accountingSettings.vatAccountingEnabled': 1, 'accountingSettings.vatRates.rate': 1 })
     .lean()
   const organisationsById = new Map(organisations.map((organisation) => [organisation._id.toString(), organisation]))
 

@@ -1,6 +1,6 @@
 {
   "name": "abrechnung-frontend",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "private": true,
   "engines": {
     "node": ">=24.12.0 <25"
@@ -21,34 +21,34 @@
     "abrechnung-common": "file:../common",
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
-    "bootstrap-icons": "^1.13.1",
+    "bootstrap-icons": "^1.13.2",
     "chart.js": "^4.5.1",
     "fflate": "^0.8.3",
-    "idb": "^8.0.3",
+    "idb": "^8.0.4",
     "json-editor-vue": "^0.19.2",
     "qrcode": "^1.5.4",
-    "qs": "^6.16.0",
+    "qs": "^6.16.1",
     "simple-code-editor": "^2.1.0",
-    "vue": "^3.5.43",
-    "vue-i18n": "^11.4.13",
-    "vue-router": "^5.3.1",
+    "vue": "^3.5.44",
+    "vue-i18n": "^11.4.16",
+    "vue-router": "^5.4.0",
     "vue-select": "^4.0.0-beta.6",
     "vue-to-print": "^1.5.1",
     "vue3-easy-data-table": "^1.5.47"
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.11",
-    "@types/node": "^24.19.1",
+    "@types/node": "^24.19.2",
     "@types/qrcode": "^1.5.6",
     "@types/qs": "^6.15.1",
     "@types/vue-select": "^3.16.8",
-    "@vitejs/plugin-vue": "^6.0.9",
-    "fake-indexeddb": "^6.2.5",
+    "@vitejs/plugin-vue": "^6.0.10",
+    "fake-indexeddb": "^6.2.6",
     "typescript": "~6.0.3",
-    "vite": "^8.3.2",
+    "vite": "^8.3.4",
     "vite-plugin-pwa": "^2.0.0",
-    "vitest": "^5.0.3",
-    "vue-tsc": "^3.3.12"
+    "vitest": "^5.0.5",
+    "vue-tsc": "^3.3.13"
   },
   "browserslist": ["> 1%", "last 2 versions", "not dead"]
 }

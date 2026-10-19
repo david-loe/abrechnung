@@ -216,7 +216,9 @@ test.serial('a category referenced only by an empty report cannot be deleted or 
 })
 
 test.after.always(async () => {
-  const reports = await ExpenseReportModel.find({ _id: { $in: reportIds } }, { history: 1, 'expenses.cost.receipts': 1 }).lean()
+  const reports = await ExpenseReportModel.find({ _id: { $in: reportIds } })
+    .select({ history: 1, 'expenses.cost.receipts': 1 })
+    .lean()
   await ExpenseReportModel.deleteMany({ _id: { $in: [...reportIds, ...reports.flatMap(({ history }) => history)] } })
   await DocumentFile.deleteMany({
     _id: { $in: reports.flatMap(({ expenses }) => expenses.flatMap(({ cost }) => cost.receipts.map(({ _id }) => _id))) }

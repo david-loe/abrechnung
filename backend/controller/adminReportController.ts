@@ -15,7 +15,7 @@ type AdminReport =
 
 async function getCurrentReport(type: ReportModelName, _id: string, printableOnly = false) {
   const filter = { _id, historic: false, ...(printableOnly ? { state: { $gte: State.BOOKABLE } } : {}) }
-  const report = await mongoose.model<AdminReport>(type).findOne(filter, { history: 0, historic: 0 }).lean()
+  const report = await mongoose.model<AdminReport>(type).findOne(filter).select({ history: 0, historic: 0 }).lean()
   if (!report) {
     throw new NotFoundError(`No current ${type} with id: '${_id}' found`)
   }

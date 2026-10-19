@@ -355,10 +355,9 @@ export class AdvanceApproveController extends Controller {
       null,
       requestBody.subject
     )
-    const result: IAdvance | null = await Advance.findOne(
-      { _id: idDocumentToId(requestBody.advanceId), historic: false },
-      { historic: 0, history: 0 }
-    ).lean()
+    const result = await Advance.findOne({ _id: idDocumentToId(requestBody.advanceId), historic: false })
+      .select({ historic: 0, history: 0 })
+      .lean()
     if (result) {
       return { message: 'alerts.successSaving', result }
     }

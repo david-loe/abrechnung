@@ -172,7 +172,8 @@ schema.pre('validate', async function () {
     const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
     if (advanceIds.length > 0) {
       const advances = await model<AdvanceBase<Types.ObjectId>>('Advance')
-        .find({ _id: { $in: advanceIds } }, { 'budget.currency': 1, 'balance.currency': 1 })
+        .find({ _id: { $in: advanceIds } })
+        .select({ 'budget.currency': 1, 'balance.currency': 1 })
         .lean()
       if (
         advances.length !== advanceIds.length ||
