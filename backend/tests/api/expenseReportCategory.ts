@@ -74,13 +74,13 @@ test.before(async () => {
   }
 })
 
-test.serial('report category is populated and inherited without replacing existing position categories', async (t) => {
+test.serial('report category is populated without replacing explicit position categories', async (t) => {
   const [a, b, c] = categories
   const report = await createReport(a)
   t.is(report.category?._id, a._id.toString())
   t.is(report.category?.style.color, a.style.color)
   t.is(report.category?.style.text, a.style.text)
-  t.is((await addExpense(report._id, [undefined, c._id])).status, 200)
+  t.is((await addExpense(report._id, [a._id, c._id])).status, 200)
   t.is((await addExpense(report._id, [a._id])).status, 200)
 
   const response = await agent.post('/expenseReport/inWork').send({ _id: report._id, category: b._id })
@@ -98,7 +98,7 @@ test.serial('report category is populated and inherited without replacing existi
   t.deepEqual(positionCategories(firstSet.body.result), positionCategories(response.body.result))
 })
 
-test.serial('multipart expenses inherit the category and preserve explicit overrides', async (t) => {
+test.serial('multipart expenses preserve explicit position categories', async (t) => {
   const [a, , c] = categories
   const report = await createReport(a)
   const request = agent
@@ -107,7 +107,7 @@ test.serial('multipart expenses inherit the category and preserve explicit overr
     .field('description', 'Multipart category expense')
     .field('cost[currency]', 'EUR')
     .field('cost[date]', '2026-01-01')
-  for (const [index, position] of cost([undefined, c._id]).positions.entries()) {
+  for (const [index, position] of cost([a._id, c._id]).positions.entries()) {
     for (const [key, value] of Object.entries(position)) {
       if (value !== undefined) request.field(`cost[positions][${index}][${key}]`, value.toString())
     }
@@ -161,21 +161,21 @@ for (const role of ['user', 'expenseReport'] as const) {
   })
 }
 
-test.serial('invalid categories and missing categories without a report category are rejected', async (t) => {
+test.serial('cost positions require valid explicit categories even when the report has a category', async (t) => {
   const [a, , , travelCategory] = categories
   const report = await createReport(a)
-  await addExpense(report._id, [a._id])
+  t.is((await addExpense(report._id, [a._id])).status, 200)
+  const withoutCategory = await createReport()
+  t.is((await addExpense(withoutCategory._id, [undefined])).status, 422)
+  t.is((await addExpense(report._id, [undefined])).status, 422)
+  t.is((await postExpense('/', report._id, { description: 'Missing category', cost: cost([undefined]) })).status, 422)
   for (const category of [travelCategory._id, new Types.ObjectId()]) {
-    const response = await agent.post('/expenseReport/inWork').send({ _id: report._id, category })
-    t.is(response.status, 422)
+    t.is((await addExpense(report._id, [category])).status, 422)
   }
   t.deepEqual(
     positionCategories((await agent.get('/expenseReport').query({ _id: report._id, additionalFields: ['expenses'] })).body.data),
     [a._id.toString()]
   )
-  const withoutCategory = await createReport()
-  t.is((await addExpense(withoutCategory._id, [undefined])).status, 422)
-  t.is((await addExpense(report._id, [travelCategory._id])).status, 422)
 })
 
 test.serial('examiner can change the report category without replacing positions and other users cannot edit', async (t) => {

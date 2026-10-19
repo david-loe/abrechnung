@@ -321,11 +321,11 @@ for (const fontName of ['Inter', 'NotoSans'] as const) {
         arguments: [, options]
       } of rendered.mock.calls) {
         if (!options?.font) throw new Error('Missing rendered font')
-        const { ascent } = fontMetrics(options.font === drawer.font ? fontName : 'BootstrapIcons', fontSize)
+        const { ascent, height } = fontMetrics(options.font === drawer.font ? fontName : 'BootstrapIcons', fontSize)
         const textTop = (options.y ?? 0) + ascent
         t.true(textTop <= top + 1e-6)
-        t.true(textTop - ascent >= bottom - 1e-6)
-        t.true(Math.abs(textTop - ascent / 2 - (top + bottom) / 2) < 1e-6)
+        t.true(textTop - height >= bottom - 1e-6)
+        t.true(Math.abs(textTop - height / 2 - (top + bottom) / 2) < 1e-6)
       }
     }
   })
