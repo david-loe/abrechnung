@@ -2,7 +2,6 @@ import {
   AddUp,
   AdvanceBase,
   baseCurrency,
-  Category,
   Comment,
   ExpenseReport,
   ExpenseReportState,
