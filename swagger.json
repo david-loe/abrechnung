@@ -5735,16 +5735,6 @@
 							"positions": {
 								"items": {
 									"properties": {
-										"category": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-												},
-												{
-													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
-												}
-											]
-										},
 										"vatAmountOverride": {
 											"type": "number",
 											"format": "double"
@@ -5762,6 +5752,16 @@
 											"enum": [
 												"ownCar",
 												"manual"
+											]
+										},
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
 											]
 										},
 										"project": {
@@ -5897,16 +5897,6 @@
 							"positions": {
 								"items": {
 									"properties": {
-										"category": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-												},
-												{
-													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
-												}
-											]
-										},
 										"vatAmountOverride": {
 											"type": "number",
 											"format": "double"
@@ -5924,6 +5914,16 @@
 											"enum": [
 												"ownCar",
 												"manual"
+											]
+										},
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
 											]
 										},
 										"project": {
@@ -10768,16 +10768,6 @@
 							"positions": {
 								"items": {
 									"properties": {
-										"category": {
-											"anyOf": [
-												{
-													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
-												},
-												{
-													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
-												}
-											]
-										},
 										"vatAmountOverride": {
 											"type": "number",
 											"format": "double"
@@ -10795,6 +10785,16 @@
 											"enum": [
 												"ownCar",
 												"manual"
+											]
+										},
+										"category": {
+											"anyOf": [
+												{
+													"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+												},
+												{
+													"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+												}
 											]
 										},
 										"project": {
@@ -11113,6 +11113,14 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"category": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Category__id_"
+							}
+						],
+						"nullable": true
+					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp__id.ExpenseReport__id.binary__"
@@ -11283,6 +11291,14 @@
 					"_id": {
 						"$ref": "#/components/schemas/_id"
 					},
+					"category": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Category__id_"
+							}
+						],
+						"nullable": true
+					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp__id.ExpenseReport__id.binary__"
@@ -11398,6 +11414,7 @@
 								"createdAt",
 								"updatedAt",
 								"_id",
+								"category",
 								"addUp",
 								"advances",
 								"currency",
@@ -11530,6 +11547,14 @@
 					},
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
+					},
+					"category": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
 					},
 					"addUp": {
 						"items": {
@@ -11686,8 +11711,7 @@
 					"kind",
 					"grossAmount",
 					"vatRate",
-					"project",
-					"category"
+					"project"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -11829,6 +11853,14 @@
 					"_id": {
 						"$ref": "#/components/schemas/mongoose.Types.ObjectId"
 					},
+					"category": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/Category_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
+					},
 					"addUp": {
 						"items": {
 							"$ref": "#/components/schemas/AddUp_mongoose.Types.ObjectId.ExpenseReport__id.binary__"
@@ -11946,6 +11978,14 @@
 					},
 					"project": {
 						"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+					},
+					"category": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/IdDocument_mongoose.Types.ObjectId_"
+							}
+						],
+						"nullable": true
 					}
 				},
 				"type": "object"
@@ -23826,6 +23866,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"category",
 									"addUp",
 									"advances",
 									"currency",
@@ -24402,6 +24443,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"category",
 									"addUp",
 									"advances",
 									"currency",
@@ -25178,6 +25220,7 @@
 									"createdAt",
 									"updatedAt",
 									"_id",
+									"category",
 									"addUp",
 									"advances",
 									"currency",
