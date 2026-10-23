@@ -13,11 +13,11 @@ import test from 'ava'
 import { mongo, Types } from 'mongoose'
 import { objectToFormFields } from '../../helper.js'
 import { calculateBookings } from '../../models/booking.js'
-import ExchangeRate from '../../models/exchangeRate.js'
 import ExpenseReportModel from '../../models/expenseReport.js'
 import Organisation from '../../models/organisation.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
 const agent = await createAgent()
 await loginUser(agent, 'expenseReport')
@@ -31,17 +31,9 @@ const today = new Date()
 today.setUTCHours(0, 0, 0, 0)
 const reportDate = new Date(today)
 reportDate.setUTCDate(reportDate.getUTCDate() - 1)
-await Promise.all([
-  ExchangeRate.updateOne(
-    { provider: 'Frankfurter', currency: 'USD', date: today },
-    { $set: { provider: 'Frankfurter', currency: 'USD', date: today, rate: 1 / 0.95 } },
-    { upsert: true }
-  ),
-  ExchangeRate.updateOne(
-    { provider: 'Frankfurter', currency: 'USD', date: reportDate },
-    { $set: { provider: 'Frankfurter', currency: 'USD', date: reportDate, rate: 1 / 0.9 } },
-    { upsert: true }
-  )
+await seedExchangeRates([
+  { provider: 'Frankfurter', currency: 'USD', date: today, rate: 1 / 0.95 },
+  { provider: 'Frankfurter', currency: 'USD', date: reportDate, rate: 1 / 0.9 }
 ])
 
 await loginUser(agent, 'advance')
@@ -147,6 +139,26 @@ test.serial('foreign expense report cannot complete review without a recalculate
   } finally {
     await ExpenseReportModel.updateOne({ _id: report._id }, { $set: { exchangeRateDate: reportDate, exchangeRate: 0.9 } })
   }
+})
+
+test.serial('foreign expense report saves without a shared rate during outages and recovers', async (t) => {
+  const restore = simulateExchangeRateOutage(t)
+  try {
+    const draft = await agent.post('/examine/expenseReport').send({ _id: report._id, exchangeRateDate: reportDate })
+    t.is(draft.status, 200)
+    t.is(draft.body.result.exchangeRate, null)
+    const completion = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: report._id })
+    t.is(completion.status, 422)
+    t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
+    const stored = await ExpenseReportModel.findById(report._id).lean()
+    t.is(stored?.state, ExpenseReportState.IN_REVIEW)
+    t.deepEqual(stored?.bookings, [])
+  } finally {
+    restore()
+  }
+  const recovered = await agent.post('/examine/expenseReport').send({ _id: report._id, exchangeRateDate: reportDate })
+  t.is(recovered.status, 200)
+  t.true(Math.abs(recovered.body.result.exchangeRate - 0.9) < Number.EPSILON)
 })
 
 test.serial('foreign expense report books the advance carrying value and exchange difference', async (t) => {

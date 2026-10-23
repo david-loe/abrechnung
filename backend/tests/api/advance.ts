@@ -6,8 +6,10 @@ import { closeIntegrationQueue, type IntegrationJobData, setIntegrationQueueForT
 import Advance from '../../models/advance.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
 const agent = await createAgent()
+await seedExchangeRates([{ provider: 'Frankfurter', currency: 'USD', date: new Date(), rate: 1.25 }])
 
 let project: Record<string, unknown>
 let category: Record<string, unknown>
@@ -108,6 +110,27 @@ test.serial('foreign advance can be submitted without a date but approval requir
   t.is(approvedResponse.body.result.balance.exchangeRate.rate, approvedResponse.body.result.budget.exchangeRate.rate)
   t.is(approvedResponse.body.result.balance.exchangeRate.amount, approvedResponse.body.result.budget.exchangeRate.amount)
 })
+
+for (const kind of ['http', 'timeout', 'network'] as const) {
+  test.serial(`foreign advance approval rejects a provider ${kind} outage and recovers`, async (t) => {
+    const created = await createAppliedAdvance(`Provider ${kind} outage`)
+    t.is(created.status, 200)
+    const restore = simulateExchangeRateOutage(t, kind)
+    try {
+      const response = await approveAdvance(created.body.result._id)
+      t.is(response.status, 422)
+      t.is(response.body.errors.exchangeRateDate.message, 'exchangeRateUnavailable')
+      const stored = await Advance.findById(created.body.result._id).lean()
+      t.is(stored?.state, AdvanceState.APPLIED_FOR)
+    } finally {
+      restore()
+    }
+    const recovered = await approveAdvance(created.body.result._id)
+    t.is(recovered.status, 200)
+    t.truthy(recovered.body.result.budget.exchangeRate)
+    t.is((await deleteApprovedAdvance(created.body.result._id)).status, 200)
+  })
+}
 
 test.serial('POST /approve/advance/bulk creates approved advances from natural references', async (t) => {
   const owner = await getAdminUser('fry')

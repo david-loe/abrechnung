@@ -104,11 +104,7 @@ schema.methods.calculateExchangeRates = async function () {
     this.budget.exchangeRate = null
     return
   }
-  try {
-    await createOperationServices().currencyConverter.addExchangeRate(this.budget, this.exchangeRateDate)
-  } catch {
-    this.budget.exchangeRate = null
-  }
+  await createOperationServices().currencyConverter.addExchangeRate(this.budget, this.exchangeRateDate)
 }
 
 async function recalcAllAssociatedReports(advanceId: Types.ObjectId, session: mongoose.ClientSession | null = null) {

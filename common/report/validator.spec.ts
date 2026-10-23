@@ -1,6 +1,6 @@
 import test from 'ava'
 import { baseCurrency, Category, ProjectSimple } from '../types.js'
-import { Validator } from './validator.js'
+import { getCostExchangeRateValidationResults, Validator } from './validator.js'
 
 const project = { _id: 'project', name: 'Project', identifier: 'project', organisation: 'organisation' } as ProjectSimple<string>
 const category = { _id: 'category', name: 'Category' } as Category<string>
@@ -77,4 +77,24 @@ test('foreign expense report completion validation requires an exchange rate dat
   })
 
   t.deepEqual(results, [{ code: 'required', severity: 'error', path: 'exchangeRateDate' }])
+})
+
+test('completion requires conversions for foreign costs, including offsetting positions', (t) => {
+  const cost = foreignExpenseReport.expenses[0].cost
+  const path = 'expenses.0.cost'
+  t.deepEqual(getCostExchangeRateValidationResults(cost, path), [
+    { code: 'exchangeRateUnavailable', severity: 'error', path: `${path}.exchangeRate` }
+  ])
+  t.deepEqual(getCostExchangeRateValidationResults({ ...cost, currency: baseCurrency }, path), [])
+  t.deepEqual(getCostExchangeRateValidationResults({ ...cost, positions: [] }, path), [])
+  t.deepEqual(getCostExchangeRateValidationResults({ ...cost, positions: [{ ...cost.positions[0], grossAmount: 0 }] }, path), [])
+  t.is(
+    getCostExchangeRateValidationResults({ ...cost, positions: [cost.positions[0], { ...cost.positions[0], grossAmount: -12 }] }, path)
+      .length,
+    1
+  )
+  for (const rate of [0, -1, Number.NaN, Number.POSITIVE_INFINITY]) {
+    t.is(getCostExchangeRateValidationResults({ ...cost, exchangeRate: { date: new Date(), rate } }, path).length, 1)
+  }
+  t.deepEqual(getCostExchangeRateValidationResults({ ...cost, exchangeRate: { date: new Date(), rate: 0.9 } }, path), [])
 })

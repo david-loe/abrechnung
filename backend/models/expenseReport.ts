@@ -16,6 +16,7 @@ import {
   addReferenceOnNewDocs,
   addToProjectBalance,
   getCostPositionValidationIssues,
+  invalidateMissingCostExchangeRates,
   offsetAdvance,
   populateAll,
   populateSelected,
@@ -119,12 +120,8 @@ schema.methods.calculateExchangeRates = async function () {
       this.exchangeRate = null
       return
     }
-    try {
-      const conversion = await currencyConverter.convert(this.exchangeRateDate, 1, idDocumentToId(this.currency).toString())
-      this.exchangeRate = conversion?.rate ?? null
-    } catch {
-      this.exchangeRate = null
-    }
+    const conversion = await currencyConverter.convert(this.exchangeRateDate, 1, idDocumentToId(this.currency).toString())
+    this.exchangeRate = conversion?.rate ?? null
     return
   }
   const promiseList = []
@@ -185,12 +182,18 @@ schema.pre('validate', async function () {
   }
 
   await this.calculateExchangeRates()
-  if (!this.historic && this.state === ExpenseReportState.REVIEW_COMPLETED && this.currency) {
+  if (!this.historic && this.state >= ExpenseReportState.REVIEW_COMPLETED && this.currency) {
     if (!this.exchangeRateDate) {
       this.invalidate('exchangeRateDate', 'required')
     } else if (typeof this.exchangeRate !== 'number') {
       this.invalidate('exchangeRateDate', 'exchangeRateUnavailable')
     }
+  } else if (!this.historic && this.state >= ExpenseReportState.REVIEW_COMPLETED) {
+    invalidateMissingCostExchangeRates(
+      this,
+      this.expenses.map(({ cost }) => cost),
+      'expenses'
+    )
   }
 })
 

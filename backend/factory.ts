@@ -12,11 +12,11 @@ import {
   TravelSettings
 } from 'abrechnung-common/types.js'
 import { CurrencyConverter, ExchangeRateProviderWithLocalStorage } from 'abrechnung-common/utils/currencyConverter.js'
-import { sources } from 'abrechnung-common/utils/exchangeRateSource.js'
 import Formatter from 'abrechnung-common/utils/formatter.js'
 import { Types } from 'mongoose'
 import { BackendConfigSnapshot } from './data/cache.js'
 import { BACKEND_CACHE } from './db.js'
+import { sources } from './exchangeRateSource.js'
 import i18n from './i18n.js'
 import Country from './models/country.js'
 import DocumentFile from './models/documentFile.js'

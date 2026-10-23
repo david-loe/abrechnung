@@ -7,6 +7,7 @@ import {
   addReferenceOnNewDocs,
   addToProjectBalance,
   getCostPositionValidationIssues,
+  invalidateMissingCostExchangeRates,
   offsetAdvance,
   populateAll,
   populateSelected,
@@ -120,12 +121,21 @@ schema.pre('validate', async function () {
   }
 })
 
-schema.pre('save', async function () {
+schema.pre('validate', async function () {
   await populateAll(this, populates)
-
   await this.calculateExchangeRates()
+  if (!this.historic && this.state >= HealthCareCostState.REVIEW_COMPLETED) {
+    invalidateMissingCostExchangeRates(
+      this,
+      this.expenses.map(({ cost }) => cost),
+      'expenses'
+    )
+  }
   this.addUp = addUp(this) as AddUp<Types.ObjectId, HealthCareCost<Types.ObjectId, mongo.Binary>>[]
   await populateAll(this, populates)
+})
+
+schema.pre('save', async function () {
   setLog(this)
   await addReferenceOnNewDocs(this, 'HealthCareCost')
   if (!this.historic && this.state < HealthCareCostState.REVIEW_COMPLETED) {

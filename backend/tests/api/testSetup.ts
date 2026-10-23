@@ -1,8 +1,10 @@
 import { mock } from 'node:test'
 import test from 'ava'
 import mongoose from 'mongoose'
+import ExchangeRate from '../../models/exchangeRate.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
+import { seedExchangeRates } from '../_exchangeRates.js'
 import { snapshotSharedFixtures } from '../_fixtures.js'
 
 const synchronize = mock.method(mongoose, 'syncIndexes', async () => {
@@ -37,6 +39,28 @@ test.serial('shared fixture restoration preserves existing users, settings and a
     await restore()
   }
   t.deepEqual(await User.collection.findOne({ _id: original._id }), original)
+})
+
+test.serial('exchange-rate fixtures normalize dates and restore existing and newly inserted rates', async (t) => {
+  const provider = 'InforEuro' as const
+  const date = new Date('2001-02-01T00:00:00.000Z')
+  const currency = `fixture-${new mongoose.Types.ObjectId()}`
+  const filter = { provider, date, currency }
+  const original = { ...filter, rate: 2 }
+  await ExchangeRate.collection.insertOne(original)
+  try {
+    const restore = await seedExchangeRates([
+      { ...filter, date: new Date('2001-02-15T12:30:00.000Z'), rate: 3 },
+      { ...filter, currency: `${currency}-new`, rate: 4 }
+    ])
+    t.is((await ExchangeRate.collection.findOne(filter))?.rate, 3)
+    t.is((await ExchangeRate.collection.findOne({ ...filter, currency: `${currency}-new` }))?.rate, 4)
+    await restore()
+    t.is((await ExchangeRate.collection.findOne(filter))?.rate, 2)
+    t.is(await ExchangeRate.collection.findOne({ ...filter, currency: `${currency}-new` }), null)
+  } finally {
+    await ExchangeRate.collection.deleteOne(filter)
+  }
 })
 
 test.after.always(async () => {

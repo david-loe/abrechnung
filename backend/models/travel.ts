@@ -21,6 +21,7 @@ import {
   addToProjectBalance,
   costObject,
   getCostPositionValidationIssues,
+  invalidateMissingCostExchangeRates,
   offsetAdvance,
   place,
   populateAll,
@@ -259,6 +260,18 @@ schema.pre('validate', async function () {
   }
 
   await this.calculateExchangeRates()
+  if (!this.historic && this.state >= TravelState.REVIEW_COMPLETED) {
+    invalidateMissingCostExchangeRates(
+      this,
+      this.expenses.map(({ cost }) => cost),
+      'expenses'
+    )
+    invalidateMissingCostExchangeRates(
+      this,
+      this.stages.map(({ cost }) => cost),
+      'stages'
+    )
+  }
   this.addUp = addUp(this) as AddUp<Types.ObjectId, Travel>[]
   await populateAll(this, populates)
 })

@@ -16,8 +16,16 @@ import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
 const agent = await createAgent()
+await seedExchangeRates([
+  { provider: 'Frankfurter', currency: 'USD', date: new Date(), rate: 1.25 },
+  { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-09-11T00:00:00.000Z'), rate: 1.25 },
+  { provider: 'Frankfurter', currency: 'GBP', date: new Date('2023-09-14T00:00:00.000Z'), rate: 0.8 },
+  { provider: 'Frankfurter', currency: 'CNY', date: new Date('2023-09-13T00:00:00.000Z'), rate: 8 },
+  { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-09-16T00:00:00.000Z'), rate: 1.25 }
+])
 await loginUser(agent, 'user')
 
 //@ts-expect-error
@@ -539,6 +547,35 @@ test.serial('POST /examine/expenseReport/expense', async (t) => {
     console.log(res.body)
   }
   t.is((res.body.result as ExpenseReport).expenses[0].cost.receipts.length, 2)
+})
+
+test.serial('expenseReport saves drafts during provider outages but cannot complete review', async (t) => {
+  await loginUser(agent, 'expenseReport')
+  const before = await ExpenseReportModel.findById(expenseReport._id).lean()
+  t.truthy(before)
+  const restore = simulateExchangeRateOutage(t)
+  try {
+    const completion = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: expenseReport._id })
+    t.is(completion.status, 422)
+    t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
+    const unchanged = await ExpenseReportModel.findById(expenseReport._id).lean()
+    t.is(unchanged?.state, before?.state)
+    t.deepEqual(unchanged?.bookings, before?.bookings)
+    t.deepEqual(unchanged?.advances, before?.advances)
+    const draft = await agent.post('/examine/expenseReport').send({ _id: expenseReport._id, name: expenseReport.name })
+    t.is(draft.status, 200)
+    t.is(draft.body.result.expenses[0].cost.exchangeRate, null)
+  } finally {
+    restore()
+    const after = await ExpenseReportModel.findById(expenseReport._id).lean()
+    const previousHistory = new Set(before?.history.map(String))
+    const createdHistory = after?.history.filter((id) => !previousHistory.has(id.toString())) ?? []
+    await ExpenseReportModel.updateOne({ _id: expenseReport._id }, { $set: { history: before?.history } })
+    await ExpenseReportModel.deleteMany({ _id: { $in: createdHistory } })
+  }
+  const recovered = await agent.post('/examine/expenseReport').send({ _id: expenseReport._id, name: expenseReport.name })
+  t.is(recovered.status, 200)
+  t.truthy(recovered.body.result.expenses[0].cost.exchangeRate)
 })
 
 test.serial('POST /examine/expenseReport/reviewCompleted', async (t) => {
