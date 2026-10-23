@@ -76,8 +76,11 @@ function mapSchemaTypeToVueformElement(
   if (schemaType.info) {
     vueformElement.info = translate(schemaType.info, language)
   }
-  if (isFlatType(schemaType.type) && schemaType.default !== undefined && schemaType.default !== null) {
-    vueformElement.default = schemaType.default
+  if (isFlatType(schemaType.type)) {
+    const defaultValue = typeof schemaType.default === 'function' ? schemaType.default() : schemaType.default
+    if (defaultValue !== undefined && defaultValue !== null) {
+      vueformElement.default = defaultValue
+    }
   }
 
   if (!vueformElement.columns && isNotNested(schemaType) && !schemaType.noColumn) {
