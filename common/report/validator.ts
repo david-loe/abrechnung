@@ -1,4 +1,4 @@
-import { Expense, ExpenseReport, HealthCareCost, idDocumentToId } from '../types.js'
+import { baseCurrency, Cost, Expense, ExpenseReport, HealthCareCost, idDocumentToId } from '../types.js'
 
 export type ValidationSeverity = 'info' | 'warning' | 'error'
 
@@ -32,6 +32,17 @@ type ReportValidatorFn<TReport extends ReportLike, TSettings extends ValidatorSe
   context?: TContext
 ) => ValidationResult[]
 type ExpenseValidatorFn = (expense: Partial<Expense>, settings: ExpenseValidatorRuntimeSettings) => ValidationResult[]
+
+export function getCostExchangeRateValidationResults(cost: Pick<Cost, 'positions' | 'currency' | 'exchangeRate'>, path: string) {
+  if (
+    idDocumentToId(cost.currency) === baseCurrency._id ||
+    !cost.positions.some(({ grossAmount }) => grossAmount !== 0) ||
+    (typeof cost.exchangeRate?.rate === 'number' && Number.isFinite(cost.exchangeRate.rate) && cost.exchangeRate.rate > 0)
+  ) {
+    return []
+  }
+  return [{ code: 'exchangeRateUnavailable', severity: 'error' as const, path: `${path}.exchangeRate` }]
+}
 
 export class Validator<
   TReport extends ReportLike = ReportLike,

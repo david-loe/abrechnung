@@ -1,10 +1,12 @@
+import { once } from 'node:events'
+import { createServer } from 'node:http'
 import test, { ExecutionContext } from 'ava'
-import axios from 'axios'
+import axios, { AxiosRequestConfig } from 'axios'
 import { sources } from './exchangeRateSource.js'
 
-function stubAxiosGet(t: ExecutionContext, handler: (url: string) => unknown) {
+function stubAxiosGet(t: ExecutionContext, handler: (url: string, config: AxiosRequestConfig) => unknown) {
   const originalGet = axios.get
-  axios.get = (async (url: string) => handler(url)) as never
+  axios.get = (async (url: string, config: AxiosRequestConfig) => handler(url, config)) as never
   t.teardown(() => {
     axios.get = originalGet
   })
@@ -73,3 +75,27 @@ test.serial('Frankfurter source returns null rate when currency is missing', asy
   t.is(result.rate, null)
   t.deepEqual(result.rates, [{ currency: 'USD', rate: 1.08 }])
 })
+
+for (const provider of ['Frankfurter', 'InforEuro'] as const) {
+  test.serial(`${provider} cancels a stalled request after five seconds`, async (t) => {
+    const server = createServer(() => {})
+    server.listen(0, '127.0.0.1')
+    await once(server, 'listening')
+    const address = server.address()
+    if (!address || typeof address === 'string') throw new Error('Missing server address')
+    t.teardown(() => {
+      server.closeAllConnections()
+      server.close()
+    })
+    const originalGet = axios.get
+    stubAxiosGet(t, (_url, config) => {
+      t.is(config.timeout, 5_000)
+      t.truthy(config.signal)
+      return originalGet(`http://127.0.0.1:${address.port}`, { ...config, proxy: false })
+    })
+    const started = performance.now()
+    const error = await t.throwsAsync(sources[provider](new Date('2024-02-15'), 'USD', 'EUR'))
+    t.true(axios.isAxiosError(error))
+    t.true(performance.now() - started < 7_000)
+  })
+}

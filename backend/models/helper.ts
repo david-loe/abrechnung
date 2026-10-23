@@ -1,3 +1,4 @@
+import { getCostExchangeRateValidationResults } from 'abrechnung-common/report/validator.js'
 import {
   AddUp,
   AdvanceBase,
@@ -21,6 +22,14 @@ import mongoose, { Document, HydratedDocument, PopulateOptions, Query, Schema, T
 import { AdvanceDoc } from './advance.js'
 import { ProjectDoc } from './project.js'
 import { nextReference } from './referenceCounter.js'
+
+export function invalidateMissingCostExchangeRates(doc: Pick<Document, 'invalidate'>, costs: Cost[], collection: 'expenses' | 'stages') {
+  for (const [index, cost] of costs.entries()) {
+    for (const issue of getCostExchangeRateValidationResults(cost, `${collection}.${index}.cost`)) {
+      doc.invalidate(issue.path, issue.code)
+    }
+  }
+}
 
 const bookingSides = ['debit', 'credit'] as const
 

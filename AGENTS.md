@@ -50,7 +50,7 @@ docker compose up -d db redis ldap inbucket
 docker compose run --rm --no-deps --pull never backend npm test
 ```
 
-Backend `npm test` builds once; `npm run test:built` prepares the configured database and LDAP fixtures once before AVA. Do not prepend `npm run setup`. Individual files can be selected with `npm run test:built -- dist/tests/api/user.js`; `test:debug` also prepares fixtures. Tests retain the configured development database and must restore shared fixture changes.
+Backend `npm test` builds once; `npm run test:built` prepares the configured database and LDAP fixtures once before AVA. Do not prepend `npm run setup`. Individual files can be selected with `npm run test:built -- dist/tests/api/user.js`; `test:debug` also prepares fixtures. Tests retain the configured development database and must restore shared fixture changes. Backend test agents block live exchange-rate provider requests. Seed required rates with `tests/_exchangeRates.ts`; agent shutdown restores overwritten rates and removes rates created by the tests. Scope intentional provider outage mocks to the test.
 
 ### Frontend Package
 Use the same validation intent as CI production build:

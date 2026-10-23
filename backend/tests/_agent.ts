@@ -2,12 +2,14 @@ import request from 'supertest'
 import { createApp, shutdown as shutdownApp } from '../app.js'
 import { initializeBackendRuntime } from '../runtime.js'
 import { connectTestDatabase } from './_database.js'
+import { blockExchangeRateRequests, restoreExchangeRates } from './_exchangeRates.js'
 import { snapshotSharedFixtures } from './_fixtures.js'
 import { users } from './_users.js'
 
 let restoreFixtures: (() => Promise<void>) | undefined
 
 export default async function createAgent() {
+  blockExchangeRateRequests()
   await connectTestDatabase()
   restoreFixtures ??= await snapshotSharedFixtures()
   await initializeBackendRuntime()
@@ -22,6 +24,7 @@ export async function loginUser(agent: request.Agent, userKey: keyof typeof user
 
 export async function shutdown() {
   try {
+    await restoreExchangeRates()
     await restoreFixtures?.()
   } finally {
     restoreFixtures = undefined

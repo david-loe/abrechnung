@@ -3,6 +3,12 @@ import { CurrencyCode, ExchangeRateProviderName } from '../types.js'
 import { GetRateFn, Rates } from './currencyConverter.js'
 import { datetimeToDateString } from './scripts.js'
 
+const requestTimeout = 5_000
+
+function requestOptions() {
+  return { timeout: requestTimeout, signal: AbortSignal.timeout(requestTimeout) }
+}
+
 type InforEuroResponse = Array<{
   country: string
   currency: string
@@ -24,7 +30,8 @@ export const sources: Record<ExchangeRateProviderName, GetRateFn> = {
     const year = date.getUTCFullYear()
 
     const res = await axios.get<InforEuroResponse>(
-      `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`
+      `https://ec.europa.eu/budg/inforeuro/api/public/monthly-rates?lang=EN&year=${year}&month=${month}`,
+      requestOptions()
     )
     if (res.status === 200) {
       result.rates = res.data.map((r) => ({ currency: r.isoA3Code, rate: r.value }))
@@ -40,7 +47,10 @@ export const sources: Record<ExchangeRateProviderName, GetRateFn> = {
     if (date.valueOf() < Date.UTC(2000, 0, 1)) {
       return result
     }
-    const res = await axios.get<FrankfurterResponse>(`https://api.frankfurter.dev/v2/rates?date=${datetimeToDateString(date)}&base=${TO}`)
+    const res = await axios.get<FrankfurterResponse>(
+      `https://api.frankfurter.dev/v2/rates?date=${datetimeToDateString(date)}&base=${TO}`,
+      requestOptions()
+    )
     if (res.status === 200) {
       result.rates = res.data.map((r) => ({ currency: r.quote, rate: r.rate }))
       const currency = result.rates.find((r) => r.currency === FROM)

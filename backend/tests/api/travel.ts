@@ -16,8 +16,13 @@ import TravelModel from '../../models/travel.js'
 import UserModel from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
 const agent = await createAgent()
+await seedExchangeRates([
+  { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-08-04T00:00:00.000Z'), rate: 1.25 },
+  { provider: 'Frankfurter', currency: 'TRY', date: new Date('2023-08-07T00:00:00.000Z'), rate: 25 }
+])
 await loginUser(agent, 'user')
 
 let travel: TravelSimple = {
@@ -679,6 +684,35 @@ test.serial('POST /travel/underExamination allows ownCar with owner vehicle regi
 })
 
 // EXAMINE
+
+test.serial('travel saves drafts during provider outages but cannot complete review', async (t) => {
+  await loginUser(agent, 'travel')
+  const before = await TravelModel.findById(travel._id).lean()
+  t.truthy(before)
+  const restore = simulateExchangeRateOutage(t)
+  try {
+    const completion = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id })
+    t.is(completion.status, 422)
+    t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
+    const unchanged = await TravelModel.findById(travel._id).lean()
+    t.is(unchanged?.state, before?.state)
+    t.deepEqual(unchanged?.bookings, before?.bookings)
+    t.deepEqual(unchanged?.advances, before?.advances)
+    const draft = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
+    t.is(draft.status, 200)
+    t.is(draft.body.result.expenses[0].cost.exchangeRate, null)
+  } finally {
+    restore()
+    const after = await TravelModel.findById(travel._id).lean()
+    const previousHistory = new Set(before?.history.map(String))
+    const createdHistory = after?.history.filter((id) => !previousHistory.has(id.toString())) ?? []
+    await TravelModel.updateOne({ _id: travel._id }, { $set: { history: before?.history } })
+    await TravelModel.deleteMany({ _id: { $in: createdHistory } })
+  }
+  const recovered = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
+  t.is(recovered.status, 200)
+  t.truthy(recovered.body.result.expenses[0].cost.exchangeRate)
+})
 
 test.serial('POST /examine/travel/reviewCompleted', async (t) => {
   await loginUser(agent, 'travel')

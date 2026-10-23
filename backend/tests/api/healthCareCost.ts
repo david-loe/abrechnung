@@ -1,10 +1,16 @@
 import { BookingExportRow, Category, HealthCareCost, HealthCareCostSimple, HealthCareCostState } from 'abrechnung-common/types.js'
 import test from 'ava'
 import { objectToFormFields } from '../../helper.js'
+import HealthCareCostModel from '../../models/healthCareCost.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
+import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
 const agent = await createAgent()
+await seedExchangeRates([
+  { provider: 'Frankfurter', currency: 'GBP', date: new Date('2023-10-18T00:00:00.000Z'), rate: 0.8 },
+  { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-09-13T00:00:00.000Z'), rate: 1.25 }
+])
 await loginUser(agent, 'user')
 
 //@ts-expect-error
@@ -170,6 +176,35 @@ test.serial('POST /healthCareCost/underExamination AGAIN', async (t) => {
 })
 
 // EXAMINE
+
+test.serial('healthCareCost saves drafts during provider outages but cannot complete review', async (t) => {
+  await loginUser(agent, 'healthCareCost')
+  const before = await HealthCareCostModel.findById(healthCareCost._id).lean()
+  t.truthy(before)
+  const restore = simulateExchangeRateOutage(t)
+  try {
+    const completion = await agent.post('/examine/healthCareCost/reviewCompleted').send({ _id: healthCareCost._id })
+    t.is(completion.status, 422)
+    t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
+    const unchanged = await HealthCareCostModel.findById(healthCareCost._id).lean()
+    t.is(unchanged?.state, before?.state)
+    t.deepEqual(unchanged?.bookings, before?.bookings)
+    t.deepEqual(unchanged?.advances, before?.advances)
+    const draft = await agent.post('/examine/healthCareCost').send({ _id: healthCareCost._id, name: healthCareCost.name })
+    t.is(draft.status, 200)
+    t.is(draft.body.result.expenses[0].cost.exchangeRate, null)
+  } finally {
+    restore()
+    const after = await HealthCareCostModel.findById(healthCareCost._id).lean()
+    const previousHistory = new Set(before?.history.map(String))
+    const createdHistory = after?.history.filter((id) => !previousHistory.has(id.toString())) ?? []
+    await HealthCareCostModel.updateOne({ _id: healthCareCost._id }, { $set: { history: before?.history } })
+    await HealthCareCostModel.deleteMany({ _id: { $in: createdHistory } })
+  }
+  const recovered = await agent.post('/examine/healthCareCost').send({ _id: healthCareCost._id, name: healthCareCost.name })
+  t.is(recovered.status, 200)
+  t.truthy(recovered.body.result.expenses[0].cost.exchangeRate)
+})
 
 test.serial('POST /examine/healthCareCost/reviewCompleted', async (t) => {
   await loginUser(agent, 'healthCareCost')
