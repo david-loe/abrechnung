@@ -37,8 +37,6 @@ Auswahl zwischen
 
 - Monatskurse von [InforEuro](https://commission.europa.eu/funding-tenders/procedures-guidelines-tenders/information-contractors-and-beneficiaries/exchange-rate-inforeuro_en)
 
-Anfragen an die Kursanbieter werden nach fünf Sekunden abgebrochen. Bereits gespeicherte Kurse bleiben bei einem Ausfall verfügbar. Entwürfe können auch ohne verfügbaren Kurs gespeichert werden. Die Genehmigung von Fremdwährungsvorschüssen und der Abschluss der Reportprüfung setzen die erforderlichen Wechselkurse voraus.
-
 ## Development Environment
 
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
