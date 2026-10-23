@@ -1,5 +1,7 @@
-import { User } from 'abrechnung-common/types.js'
+import { accesses, User } from 'abrechnung-common/types.js'
 import test from 'ava'
+import DisplaySettings from '../../models/displaySettings.js'
+import Settings from '../../models/settings.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
@@ -46,6 +48,49 @@ test.serial('last activity is read-only and absent from user forms', async (t) =
   const form = await agent.get('/admin/user/form')
   t.is(form.status, 200)
   t.false('lastActiveAt' in form.body.data)
+})
+
+test.serial('user form defaults reflect current permissions and language settings', async (t) => {
+  const settings = await Settings.findOne().orFail()
+  const displaySettings = await DisplaySettings.findOne().orFail()
+  const originalAccess = settings.toObject().defaultAccess
+  const originalLanguage = displaySettings.locale.default
+  const existingUser = (await agent.get('/user')).body.data as User
+
+  const assertDefaults = async () => {
+    const response = await agent.get('/admin/user/form')
+    t.is(response.status, 200)
+    for (const access of accesses) {
+      t.is(response.body.data.access.schema[access].default, settings.defaultAccess[access], access)
+    }
+    t.is(response.body.data.settings.schema.language.default, displaySettings.locale.default)
+  }
+
+  try {
+    await assertDefaults()
+    for (const access of accesses) {
+      settings.defaultAccess[access] = !originalAccess[access]
+    }
+    displaySettings.locale.default = originalLanguage === 'en' ? 'de' : 'en'
+    await settings.save()
+    await displaySettings.save()
+
+    await assertDefaults()
+    const unchangedUser = (await agent.get('/user')).body.data as User
+    t.deepEqual(unchangedUser.access, existingUser.access)
+    t.is(unchangedUser.settings.language, existingUser.settings.language)
+  } finally {
+    settings.defaultAccess = originalAccess
+    displaySettings.locale.default = originalLanguage
+    await settings.save()
+    await displaySettings.save()
+  }
+})
+
+test.serial('organisation form serializes the empty payout accounts default', async (t) => {
+  const response = await agent.get('/admin/organisation/form')
+  t.is(response.status, 200)
+  t.deepEqual(response.body.data.accountingSettings.schema.payoutAccounts.default, [])
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
