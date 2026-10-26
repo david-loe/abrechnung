@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "private": true,
   "engines": {
-    "node": ">=24.12.0 <25"
+    "node": ">=26.12.1 <27"
   },
   "type": "module",
   "exports": {
@@ -17,7 +17,7 @@
     "axios": "^1.20.0",
     "big.js": "^7.0.1",
     "bootstrap-icons": "^1.13.2",
-    "envalid": "^8.2.0",
+    "envalid": "^9.0.0",
     "pdf-fontkit": "^1.8.9",
     "pdf-lib": "^1.17.1"
   },
@@ -28,10 +28,10 @@
   },
   "devDependencies": {
     "@types/big.js": "^7.0.0",
-    "@types/node": "^24.19.2",
-    "ava": "^8.1.0",
-    "mongodb": "~7.7",
-    "mongoose": "^9.11.2",
+    "@types/node": "^26.6.5",
+    "ava": "^8.1.2",
+    "mongodb": "~7.7.0",
+    "mongoose": "^9.11.4",
     "nodemon": "^3.1.14",
     "typescript": "^7.0.2"
   }

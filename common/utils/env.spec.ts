@@ -43,6 +43,21 @@ test('cleanBackendEnv parses numbers and booleans', (t) => {
   t.is(env.WORKER_JOB_COMPLETED_MAX_COUNT, 400)
 })
 
+test('cleanBackendEnv applies defaults to missing and blank optional values', (t) => {
+  for (const value of [undefined, '', '   ']) {
+    const env = cleanBackendEnv({ ...ENV, VITE_MAX_FILE_SIZE: value, VITE_PUBLIC_VAPID_KEY: value }, { reporter: null })
+
+    t.is(env.VITE_MAX_FILE_SIZE, 16_000_000)
+    t.is(env.VITE_PUBLIC_VAPID_KEY, undefined)
+  }
+})
+
+test('cleanBackendEnv rejects missing and blank required values', (t) => {
+  for (const value of [undefined, '', '   ']) {
+    t.throws(() => cleanBackendEnv({ ...ENV, COOKIE_SECRET: value }, { reporter: null }))
+  }
+})
+
 test('cleanBackendEnv accepts explicit worker job retention limits and false', (t) => {
   const env = cleanBackendEnv({
     ...ENV,

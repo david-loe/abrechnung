@@ -18,7 +18,7 @@ case "$(uname -s)" in
 esac
 
 # Keep this version in sync with backend/package.json.
-BIOME_VERSION="2.5.15"
+BIOME_VERSION="2.6.3"
 IMAGE_NAME="ghcr.io/biomejs/biome:${BIOME_VERSION}"
 
 # Run Docker

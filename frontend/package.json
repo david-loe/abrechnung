@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "private": true,
   "engines": {
-    "node": ">=24.12.0 <25"
+    "node": ">=26.12.1 <27"
   },
   "type": "module",
   "exports": {
@@ -22,7 +22,7 @@
     "axios": "^1.20.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.2",
-    "chart.js": "^4.5.1",
+    "chart.js": "^4.6.1",
     "fflate": "^0.8.3",
     "idb": "^8.0.4",
     "json-editor-vue": "^0.19.2",
@@ -38,14 +38,14 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^5.2.11",
-    "@types/node": "^24.19.2",
+    "@types/node": "^26.6.5",
     "@types/qrcode": "^1.5.6",
     "@types/qs": "^6.15.1",
     "@types/vue-select": "^3.16.8",
     "@vitejs/plugin-vue": "^6.0.10",
     "fake-indexeddb": "^6.2.6",
     "typescript": "~6.0.3",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vite-plugin-pwa": "^2.0.0",
     "vitest": "^5.0.5",
     "vue-tsc": "^3.3.13"

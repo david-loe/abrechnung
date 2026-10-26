@@ -1,12 +1,16 @@
 <h1 align="center">
-abrechnung 🧾
+  abrechnung 🧾
 </h1>
 <p align="center">
-<a href="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml"><img src="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml/badge.svg" alt="Migration & Test"></a>
-<a href="https://hub.docker.com/r/davidloe/abrechnung-backend"><img src="https://img.shields.io/docker/pulls/davidloe/abrechnung-backend?logo=docker" alt="Docker Pulls"></a>
+  <a href="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml"
+    ><img src="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml/badge.svg" alt="Migration & Test"></a
+  >
+  <a href="https://hub.docker.com/r/davidloe/abrechnung-backend"
+    ><img src="https://img.shields.io/docker/pulls/davidloe/abrechnung-backend?logo=docker" alt="Docker Pulls"></a
+  >
 </p>
-<h3 align="center"  style="margin-top: 0px; margin-bottom: 30px">
-Demo und Hosting ➡️ <a href="https://reiseabrechner.de">reiseabrechner.de</a>
+<h3 align="center" style="margin-top: 0px; margin-bottom: 30px">
+  Demo und Hosting ➡️ <a href="https://reiseabrechner.de">reiseabrechner.de</a>
 </h3>
 
 **abrechnung 🧾** ist eine Web App die:
