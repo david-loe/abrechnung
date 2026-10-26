@@ -1,12 +1,16 @@
 <h1 align="center">
-abrechnung 🧾
+  abrechnung 🧾
 </h1>
 <p align="center">
-<a href="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml"><img src="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml/badge.svg" alt="Migration & Test"></a>
-<a href="https://hub.docker.com/r/davidloe/abrechnung-backend"><img src="https://img.shields.io/docker/pulls/davidloe/abrechnung-backend?logo=docker" alt="Docker Pulls"></a>
+  <a href="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml"
+    ><img src="https://github.com/david-loe/abrechnung/actions/workflows/migration-test.yml/badge.svg" alt="Migration & Test"></a
+  >
+  <a href="https://hub.docker.com/r/davidloe/abrechnung-backend"
+    ><img src="https://img.shields.io/docker/pulls/davidloe/abrechnung-backend?logo=docker" alt="Docker Pulls"></a
+  >
 </p>
-<h3 align="center"  style="margin-top: 0px; margin-bottom: 30px">
-Demo und Hosting ➡️ <a href="https://reiseabrechner.de">reiseabrechner.de</a>
+<h3 align="center" style="margin-top: 0px; margin-bottom: 30px">
+  Demo und Hosting ➡️ <a href="https://reiseabrechner.de">reiseabrechner.de</a>
 </h3>
 
 **abrechnung 🧾** ist eine Web App die:
@@ -38,6 +42,8 @@ Auswahl zwischen
 - Monatskurse von [InforEuro](https://commission.europa.eu/funding-tenders/procedures-guidelines-tenders/information-contractors-and-beneficiaries/exchange-rate-inforeuro_en)
 
 ## Development Environment
+
+The containers use Node.js 26. For local package commands, use Node.js 26.12.1 or newer within v26 and npm.
 
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
 2. Copy `.env.example` to `.env` and adapt if needed

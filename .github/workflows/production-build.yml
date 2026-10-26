@@ -13,7 +13,7 @@ permissions:
 env:
   COMPOSE_PROJECT_NAME: abrechnung
   PREVIOUS_VERSION: ${{ inputs.previous-version }}
-  DOCKER_BUILD_RECORD_UPLOAD: 'false'
+  DOCKER_BUILD_RECORD_UPLOAD: "false"
 
 jobs:
   production-build:
@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [backend, frontend]
+        package: [ backend, frontend ]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: ./.github/actions/setup-production-env
@@ -61,7 +61,7 @@ jobs:
       - name: Install browser test tools on the runner
         if: matrix.package == 'frontend'
         run: |
-          npm install --prefix "$RUNNER_TEMP/frontend-migration" --no-save --package-lock=false playwright@1.63.0
+          npm install --prefix "$RUNNER_TEMP/frontend-migration" --no-save --package-lock=false playwright@1.64.1
           node "$RUNNER_TEMP/frontend-migration/node_modules/playwright/cli.js" install --with-deps firefox chromium
       - name: Test production frontend upgrade in Firefox and Chromium
         if: matrix.package == 'frontend'
