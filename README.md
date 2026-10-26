@@ -43,8 +43,6 @@ Auswahl zwischen
 
 ## Development Environment
 
-The containers use Node.js 26. For local package commands, use Node.js 26.12.1 or newer within v26 and npm.
-
 1. Install [Docker & Docker Compose](https://docs.docker.com/engine/install/)
 2. Copy `.env.example` to `.env` and adapt if needed
 3. Run `docker compose up`
