@@ -13,10 +13,18 @@ describe('report reference links', () => {
     ['HealthCareCost', 'H-001', '/healthCareCost/report-id'],
     ['Advance', 'A-001', '/advance/report-id']
   ] as [ReportModelName, string, string][])('builds and resolves %s references', async (reportModelName, reference, expectedRoute) => {
-    serve(() => ({ data: { data: { _id: 'report-id', owner: 'owner', state: TravelState.APPLIED_FOR }, meta } }))
+    let requestUrl: string | undefined
+    let requestParams: unknown
+    serve((request) => {
+      requestUrl = request.url
+      requestParams = request.params
+      return { data: { data: { _id: 'report-id', owner: 'owner', state: TravelState.APPLIED_FOR }, meta } }
+    })
 
     expect(getReportReferenceUrl(1, reportModelName)).toBe(`http://frontend.test/${reference}`)
     await expect(getRouteForReportReference(owner, reference)).resolves.toBe(expectedRoute)
+    expect(requestUrl).toBe('http://backend.test/search/ref')
+    expect(requestParams).toEqual({ ref: 1, type: reportModelName })
   })
 
   it('uses the existing permission-aware route selection', async () => {

@@ -1,6 +1,7 @@
 import test from 'ava'
 import mongoose from 'mongoose'
 import ExchangeRate from '../../models/exchangeRate.js'
+import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { connectTestDatabase } from '../_database.js'
@@ -86,6 +87,31 @@ test.serial('fixture cleanup removes only recorded new IDs and preserves existin
     t.truthy(await User.exists({ _id: unrelated._id }))
   } finally {
     await User.deleteMany({ _id: { $in: [existing._id, own._id, unrelated._id] } })
+  }
+})
+
+test.serial('fixture cleanup removes recorded new organisations and preserves existing and unrelated organisations', async (t) => {
+  const source = await Organisation.collection.findOne()
+  if (!source) throw new Error('Missing organisation fixture')
+  const [existing, own, unrelated] = Array.from({ length: 3 }, () => new mongoose.Types.ObjectId())
+  try {
+    await Organisation.collection.insertOne({ ...source, _id: existing, name: `Existing cleanup ${existing}` })
+    const tracker = await createFixtureTracker()
+    await Organisation.collection.insertMany([
+      { ...source, _id: own, name: `Owned cleanup ${own}` },
+      { ...source, _id: unrelated, name: `Unrelated cleanup ${unrelated}` }
+    ])
+    tracker.recordResponse('/admin/organisation', { _id: existing })
+    tracker.recordResponse('/admin/organisation', { _id: own })
+    await tracker.cleanup()
+    t.truthy(await Organisation.exists({ _id: existing }))
+    t.truthy(await Organisation.exists({ _id: unrelated }))
+    t.is(await Organisation.findById(own), null)
+    await tracker.cleanup()
+    t.truthy(await Organisation.exists({ _id: existing }))
+    t.truthy(await Organisation.exists({ _id: unrelated }))
+  } finally {
+    await Organisation.collection.deleteMany({ _id: { $in: [existing, own, unrelated] } })
   }
 })
 

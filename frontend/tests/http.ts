@@ -28,6 +28,9 @@ export function requestBody(config: InternalAxiosRequestConfig) {
     const multipart = config.data.getBuffer().toString() as string
     const fields: Record<string, string> = {}
     for (const part of multipart.split(`--${config.data.getBoundary()}`)) {
+      if (/^Content-Disposition:[^\r\n]*;\s*filename=/im.test(part)) {
+        throw new Error('Binary multipart uploads require a real HTTP fixture')
+      }
       const match = part.match(/name="([^"]+)"\r\n\r\n([\s\S]*?)\r\n$/)
       if (match) fields[match[1]] = match[2]
     }

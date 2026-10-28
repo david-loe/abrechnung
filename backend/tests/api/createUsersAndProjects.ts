@@ -1,6 +1,6 @@
 import { accesses, User as IUser } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
-import test from 'ava'
+import test, { type ExecutionContext } from 'ava'
 import { Types } from 'mongoose'
 import { BACKEND_CACHE } from '../../db.js'
 import Project from '../../models/project.js'
@@ -22,7 +22,7 @@ test.serial('given a delegated creator, permitted creation preserves defaults an
   const customMagiclogin = `custom-login-${uniqueSuffix}@example.com`
   const projectIdentifier = `CREATOR-PROJECT-${uniqueSuffix}`
 
-  function assertDefaultAccess(t: import('ava').ExecutionContext, user: IUser | null) {
+  function assertDefaultAccess(t: ExecutionContext, user: IUser | null) {
     for (const access of accesses) {
       t.is(user?.access[access], BACKEND_CACHE.settings.defaultAccess[access])
     }

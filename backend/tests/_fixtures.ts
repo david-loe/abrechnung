@@ -44,6 +44,7 @@ const fixtureModels = [
   'DocumentFile',
   'Token',
   'Project',
+  'Organisation',
   'Category',
   'LedgerAccount',
   'User'
@@ -85,6 +86,7 @@ export async function createFixtureTracker() {
         advance: 'Advance',
         user: 'User',
         project: 'Project',
+        organisation: 'Organisation',
         category: 'Category',
         ledgerAccount: 'LedgerAccount'
       }

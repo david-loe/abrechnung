@@ -107,15 +107,23 @@ describe('action counts through session and HTTP boundaries', () => {
   })
   it('given focus and workflow changes, counts refresh; personal settings leave the current counts alone', async () => {
     let value = counts
-    serve(() => ({ data: { data: value, meta } }))
+    let requests = 0
+    serve(() => {
+      requests++
+      return { data: { data: value, meta } }
+    })
     window.dispatchEvent(new Event('focus'))
     await vi.waitFor(() => expect(actionCountState.counts.value).toEqual(counts))
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(requests).toBe(1)
     value = { ...counts, 'approve/advance': 30 }
     mutation('user/settings')
-    await Promise.resolve()
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(requests).toBe(1)
     expect(actionCountState.counts.value).toEqual(counts)
     mutation('approve/advance/bulk')
     await vi.waitFor(() => expect(actionCountState.counts.value).toEqual(value))
+    expect(requests).toBe(2)
   })
   it('given logout, current counts and total are cleared', async () => {
     await refreshActionCounts()

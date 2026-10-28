@@ -33,13 +33,18 @@ describe('offline session lifecycle', () => {
   })
   it('given a pending reset, logout waits for completion and leaves a tombstone', async () => {
     const reset = Promise.withResolvers<void>()
+    const invoked = Promise.withResolvers<void>()
     let finished = false
-    const unregister = registerSessionPurgeHandler(() => reset.promise)
+    const unregister = registerSessionPurgeHandler(() => {
+      invoked.resolve()
+      return reset.promise
+    })
     try {
       const logout = beginLogout().then(() => {
         finished = true
       })
-      await Promise.resolve()
+      await invoked.promise
+      await new Promise((resolve) => setTimeout(resolve, 0))
       expect(finished).toBe(false)
       reset.resolve()
       await logout

@@ -73,16 +73,19 @@ test('given two receipts, table links in the saved PDF lead to their separate at
   t.is(pages[0].annotations.length, 2)
   const destinations = pages[0].annotations.map(({ dest }) => JSON.stringify(dest))
   t.is(new Set(destinations).size, 2)
+  const receiptText = pages[0].text.find(({ str }) => str.includes('1, 2'))
+  t.truthy(receiptText)
+  if (!receiptText) throw new Error('Missing receipt text in the PDF')
   for (const annotation of pages[0].annotations) {
     t.is(annotation.subtype, 'Link')
     t.truthy(annotation.dest)
     const [left, bottom, right, top] = annotation.rect
     t.true(right > left && top > bottom)
-    const receiptText = pages[0].text.find(({ str }) => str.includes('1, 2'))
-    t.truthy(receiptText)
-    if (!receiptText) throw new Error('Missing receipt text in the PDF')
-    t.true(receiptText.transform[5] >= bottom - 1 && receiptText.transform[5] <= top)
+    t.true(left >= receiptText.transform[4] - 0.01)
+    t.true(right <= receiptText.transform[4] + receiptText.width + 0.01)
+    t.true(receiptText.transform[5] >= bottom - 0.01 && receiptText.transform[5] <= top + 0.01)
   }
+  t.true(pages[0].annotations[0].rect[2] < pages[0].annotations[1].rect[0])
 })
 
 test('given two external links, both URLs and clickable rectangles survive saving', async (t) => {

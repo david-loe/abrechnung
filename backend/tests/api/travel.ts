@@ -24,10 +24,13 @@ test.serial('given a business trip, application, correction, review and booking 
   t.timeout(120_000)
   const agent = await createAgent()
   t.teardown(async () => {
-    if (originalVehicleRegistrationSetting) {
-      await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
+    try {
+      if (originalVehicleRegistrationSetting) {
+        await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
+      }
+    } finally {
+      await shutdown()
     }
-    await shutdown()
   })
   await seedExchangeRates([
     { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-08-04T00:00:00.000Z'), rate: 1.25 },

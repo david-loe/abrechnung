@@ -217,7 +217,7 @@ test.serial('given an authenticated user, activity, personal settings and sessio
     t.is(logoutResponse.status, 204)
     t.is((await agent.get('/auth/authenticated')).status, 401)
 
-    const loginResponse = await agent.post('/auth/ldapauth').send({ username: 'fry', password: 'fry' })
+    const loginResponse = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
     t.is(loginResponse.status, 204)
     const newContext = (await agent.get('/auth/authenticated')).body as AuthContext
     t.not(newContext.cacheScope, initialCacheScope)

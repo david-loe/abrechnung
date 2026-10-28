@@ -30,6 +30,7 @@ function roundedQuotient(numerator: bigint, denominator: bigint) {
 }
 
 test('money: rounding mill amounts uses half-up cents and never produces negative zero', (t) => {
+  t.is(roundAmount(0.005), 0.01)
   fc.assert(
     fc.property(cents, (mills) => {
       const actual = roundAmount(mills / 1000)
