@@ -176,7 +176,6 @@ function clickFilter(header: keyof typeof showFilter.value, event?: MouseEvent) 
 const userToEdit: Ref<User | undefined> = ref(undefined)
 const _showForm = ref(false)
 const viewOnly = ref(false)
-const modal = useTemplateRef<{ modal: { show: () => void } }>('modal')
 
 function showForm(user?: User, readOnly = false) {
   // biome-ignore lint/suspicious/noExplicitAny: reduce arrays of objects to arrays of _ids for vueform select elements
@@ -230,7 +229,7 @@ async function deleteUser(user: User<string>) {
 function setupForm(form$: any) {
   if (!props.createOnly) {
     form$.el$('fk.genApiKey').on('click', () => {
-      modal.value?.modal.show()
+      apiKeyModal.value?.modal?.show()
     })
   }
 
@@ -295,5 +294,3 @@ const tabs = props.createOnly
       tab1: { label: `Login & ${t('labels.access')}`, elements: ['fk', 'access', 'loseAccessAt', 'buttons1'] }
     }
 </script>
-
-<style></style>

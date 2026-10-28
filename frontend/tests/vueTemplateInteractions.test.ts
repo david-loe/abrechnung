@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs'
-import { compileTemplate, parse } from '@vue/compiler-sfc'
-import { transpile } from 'typescript'
+import { compileScript, compileTemplate, parse } from '@vue/compiler-sfc'
+import { ModuleKind, ScriptTarget, transpile } from 'typescript'
 import { describe, expect, it, vi } from 'vitest'
 import * as Vue from 'vue'
+import { renderToString } from 'vue/server-renderer'
 
 function source(path: string) {
   return readFileSync(new URL(`../src/components/${path}`, import.meta.url), 'utf8')
@@ -27,6 +28,32 @@ function nativeElement(path: string, pattern: RegExp) {
 }
 
 describe('Vue template interactions after enabling Biome', () => {
+  it.each([false, true])('initializes the user list without duplicate template refs (createOnly=%s)', async (createOnly) => {
+    const { descriptor } = parse(source('settings/elements/UserList.vue'))
+    const script = compileScript(descriptor, { id: 'user-list' })
+    const modules: Record<string, unknown> = {
+      vue: Vue,
+      'vue-i18n': { useI18n: () => ({ t: (key: string) => key }) },
+      'abrechnung-common/types.js': { accesses: [] },
+      '@/api.js': { default: { getter: async () => ({ ok: { data: {} } }) } },
+      '@/dataLoader.js': { default: { loadData: async () => {}, data: undefined } }
+    }
+    const component = new Function(
+      'require',
+      'exports',
+      `${transpile(script.content, { module: ModuleKind.CommonJS, target: ScriptTarget.ESNext, esModuleInterop: false })}\nreturn exports.default`
+    )((id: string) => modules[id] ?? { default: {} }, {})
+    component.render = () => null
+    const app = Vue.createSSRApp(component, { createOnly, endpoint: createOnly ? 'create/user' : 'admin/user' })
+    const errors: unknown[] = []
+    app.config.warnHandler = (warning) => errors.push(warning)
+    app.config.errorHandler = (error) => errors.push(error)
+
+    await renderToString(app)
+
+    expect(errors).toEqual([])
+  })
+
   it('keeps the API key close handlers callable and tolerates unmounted refs', () => {
     const template = parse(source('settings/elements/UserList.vue')).descriptor.template?.content ?? ''
     const afterClose = template.match(/@afterClose="([^"]+)"/)?.[1]
