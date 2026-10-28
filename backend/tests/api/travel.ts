@@ -1,5 +1,6 @@
 import {
   BookingExportRow,
+  baseCurrency,
   Category,
   idDocumentToId,
   Stage,
@@ -10,8 +11,9 @@ import {
   User
 } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { Types } from 'mongoose'
+import { mongo, Types } from 'mongoose'
 import { objectToFormFields } from '../../helper.js'
+import { calculateBookings } from '../../models/booking.js'
 import TravelModel from '../../models/travel.js'
 import UserModel from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
@@ -745,6 +747,56 @@ test.serial('given a business trip, application, correction, review and booking 
   })
 
   // BOOK
+
+  await step(t, 'travel bookings apply numeric professional shares to mixed expenses and stages', async (t) => {
+    const storedReport = await TravelModel.collection.findOne<Travel<Types.ObjectId, mongo.Binary>>({
+      _id: new Types.ObjectId(travel._id.toString())
+    })
+    if (!storedReport) throw new Error('Missing test travel')
+    const expense = storedReport.expenses[0]
+    const position = expense.cost.positions[0]
+    const cost = {
+      currency: baseCurrency,
+      receipts: [],
+      positions: [{ kind: 'manual' as const, grossAmount: 100, vatRate: 0, project: position.project, category: position.category }]
+    }
+    const actual = []
+    const expected = []
+    for (const source of ['expense', 'stage'] as const) {
+      for (const scenario of [
+        { purpose: 'mixed' as const, professionalShare: 0, amount: 0 },
+        { purpose: 'mixed' as const, professionalShare: 0.5, amount: 50 },
+        { purpose: 'mixed' as const, professionalShare: null, amount: 100 },
+        { purpose: 'professional' as const, professionalShare: 0, amount: 100 }
+      ]) {
+        const { purpose, professionalShare, amount } = scenario
+        const report = {
+          ...storedReport,
+          professionalShare,
+          days: [],
+          advances: [],
+          addUp: [],
+          expenses: source === 'expense' ? [{ ...expense, purpose, cost }] : [],
+          stages: source === 'stage' ? [{ ...storedReport.stages[0], purpose, cost }] : []
+        }
+        const bookings = await calculateBookings(report, 'Travel')
+        actual.push({ source, purpose, professionalShare, bookings: bookings.map(({ side, amount }) => ({ side, amount })) })
+        expected.push({
+          source,
+          purpose,
+          professionalShare,
+          bookings:
+            amount === 0
+              ? []
+              : [
+                  { side: 'debit', amount },
+                  { side: 'credit', amount }
+                ]
+        })
+      }
+    }
+    t.deepEqual(actual, expected)
+  })
 
   await step(t, 'POST /book/travel/bookingExportPackage cumulatively allocates mixed cent amounts and VAT overrides', async (t) => {
     const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())

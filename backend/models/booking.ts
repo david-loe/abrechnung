@@ -257,13 +257,13 @@ export async function calculateBookings(
     if (reportModelName === 'Travel') {
       const travel = costReport as Travel<Types.ObjectId, mongo.Binary>
       for (const expense of travel.expenses) {
-        const factor = expense.purpose === 'mixed' && travel.professionalShare ? travel.professionalShare : 1
+        const factor = expense.purpose === 'mixed' && typeof travel.professionalShare === 'number' ? travel.professionalShare : 1
         for (const position of expense.cost.positions) {
           addPosition(expense.cost, position, categoryAccount(position), factor)
         }
       }
       for (const stage of travel.stages) {
-        const factor = stage.purpose === 'mixed' && travel.professionalShare ? travel.professionalShare : 1
+        const factor = stage.purpose === 'mixed' && typeof travel.professionalShare === 'number' ? travel.professionalShare : 1
         for (const position of stage.cost.positions) {
           const project = projectContext(position.project)
           const ledgerAccount = project.accountMapping[stage.transport.type]
