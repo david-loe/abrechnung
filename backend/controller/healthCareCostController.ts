@@ -510,7 +510,7 @@ export class HealthCareCostBookableController extends Controller {
     const count = reducedResults.length
     const fulfilledCount = reducedResults.filter((entry) => entry.status === 'fulfilled').length
     if (fulfilledCount === 0 && count > 0) {
-      throw new Error(reducedResults[0].reason)
+      throw reducedResults[0].reason
     }
     return { result: reducedResults, message: `${fulfilledCount}/${count}` }
   }

@@ -1,149 +1,77 @@
-import test, { ExecutionContext } from 'ava'
-import { type Queue } from 'bullmq'
-import { disconnectDB } from '../../db.js'
-import {
-  closeIntegrationQueue,
-  getIntegrationJobRetentionOptions,
-  type IntegrationJobData,
-  setIntegrationQueueForTests
-} from '../../integrations/queue.js'
-import { syncIntegrationSchedules } from '../../integrations/scheduler.js'
-import IntegrationSettingsModel from '../../models/integrationSettings.js'
-import { connectTestDatabase } from '../_database.js'
-import { snapshotSharedFixtures } from '../_fixtures.js'
+import test from 'ava'
+import createAgent, { loginUser, shutdown } from '../_agent.js'
+import { queueFixture } from '../_queue.js'
 
-await connectTestDatabase()
-const restoreFixtures = await snapshotSharedFixtures()
-
-function stubQueue(
-  t: ExecutionContext,
-  options: {
-    existingSchedulers?: Array<{ key: string; name: string }>
-    onUpsert?: (jobSchedulerId: string, repeatOpts: unknown, jobTemplate?: unknown) => Promise<unknown>
-    onRemove?: (jobSchedulerId: string) => Promise<boolean>
-  } = {}
-) {
-  const removedSchedulers: string[] = []
-  const upserts: Array<{ jobSchedulerId: string; repeatOpts: unknown; jobTemplate?: unknown }> = []
-
-  setIntegrationQueueForTests({
-    add: async () => ({}) as never,
-    close: async () => {},
-    getJob: async () => undefined,
-    getJobSchedulers: async () => (options.existingSchedulers ?? []) as never,
-    removeJobScheduler: async (jobSchedulerId: string) => {
-      removedSchedulers.push(jobSchedulerId)
-      return options.onRemove ? await options.onRemove(jobSchedulerId) : true
-    },
-    upsertJobScheduler: async (jobSchedulerId: string, repeatOpts: unknown, jobTemplate: unknown) => {
-      upserts.push({ jobSchedulerId, repeatOpts, jobTemplate })
-      return options.onUpsert ? ((await options.onUpsert(jobSchedulerId, repeatOpts, jobTemplate)) as never) : ({} as never)
-    }
-  } as unknown as Queue<IntegrationJobData>)
-
-  t.teardown(() => {
-    setIntegrationQueueForTests(undefined)
-  })
-
-  return { removedSchedulers, upserts }
+const agent = await createAgent()
+await loginUser(agent, 'admin')
+const retentionSettings = {
+  deleteApprovedTravelAfterXDaysUnused: 0,
+  deleteInWorkReportsAfterXDaysUnused: 0,
+  deleteBookedAfterXDays: 0,
+  mailXDaysBeforeDeletion: 7
 }
 
-test.after.always(async () => {
-  await closeIntegrationQueue()
-  await restoreFixtures()
-  await disconnectDB()
-})
-
-test.serial('syncIntegrationSchedules upserts repeatable jobs for enabled integration schedules', async (t) => {
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'lumpSums' },
-    { integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } }, settings: {} },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'retentionPolicy' },
-    {
+test.serial('given enabled integration schedules, saving settings persists their cron jobs in Redis', async (t) => {
+  const queue = queueFixture(t)
+  await agent
+    .post('/admin/integrationSettings/lumpSums')
+    .send({ integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } }, settings: {} })
+    .expect(200)
+  await agent
+    .post('/admin/integrationSettings/retentionPolicy')
+    .send({
       integrationKey: 'retentionPolicy',
       schedules: { apply: { enabled: true, schedule: { type: 'weekly', weekdays: [1, 3], hour: 2, minute: 15 } } },
-      settings: {
-        deleteApprovedTravelAfterXDaysUnused: 0,
-        deleteInWorkReportsAfterXDaysUnused: 0,
-        deleteBookedAfterXDays: 0,
-        mailXDaysBeforeDeletion: 7
-      }
-    },
-    { upsert: true, returnDocument: 'after', runValidators: true }
+      settings: retentionSettings
+    })
+    .expect(200)
+  const schedulers = await queue.getJobSchedulers()
+  t.deepEqual(
+    schedulers.map(({ key, name, pattern }) => ({ key, name, pattern })).sort((a, b) => a.key.localeCompare(b.key)),
+    [
+      { key: 'schedule:lumpSums:sync', name: 'lumpSums.sync', pattern: '0 */6 * * *' },
+      { key: 'schedule:retentionPolicy:apply', name: 'retentionPolicy.apply', pattern: '15 2 * * 1,3' }
+    ]
   )
-
-  const { upserts, removedSchedulers } = stubQueue(t)
-
-  await syncIntegrationSchedules()
-
-  t.deepEqual(removedSchedulers, [])
-  t.deepEqual(upserts, [
-    {
-      jobSchedulerId: 'schedule:lumpSums:sync',
-      repeatOpts: { pattern: '0 */6 * * *' },
-      jobTemplate: {
-        name: 'lumpSums.sync',
-        data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
-      }
-    },
-    {
-      jobSchedulerId: 'schedule:retentionPolicy:apply',
-      repeatOpts: { pattern: '15 2 * * 1,3' },
-      jobTemplate: {
-        name: 'retentionPolicy.apply',
-        data: { integrationKey: 'retentionPolicy', operation: 'apply', payload: null },
-        opts: getIntegrationJobRetentionOptions()
-      }
-    }
-  ])
+  const jobs = await queue.getJobs(['delayed', 'waiting'])
+  t.true(jobs.some(({ data }) => data.integrationKey === 'lumpSums' && data.operation === 'sync' && data.payload === null))
+  t.true(jobs.some(({ data }) => data.integrationKey === 'retentionPolicy' && data.operation === 'apply' && data.payload === null))
+  const lumpSums = jobs.find(({ name }) => name === 'lumpSums.sync')
+  t.is(lumpSums?.opts.attempts, 3)
+  t.deepEqual(lumpSums?.opts.backoff, { type: 'exponential', delay: 5000 })
 })
 
-test.serial('syncIntegrationSchedules removes disabled and obsolete repeatable jobs', async (t) => {
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'lumpSums' },
-    { integrationKey: 'lumpSums', schedules: { sync: { enabled: true, schedule: { type: 'daily', hour: 1, minute: 0 } } }, settings: {} },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
-  await IntegrationSettingsModel.findOneAndUpdate(
-    { integrationKey: 'retentionPolicy' },
-    {
-      integrationKey: 'retentionPolicy',
-      schedules: { apply: { enabled: false, schedule: { type: 'daily', hour: 1, minute: 0 } } },
-      settings: {
-        deleteApprovedTravelAfterXDaysUnused: 0,
-        deleteInWorkReportsAfterXDaysUnused: 0,
-        deleteBookedAfterXDays: 0,
-        mailXDaysBeforeDeletion: 7
-      }
-    },
-    { upsert: true, returnDocument: 'after', runValidators: true }
-  )
-
-  const { upserts, removedSchedulers } = stubQueue(t, {
-    existingSchedulers: [
-      { key: 'schedule:lumpSums:sync', name: 'lumpSums.sync' },
-      { key: 'schedule:retentionPolicy:apply', name: 'retentionPolicy.apply' },
-      { key: 'schedule:legacy:orphan', name: 'legacy.orphan' },
-      { key: 'other:scheduler', name: 'other.scheduler' }
-    ]
-  })
-
-  await syncIntegrationSchedules()
-
-  t.deepEqual(upserts, [
-    {
-      jobSchedulerId: 'schedule:lumpSums:sync',
-      repeatOpts: { pattern: '0 1 * * *' },
-      jobTemplate: {
-        name: 'lumpSums.sync',
-        data: { integrationKey: 'lumpSums', operation: 'sync', payload: null },
-        opts: { attempts: 3, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
-      }
+test.serial(
+  'given disabled and obsolete integration schedules, saving settings removes them and preserves unrelated schedulers',
+  async (t) => {
+    const queue = queueFixture(t)
+    for (const key of ['schedule:lumpSums:sync', 'schedule:retentionPolicy:apply', 'schedule:legacy:orphan', 'other:scheduler']) {
+      await queue.upsertJobScheduler(
+        key,
+        { pattern: '0 1 * * *' },
+        { name: key, data: { integrationKey: 'example', operation: 'run', payload: null } }
+      )
     }
-  ])
-  t.deepEqual(removedSchedulers, ['schedule:retentionPolicy:apply', 'schedule:legacy:orphan'])
+    await agent
+      .post('/admin/integrationSettings/lumpSums')
+      .send({
+        integrationKey: 'lumpSums',
+        schedules: { sync: { enabled: true, schedule: { type: 'daily', hour: 1, minute: 0 } } },
+        settings: {}
+      })
+      .expect(200)
+    await agent
+      .post('/admin/integrationSettings/retentionPolicy')
+      .send({
+        integrationKey: 'retentionPolicy',
+        schedules: { apply: { enabled: false, schedule: { type: 'daily', hour: 1, minute: 0 } } },
+        settings: retentionSettings
+      })
+      .expect(200)
+    t.deepEqual((await queue.getJobSchedulers()).map(({ key }) => key).sort(), ['other:scheduler', 'schedule:lumpSums:sync'])
+  }
+)
+
+test.after.always(async () => {
+  await shutdown()
 })

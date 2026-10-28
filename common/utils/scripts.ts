@@ -413,7 +413,7 @@ function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: F
   for (const stage of travel.stages) {
     for (const position of stage.cost.positions) {
       let add = getCostPositionBaseCurrencyAmount(stage.cost, position)
-      if (stage.purpose === 'mixed' && travel.professionalShare) {
+      if (stage.purpose === 'mixed' && typeof travel.professionalShare === 'number') {
         add = multiplyAmount(add, travel.professionalShare)
       }
       addToAddUps(addUps, add, 'expenses', position.project, true)
@@ -422,7 +422,7 @@ function addTravelExpensesSum<idType extends _id>(travel: AddUpTravel, addUps: F
   for (const expense of travel.expenses) {
     for (const position of expense.cost.positions) {
       let add = getCostPositionBaseCurrencyAmount(expense.cost, position)
-      if (expense.purpose === 'mixed' && travel.professionalShare) {
+      if (expense.purpose === 'mixed' && typeof travel.professionalShare === 'number') {
         add = multiplyAmount(add, travel.professionalShare)
       }
       addToAddUps(addUps, add, 'expenses', position.project, true)

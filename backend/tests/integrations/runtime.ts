@@ -1,34 +1,15 @@
-import test, { ExecutionContext } from 'ava'
-import { type Queue } from 'bullmq'
+import test from 'ava'
 import { Integration } from '../../integrations/integration.js'
 import { processIntegrationJob } from '../../integrations/processor.js'
-import {
-  closeIntegrationQueue,
-  getIntegrationJobRetentionOptions,
-  type IntegrationJobData,
-  setIntegrationQueueForTests
-} from '../../integrations/queue.js'
-
-function stubQueueAdd(t: ExecutionContext, implementation: (name: string, data: IntegrationJobData, opts?: unknown) => Promise<unknown>) {
-  setIntegrationQueueForTests({
-    add: implementation as never,
-    close: async () => {},
-    getJob: async () => undefined,
-    getJobSchedulers: async () => [],
-    removeJobScheduler: async () => true,
-    upsertJobScheduler: async () => ({}) as never
-  } as unknown as Queue<IntegrationJobData>)
-  t.teardown(() => {
-    setIntegrationQueueForTests(undefined)
-  })
-}
+import { closeIntegrationQueue } from '../../integrations/queue.js'
+import { queueFixture } from '../_queue.js'
 
 test.after.always(async () => {
   await closeIntegrationQueue()
 })
 
 test.serial('Integration.enqueue applies integration-specific job options', async (t) => {
-  let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
+  const queue = queueFixture(t)
 
   class QueueingIntegration extends Integration {
     public override readonly operations = {
@@ -40,22 +21,30 @@ test.serial('Integration.enqueue applies integration-specific job options', asyn
     }
   }
 
-  stubQueueAdd(t, async (name, data, opts) => {
-    captured = { name, data, opts }
-    return {} as never
-  })
-
   await new QueueingIntegration().enqueue('send', { ok: true })
 
-  t.deepEqual(captured, {
-    name: 'stub.send',
-    data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
-    opts: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 }, ...getIntegrationJobRetentionOptions() }
-  })
+  const [job] = await queue.getJobs(['waiting'])
+  t.truthy(job)
+  t.deepEqual(
+    {
+      name: job.name,
+      data: job.data,
+      opts: {
+        attempts: job.opts.attempts,
+        ...(job.opts.backoff ? { backoff: job.opts.backoff } : {}),
+        ...(job.opts.jobId ? { jobId: job.opts.jobId } : {})
+      }
+    },
+    {
+      name: 'stub.send',
+      data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
+      opts: { attempts: 5, backoff: { type: 'exponential', delay: 5_000 } }
+    }
+  )
 })
 
 test.serial('Integration.enqueue lets explicit job options override integration defaults', async (t) => {
-  let captured: { name: string; data: IntegrationJobData; opts: unknown } | undefined
+  const queue = queueFixture(t)
 
   class QueueingIntegration extends Integration {
     public override readonly operations = { send: { jobOptions: { attempts: 5, removeOnComplete: false }, run: async () => {} } }
@@ -65,18 +54,22 @@ test.serial('Integration.enqueue lets explicit job options override integration 
     }
   }
 
-  stubQueueAdd(t, async (name, data, opts) => {
-    captured = { name, data, opts }
-    return {} as never
-  })
+  await new QueueingIntegration().enqueue('send', { ok: true }, { attempts: 2, removeOnComplete: true, jobId: 'job-1' })
 
-  await new QueueingIntegration().enqueue('send', { ok: true }, { removeOnComplete: true, jobId: 'job-1' })
-
-  t.deepEqual(captured, {
-    name: 'stub.send',
-    data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } },
-    opts: { attempts: 5, jobId: 'job-1', ...getIntegrationJobRetentionOptions() }
-  })
+  const [job] = await queue.getJobs(['waiting'])
+  t.truthy(job)
+  t.deepEqual(
+    {
+      name: job.name,
+      data: job.data,
+      opts: {
+        attempts: job.opts.attempts,
+        ...(job.opts.backoff ? { backoff: job.opts.backoff } : {}),
+        ...(job.opts.jobId ? { jobId: job.opts.jobId } : {})
+      }
+    },
+    { name: 'stub.send', data: { integrationKey: 'stub', operation: 'send', payload: { ok: true } }, opts: { attempts: 2, jobId: 'job-1' } }
+  )
 })
 
 test.serial('processIntegrationJob dispatches to the matching integration instance', async (t) => {

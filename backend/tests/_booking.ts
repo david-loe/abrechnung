@@ -1,5 +1,4 @@
 import { type BookingExportPackage, type BookingExportRow, type ReportModelName } from 'abrechnung-common/types.js'
-import { roundAmount, sumAmounts } from 'abrechnung-common/utils/scripts.js'
 import type { ExecutionContext } from 'ava'
 import { Types } from 'mongoose'
 import request from 'supertest'
@@ -64,8 +63,8 @@ export function assertBookingsBalanced(t: ExecutionContext, bookings: BookingExp
     t.true(booking.side === 'debit' || booking.side === 'credit')
     t.true(Boolean(booking.remark?.startsWith(`${reportModelName} `) || booking.remark?.startsWith('SEPA ')))
     const projectId = booking.project._id.toString()
-    const signedAmount = booking.side === 'debit' ? booking.amount : -booking.amount
-    balances.set(projectId, roundAmount(sumAmounts(balances.get(projectId) ?? 0, signedAmount)))
+    const signedCents = Math.round(booking.amount * 100) * (booking.side === 'debit' ? 1 : -1)
+    balances.set(projectId, (balances.get(projectId) ?? 0) + signedCents)
   }
   t.deepEqual(
     Array.from(balances.values()),

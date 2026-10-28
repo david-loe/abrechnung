@@ -1,19 +1,39 @@
+import { randomUUID } from 'node:crypto'
+import { Queue } from 'bullmq'
 import request from 'supertest'
 import { createApp, shutdown as shutdownApp } from '../app.js'
+import ENV from '../env.js'
+import { type IntegrationJobData, setIntegrationQueueForTests } from '../integrations/queue.js'
 import { initializeBackendRuntime } from '../runtime.js'
 import { connectTestDatabase } from './_database.js'
 import { blockExchangeRateRequests, restoreExchangeRates } from './_exchangeRates.js'
-import { snapshotSharedFixtures } from './_fixtures.js'
+import { createFixtureTracker, snapshotSharedFixtures } from './_fixtures.js'
 import { users } from './_users.js'
 
 let restoreFixtures: (() => Promise<void>) | undefined
+let agentQueue: Queue<IntegrationJobData> | undefined
+let fixtureTracker: Awaited<ReturnType<typeof createFixtureTracker>> | undefined
 
 export default async function createAgent() {
   blockExchangeRateRequests()
   await connectTestDatabase()
   restoreFixtures ??= await snapshotSharedFixtures()
   await initializeBackendRuntime()
-  return request.agent(await createApp())
+  fixtureTracker ??= await createFixtureTracker()
+  if (!agentQueue) {
+    agentQueue = new Queue<IntegrationJobData>(`test-agent-${randomUUID()}`, { connection: { url: ENV.REDIS_URL } })
+    setIntegrationQueueForTests(agentQueue)
+  }
+  const agent = request.agent(await createApp())
+  const post = agent.post.bind(agent)
+  agent.post = (path: string) => {
+    const mutation = post(path)
+    mutation.on('response', (response) => {
+      if (response.status < 400) fixtureTracker?.recordResponse(path, response.body?.result)
+    })
+    return mutation
+  }
+  return agent
 }
 
 export async function loginUser(agent: request.Agent, userKey: keyof typeof users) {
@@ -24,10 +44,24 @@ export async function loginUser(agent: request.Agent, userKey: keyof typeof user
 
 export async function shutdown() {
   try {
-    await restoreExchangeRates()
-    await restoreFixtures?.()
+    await fixtureTracker?.cleanup()
   } finally {
-    restoreFixtures = undefined
-    await shutdownApp()
+    try {
+      await restoreExchangeRates()
+    } finally {
+      try {
+        await restoreFixtures?.()
+      } finally {
+        restoreFixtures = undefined
+        fixtureTracker = undefined
+        try {
+          await agentQueue?.obliterate({ force: true })
+        } finally {
+          await agentQueue?.close()
+          agentQueue = undefined
+          await shutdownApp()
+        }
+      }
+    }
   }
 }

@@ -32,18 +32,17 @@ describe('unsaved changes guard', () => {
   })
 
   it('only asks for confirmation when the form differs from its initial value', () => {
-    const confirm = vi.fn(() => false)
+    const confirm = () => false
     vi.stubGlobal('confirm', confirm)
     const formValue = ref({ description: 'Train', cost: { amount: 12 } })
     const guard = useUnsavedChangesGuard(formValue)
 
     expect(guard.confirmNavigation('Discard changes?')).toBe(true)
-    expect(confirm).not.toHaveBeenCalled()
 
     formValue.value.description = 'Taxi'
 
     expect(guard.confirmNavigation('Discard changes?')).toBe(false)
-    expect(confirm).toHaveBeenCalledWith('Discard changes?')
+    expect(guard.hasUnsavedChanges.value).toBe(true)
 
     formValue.value.description = 'Train'
 

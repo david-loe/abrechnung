@@ -6,11 +6,7 @@ await loginUser(agent, 'user')
 
 test('GET /healthInsurance', async (t) => {
   const res = await agent.get('/healthInsurance')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-  }
+  t.is(res.status, 200, JSON.stringify(res.body))
 })
 
 test.serial.after.always('Drop DB Connection', async () => {

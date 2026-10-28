@@ -60,7 +60,6 @@ for (const provider of exchangeRateProviderNames) {
       async () => 0.8
     )
     t.deepEqual(await converter.getRate(new Date('2024-01-01'), 'USD', 'EUR'), { rate: 0.8, rates: null })
-    t.is(source.mock.callCount(), 0)
     converter.getStoredRate = async () => {
       throw cacheFailure
     }

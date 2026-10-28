@@ -4,12 +4,21 @@ import { createListRequests, watchListRequests } from '@/components/elements/lis
 
 function fixture() {
   const pending: { signal: AbortSignal; resolve: (value: string) => void; reject: (error: unknown) => void }[] = []
-  const apply = vi.fn()
-  const setLoading = vi.fn()
-  const onError = vi.fn()
-  const request = vi.fn((signal: AbortSignal) => new Promise<string>((resolve, reject) => pending.push({ signal, resolve, reject })))
-  const requests = createListRequests({ request, apply, setLoading, onError })
-  return { requests, request, pending, apply, setLoading, onError }
+  const view = { data: '', loading: false, error: undefined as unknown }
+  const request = (signal: AbortSignal) => new Promise<string>((resolve, reject) => pending.push({ signal, resolve, reject }))
+  const requests = createListRequests({
+    request,
+    apply: (data) => {
+      view.data = data
+    },
+    setLoading: (loading) => {
+      view.loading = loading
+    },
+    onError: (error) => {
+      view.error = error
+    }
+  })
+  return { requests, pending, view }
 }
 
 beforeEach(() => vi.useFakeTimers())
@@ -27,12 +36,12 @@ describe('list requests', () => {
       await vi.advanceTimersByTimeAsync(200)
       filter.value = 'ab'
       await vi.advanceTimersByTimeAsync(249)
-      expect(f.request).not.toHaveBeenCalled()
+      expect(f.pending).toHaveLength(0)
       await vi.advanceTimersByTimeAsync(1)
-      expect(f.request).toHaveBeenCalledOnce()
+      expect(f.pending).toHaveLength(1)
       f.pending[0].resolve('ab')
       await vi.advanceTimersByTimeAsync(0)
-      expect(f.apply).toHaveBeenCalledExactlyOnceWith('ab')
+      expect(f.view.data).toBe('ab')
     } finally {
       stop()
       f.requests.dispose()
@@ -46,12 +55,12 @@ describe('list requests', () => {
     try {
       f.requests.schedule()
       options.value.page = 2
-      expect(f.request).toHaveBeenCalledOnce()
+      expect(f.pending).toHaveLength(1)
       options.value.sortBy = 'updatedAt'
-      expect(f.request).toHaveBeenCalledTimes(2)
+      expect(f.pending).toHaveLength(2)
       expect(f.pending[0].signal.aborted).toBe(true)
       await vi.advanceTimersByTimeAsync(250)
-      expect(f.request).toHaveBeenCalledTimes(2)
+      expect(f.pending).toHaveLength(2)
     } finally {
       stop()
       f.requests.dispose()
@@ -65,13 +74,13 @@ describe('list requests', () => {
     expect(f.pending[0].signal.aborted).toBe(true)
     f.pending[0].resolve('old')
     await first
-    expect(f.apply).not.toHaveBeenCalled()
-    expect(f.setLoading).not.toHaveBeenCalledWith(false)
+    expect(f.view.data).toBe('')
+    expect(f.view.loading).toBe(true)
     await vi.advanceTimersByTimeAsync(250)
     f.pending[1].resolve('new')
     await vi.advanceTimersByTimeAsync(0)
-    expect(f.apply).toHaveBeenCalledExactlyOnceWith('new')
-    expect(f.setLoading).toHaveBeenLastCalledWith(false)
+    expect(f.view.data).toBe('new')
+    expect(f.view.loading).toBe(false)
   })
 
   it('keeps the newest result when older requests finish later', async () => {
@@ -82,8 +91,8 @@ describe('list requests', () => {
     await second
     f.pending[0].resolve('old')
     await first
-    expect(f.apply).toHaveBeenCalledExactlyOnceWith('new')
-    expect(f.setLoading.mock.calls.filter(([loading]) => !loading)).toHaveLength(1)
+    expect(f.view.data).toBe('new')
+    expect(f.view.loading).toBe(false)
   })
 
   it('reports only current errors and releases the loading state', async () => {
@@ -92,12 +101,12 @@ describe('list requests', () => {
     const second = f.requests.load()
     f.pending[0].reject(new Error('old'))
     await first
-    expect(f.onError).not.toHaveBeenCalled()
+    expect(f.view.error).toBeUndefined()
     const error = new Error('current')
     f.pending[1].reject(error)
     await second
-    expect(f.onError).toHaveBeenCalledExactlyOnceWith(error)
-    expect(f.setLoading).toHaveBeenLastCalledWith(false)
+    expect(f.view.error).toBe(error)
+    expect(f.view.loading).toBe(false)
   })
 
   it('does not update an unmounted list or start its pending requests', async () => {
@@ -110,8 +119,8 @@ describe('list requests', () => {
     await vi.advanceTimersByTimeAsync(1000)
     await f.requests.load()
     f.requests.schedule()
-    expect(f.request).toHaveBeenCalledOnce()
+    expect(f.pending).toHaveLength(1)
     expect(f.pending[0].signal.aborted).toBe(true)
-    expect(f.apply).not.toHaveBeenCalled()
+    expect(f.view.data).toBe('')
   })
 })
