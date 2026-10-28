@@ -24,10 +24,12 @@ for port in 18765 18766; do
   done
   curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null
 done
+cp frontend/tests/browser/userManagement.mjs "$RUNNER_TEMP/frontend-migration/userManagement.mjs"
 cat > "$RUNNER_TEMP/frontend-migration/test.mjs" <<'EOF'
 import assert from 'node:assert/strict'
 import { createServer, request } from 'node:http'
 import { chromium, firefox } from 'playwright'
+import { testUserManagement } from './userManagement.mjs'
 
 const origin = 'http://127.0.0.1:18767'
 let upgraded = false
@@ -112,15 +114,16 @@ try {
       await page.waitForFunction((entry) =>
         [...document.scripts].some((script) => script.src === location.origin + entry), currentEntry)
       console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend`)
+      await testUserManagement(browser, origin)
     } catch (error) {
-      console.error(`${browserType.name()}: automatic service worker update failed`, error)
+      console.error(`${browserType.name()}: production frontend test failed`, error)
       failures.push(error)
     } finally {
       resumePageScripts?.()
       await browser.close()
     }
   }
-  if (failures.length) throw new AggregateError(failures, 'Automatic service worker update failed')
+  if (failures.length) throw new AggregateError(failures, 'Production frontend tests failed')
 } finally {
   server.close()
   server.closeAllConnections()
