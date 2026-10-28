@@ -34,6 +34,7 @@ Development dependencies remain in bind-mounted `node_modules`. Container starts
 ## Quality Gate (Repo-Standard)
 
 Run checks only for impacted areas by default. Expand scope when changes are cross-cutting.
+Write behavior-driven tests through public interfaces and observable results. For UI regressions, exercise user interactions in the existing Playwright production browser checks; do not parse source code, inspect component internals, or evaluate extracted code.
 
 ### Code Quality
 
