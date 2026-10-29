@@ -2,11 +2,12 @@ import { Controller as TsoaController } from '@tsoa/runtime'
 import { _id, GETResponse, IdDocument, idDocumentToId, Meta, User } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { DeleteResult } from 'mongodb'
-import { HydratedDocument, Model, mongo, ProjectionType, QueryFilter, SortOrder, Types } from 'mongoose'
+import { HydratedDocument, Model, mongo, QueryFilter, SortOrder, Types } from 'mongoose'
 import Advance from '../models/advance.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
 import { ConflictError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
+import { parseGetterFilter } from './getterFilter.js'
 
 export interface PaginationQuery {
   /**
@@ -39,7 +40,7 @@ export interface GetterQuery<ModelType> extends PaginationQuery {
 export interface GetterOptions<ModelType> {
   query: GetterQuery<ModelType>
   filter?: QueryFilter<ModelType>
-  projection?: ProjectionType<ModelType>
+  projection?: Record<string, 0 | 1 | boolean>
   sort?: string | { [key: string]: SortOrder } | [string, SortOrder][] | undefined | null
   cb?: (data: ModelType | ModelType[]) => unknown
   allowedAdditionalFields?: (keyof ModelType)[]
@@ -208,6 +209,10 @@ export class Controller extends TsoaController {
         }
       }
     }
+    const clientFilter = options.query.filterJSON
+      ? (parseGetterFilter(options.query.filterJSON, options.projection, model.schema) as QueryFilter<ModelType>)
+      : {}
+
     // find by ID
     if (options.query._id) {
       const conditions = Object.assign({ _id: options.query._id }, options.filter)
@@ -223,10 +228,7 @@ export class Controller extends TsoaController {
 
     // find all
     // conditions
-    let conditions: QueryFilter<ModelType> = {}
-    if (options.query.filterJSON) {
-      conditions = JSON.parse(Base64.decode(options.query.filterJSON))
-    }
+    const conditions: QueryFilter<ModelType> = clientFilter
     if (Object.keys(options.filter).length > 0) {
       if (!('$and' in conditions) || !Array.isArray(conditions.$and)) {
         conditions.$and = []
