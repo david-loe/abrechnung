@@ -5,7 +5,7 @@
 - Keep code explicit, predictable, and easy to maintain.
 - No fallback or legacy layers; use only current, clean, idiomatic solutions.
 - Make focused changes; avoid unrelated refactors.
-- Preserve existing architecture and conventions unless the task requires architectural changes.
+- Preserve existing architecture and conventions unless explicitly asked for or approved.
 - Performance matters: prefer solutions that keep runtime fast for end users.
 - Preserve meaningful regression coverage when replacing tests; see [TESTING.md](TESTING.md)
 - Prefer Docker Compose from the repo root
@@ -13,5 +13,4 @@
 - Do not add explicit function return annotations; prefer static imports.
 - Keep admin-only code out of the main frontend bundle through lazy loading.
 - Branch from main; use Conventional Commits and do not rewrite reviewed history.
-- PRs explain changes, benefits, drawbacks, risks and actual validation results.
 - Never commit secrets, change tracked environment defaults or perform destructive operations without task authorization.
