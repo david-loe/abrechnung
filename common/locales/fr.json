@@ -45,6 +45,7 @@
     "fileXToLargeMaxIsY": "Le fichier '{X}' est trop volumineux. La taille maximale est de {Y}.",
     "fillOut": "Veuillez fournir les informations suivantes afin que nous puissions mieux attribuer vos comptes.",
     "futureNotAllowed": "La date ne peut pas être dans le futur",
+    "invalidAdvanceOwner": "Les avances sélectionnées doivent être disponibles et appartenir au propriétaire du rapport.",
     "invalidVatAmountOverride": "Le montant de TVA ajusté doit être précis au centime, respecter le signe et la limite du montant brut et nécessite un taux de TVA actif.",
     "isReadOnly": "Le système est en lecture seule !",
     "linkCopied": "Lien copié",
