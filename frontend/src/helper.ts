@@ -13,6 +13,7 @@ import { refNumberToString, refStringToNumber } from 'abrechnung-common/utils/sc
 import { AxiosRequestConfig } from 'axios'
 import { Ref } from 'vue'
 import API from './api'
+import { cookieWriteConfig } from './csrf.js'
 import ENV from './env.js'
 
 /**
@@ -38,12 +39,9 @@ export async function subscribeToPush() {
   if (!subscription) {
     return
   }
-  await fetch(`${ENV.VITE_BACKEND_URL}/user/subscription`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(subscription),
-    credentials: 'include'
-  })
+  const url = `${ENV.VITE_BACKEND_URL}/user/subscription`
+  const config = await cookieWriteConfig(url, { headers: { 'Content-Type': 'application/json' } })
+  await fetch(url, { method: 'POST', headers: config.headers.toJSON(true), body: JSON.stringify(subscription), credentials: 'include' })
 }
 /**
  * Converts a base64 string into a Uint8Array for cryptographic or encoding purposes.

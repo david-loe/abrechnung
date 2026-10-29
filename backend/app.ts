@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express'
 import auth from './auth.js'
 import { RateLimitExceededError, ReadOnlyError } from './controller/error.js'
 import { errorHandler } from './controller/errorHandler.js'
+import { trustedOrigins } from './csrf.js'
 import { prepareDatabase } from './databaseSetup.js'
 import { BACKEND_CACHE, disconnectDB, sessionStore } from './db.js'
 import { RegisterRoutes } from './dist/routes.js'
@@ -35,7 +36,7 @@ export async function createApp() {
 
   app.use(express.json({ limit: '2mb' }))
   app.use(express.urlencoded({ limit: '2mb', extended: true }))
-  app.use(cors({ credentials: true, origin: [ENV.VITE_FRONTEND_URL, ENV.VITE_BACKEND_URL] }))
+  app.use(cors({ credentials: true, origin: trustedOrigins }))
 
   if (ENV.RATE_LIMIT_WINDOW_MS || ENV.RATE_LIMIT) {
     app.use(

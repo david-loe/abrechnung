@@ -24,7 +24,7 @@ export default async function createAgent() {
     agentQueue = new Queue<IntegrationJobData>(`test-agent-${randomUUID()}`, { connection: { url: ENV.REDIS_URL } })
     setIntegrationQueueForTests(agentQueue)
   }
-  const agent = request.agent(await createApp())
+  const agent = request.agent(await createApp()).set('Origin', new URL(ENV.VITE_FRONTEND_URL).origin)
   const post = agent.post.bind(agent)
   agent.post = (path: string) => {
     const mutation = post(path)
@@ -40,6 +40,12 @@ export async function loginUser(agent: request.Agent, userKey: keyof typeof user
   const logout = await agent.delete('/auth/logout')
   if (logout.status !== 204 && logout.status !== 401) throw new Error(`Logout failed: ${logout.status}`)
   await agent.post('/auth/ldapauth').send({ username: users[userKey].username, password: users[userKey].password }).expect(204)
+  await refreshCsrfToken(agent)
+}
+
+export async function refreshCsrfToken(agent: request.Agent) {
+  const response = await agent.get('/auth/csrf').expect(200)
+  agent.set('X-CSRF-Token', response.body.csrfToken)
 }
 
 export async function shutdown() {

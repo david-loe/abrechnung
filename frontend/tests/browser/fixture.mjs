@@ -48,9 +48,16 @@ export async function browserFixture(browser) {
     const url = new URL(request.url())
     const path = url.pathname.replace('/api/', '')
     state.requests.push({ path, method: request.method(), query: url.search })
+    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()) && !['auth/ldapauth', 'auth/magiclogin'].includes(path)) {
+      assert.equal(request.headers()['x-csrf-token'], 'a'.repeat(43), 'Cookie writes include the session CSRF token')
+    }
     const handler = state.handlers[`${request.method()} ${path}`]
     if (handler) {
       await handler(route)
+      return
+    }
+    if (path === 'auth/csrf') {
+      await route.fulfill({ json: { csrfToken: 'a'.repeat(43) }, headers: { 'Cache-Control': 'no-store' } })
       return
     }
     if (path === 'documentFile' && request.method() === 'DELETE') {

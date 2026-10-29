@@ -23,6 +23,7 @@ import { getLdapauthStrategy } from '../authStrategies/ldapauth.js'
 import magiclogin from '../authStrategies/magiclogin.js'
 import { getMicrosoftStrategy } from '../authStrategies/microsoft.js'
 import { getOidcStrategy } from '../authStrategies/oidc.js'
+import { createCsrfToken, requireTrustedOrigin } from '../csrf.js'
 import { BACKEND_CACHE } from '../db.js'
 import ENV from '../env.js'
 import User from '../models/user.js'
@@ -135,7 +136,7 @@ export class AuthController extends Controller {
    * @summary Login using LDAP
    */
   @Post('ldapauth')
-  @Middlewares(ldapauthHandler)
+  @Middlewares(requireTrustedOrigin, ldapauthHandler)
   @Response(501, disabledMessage)
   public ldapauth(@Body() _requestBody: { username: string; password: string }) {}
 
@@ -163,7 +164,7 @@ export class AuthController extends Controller {
    * @summary Send login email
    */
   @Post('magiclogin')
-  @Middlewares(magicloginHandler)
+  @Middlewares(requireTrustedOrigin, magicloginHandler)
   @SuccessResponse(200)
   @Response(501, disabledMessage)
   public magiclogin(@Body() _requestBody: { destination: string; redirect?: string }) {}
@@ -216,6 +217,19 @@ export class AuthController extends Controller {
   @Middlewares(logoutMiddleware)
   public logout() {}
 
+  /**
+   * Returns the session-bound token required in X-CSRF-Token on cookie-authenticated writes.
+   * These writes also require a trusted Origin. Login POSTs require only a trusted Origin.
+   * @summary Return the CSRF token for the current cookie session
+   */
+  @Get('csrf')
+  @Security('cookieAuth')
+  @Response(401, 'Unauthorized')
+  public csrf(@Request() req: AuthenticatedExpressRequest) {
+    this.setHeader('Cache-Control', 'no-store')
+    return { csrfToken: createCsrfToken(req) }
+  }
+
   /** @summary Return the current authentication and offline-cache context */
   @Get('authenticated')
   @Security('cookieAuth')
@@ -226,7 +240,7 @@ export class AuthController extends Controller {
     const userId = String(req.user._id)
     const sessionExpiresAt = req.session.cookie.expires ?? new Date(Date.now() + ENV.COOKIE_MAX_AGE_DAYS * 86_400_000)
     const accessExpiresAt = req.user.loseAccessAt ? new Date(req.user.loseAccessAt) : sessionExpiresAt
-    const expiresAt = accessExpiresAt < sessionExpiresAt ? accessExpiresAt : sessionExpiresAt
+    const expiresAt = new Date(Math.min(accessExpiresAt.getTime(), sessionExpiresAt.getTime()))
     // Hydrating legacy access objects can generate a new subdocument ID on every request.
     const permissions: AuthContext['permissions'] = {}
     for (const access of accesses) {

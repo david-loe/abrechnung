@@ -6,7 +6,7 @@ import request from 'supertest'
 import { createApp } from '../../app.js'
 import { objectToFormFields } from '../../helper.js'
 import UserModel from '../../models/user.js'
-import createAgent, { loginUser, shutdown } from '../_agent.js'
+import createAgent, { loginUser, refreshCsrfToken, shutdown } from '../_agent.js'
 
 import { step } from '../_scenario.js'
 
@@ -22,6 +22,7 @@ test.serial('given an authenticated user, activity, personal settings and sessio
   await step(t, 'POST /auth/ldapauth', async (t) => {
     const res = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
     t.is(res.status, 204, JSON.stringify(res.body))
+    await refreshCsrfToken(agent)
   })
 
   await step(t, 'GET /user', async (t) => {
@@ -45,6 +46,7 @@ test.serial('given an authenticated user, activity, personal settings and sessio
     t.is((await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'wrong' })).status, 401)
     t.deepEqual((await UserModel.findById(current._id))?.lastActiveAt, recent)
     t.is((await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })).status, 204)
+    await refreshCsrfToken(agent)
     const loggedIn = await UserModel.findById(current._id).orFail()
     assert(loggedIn.lastActiveAt)
     t.true(new Date(loggedIn.lastActiveAt).valueOf() > recent.valueOf())
@@ -62,6 +64,7 @@ test.serial('given an authenticated user, activity, personal settings and sessio
       if (activity === 'login') {
         t.is((await activityAgent.delete('/auth/logout')).status, 204)
         t.is((await activityAgent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })).status, 204)
+        await refreshCsrfToken(activityAgent)
       } else {
         t.is((await activityAgent.get('/user')).status, 200)
       }
@@ -218,6 +221,7 @@ test.serial('given an authenticated user, activity, personal settings and sessio
     t.is((await agent.get('/auth/authenticated')).status, 401)
 
     const loginResponse = await agent.post('/auth/ldapauth').send({ username: 'professor', password: 'professor' })
+    await refreshCsrfToken(agent)
     t.is(loginResponse.status, 204)
     const newContext = (await agent.get('/auth/authenticated')).body as AuthContext
     t.not(newContext.cacheScope, initialCacheScope)

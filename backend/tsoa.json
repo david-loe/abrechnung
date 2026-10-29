@@ -13,7 +13,8 @@
       "cookieAuth": {
         "type": "apiKey",
         "name": "abrechnung",
-        "in": "cookie"
+        "in": "cookie",
+        "description": "Cookie-authenticated writes require an exact trusted Origin and X-CSRF-Token from GET /auth/csrf."
       }
     }
   },
