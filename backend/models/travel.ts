@@ -151,7 +151,7 @@ schema.pre('deleteOne', { document: true, query: false }, async function () {
   collectReceipts(this.expenses)
   await Promise.all([
     model('Travel').deleteMany({ _id: { $in: this.history } }),
-    model('DocumentFile').deleteMany({ _id: { $in: receiptIds } })
+    model('DocumentFile').deleteMany({ _id: { $in: receiptIds }, owner: this.owner._id })
   ])
 })
 

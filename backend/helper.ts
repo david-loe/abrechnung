@@ -3,6 +3,7 @@ import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
 import { Types } from 'mongoose'
 import multer from 'multer'
+import { NotAllowedError } from './controller/error.js'
 import ENV from './env.js'
 import DocumentFile from './models/documentFile.js'
 
@@ -32,8 +33,19 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
         break
       }
     }
-    if (pathExists && ((Array.isArray(tmpCheckObj) && req.files && opts.multiple) || (!opts.multiple && req.file))) {
+    if (pathExists && ((Array.isArray(tmpCheckObj) && opts.multiple) || !opts.multiple)) {
       const reqDocuments: ReqDocument[] | ReqDocument = tmpCheckObj
+      const documents = Array.isArray(reqDocuments) ? reqDocuments : [reqDocuments]
+      const existingIds = [...new Set(documents.filter((document) => document._id).map((document) => document._id.toString()))]
+      // Authorize every reference before persisting any new uploads.
+      if (
+        existingIds.length > 0 &&
+        (existingIds.some((id) => !Types.ObjectId.isValid(id)) ||
+          (await DocumentFile.countDocuments({ _id: { $in: existingIds }, ...(opts.checkOwner ? { owner: fileOwner } : {}) })) !==
+            existingIds.length)
+      ) {
+        throw new NotAllowedError()
+      }
       function multerFileName(i: number) {
         let str = pathToFiles.length > 0 ? pathToFiles[0] : ''
         for (let j = 1; j < pathToFiles.length; j++) {
@@ -46,7 +58,7 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
         if (!reqDoc._id) {
           let buffer = null
           if (opts.multiple) {
-            for (const file of req.files as Express.Multer.File[]) {
+            for (const file of (req.files as Express.Multer.File[] | undefined) ?? []) {
               if (file.fieldname === multerFileName(i)) {
                 buffer = file.buffer
                 break
@@ -63,11 +75,6 @@ export function documentFileHandler(pathToFiles: string[], options: FileHandleOp
             reqDoc.data = undefined
             Object.assign(reqDoc, dbDoc)
           } else {
-            return undefined
-          }
-        } else {
-          const documentFile = await DocumentFile.findOne({ _id: reqDoc._id }, { owner: 1 }).lean()
-          if (!documentFile || (opts.checkOwner && !documentFile.owner.equals(fileOwner))) {
             return undefined
           }
         }

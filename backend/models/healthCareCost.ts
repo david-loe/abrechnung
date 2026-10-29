@@ -77,7 +77,7 @@ schema.pre('deleteOne', { document: true, query: false }, async function () {
   }
   await Promise.all([
     model('HealthCareCost').deleteMany({ _id: { $in: this.history } }),
-    model('DocumentFile').deleteMany({ _id: { $in: receiptIds } })
+    model('DocumentFile').deleteMany({ _id: { $in: receiptIds }, owner: this.owner._id })
   ])
 })
 
