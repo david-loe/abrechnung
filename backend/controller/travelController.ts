@@ -427,6 +427,9 @@ export class TravelApproveController extends Controller {
   @Post('bulk')
   public async postManyApproved(@Body() requestBody: TravelBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
     const resolvedReferences = await resolveImportReferences(requestBody)
+    if (resolvedReferences.some(({ project }) => !checkIfUserIsProjectSupervisor(request.user, project))) {
+      throw new NotAllowedError('Not allowed to approve a travel for this project')
+    }
     const countries = await Country.find(
       { _id: { $in: requestBody.map(({ destinationPlace }) => destinationPlace?.country) } },
       { _id: 1, needsA1Certificate: 1 }
@@ -504,6 +507,10 @@ export class TravelApproveController extends Controller {
     @Body() requestBody: ((TravelApplication & { owner: IdDocument }) | { _id: string }) & { comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    const project = 'project' in requestBody ? requestBody.project : undefined
+    if (project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(project))) {
+      throw new NotAllowedError('Not allowed to approve a travel for this project')
+    }
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       const travelApplication = extendedBody as TravelApplication & { owner: IdDocument }
@@ -591,6 +598,9 @@ export class TravelExamineController extends Controller {
 
   @Post()
   public async postAny(@Body() requestBody: SetterBody<TravelPost>, @Request() request: AuthenticatedExpressRequest) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to modify a travel for this project')
+    }
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(Travel, {

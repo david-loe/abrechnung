@@ -23,7 +23,7 @@ import ReportUsage from '../models/reportUsage.js'
 import Travel from '../models/travel.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotAllowedError, NotFoundError } from './error.js'
 import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AdvanceBulkImportPost, AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
@@ -194,6 +194,9 @@ export class AdvanceApproveController extends Controller {
   @Post('bulk')
   public async postManyApproved(@Body() requestBody: AdvanceBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
     const resolvedReferences = await resolveImportReferences(requestBody, false)
+    if (resolvedReferences.some(({ project }) => !checkIfUserIsProjectSupervisor(request.user, project))) {
+      throw new NotAllowedError('Not allowed to approve an advance for this project')
+    }
     const currencies = await Currency.find({ _id: { $in: requestBody.map(({ budget }) => budget?.currency) } }, { _id: 1 }).lean()
     validateImportValues(
       requestBody.map(({ budget }) => budget?.currency),
@@ -262,6 +265,10 @@ export class AdvanceApproveController extends Controller {
       | { _id: string; comment?: string; bookingRemark?: string | null; exchangeRateDate?: Date | string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    const project = 'project' in requestBody ? requestBody.project : undefined
+    if (project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(project))) {
+      throw new NotAllowedError('Not allowed to approve an advance for this project')
+    }
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       if (!(extendedBody as AdvanceApplication).name) {
