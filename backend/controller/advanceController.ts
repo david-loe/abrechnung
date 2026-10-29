@@ -194,6 +194,9 @@ export class AdvanceApproveController extends Controller {
   @Post('bulk')
   public async postManyApproved(@Body() requestBody: AdvanceBulkImportPost[], @Request() request: AuthenticatedExpressRequest) {
     const resolvedReferences = await resolveImportReferences(requestBody, false)
+    if (resolvedReferences.some(({ project }) => !checkIfUserIsProjectSupervisor(request.user, project))) {
+      throw new NotAllowedError('Not allowed to approve an advance for this project')
+    }
     const currencies = await Currency.find({ _id: { $in: requestBody.map(({ budget }) => budget?.currency) } }, { _id: 1 }).lean()
     validateImportValues(
       requestBody.map(({ budget }) => budget?.currency),
