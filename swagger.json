@@ -15788,7 +15788,8 @@
 			"cookieAuth": {
 				"type": "apiKey",
 				"name": "abrechnung",
-				"in": "cookie"
+				"in": "cookie",
+				"description": "Cookie-authenticated writes require an exact trusted Origin and X-CSRF-Token from GET /auth/csrf."
 			}
 		}
 	},
@@ -27930,6 +27931,45 @@
 				},
 				"description": "Logout and delete session",
 				"summary": "Logout",
+				"tags": [
+					"Auth"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/auth/csrf": {
+			"get": {
+				"operationId": "Csrf",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"csrfToken": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"csrfToken"
+									],
+									"type": "object"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized"
+					}
+				},
+				"description": "Returns the session-bound token required in X-CSRF-Token on cookie-authenticated writes.\nThese writes also require a trusted Origin. Login POSTs require only a trusted Origin.",
+				"summary": "Return the CSRF token for the current cookie session",
 				"tags": [
 					"Auth"
 				],
