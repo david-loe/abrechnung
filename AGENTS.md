@@ -7,7 +7,7 @@
 - Make focused changes; avoid unrelated refactors.
 - Preserve existing architecture and conventions unless the task requires architectural changes.
 - Performance matters: prefer solutions that keep runtime fast for end users.
-- Preserve meaningful regression coverage when replacing tests; see [TESTING.md](TESTING.md) and [TEST-AUDIT.md](TEST-AUDIT.md).
+- Preserve meaningful regression coverage when replacing tests; see [TESTING.md](TESTING.md)
 - Prefer Docker Compose from the repo root
 - Follow Biome and strict TypeScript
 - Do not add explicit function return annotations; prefer static imports.
