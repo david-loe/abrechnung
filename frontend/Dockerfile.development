@@ -1,4 +1,4 @@
-FROM node:26.12.1-alpine
+FROM node:26.13.0-alpine
 
 LABEL org.opencontainers.image.source=https://github.com/david-loe/abrechnung
 LABEL org.opencontainers.image.description="abrechnung🧾 frontend DEVELOPMENT"

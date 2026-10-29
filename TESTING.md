@@ -35,7 +35,7 @@ Use the seed/path from the failure, after building common. Normal runs choose fr
 
 ## Running checks
 
-Use Node 26 (>=26.12.1) and npm. Run package checks sequentially. Development dependencies live in bind-mounted `node_modules`: rebuild the affected development image after manifest changes. Starts synchronize dependencies only when the image changes or `node_modules/.dependency-id` is missing; remove that marker to repair a manually changed installation. Frontend validation requires Compose's repository mounts.
+Use Node >=26 and npm. Run package checks sequentially. Development dependencies live in bind-mounted `node_modules`: rebuild the affected development image after manifest changes. Starts synchronize dependencies only when the image changes or `node_modules/.dependency-id` is missing; remove that marker to repair a manually changed installation. Frontend validation requires Compose's repository mounts.
 
 ```bash
 docker compose build common backend frontend ldap inbucket
@@ -56,7 +56,7 @@ docker compose run --rm --no-deps --pull never backend npm run test:built -- \
 Run Biome with the backend-pinned version, matching `biome.json`, the CI check and the pre-commit hook:
 
 ```bash
-docker run --rm -v "$PWD:/code" --workdir /code ghcr.io/biomejs/biome:2.6.3 \
+docker run --rm -v "$PWD:/code" --workdir /code ghcr.io/biomejs/biome:$BIOME_VERSION \
   ci --changed --error-on-warnings --no-errors-on-unmatched .
 python3 dev-tools/tests/dependency-sync.py
 ```

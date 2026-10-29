@@ -110,7 +110,7 @@ export async function browserFixture(browser) {
       'admin/ledgerAccount': [],
       specialLumpSums: {},
       'user/actionCounts': {},
-      settings: { version: '3.0.3', isReadOnly: false, disableReportType: {} },
+      settings: { version: '3.1.0', isReadOnly: false, disableReportType: {} },
       travelSettings: { fallbackLumpSumCountry: 'DE' },
       printerSettings: {},
       displaySettings: {
