@@ -22,7 +22,7 @@ import Currency from '../models/currency.js'
 import ExpenseReport, { ExpenseReportDoc } from '../models/expenseReport.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
-import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
+import { assertAdvanceOwnership, Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AuthenticatedExpressRequest, ExpenseBulkImportPost, ExpenseReportBulkImportPost } from './types.js'
@@ -40,10 +40,11 @@ type ExpenseReportDetailsBody = {
   exchangeRateDate?: Date | string | null
 }
 
-function assertExpenseReportCanEnterReview(
-  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+async function assertExpenseReportCanEnterReview(
+  report: Pick<IExpenseReport, 'owner' | 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
   language: string
 ) {
+  await assertAdvanceOwnership(report.owner, report.advances)
   const reviewSummary = expenseReportReviewValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
@@ -53,10 +54,11 @@ function assertExpenseReportCanEnterReview(
   }
 }
 
-function assertExpenseReportCanCompleteReview(
-  report: Pick<IExpenseReport, 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
+async function assertExpenseReportCanCompleteReview(
+  report: Pick<IExpenseReport, 'owner' | 'expenses' | 'advances' | 'currency' | 'exchangeRate' | 'exchangeRateDate'>,
   language: string
 ) {
+  await assertAdvanceOwnership(report.owner, report.advances)
   const reviewSummary = expenseReportCompletionValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
@@ -203,6 +205,7 @@ export class ExpenseReportController extends Controller {
         throw new AuthorizationError()
       }
       Object.assign(extendedBody, { owner: request.user._id })
+      await assertAdvanceOwnership(request.user._id, requestBody.advances)
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -214,9 +217,11 @@ export class ExpenseReportController extends Controller {
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === ExpenseReportState.IN_WORK && request.user.access['inWork:expenseReport']) {
+            await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             return true
           }
           if (oldObject.state === ExpenseReportState.IN_REVIEW && oldObject.editor._id.equals(request.user._id)) {
+            await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             await oldObject.saveToHistory()
             return true
           }
@@ -240,7 +245,7 @@ export class ExpenseReportController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
-          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
+          await assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -424,10 +429,17 @@ export class ExpenseReportExamineController extends Controller {
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       allowNew: false,
-      checkOldObject: async (oldObject: ExpenseReportDoc) =>
-        !oldObject.historic &&
-        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
-        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+      checkOldObject: async (oldObject: ExpenseReportDoc) => {
+        if (
+          !oldObject.historic &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
+          await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
+          return true
+        }
+        return false
+      }
     })
   }
 
@@ -444,6 +456,9 @@ export class ExpenseReportExamineController extends Controller {
         extendedBody.name = `${i18n.t('labels.expenses', { lng: request.user.settings.language })} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
+    if (!extendedBody._id) {
+      await assertAdvanceOwnership(requestBody.owner, requestBody.advances)
+    }
     return await this.setter(ExpenseReport, {
       requestBody: extendedBody,
       cb: async (e: IExpenseReport<Types.ObjectId>) =>
@@ -451,6 +466,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          await assertAdvanceOwnership(requestBody.owner ?? oldObject.owner, requestBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
         }
@@ -474,7 +490,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertExpenseReportCanCompleteReview(oldObject, request.user.settings.language)
+          await assertExpenseReportCanCompleteReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -496,7 +512,7 @@ export class ExpenseReportExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
         if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
+          await assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

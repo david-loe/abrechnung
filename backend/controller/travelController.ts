@@ -26,12 +26,13 @@ import Country from '../models/country.js'
 import Travel, { TravelDoc } from '../models/travel.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
-import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
+import { assertAdvanceOwnership, Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, ConflictError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AuthenticatedExpressRequest, TravelApplication, TravelBulkImportPost, TravelPost } from './types.js'
 
 async function assertTravelCanEnterReview(report: ITravel<Types.ObjectId, mongo.Binary>, language: string) {
+  await assertAdvanceOwnership(report.owner, report.advances)
   const owner = await User.findOne({ _id: report.owner._id }, { vehicleRegistration: 1 }).lean()
   const reviewSummary = createOperationServices().travelCalculator.validator.getValidationSummary(report, {
     vehicleRegistration: owner?.vehicleRegistration
@@ -282,6 +283,7 @@ export class TravelController extends Controller {
         throw new AuthorizationError()
       }
       Object.assign(extendedBody, { owner: request.user._id })
+      await assertAdvanceOwnership(request.user._id, requestBody.advances)
       if (!extendedBody.name && extendedBody.startDate) {
         const date = new Date(extendedBody.startDate)
         extendedBody.name = `${extendedBody.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -290,11 +292,18 @@ export class TravelController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.submitted', report: t }),
-      checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic &&
-        oldObject.state <= TravelState.APPROVED &&
-        request.user._id.equals(oldObject.owner._id) &&
-        request.user.access['appliedFor:travel'],
+      checkOldObject: async (oldObject: TravelDoc) => {
+        if (
+          !oldObject.historic &&
+          oldObject.state <= TravelState.APPROVED &&
+          request.user._id.equals(oldObject.owner._id) &&
+          request.user.access['appliedFor:travel']
+        ) {
+          await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
+          return true
+        }
+        return false
+      },
       allowNew: true
     })
   }
@@ -319,6 +328,9 @@ export class TravelController extends Controller {
           await emitIntegrationEvent({ type: 'travel.directly_approved', report: t })
         }
       }
+      if (!extendedBody._id) {
+        await assertAdvanceOwnership(request.user._id, extendedBody.advances)
+      }
       Object.assign(extendedBody, { state: TravelState.APPROVED, editor: request.user._id, owner: request.user._id })
     }
     return await this.setter(Travel, {
@@ -331,6 +343,7 @@ export class TravelController extends Controller {
           (oldObject.state === TravelState.APPROVED || oldObject.state === TravelState.IN_REVIEW) &&
           oldObject.editor._id.equals(request.user._id)
         ) {
+          await assertAdvanceOwnership(oldObject.owner, extendedBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
         }
@@ -493,7 +506,8 @@ export class TravelApproveController extends Controller {
   ) {
     const extendedBody = Object.assign(requestBody, { state: TravelState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
-      const travelApplication = extendedBody as TravelApplication
+      const travelApplication = extendedBody as TravelApplication & { owner: IdDocument }
+      await assertAdvanceOwnership(travelApplication.owner, travelApplication.advances)
       if (!travelApplication.name && travelApplication.startDate) {
         const date = new Date(travelApplication.startDate as string)
         travelApplication.name = `${travelApplication.destinationPlace?.place} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -506,6 +520,8 @@ export class TravelApproveController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
         if (oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          const changes = requestBody as TravelApplication & { owner?: IdDocument }
+          await assertAdvanceOwnership(changes.owner ?? oldObject.owner, changes.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
         }
@@ -580,10 +596,17 @@ export class TravelExamineController extends Controller {
     return await this.setter(Travel, {
       requestBody: extendedBody,
       allowNew: false,
-      checkOldObject: async (oldObject: TravelDoc) =>
-        !oldObject.historic &&
-        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
-        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+      checkOldObject: async (oldObject: TravelDoc) => {
+        if (
+          !oldObject.historic &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
+          await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
+          return true
+        }
+        return false
+      }
     })
   }
 

@@ -45,6 +45,7 @@
     "fileXToLargeMaxIsY": "El archivo \"{X}\" es demasiado grande. El tamaño máximo es {\"{Y}\"}.",
     "fillOut": "Por favor, proporciona los siguientes datos para que podamos asignar mejor tus liquidaciones.",
     "futureNotAllowed": "La fecha no puede estar en el futuro",
+    "invalidAdvanceOwner": "Los anticipos seleccionados deben estar disponibles y pertenecer al titular del informe.",
     "invalidVatAmountOverride": "El importe de IVA ajustado debe ser exacto al céntimo, respetar el signo y el límite del importe bruto y requiere un tipo de IVA activo.",
     "isReadOnly": "¡El sistema está en modo de solo lectura!",
     "linkCopied": "Enlace copiado",

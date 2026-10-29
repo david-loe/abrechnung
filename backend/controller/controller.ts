@@ -1,11 +1,12 @@
 import { Controller as TsoaController } from '@tsoa/runtime'
-import { _id, GETResponse, IdDocument, Meta, User } from 'abrechnung-common/types.js'
+import { _id, GETResponse, IdDocument, idDocumentToId, Meta, User } from 'abrechnung-common/types.js'
 import { Base64 } from 'abrechnung-common/utils/encoding.js'
 import { DeleteResult } from 'mongodb'
 import { HydratedDocument, Model, mongo, ProjectionType, QueryFilter, SortOrder, Types } from 'mongoose'
+import Advance from '../models/advance.js'
 import Country from '../models/country.js'
 import Currency from '../models/currency.js'
-import { ConflictError, NotAllowedError, NotFoundError } from './error.js'
+import { ConflictError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 
 export interface PaginationQuery {
   /**
@@ -412,4 +413,26 @@ export class Controller extends TsoaController {
 }
 export function checkOwner(requestUser: User<Types.ObjectId>) {
   return async (oldObject: { owner: { _id: Types.ObjectId | string } }) => requestUser._id.equals(oldObject.owner._id)
+}
+
+export async function assertAdvanceOwnership(
+  owner: IdDocument | null | undefined,
+  advances: (Types.ObjectId | string | { _id?: Types.ObjectId | string | null })[] | null | undefined
+) {
+  const advanceIds = [
+    ...new Set(
+      (advances ?? []).map((advance) =>
+        typeof advance === 'string' || advance instanceof Types.ObjectId ? advance.toString() : advance._id?.toString()
+      )
+    )
+  ]
+  if (advanceIds.length === 0) return
+  if (
+    !owner ||
+    advanceIds.some((id) => !id || !Types.ObjectId.isValid(id)) ||
+    (await Advance.countDocuments({ historic: false }).where('_id').in(advanceIds).where('owner').equals(idDocumentToId(owner))) !==
+      advanceIds.length
+  ) {
+    throw new ValidationClientError('invalidAdvanceOwner', [{ path: 'advances', message: 'invalidAdvanceOwner' }])
+  }
 }
