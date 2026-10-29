@@ -595,7 +595,14 @@ export function csvToObjects(
   const lines = csvToArray(csv, separator, escapeChar)
   const result = []
   if (lines.length > 1) {
-    const headers = lines[0]
+    const headers = lines[0].map((value) => {
+      const header = value.trim()
+      const pathParts = header.split(pathSeparator)
+      if (pathParts.some((part) => part === '__proto__' || part === 'constructor' || part === 'prototype')) {
+        throw new Error(`Invalid CSV header: ${header}`)
+      }
+      return { header, pathParts }
+    })
     for (let i = 1; i < lines.length; i++) {
       const currentline = lines[i]
       if (currentline.every((entry) => entry.trim() === '')) {
@@ -604,16 +611,15 @@ export function csvToObjects(
 
       const obj: Record<string, ValueType> = {}
       for (let j = 0; j < headers.length; j++) {
-        const header = headers[j]?.trim()
+        const { header, pathParts } = headers[j]
         if (!header) {
           continue
         }
         let object = obj
         const valStr = currentline[j] !== '' ? currentline[j] : undefined
         let val: ValueType = valStr
-        const pathParts = header.split(pathSeparator)
         for (let k = 0; k < pathParts.length - 1; k++) {
-          if (!isObject(object[pathParts[k]])) {
+          if (!Object.hasOwn(object, pathParts[k]) || !isObject(object[pathParts[k]])) {
             object[pathParts[k]] = {}
           }
           object = object[pathParts[k]] as Record<string, ValueType>
@@ -621,14 +627,15 @@ export function csvToObjects(
         const key = pathParts[pathParts.length - 1]
         // search for [] to identify arrays
         const match = currentline[j]?.match(/^\[(.*)\]$/) || null
+        const transform = Object.hasOwn(transformer, header) ? transformer[header] : undefined
         if (match === null) {
-          if (transformer[header]) {
-            val = transformer[header](valStr)
+          if (transform) {
+            val = transform(valStr)
           }
         } else {
           const split = match[1].split(arraySeparator)
-          if (transformer[header]) {
-            val = split.map(transformer[header])
+          if (transform) {
+            val = split.map(transform)
           }
         }
         object[key] = val
