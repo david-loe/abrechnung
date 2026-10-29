@@ -598,6 +598,9 @@ export class TravelExamineController extends Controller {
 
   @Post()
   public async postAny(@Body() requestBody: SetterBody<TravelPost>, @Request() request: AuthenticatedExpressRequest) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to modify a travel for this project')
+    }
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(Travel, {

@@ -87,6 +87,21 @@ for (const reference of ['id', 'object'] as const) {
     t.deepEqual([await readProject(supervisedProject._id), await readProject(otherProject._id)], projectsBefore)
   })
 
+  test.serial(`travel examination: restricted examiner cannot move a travel to another project (${reference})`, async (t) => {
+    await setSupervisedProjects([supervisedProject._id])
+    const created = await agent.post('/approve/travel/approved').send(travelBody(supervisedProject._id)).expect(200)
+    const id = created.body.result._id as string
+    const before = await readTravel(id)
+    const projectsBefore = [await readProject(supervisedProject._id), await readProject(otherProject._id)]
+    const response = await agent
+      .post('/examine/travel')
+      .send({ _id: id, project: reference === 'id' ? otherProject._id : { _id: otherProject._id } })
+    t.is(response.status, 403)
+    t.is(response.body.name, 'alerts.notAllowed')
+    t.deepEqual(await readTravel(id), before)
+    t.deepEqual([await readProject(supervisedProject._id), await readProject(otherProject._id)], projectsBefore)
+  })
+
   for (const restricted of [true, false]) {
     test.serial(
       `travel creation: ${restricted ? 'project-restricted' : 'unrestricted'} approver can use an authorized project (${reference})`,

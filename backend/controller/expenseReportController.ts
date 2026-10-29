@@ -320,6 +320,9 @@ export class ExpenseReportExamineController extends Controller {
       true
     )
     const resolvedReferences = await resolveImportReferences(normalizedRows)
+    if (resolvedReferences.some(({ project }) => !checkIfUserIsProjectSupervisor(request.user, project))) {
+      throw new NotAllowedError('Not allowed to create an expense report for this project')
+    }
     const documents = normalizedRows.map((row, index) => {
       let name = row.name
       if (!name) {
@@ -424,6 +427,9 @@ export class ExpenseReportExamineController extends Controller {
 
   @Post()
   public async postAny(@Body() requestBody: ExpenseReportDetailsBody & { _id: string }, @Request() request: AuthenticatedExpressRequest) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to modify an expense report for this project')
+    }
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(ExpenseReport, {
@@ -449,6 +455,9 @@ export class ExpenseReportExamineController extends Controller {
     requestBody: ExpenseReportDetailsBody & { owner?: IdDocument<Types.ObjectId>; comment?: string },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to save an expense report for this project')
+    }
     const extendedBody = Object.assign(requestBody, { state: ExpenseReportState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
       if (!extendedBody.name) {

@@ -24,7 +24,7 @@ import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { assertAdvanceOwnership, Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
-import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
+import { AuthorizationError, NotAllowedError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
 const healthCareCostValidator = new Validator({ requireReceipts: true })
@@ -302,6 +302,9 @@ export class HealthCareCostExamineController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to modify health care costs for this project')
+    }
     const extendedBody = Object.assign(requestBody, { editor: request.user._id })
 
     return await this.setter(HealthCareCost, {
@@ -336,6 +339,9 @@ export class HealthCareCostExamineController extends Controller {
     },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    if (requestBody.project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(requestBody.project))) {
+      throw new NotAllowedError('Not allowed to save health care costs for this project')
+    }
     const extendedBody = Object.assign(requestBody, { state: HealthCareCostState.IN_WORK, editor: request.user._id })
     if (!extendedBody._id) {
       if (!extendedBody.name) {
