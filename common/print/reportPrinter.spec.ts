@@ -1,10 +1,8 @@
-import { mock } from 'node:test'
 import test from 'ava'
-import { PDFDocument, PDFPage } from 'pdf-lib'
 import displaySettings from '../data/displaySettings.js'
 import { Advance, AdvanceState, baseCurrency, Category, ExpenseReport, ExpenseReportState } from '../types.js'
 import Formatter from '../utils/formatter.js'
-import { PDFDrawer } from './printer.js'
+import { readPdf } from './_pdf.js'
 import printerSettings from './printerSettings.js'
 import { ReportPrinter } from './reportPrinter.js'
 
@@ -51,10 +49,10 @@ test('ReportPrinter renders configured report type icons and ignores unknown ico
     bookingRemark: false,
     additionalOwnerDetails: false
   })
-  const pdf = await PDFDocument.load(bytes)
+  const pages = await readPdf(bytes)
 
-  t.is(pdf.getPageCount(), 1)
-  t.true(bytes.length > 0)
+  t.is(pages.length, 1)
+  t.true(pages[0].content.includes('Test advance'))
 })
 
 test('ReportPrinter renders a foreign-currency advance with an offset', async (t) => {
@@ -96,10 +94,12 @@ test('ReportPrinter renders a foreign-currency advance with an offset', async (t
     bookingRemark: false,
     additionalOwnerDetails: false
   })
-  const pdf = await PDFDocument.load(bytes)
+  const pages = await readPdf(bytes)
 
-  t.is(pdf.getPageCount(), 1)
-  t.true(bytes.length > 0)
+  t.is(pages.length, 1)
+  t.true(pages[0].content.includes('Foreign expense report'))
+  t.regex(pages[0].content, /100[,.]00/)
+  t.regex(pages[0].content, /60[,.]00/)
 })
 
 function expenseReportFixture(fontName: 'Inter' | 'NotoSans' = printerSettings.fontName) {
@@ -142,81 +142,54 @@ function expenseReportFixture(fontName: 'Inter' | 'NotoSans' = printerSettings.f
   return { category, report, printer }
 }
 
-test.serial('expense report category badge is printed independently of project and metadata options', async (t) => {
-  const badge = mock.method(PDFDrawer.prototype, 'drawBadge')
-  t.teardown(() => badge.mock.restore())
+test('given hidden metadata, the saved report still contains its category and omits an absent category', async (t) => {
   const { category, report, printer } = expenseReportFixture()
   const options = { project: false, metaInformation: false, reviewDates: false }
-  const bytes = await printer.print(report, 'de', options)
-  t.is((await PDFDocument.load(bytes)).getPageCount(), 1)
-  t.is(badge.mock.callCount(), 1)
-  t.is(badge.mock.calls[0].arguments[0], category.name)
-  t.deepEqual(badge.mock.calls[0].arguments[1], category.style)
-  await printer.print({ ...report, category: null }, 'de', options)
-  t.is(badge.mock.callCount(), 1)
+  const [withCategory] = await readPdf(await printer.print(report, 'de', options))
+  const [withoutCategory] = await readPdf(await printer.print({ ...report, category: null }, 'de', options))
+  t.true(withCategory.content.includes(category.name))
+  t.false(withoutCategory.content.includes(category.name))
+  t.false(withCategory.content.includes('PROJECT'))
 })
 
-test.serial('expense report project and category share their first text upper edge without overlapping', async (t) => {
-  const text = mock.method(PDFDrawer.prototype, 'drawText')
-  const renderedText = mock.method(PDFPage.prototype, 'drawText')
-  const badge = mock.method(PDFDrawer.prototype, 'drawBadge')
-  t.teardown(() => {
-    text.mock.restore()
-    renderedText.mock.restore()
-    badge.mock.restore()
-  })
-  for (const fontName of ['Inter', 'NotoSans'] as const) {
-    const { category, report, printer } = expenseReportFixture(fontName)
-    for (const longProject of [false, true]) {
-      for (const longCategory of [false, true]) {
-        text.mock.resetCalls()
-        renderedText.mock.resetCalls()
-        badge.mock.resetCalls()
+for (const fontName of ['Inter', 'NotoSans'] as const) {
+  for (const longProject of [false, true]) {
+    for (const longCategory of [false, true]) {
+      test(`${fontName}: project and category remain aligned and do not overlap (long project: ${longProject}, long category: ${longCategory})`, async (t) => {
+        const { category, report, printer } = expenseReportFixture(fontName)
         const project = {
           ...report.project,
           identifier: longProject ? 'P'.repeat(200) : 'PROJECT',
           name: longProject ? 'Project name '.repeat(15) : 'Office'
         }
-        const bytes = await printer.print(
-          { ...report, project, category: { ...category, name: longCategory ? 'Office supplies '.repeat(30) : category.name } },
-          'de',
-          { reviewDates: false }
+        const name = longCategory ? 'Office supplies '.repeat(30) : category.name
+        const pages = await readPdf(
+          await printer.print({ ...report, project, category: { ...category, name } }, 'de', { reviewDates: false })
         )
-        t.is((await PDFDocument.load(bytes)).getPageCount(), 1)
-        const labelIndex = text.mock.calls.findIndex(({ arguments: [value] }) => value === 'labels.category: ')
-        const label = text.mock.calls[labelIndex].arguments[1]
-        const projectLines = text.mock.calls
-          .slice(0, labelIndex)
-          .filter(
-            ({ arguments: [, options] }) =>
-              options.xStart === printerSettings.pagePadding && options.fontSize === printerSettings.fontSizes.M
-          )
-        t.true(projectLines.length > 0)
-        t.is(projectLines[0].arguments[1].yStart, label.yStart)
+        t.is(pages.length, 1)
+        const page = pages[0]
+        const label = page.text.find(({ str }) => str.startsWith('labels.category:'))
+        const badge = page.text.filter(({ str }) => str.includes('Office supplies'))
+        const projectLines = page.text.filter(
+          ({ str }) =>
+            str.startsWith('labels.project:') ||
+            str.includes('PROJECT') ||
+            /^P{2,}/.test(str) ||
+            str.includes('Project name') ||
+            str.includes('Office)')
+        )
+        const owner = page.text.find(({ str }) => str.startsWith('labels.expensePayer:'))
+        if (!label || !owner || !badge.length || !projectLines.length) throw new Error('Missing project, category or owner in PDF')
+        t.true(Math.abs(badge[0].transform[5] - label.transform[5]) < 0.01)
+        t.true(Math.abs(projectLines[0].transform[5] - label.transform[5]) < 0.01)
         if (longProject) t.true(projectLines.length > 1)
-        const badgeCall = badge.mock.calls[0]
-        if (typeof badgeCall.result !== 'number') throw new Error('Badge did not return its lower edge')
-        const drawer = badgeCall.this as PDFDrawer<string>
-        const badgeOptions = badgeCall.arguments[2]
-        t.is(label.yStart, badgeOptions.yStart)
-        const renderedBadge = renderedText.mock.calls.find(({ arguments: [value] }) => value.startsWith('Office supplies'))
-        t.truthy(renderedBadge)
-        if (renderedBadge) {
-          const renderedLabel = renderedText.mock.calls.find(({ arguments: [value] }) => value === 'labels.category: ')
-          t.is(renderedBadge.arguments[1]?.y, renderedLabel?.arguments[1]?.y)
+        if (longCategory) t.true(badge.length > 1)
+        for (const item of projectLines) t.true(item.transform[4] + item.width < label.transform[4])
+        for (const item of [...badge, ...projectLines]) {
+          t.true(item.transform[5] > owner.transform[5])
+          t.true(item.transform[4] + item.width <= page.width - printerSettings.pagePadding + 0.1)
         }
-        for (const {
-          arguments: [value, options]
-        } of projectLines) {
-          t.true(options.xStart + drawer.font.widthOfTextAtSize(value, options.fontSize) < label.xStart)
-        }
-        const owner = text.mock.calls.find(({ arguments: [value] }) => value.startsWith('labels.expensePayer:'))
-        t.truthy(owner)
-        if (owner) {
-          t.true(owner.arguments[1].yStart < badgeCall.result)
-          t.true(owner.arguments[1].yStart < projectLines[projectLines.length - 1].arguments[1].yStart)
-        }
-      }
+      })
     }
   }
-})
+}

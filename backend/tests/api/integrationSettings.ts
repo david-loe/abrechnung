@@ -1,6 +1,5 @@
 import test from 'ava'
 import { IntegrationSettingsPayload } from '../../integrations/settings.js'
-import IntegrationSettingsModel from '../../models/integrationSettings.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 
 const agent = await createAgent()
@@ -29,7 +28,7 @@ test.serial('POST /admin/integrationSettings/lumpSums persists updated schedule 
   t.is(postRes.status, 200)
   t.deepEqual(postRes.body.result, settings)
 
-  const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'lumpSums' }, { __v: 0 }).lean()
+  const stored = (await agent.get('/admin/integrationSettings/lumpSums').expect(200)).body.data
   t.deepEqual(stored?.schedules, { sync: { enabled: true, schedule: { type: 'everyXHour', value: 6 } } })
   t.deepEqual(stored?.settings, {})
 })
@@ -60,7 +59,7 @@ test.serial('POST /admin/integrationSettings/retentionPolicy persists schedule a
   t.is(postRes.status, 200)
   t.deepEqual(postRes.body.result, settings)
 
-  const stored = await IntegrationSettingsModel.findOne({ integrationKey: 'retentionPolicy' }, { __v: 0 }).lean()
+  const stored = (await agent.get('/admin/integrationSettings/retentionPolicy').expect(200)).body.data
   t.deepEqual(stored?.schedules, { apply: { enabled: false, schedule: { type: 'weekly', weekdays: [2, 4], hour: 5, minute: 30 } } })
   t.deepEqual(stored?.settings, settings.settings)
 })

@@ -124,7 +124,14 @@ const travels = [
           endLocation: { place: 'Paris', country: FR, special: 'Paris' },
           midnightCountries: null,
           transport: { type: 'ownCar' as const, distance: 850, distanceRefundType: 'car' as const },
-          cost: { currency: EUR, amount: 255.0, date: '2025-03-10', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TA-S1-position', kind: 'ownCar' as const, grossAmount: 255.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-03-10',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const,
           note: 'Anreise mit eigenem PKW'
         },
@@ -136,7 +143,14 @@ const travels = [
           endLocation: { place: 'Paris', country: FR, special: 'Paris' },
           midnightCountries: null,
           transport: { type: 'otherTransport' as const },
-          cost: { currency: EUR, amount: 45.0, date: '2025-03-11', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TA-S2-position', kind: 'manual' as const, grossAmount: 45.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-03-11',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const,
           note: 'Lokale Fahrten (Metro/Taxi)'
         },
@@ -148,7 +162,14 @@ const travels = [
           endLocation: { place: 'München', country: DE },
           midnightCountries: null,
           transport: { type: 'ownCar' as const, distance: 850, distanceRefundType: 'halfCar' as const },
-          cost: { currency: EUR, amount: 127.5, date: '2025-03-13', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TA-S3-position', kind: 'ownCar' as const, grossAmount: 127.5, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-03-13',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const,
           note: 'Rückreise mit halbem PKW-Satz'
         }
@@ -158,14 +179,27 @@ const travels = [
           _id: 'TA-E1',
           description: 'Maut und Parken',
           purpose: 'professional' as const,
-          cost: { currency: EUR, amount: 35.0, date: '2025-03-10', receipts: [receipt1] },
-          project: projectSimple2
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TA-E1-position', kind: 'manual' as const, grossAmount: 35.0, vatRate: 0, project: projectSimple2, category }
+            ],
+            date: '2025-03-10',
+            receipts: [receipt1]
+          }
         },
         {
           _id: 'TA-E2',
           description: 'Abendessen privat',
           purpose: 'mixed' as const,
-          cost: { currency: EUR, amount: 60.0, date: '2025-03-12', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TA-E2-position', kind: 'manual' as const, grossAmount: 60.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-03-12',
+            receipts: [receipt1]
+          },
           note: 'Gemischte Veranlassung'
         }
       ],
@@ -228,7 +262,14 @@ const travels = [
           endLocation: { place: 'BER Flughafen', country: DE },
           midnightCountries: null,
           transport: { type: 'ownCar' as const, distance: 25, distanceRefundType: 'motorcycle' as const },
-          cost: { currency: EUR, amount: 5.0, date: '2025-02-01', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TB-S0-position', kind: 'ownCar' as const, grossAmount: 5.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-02-01',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const
         },
         {
@@ -239,7 +280,14 @@ const travels = [
           endLocation: { place: 'Ankunft International', country: DE },
           midnightCountries: null,
           transport: { type: 'airplane' as const },
-          cost: { currency: EUR, amount: 1200.0, date: '2025-02-01', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TB-S1-position', kind: 'manual' as const, grossAmount: 1200.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-02-01',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const,
           note: 'Flug >24h, zweite Mitternacht auf Flug-Pauschalland AT'
         },
@@ -251,7 +299,14 @@ const travels = [
           endLocation: { place: 'Berlin', country: DE },
           midnightCountries: null,
           transport: { type: 'otherTransport' as const },
-          cost: { currency: EUR, amount: 40.0, date: '2025-02-03', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TB-S2-position', kind: 'manual' as const, grossAmount: 40.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-02-03',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const
         }
       ],
@@ -260,7 +315,14 @@ const travels = [
           _id: 'TB-E1',
           description: 'Aufgabegepäck',
           purpose: 'professional' as const,
-          cost: { currency: EUR, amount: 30.0, date: '2025-02-01', receipts: [receipt1] }
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TB-E1-position', kind: 'manual' as const, grossAmount: 30.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-02-01',
+            receipts: [receipt1]
+          }
         }
       ],
       days: [
@@ -314,7 +376,14 @@ const travels = [
           endLocation: { place: 'Hbf Hamburg', country: DE },
           midnightCountries: null,
           transport: { type: 'ownCar' as const, distance: 10, distanceRefundType: 'halfCar' as const },
-          cost: { currency: EUR, amount: 1.5, date: '2025-05-10', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TC-S0-position', kind: 'ownCar' as const, grossAmount: 1.5, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-05-10',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const
         },
         {
@@ -328,7 +397,14 @@ const travels = [
             { date: '2025-05-12', country: FR }
           ],
           transport: { type: 'otherTransport' as const },
-          cost: { currency: EUR, amount: 180.0, date: '2025-05-10', receipts: [receipt1] },
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TC-S1-position', kind: 'manual' as const, grossAmount: 180.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-05-10',
+            receipts: [receipt1]
+          },
           purpose: 'professional' as const,
           note: 'Bahnfahrt >1 Mitternacht, Reihenfolge der Mitternachtsländer maßgeblich'
         }
@@ -338,7 +414,14 @@ const travels = [
           _id: 'TC-E1',
           description: 'Sitzplatzreservierung',
           purpose: 'professional' as const,
-          cost: { currency: EUR, amount: 12.0, date: '2025-05-10', receipts: [receipt1] }
+          cost: {
+            currency: EUR,
+            positions: [
+              { _id: 'TC-E1-position', kind: 'manual' as const, grossAmount: 12.0, vatRate: 0, project: projectSimple1, category }
+            ],
+            date: '2025-05-10',
+            receipts: [receipt1]
+          }
         }
       ],
       days: [
@@ -376,33 +459,11 @@ const getCountryById = async (id: CountryCode) => countries[id]
 
 const calculator = new TravelCalculator(getCountryById, { ...travelSettings, _id: 'settings' })
 
-function migrateLegacyCostsForTest(travel: (typeof travels)[number]['travel']) {
-  const records = [...travel.stages, ...travel.expenses]
-  for (const record of records) {
-    const legacyRecord = record as unknown as {
-      cost: { amount?: number; positions?: unknown[] }
-      project?: typeof projectSimple1
-      transport?: { type: string }
-    }
-    legacyRecord.cost.positions = [
-      {
-        _id: `${record._id}-position`,
-        kind: legacyRecord.transport?.type === 'ownCar' ? 'ownCar' : 'manual',
-        grossAmount: legacyRecord.cost.amount ?? 0,
-        vatRate: 0,
-        project: legacyRecord.project ?? travel.project,
-        category
-      }
-    ]
-    delete legacyRecord.cost.amount
-    delete legacyRecord.project
-  }
-  return travel as unknown as Parameters<typeof calculator.calc>[0]
-}
-
 for (const { travel, expectedResult } of travels) {
-  test(`Travel ${travel._id} calculation`, async (t) => {
-    const { result } = await calculator.calc(migrateLegacyCostsForTest(travel))
+  test(`given travel ${travel._id}, expenses and allowances match the specified totals`, async (t) => {
+    const { result, conflicts } = await calculator.calc(structuredClone(travel))
+    t.deepEqual(conflicts, [])
+    t.truthy(result)
     if (result) {
       const addUpResult = addUp<string, AddUpTravel>(result as unknown as AddUpTravel)
       let resLumpSum = 0

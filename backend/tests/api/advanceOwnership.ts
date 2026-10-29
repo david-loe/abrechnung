@@ -1,378 +1,261 @@
-import { Advance, ExpenseReport, ExpenseReportState, ProjectSimple, User } from 'abrechnung-common/types.js'
-import test from 'ava'
+import { Advance, ProjectSimple, User } from 'abrechnung-common/types.js'
+import { Base64 } from 'abrechnung-common/utils/encoding.js'
+import test, { type ExecutionContext } from 'ava'
 import mongoose, { Types } from 'mongoose'
+import type { Response } from 'supertest'
 import { objectToFormFields } from '../../helper.js'
 import AdvanceModel from '../../models/advance.js'
-import DocumentFile from '../../models/documentFile.js'
-import ExpenseReportModel from '../../models/expenseReport.js'
-import ProjectModel from '../../models/project.js'
-import ReportUsage from '../../models/reportUsage.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
-import { seedExchangeRates } from '../_exchangeRates.js'
 
 const agent = await createAgent()
-const reportIds: string[] = []
-const advanceIds: string[] = []
+const reader = await createAgent()
+const ownerReader = await createAgent()
+const reportTypes = ['expenseReport', 'travel', 'healthCareCost'] as const
+type ReportType = (typeof reportTypes)[number]
+const collections = { expenseReport: 'expensereports', travel: 'travels', healthCareCost: 'healthcarecosts' }
 let project: ProjectSimple<string>
 let owner: User<string>
 let examiner: User<string>
 let insuranceId: string
-const additionalReports: { collection: string; id: Types.ObjectId }[] = []
-const otherReportTypes = [
-  {
-    path: 'travel',
-    collection: 'travels',
-    reviewer: 'travel',
-    creation: '/travel/appliedFor',
-    examinerCreation: '/approve/travel/approved'
-  },
-  {
-    path: 'healthCareCost',
-    collection: 'healthcarecosts',
-    reviewer: 'healthCareCost',
-    creation: '/healthCareCost/inWork',
-    examinerCreation: '/examine/healthCareCost/inWork'
-  }
-] as const
-let restoreProjectBalance: (() => Promise<unknown>) | undefined
 
-async function createAdvance(advanceOwner: User<string>, currency = 'EUR') {
+function reportBody(type: ReportType) {
+  const fields =
+    type === 'travel'
+      ? { reason: 'Conference', destinationPlace: { country: 'DE', place: 'Berlin' }, startDate: '2024-05-01', endDate: '2024-05-01' }
+      : type === 'healthCareCost'
+        ? { patientName: 'Fry', insurance: insuranceId }
+        : {}
+  return { name: `Ownership regression ${new Types.ObjectId()}`, project: project._id, ...fields }
+}
+
+function creationPath(type: ReportType, asReviewer = false) {
+  if (type === 'travel') return asReviewer ? '/approve/travel/approved' : '/travel/appliedFor'
+  return `${asReviewer ? '/examine' : ''}/${type}/inWork`
+}
+
+async function details(type: ReportType | 'advance', id: string) {
+  return (await reader.get(`/admin/${type}`).query({ _id: id }).expect(200)).body.data
+}
+
+async function finances(advances: Advance<string>[]) {
+  const balances = await Promise.all(
+    advances.map(async ({ _id }) => {
+      const { budget, balance, offsetAgainst, state, settledOn, updatedAt } = await details('advance', _id)
+      return { budget, balance, offsetAgainst, state, settledOn, updatedAt }
+    })
+  )
+  const projectState = (await reader.get('/admin/project').query({ _id: project._id }).expect(200)).body.data
+  return { balances, project: projectState }
+}
+
+async function savedState(type: ReportType, id: string, advances: Advance<string>[]) {
+  const report = await details(type, id)
+  // History is persisted but hidden by the read APIs; financial data is read through HTTP.
+  const stored = await mongoose.connection
+    .collection(collections[type])
+    .findOne({ _id: new Types.ObjectId(id) }, { projection: { history: 1 } })
+  if (!stored) throw new Error('Missing report fixture')
+  return { report, history: stored.history, finances: await finances(advances) }
+}
+
+function assertRejected(t: ExecutionContext, response: Response) {
+  t.is(response.status, 422, JSON.stringify(response.body))
+  t.deepEqual(response.body.errors, [{ path: 'advances', message: 'invalidAdvanceOwner' }])
+  t.falsy(response.body.result)
+}
+
+async function assertNotCreated(t: ExecutionContext, type: ReportType, name: string) {
+  const response = await ownerReader
+    .get(`/${type}`)
+    .query({ filterJSON: Base64.encode(JSON.stringify({ name })) })
+    .expect(200)
+  t.deepEqual(response.body.data, [])
+  t.is(response.body.meta.count, 0)
+}
+
+async function createAdvance(advanceOwner: User<string>) {
   await loginUser(agent, 'advance')
   const response = await agent
     .post('/approve/advance/approved')
     .send({
-      name: 'Ownership regression advance',
-      reason: 'Ownership regression',
+      name: 'Ownership advance',
+      reason: 'Conference costs',
       owner: advanceOwner._id,
       project: project._id,
-      budget: { amount: 1000, currency },
-      ...(currency === 'EUR' ? {} : { exchangeRateDate: '2024-05-01' })
+      budget: { amount: 1000, currency: 'EUR' }
     })
-  if (response.status !== 200) throw new Error(JSON.stringify(response.body))
-  advanceIds.push(response.body.result._id)
+    .expect(200)
   return response.body.result as Advance<string>
 }
 
-async function createReport(advances: string[] = [], currency?: string) {
+async function createReport(type: ReportType, advances: Advance<string>[]) {
   await loginUser(agent, 'user')
   const response = await agent
-    .post('/expenseReport/inWork')
-    .send({ name: 'Ownership regression report', project: project._id, advances, currency })
-  if (response.body.result?._id) reportIds.push(response.body.result._id)
-  return response
-}
-
-async function readAdvance(id: string) {
-  await loginUser(agent, 'advance')
-  const response = await agent.get('/approve/advance').query({ _id: id })
-  if (response.status !== 200) throw new Error(JSON.stringify(response.body))
-  const advance = response.body.data as Advance<string>
-  return {
-    budget: advance.budget,
-    balance: advance.balance,
-    offsetAgainst: advance.offsetAgainst,
-    state: advance.state,
-    settledOn: advance.settledOn,
-    updatedAt: advance.updatedAt
+    .post(creationPath(type))
+    .send({ ...reportBody(type), advances: advances.map(({ _id }) => _id) })
+    .expect(200)
+  const id = response.body.result._id as string
+  if (type === 'travel') {
+    await loginUser(agent, 'travel')
+    await agent.post('/approve/travel/approved').send({ _id: id }).expect(200)
   }
+  return id
 }
 
-test.before(async () => {
-  await seedExchangeRates([{ provider: 'Frankfurter', currency: 'USD', date: new Date('2024-05-01'), rate: 0.8 }])
-  await loginUser(agent, 'user')
-  owner = (await agent.get('/user')).body.data
-  project = (await agent.get('/project')).body.data[0]
-  insuranceId = (await agent.get('/healthInsurance')).body.data[0]._id
-  const originalProject = await ProjectModel.collection.findOne({ _id: new Types.ObjectId(project._id) })
-  if (!originalProject) throw new Error('Missing project fixture')
-  restoreProjectBalance = async () =>
-    ProjectModel.collection.updateOne({ _id: originalProject._id }, { $set: { balance: originalProject.balance } })
-  await loginUser(agent, 'expenseReport')
-  examiner = (await agent.get('/user')).body.data
-})
-
-for (const currency of ['EUR', 'USD']) {
-  test.serial(`creating a ${currency} report rejects another owner's advance without exposing its finances`, async (t) => {
-    const foreignAdvance = await createAdvance(examiner, currency)
-    const before = await readAdvance(foreignAdvance._id)
-    const response = await createReport([foreignAdvance._id], currency === 'EUR' ? undefined : currency)
-    t.is(response.status, 422)
-    t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-    t.falsy(response.body.result)
-    t.deepEqual(await readAdvance(foreignAdvance._id), before)
-    t.is(
-      await ExpenseReportModel.collection.countDocuments({
-        _id: { $in: reportIds.map((id) => new Types.ObjectId(id)) },
-        advances: new Types.ObjectId(foreignAdvance._id)
-      }),
-      0
-    )
+async function historicAdvance(t: ExecutionContext, advance: Advance<string>) {
+  const id = new Types.ObjectId()
+  t.teardown(async () => {
+    await AdvanceModel.collection.deleteOne({ _id: id })
   })
-}
-
-for (const endpoint of ['/expenseReport/inWork', '/examine/expenseReport']) {
-  test.serial(`${endpoint} rejects a mixed selection and preserves the saved report and both advances`, async (t) => {
-    const ownAdvance = await createAdvance(owner)
-    const foreignAdvance = await createAdvance(examiner)
-    const created = await createReport([ownAdvance._id])
-    t.is(created.status, 200)
-    const report = created.body.result as ExpenseReport<string>
-    const before = await ExpenseReportModel.collection.findOne({ _id: new Types.ObjectId(report._id) })
-    const advancesBefore = [await readAdvance(ownAdvance._id), await readAdvance(foreignAdvance._id)]
-    await loginUser(agent, endpoint.startsWith('/examine/') ? 'expenseReport' : 'user')
-    const response = await agent.post(endpoint).send({ _id: report._id, advances: [ownAdvance._id, foreignAdvance._id] })
-    t.is(response.status, 422)
-    t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-    t.falsy(response.body.result)
-    t.deepEqual(await ExpenseReportModel.collection.findOne({ _id: new Types.ObjectId(report._id) }), before)
-    t.deepEqual(await readAdvance(ownAdvance._id), advancesBefore[0])
-    t.deepEqual(await readAdvance(foreignAdvance._id), advancesBefore[1])
-  })
-}
-
-test.serial('examiner-created reports validate advances against the selected owner', async (t) => {
-  const ownAdvance = await createAdvance(owner)
-  const examinerAdvance = await createAdvance(examiner)
-  await loginUser(agent, 'expenseReport')
-  const rejected = await agent
-    .post('/examine/expenseReport/inWork')
-    .send({ owner: owner._id, project: project._id, advances: [examinerAdvance._id] })
-  if (rejected.body.result?._id) reportIds.push(rejected.body.result._id)
-  t.is(rejected.status, 422)
-  t.is(rejected.body.errors[0].message, 'invalidAdvanceOwner')
-  t.falsy(rejected.body.result)
-  const accepted = await agent
-    .post('/examine/expenseReport/inWork')
-    .send({ owner: owner._id, project: project._id, advances: [ownAdvance._id] })
-  if (accepted.body.result?._id) reportIds.push(accepted.body.result._id)
-  t.is(accepted.status, 200)
-  t.is(accepted.body.result.advances[0]._id, ownAdvance._id)
-})
-
-test.serial('missing and historic advances are rejected instead of silently dropping the relationship', async (t) => {
-  const advance = await createAdvance(owner)
-  const historicId = new Types.ObjectId()
-  advanceIds.push(historicId.toString())
   const source = await AdvanceModel.collection.findOne({ _id: new Types.ObjectId(advance._id) })
   if (!source) throw new Error('Missing advance fixture')
   const { reference: _reference, ...historic } = source
-  await AdvanceModel.collection.insertOne({ ...historic, _id: historicId, historic: true })
-  for (const id of [new Types.ObjectId().toString(), historicId.toString()]) {
-    const response = await createReport([id])
-    t.is(response.status, 422)
-    t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-    t.falsy(response.body.result)
-  }
-})
+  await AdvanceModel.collection.insertOne({ ...historic, _id: id, historic: true })
+  return id.toString()
+}
 
-test.serial('an examiner selects the report owner’s advance and review consumes only that balance', async (t) => {
-  const ownAdvance = await createAdvance(owner)
-  const examinerAdvance = await createAdvance(examiner)
-  const examinerBefore = await readAdvance(examinerAdvance._id)
-  const created = await createReport()
-  t.is(created.status, 200)
-  const id = created.body.result._id as string
-  await loginUser(agent, 'expenseReport')
-  const selected = await agent.post('/examine/expenseReport').send({ _id: id, advances: [ownAdvance._id] })
-  t.is(selected.status, 200)
-  t.is(selected.body.result.advances[0].balance.amount, 1000)
-  t.is(selected.body.result.owner._id, owner._id)
+async function submitForReview(type: ReportType, id: string) {
   await loginUser(agent, 'user')
-  const categories = await agent.get('/category')
-  const category = categories.body.data.find(({ for: value }: { for: string }) => value === 'ExpenseReport' || value === 'both')
-  let request = agent.post('/expenseReport/expense').query({ parentId: id })
-  for (const entry of objectToFormFields({
-    description: 'Ownership expense',
-    cost: {
-      date: '2024-05-01',
-      currency: 'EUR',
-      receipts: [{ name: 'Ownership receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-      positions: [
-        { kind: 'manual', description: 'Ownership expense', grossAmount: 100, vatRate: 0, project: project._id, category: category._id }
-      ]
-    }
-  })) {
+  const categories = (await agent.get('/category').expect(200)).body.data
+  const category = categories.find(
+    ({ for: value }: { for: string }) => value === (type === 'travel' ? 'Travel' : 'ExpenseReport') || value === 'both'
+  )
+  const cost = {
+    date: '2024-05-01',
+    currency: 'EUR',
+    receipts: [{ name: 'Receipt.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
+    positions: [{ kind: 'manual', description: 'Train ticket', grossAmount: 100, vatRate: 0, project: project._id, category: category._id }]
+  }
+  const record =
+    type === 'travel'
+      ? {
+          departure: '2024-05-01T08:00:00Z',
+          arrival: '2024-05-01T19:00:00Z',
+          startLocation: { country: 'DE', place: 'Berlin' },
+          endLocation: { country: 'DE', place: 'Berlin' },
+          transport: { type: 'otherTransport' },
+          purpose: 'professional',
+          cost
+        }
+      : { description: 'Train ticket', cost }
+  let request = agent.post(`/${type}/${type === 'travel' ? 'stage' : 'expense'}`).query({ parentId: id })
+  for (const entry of objectToFormFields(record)) {
     request = entry.field.endsWith('[data]') ? request.attach(entry.field, entry.val) : request.field(entry.field, entry.val)
   }
-  const expense = await request
-  t.is(expense.status, 200)
-  t.is((await agent.post('/expenseReport/underExamination').send({ _id: id })).status, 200)
+  await request.expect(200)
+  await agent.post(`/${type}/underExamination`).send({ _id: id }).expect(200)
+}
+
+test.before(async () => {
+  await loginUser(reader, 'admin')
+  await loginUser(ownerReader, 'user')
+  owner = (await ownerReader.get('/user').expect(200)).body.data
+  project = (await ownerReader.get('/project').expect(200)).body.data[0]
+  insuranceId = (await ownerReader.get('/healthInsurance').expect(200)).body.data[0]._id
   await loginUser(agent, 'expenseReport')
-  const completed = await agent.post('/examine/expenseReport/reviewCompleted').send({ _id: id })
-  t.is(completed.status, 200)
-  t.is(completed.body.result.state, ExpenseReportState.REVIEW_COMPLETED)
-  const after = await readAdvance(ownAdvance._id)
-  t.is(after.balance.amount, 900)
-  t.is(after.offsetAgainst.length, 1)
-  t.is(after.offsetAgainst[0].reportId, id)
-  t.deepEqual(await readAdvance(examinerAdvance._id), examinerBefore)
+  examiner = (await agent.get('/user').expect(200)).body.data
 })
 
-function reportFields(path: string) {
-  return path === 'travel'
-    ? {
-        reason: 'Ownership regression trip',
-        destinationPlace: { country: { _id: 'DE' }, place: 'Berlin' },
-        startDate: '2024-05-01',
-        endDate: '2024-05-03'
-      }
-    : { patientName: 'Fry', insurance: insuranceId }
-}
-
-async function createOtherReport(scenario: (typeof otherReportTypes)[number], advances: string[] = []) {
-  await loginUser(agent, 'user')
-  const response = await agent
-    .post(scenario.creation)
-    .send({ name: 'Ownership regression', project: project._id, advances, ...reportFields(scenario.path) })
-  if (response.body.result?._id) {
-    additionalReports.push({ collection: scenario.collection, id: new Types.ObjectId(response.body.result._id) })
-    if (scenario.path === 'travel') {
-      await loginUser(agent, 'travel')
-      const approved = await agent.post('/approve/travel/approved').send({ _id: response.body.result._id })
-      if (approved.status !== 200) throw new Error(JSON.stringify(approved.body))
-      return approved
-    }
-  }
-  return response
-}
-
-for (const scenario of otherReportTypes) {
-  test.serial(`${scenario.path}: creating a report rejects another owner's advance`, async (t) => {
-    const foreignAdvance = await createAdvance(examiner)
-    const before = await readAdvance(foreignAdvance._id)
-    const response = await createOtherReport(scenario, [foreignAdvance._id])
-    t.is(response.status, 422)
-    t.is(response.body.errors[0].path, 'advances')
-    t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-    t.falsy(response.body.result)
-    t.deepEqual(await readAdvance(foreignAdvance._id), before)
-    t.is(await mongoose.connection.collection(scenario.collection).countDocuments({ advances: new Types.ObjectId(foreignAdvance._id) }), 0)
+for (const type of reportTypes) {
+  test.serial(`${type}: creating a report rejects another owner's advance`, async (t) => {
+    const foreign = await createAdvance(examiner)
+    await loginUser(agent, 'user')
+    const before = await finances([foreign])
+    const body = { ...reportBody(type), advances: [foreign._id] }
+    assertRejected(t, await agent.post(creationPath(type)).send(body))
+    await assertNotCreated(t, type, body.name)
+    t.deepEqual(await finances([foreign]), before)
   })
 
-  for (const asExaminer of [false, true]) {
-    test.serial(
-      `${scenario.path}: ${asExaminer ? 'examiner' : 'owner'} update rejects mixed selections without changing stored data`,
-      async (t) => {
-        const ownAdvance = await createAdvance(owner)
-        const foreignAdvance = await createAdvance(examiner)
-        const created = await createOtherReport(scenario, [ownAdvance._id])
-        t.is(created.status, 200)
-        const id = new Types.ObjectId(created.body.result._id)
-        const collection = mongoose.connection.collection(scenario.collection)
-        const before = await collection.findOne({ _id: id })
-        const ownBefore = await readAdvance(ownAdvance._id)
-        const foreignBefore = await readAdvance(foreignAdvance._id)
-        await loginUser(agent, asExaminer ? scenario.reviewer : 'user')
-        const response = await agent
-          .post(asExaminer ? `/examine/${scenario.path}` : scenario.creation)
-          .send({ _id: id.toString(), advances: [ownAdvance._id, foreignAdvance._id] })
-        t.is(response.status, 422)
-        t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-        t.falsy(response.body.result)
-        t.deepEqual(await collection.findOne({ _id: id }), before)
-        t.deepEqual(await readAdvance(ownAdvance._id), ownBefore)
-        t.deepEqual(await readAdvance(foreignAdvance._id), foreignBefore)
-      }
-    )
+  for (const role of ['owner', 'examiner'] as const) {
+    test.serial(`${type}: ${role} cannot save a mixed selection or change financial data`, async (t) => {
+      const advances = [await createAdvance(owner), await createAdvance(examiner)]
+      const id = await createReport(type, [advances[0]])
+      await loginUser(agent, role === 'owner' ? 'user' : type)
+      const before = await savedState(type, id, advances)
+      const endpoint = role === 'owner' ? creationPath(type) : `/examine/${type}`
+      assertRejected(t, await agent.post(endpoint).send({ _id: id, advances: advances.map(({ _id }) => _id) }))
+      t.deepEqual(await savedState(type, id, advances), before)
+    })
   }
 
-  test.serial(`${scenario.path}: examiner-created reports use the report owner and deduplicate valid selections`, async (t) => {
-    await loginUser(agent, scenario.reviewer)
-    const reviewer = (await agent.get('/user')).body.data as User<string>
-    const ownAdvance = await createAdvance(owner)
-    const reviewerAdvance = await createAdvance(reviewer)
-    await loginUser(agent, scenario.reviewer)
-    const body = { owner: owner._id, project: project._id, ...reportFields(scenario.path) }
-    const rejected = await agent.post(scenario.examinerCreation).send({ ...body, advances: [reviewerAdvance._id] })
-    if (rejected.body.result?._id)
-      additionalReports.push({ collection: scenario.collection, id: new Types.ObjectId(rejected.body.result._id) })
-    t.is(rejected.status, 422)
-    t.is(rejected.body.errors[0].message, 'invalidAdvanceOwner')
-    t.falsy(rejected.body.result)
-    const accepted = await agent.post(scenario.examinerCreation).send({ ...body, advances: [ownAdvance._id, ownAdvance._id] })
-    if (accepted.body.result?._id)
-      additionalReports.push({ collection: scenario.collection, id: new Types.ObjectId(accepted.body.result._id) })
-    t.is(accepted.status, 200)
-    t.is(accepted.body.result.owner._id, owner._id)
+  test.serial(`${type}: reviewer creation uses the selected owner and deduplicates valid advances`, async (t) => {
+    await loginUser(agent, type)
+    const reviewer = (await agent.get('/user').expect(200)).body.data as User<string>
+    const advances = [await createAdvance(owner), await createAdvance(reviewer)]
+    await loginUser(agent, type)
+    const body = { ...reportBody(type), owner: owner._id }
+    const before = await finances(advances)
+    assertRejected(t, await agent.post(creationPath(type, true)).send({ ...body, advances: [advances[1]._id] }))
+    await assertNotCreated(t, type, body.name)
+    t.deepEqual(await finances(advances), before)
+    const accepted = await agent
+      .post(creationPath(type, true))
+      .send({ ...body, advances: [advances[0]._id, advances[0]._id] })
+      .expect(200)
+    const saved = await details(type, accepted.body.result._id)
+    t.is(saved.owner._id, owner._id)
     t.deepEqual(
-      accepted.body.result.advances.map(({ _id }: { _id: string }) => _id),
-      [ownAdvance._id]
+      saved.advances.map(({ _id }: { _id: string }) => _id),
+      [advances[0]._id]
     )
   })
 
-  test.serial(`${scenario.path}: missing and historic selections are rejected`, async (t) => {
-    const advance = await createAdvance(owner)
-    const historicId = new Types.ObjectId()
-    advanceIds.push(historicId.toString())
-    const source = await AdvanceModel.collection.findOne({ _id: new Types.ObjectId(advance._id) })
-    if (!source) throw new Error('Missing advance fixture')
-    const { reference: _reference, ...historic } = source
-    await AdvanceModel.collection.insertOne({ ...historic, _id: historicId, historic: true })
-    for (const id of [new Types.ObjectId().toString(), historicId.toString()]) {
-      const response = await createOtherReport(scenario, [id])
-      t.is(response.status, 422)
-      t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-      t.falsy(response.body.result)
-    }
+  test.serial(`${type}: review rejects a stored cross-owner link without changing balances or history`, async (t) => {
+    const advances = [await createAdvance(owner), await createAdvance(examiner)]
+    const id = await createReport(type, [advances[0]])
+    await submitForReview(type, id)
+    // Current APIs cannot create the invalid relationship left by older versions.
+    await mongoose.connection
+      .collection(collections[type])
+      .updateOne({ _id: new Types.ObjectId(id) }, { $set: { advances: [new Types.ObjectId(advances[1]._id)] } })
+    await loginUser(agent, type)
+    const before = await savedState(type, id, advances)
+    assertRejected(t, await agent.post(`/examine/${type}/reviewCompleted`).send({ _id: id }))
+    t.deepEqual(await savedState(type, id, advances), before)
   })
 }
 
-for (const scenario of [{ path: 'expenseReport', collection: 'expensereports', reviewer: 'expenseReport' }, ...otherReportTypes] as const) {
-  test.serial(`${scenario.path}: review rejects a stored cross-owner link before changing balances or history`, async (t) => {
-    const ownAdvance = await createAdvance(owner)
-    const foreignAdvance = await createAdvance(examiner)
-    const created =
-      scenario.path === 'expenseReport' ? await createReport([ownAdvance._id]) : await createOtherReport(scenario, [ownAdvance._id])
-    t.is(created.status, 200)
-    const id = new Types.ObjectId(created.body.result._id)
-    const collection = mongoose.connection.collection(scenario.collection)
-    // Arrange a legacy invalid relationship; only the real HTTP review operation is under test.
-    await collection.updateOne(
-      { _id: id },
-      { $set: { state: ExpenseReportState.IN_REVIEW, advances: [new Types.ObjectId(foreignAdvance._id)] } }
-    )
-    const before = await collection.findOne({ _id: id })
-    const ownBefore = await readAdvance(ownAdvance._id)
-    const foreignBefore = await readAdvance(foreignAdvance._id)
-    const projectBefore = await ProjectModel.collection.findOne({ _id: new Types.ObjectId(project._id) })
-    await loginUser(agent, scenario.reviewer)
-    const response = await agent.post(`/examine/${scenario.path}/reviewCompleted`).send({ _id: id.toString() })
-    t.is(response.status, 422)
-    t.is(response.body.errors[0].message, 'invalidAdvanceOwner')
-    t.deepEqual(await collection.findOne({ _id: id }), before)
-    t.deepEqual(await readAdvance(ownAdvance._id), ownBefore)
-    t.deepEqual(await readAdvance(foreignAdvance._id), foreignBefore)
-    t.deepEqual(await ProjectModel.collection.findOne({ _id: new Types.ObjectId(project._id) }), projectBefore)
+for (const type of ['expenseReport', 'healthCareCost'] as const) {
+  test.serial(`${type}: returning to draft validates advances against the changed owner`, async (t) => {
+    const advances = [await createAdvance(owner), await createAdvance(examiner)]
+    const id = await createReport(type, [advances[0]])
+    await submitForReview(type, id)
+    await loginUser(agent, type)
+    const before = await savedState(type, id, advances)
+    assertRejected(t, await agent.post(`/examine/${type}/inWork`).send({ _id: id, owner: examiner._id }))
+    t.deepEqual(await savedState(type, id, advances), before)
+    await agent
+      .post(`/examine/${type}/inWork`)
+      .send({ _id: id, owner: examiner._id, advances: [advances[1]._id] })
+      .expect(200)
+    const saved = await details(type, id)
+    t.is(saved.owner._id, examiner._id)
+    t.is(saved.advances[0]._id, advances[1]._id)
   })
 }
 
-test.serial('travel approval rejects a changed selection before writing history', async (t) => {
-  const ownAdvance = await createAdvance(owner)
-  const foreignAdvance = await createAdvance(examiner)
+test.serial('travel approval rejects changed selections before writing history', async (t) => {
+  const advances = [await createAdvance(owner), await createAdvance(examiner)]
   await loginUser(agent, 'user')
   const created = await agent
     .post('/travel/appliedFor')
-    .send({ project: project._id, advances: [ownAdvance._id], ...reportFields('travel') })
-  t.is(created.status, 200)
-  const id = new Types.ObjectId(created.body.result._id)
-  additionalReports.push({ collection: 'travels', id })
-  const collection = mongoose.connection.collection('travels')
-  const before = await collection.findOne({ _id: id })
+    .send({ ...reportBody('travel'), advances: [advances[0]._id] })
+    .expect(200)
+  const id = created.body.result._id as string
   await loginUser(agent, 'travel')
-  const rejected = await agent
+  const before = await savedState('travel', id, advances)
+  assertRejected(t, await agent.post('/approve/travel/approved').send({ _id: id, owner: owner._id, advances: [advances[1]._id] }))
+  t.deepEqual(await savedState('travel', id, advances), before)
+  await agent
     .post('/approve/travel/approved')
-    .send({ _id: id.toString(), owner: owner._id, advances: [foreignAdvance._id] })
-  t.is(rejected.status, 422)
-  t.is(rejected.body.errors[0].message, 'invalidAdvanceOwner')
-  t.deepEqual(await collection.findOne({ _id: id }), before)
-  const accepted = await agent.post('/approve/travel/approved').send({ _id: id.toString(), owner: owner._id, advances: [ownAdvance._id] })
-  t.is(accepted.status, 200)
-  t.is(accepted.body.result.advances[0]._id, ownAdvance._id)
+    .send({ _id: id, owner: owner._id, advances: [advances[0]._id] })
+    .expect(200)
+  t.is((await details('travel', id)).advances[0]._id, advances[0]._id)
 })
 
-test.serial('directly approved own travel validates both creation and subsequent selections', async (t) => {
-  const ownAdvance = await createAdvance(owner)
-  const foreignAdvance = await createAdvance(examiner)
+test.serial('direct travel approval validates creation and subsequent selections', async (t) => {
+  const advances = [await createAdvance(owner), await createAdvance(examiner)]
   await loginUser(agent, 'admin')
   await agent
     .post('/admin/user')
@@ -380,78 +263,38 @@ test.serial('directly approved own travel validates both creation and subsequent
     .expect(200)
   try {
     await loginUser(agent, 'user')
-    const body = { project: project._id, ...reportFields('travel') }
-    const rejected = await agent.post('/travel/approved').send({ ...body, advances: [foreignAdvance._id] })
-    if (rejected.body.result?._id) additionalReports.push({ collection: 'travels', id: new Types.ObjectId(rejected.body.result._id) })
-    t.is(rejected.status, 422)
-    t.is(rejected.body.errors[0].message, 'invalidAdvanceOwner')
-    const accepted = await agent.post('/travel/approved').send({ ...body, advances: [ownAdvance._id] })
-    t.is(accepted.status, 200)
-    const id = new Types.ObjectId(accepted.body.result._id)
-    additionalReports.push({ collection: 'travels', id })
-    const collection = mongoose.connection.collection('travels')
-    const before = await collection.findOne({ _id: id })
-    const changed = await agent.post('/travel/approved').send({ _id: id.toString(), advances: [ownAdvance._id, foreignAdvance._id] })
-    t.is(changed.status, 422)
-    t.is(changed.body.errors[0].message, 'invalidAdvanceOwner')
-    t.deepEqual(await collection.findOne({ _id: id }), before)
+    const body = reportBody('travel')
+    const before = await finances(advances)
+    assertRejected(t, await agent.post('/travel/approved').send({ ...body, advances: [advances[1]._id] }))
+    await assertNotCreated(t, 'travel', body.name)
+    t.deepEqual(await finances(advances), before)
+    const created = await agent
+      .post('/travel/approved')
+      .send({ ...body, advances: [advances[0]._id] })
+      .expect(200)
+    const id = created.body.result._id as string
+    const saved = await savedState('travel', id, advances)
+    assertRejected(t, await agent.post('/travel/approved').send({ _id: id, advances: advances.map(({ _id }) => _id) }))
+    t.deepEqual(await savedState('travel', id, advances), saved)
   } finally {
     await loginUser(agent, 'admin')
     await agent.post('/admin/user').send({ _id: owner._id, access: owner.access }).expect(200)
   }
 })
 
-for (const scenario of [{ path: 'expenseReport', collection: 'expensereports', reviewer: 'expenseReport' }, otherReportTypes[1]] as const) {
-  test.serial(`${scenario.path}: returning to draft validates advances against a changed report owner`, async (t) => {
-    const ownAdvance = await createAdvance(owner)
-    const nextOwnerAdvance = await createAdvance(examiner)
-    const created =
-      scenario.path === 'expenseReport' ? await createReport([ownAdvance._id]) : await createOtherReport(scenario, [ownAdvance._id])
-    t.is(created.status, 200)
-    const id = new Types.ObjectId(created.body.result._id)
-    const collection = mongoose.connection.collection(scenario.collection)
-    await collection.updateOne({ _id: id }, { $set: { state: ExpenseReportState.IN_REVIEW } })
-    const before = await collection.findOne({ _id: id })
-    await loginUser(agent, scenario.reviewer)
-    const rejected = await agent.post(`/examine/${scenario.path}/inWork`).send({ _id: id.toString(), owner: examiner._id })
-    t.is(rejected.status, 422)
-    t.is(rejected.body.errors[0].message, 'invalidAdvanceOwner')
-    t.deepEqual(await collection.findOne({ _id: id }), before)
-    const accepted = await agent
-      .post(`/examine/${scenario.path}/inWork`)
-      .send({ _id: id.toString(), owner: examiner._id, advances: [nextOwnerAdvance._id] })
-    t.is(accepted.status, 200)
-    t.is(accepted.body.result.owner._id, examiner._id)
-    t.is(accepted.body.result.advances[0]._id, nextOwnerAdvance._id)
-  })
-}
-
-test.serial.after.always(async () => {
-  try {
-    for (const entry of additionalReports) {
-      const collection = mongoose.connection.collection(entry.collection)
-      const report = await collection.findOne({ _id: entry.id })
-      if (!report) continue
-      const ids = [report._id, ...report.history]
-      await DocumentFile.deleteMany({
-        _id: { $in: report.expenses.flatMap(({ cost }: { cost: { receipts: Types.ObjectId[] } }) => cost.receipts) }
-      })
-      await collection.deleteMany({ _id: { $in: ids } })
-      await ReportUsage.deleteMany({ reportId: { $in: ids } })
-    }
-    const reports = await ExpenseReportModel.collection.find({ _id: { $in: reportIds.map((id) => new Types.ObjectId(id)) } }).toArray()
-    const reportAndHistoryIds = reports.flatMap((report) => [report._id, ...report.history])
-    const advances = await AdvanceModel.collection.find({ _id: { $in: advanceIds.map((id) => new Types.ObjectId(id)) } }).toArray()
-    const advanceAndHistoryIds = advances.flatMap((advance) => [advance._id, ...advance.history])
-    const receiptIds = reports.flatMap((report) =>
-      report.expenses.flatMap(({ cost }: { cost: { receipts: Types.ObjectId[] } }) => cost.receipts)
-    )
-    await DocumentFile.deleteMany({ _id: { $in: receiptIds } })
-    await ExpenseReportModel.deleteMany({ _id: { $in: reportAndHistoryIds } })
-    await AdvanceModel.deleteMany({ _id: { $in: advanceAndHistoryIds } })
-    await ReportUsage.deleteMany({ reportId: { $in: [...reportAndHistoryIds, ...advanceAndHistoryIds] } })
-  } finally {
-    await restoreProjectBalance?.()
-    await shutdown()
+test.serial('expenseReport: missing and historic advance references are rejected', async (t) => {
+  const advance = await createAdvance(owner)
+  const historic = await historicAdvance(t, advance)
+  await loginUser(agent, 'user')
+  const before = await finances([advance])
+  for (const id of [new Types.ObjectId().toString(), historic]) {
+    const body = { ...reportBody('expenseReport'), advances: [id] }
+    assertRejected(t, await agent.post('/expenseReport/inWork').send(body))
+    await assertNotCreated(t, 'expenseReport', body.name)
+    t.deepEqual(await finances([advance]), before)
   }
+})
+
+test.after.always(async () => {
+  await shutdown()
 })

@@ -24,12 +24,14 @@ for port in 18765 18766; do
   done
   curl --fail --silent "http://127.0.0.1:${port}/sw.js" >/dev/null
 done
-cp frontend/tests/browser/userManagement.mjs "$RUNNER_TEMP/frontend-migration/userManagement.mjs"
+cp frontend/tests/browser/*.mjs "$RUNNER_TEMP/frontend-migration/"
 cat > "$RUNNER_TEMP/frontend-migration/test.mjs" <<'EOF'
 import assert from 'node:assert/strict'
 import { createServer, request } from 'node:http'
 import { chromium, firefox } from 'playwright'
 import { testUserManagement } from './userManagement.mjs'
+import { testInteractions } from './interactions.mjs'
+import { testWorkerLifecycle } from './workerLifecycle.mjs'
 
 const origin = 'http://127.0.0.1:18767'
 let upgraded = false
@@ -47,6 +49,18 @@ const server = createServer((req, res) => {
   // not navigate this test page and discard the observed registration.
   if (req.url === '/api/__sw-observer') {
     res.writeHead(200, { 'Content-Type': 'text/html' }).end('<!doctype html><title>Worker observer</title>')
+    return
+  }
+  // Public login configuration must remain available: unrelated auth redirects
+  // would otherwise change the query/fragment being checked during upgrades.
+  if (req.url.split('?')[0] === '/api/displaySettings') {
+    const data = {
+      auth: { ldapauth: true, magiclogin: false, microsoft: false, oidc: false },
+      locale: { default: 'en', fallback: 'en', overwrite: {} },
+      nameDisplayFormat: 'givenNameFirst', accessIcons: {}, reportTypeIcons: {},
+      helpButton: { enabled: false, examinersMail: false, examinersMsTeams: false, customOptions: [] }
+    }
+    res.writeHead(200, { 'Content-Type': 'application/json' }).end(JSON.stringify({ data }))
     return
   }
   // Authentication is not needed to register or update the worker.
@@ -95,6 +109,12 @@ try {
         window.previousWorker = window.workerRegistration.active
       })
 
+      const second = await context.newPage()
+      await second.goto(`${origin}/login?tab=2#details`)
+      await second.waitForFunction(() => navigator.serviceWorker.controller?.state === 'activated')
+      const secondDocument = await second.evaluate(() => performance.timeOrigin)
+      const observerDocument = await observer.evaluate(() => performance.timeOrigin)
+
       // Leave the old page, deploy, and return without altering browser
       // storage or calling register(), update() or unregister() from the test.
       await page.goto('about:blank')
@@ -113,8 +133,14 @@ try {
       // stay broken even though the registration reports an active new worker.
       await page.waitForFunction((entry) =>
         [...document.scripts].some((script) => script.src === location.origin + entry), currentEntry)
-      console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend`)
+      await second.waitForFunction((previous) => performance.timeOrigin !== previous, secondDocument)
+      await second.waitForFunction((entry) => [...document.scripts].some((script) => script.src === location.origin + entry), currentEntry)
+      await second.waitForURL(`${origin}/login?tab=2#details`)
+      assert.equal(await observer.evaluate(() => performance.timeOrigin), observerDocument, 'Backend tabs must remain untouched')
+      console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend; all tabs reloaded with query and fragment intact`)
       await testUserManagement(browser, origin)
+      await testInteractions(browser, origin)
+      await testWorkerLifecycle(browser, origin, currentEntry)
     } catch (error) {
       console.error(`${browserType.name()}: production frontend test failed`, error)
       failures.push(error)

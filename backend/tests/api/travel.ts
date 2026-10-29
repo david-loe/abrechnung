@@ -1,5 +1,6 @@
 import {
   BookingExportRow,
+  baseCurrency,
   Category,
   idDocumentToId,
   Stage,
@@ -10,277 +11,441 @@ import {
   User
 } from 'abrechnung-common/types.js'
 import test from 'ava'
-import { Types } from 'mongoose'
+import { mongo, Types } from 'mongoose'
 import { objectToFormFields } from '../../helper.js'
+import { calculateBookings } from '../../models/booking.js'
 import TravelModel from '../../models/travel.js'
 import UserModel from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
 import { assertBookingsBalanced, requestBookingExport } from '../_booking.js'
 import { seedExchangeRates, simulateExchangeRateOutage } from '../_exchangeRates.js'
 
-const agent = await createAgent()
-await seedExchangeRates([
-  { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-08-04T00:00:00.000Z'), rate: 1.25 },
-  { provider: 'Frankfurter', currency: 'TRY', date: new Date('2023-08-07T00:00:00.000Z'), rate: 25 }
-])
-await loginUser(agent, 'user')
+import { step } from '../_scenario.js'
 
-let travel: TravelSimple = {
-  name: 'Ankara Aug 2023',
-  reason: 'Fortbildung',
-  destinationPlace: {
-    //@ts-expect-error
-    country: { _id: 'TR' },
-    place: 'Ankara'
-  },
-  startDate: new Date('2023-08-24T00:00:00.000Z'),
-  endDate: new Date('2023-09-02T00:00:00.000Z')
-}
+test.serial('given a business trip, application, correction, review and booking preserve the travel contract', async (t) => {
+  t.timeout(120_000)
+  const agent = await createAgent()
+  t.teardown(async () => {
+    try {
+      if (originalVehicleRegistrationSetting) {
+        await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
+      }
+    } finally {
+      await shutdown()
+    }
+  })
+  await seedExchangeRates([
+    { provider: 'Frankfurter', currency: 'USD', date: new Date('2023-08-04T00:00:00.000Z'), rate: 1.25 },
+    { provider: 'Frankfurter', currency: 'TRY', date: new Date('2023-08-07T00:00:00.000Z'), rate: 25 }
+  ])
+  await loginUser(agent, 'user')
 
-let originalVehicleRegistrationSetting: 'required' | 'optional' | 'none' | undefined
-let category: Category
+  let travel: TravelSimple = {
+    name: 'Ankara Aug 2023',
+    reason: 'Fortbildung',
+    destinationPlace: {
+      //@ts-expect-error
+      country: { _id: 'TR' },
+      place: 'Ankara'
+    },
+    startDate: new Date('2023-08-24T00:00:00.000Z'),
+    endDate: new Date('2023-09-02T00:00:00.000Z')
+  }
 
-function withCostPositions<T>(record: T, description: string, kind: 'manual' | 'ownCar' = 'manual') {
-  const input = record as T & { cost: { amount?: number | null } }
-  const { amount, ...cost } = input.cost
-  return {
-    ...record,
-    cost: {
-      ...cost,
-      positions:
-        typeof amount === 'number'
-          ? [{ kind, ...(kind === 'manual' ? { description } : {}), grossAmount: amount, vatRate: 0, project: travel.project, category }]
-          : []
+  let originalVehicleRegistrationSetting: 'required' | 'optional' | 'none' | undefined
+  let category: Category
+
+  function withCostPositions<T>(record: T, description: string, kind: 'manual' | 'ownCar' = 'manual') {
+    const input = record as T & { cost: { amount?: number | null } }
+    const { amount, ...cost } = input.cost
+    return {
+      ...record,
+      cost: {
+        ...cost,
+        positions:
+          typeof amount === 'number'
+            ? [{ kind, ...(kind === 'manual' ? { description } : {}), grossAmount: amount, vatRate: 0, project: travel.project, category }]
+            : []
+      }
     }
   }
-}
 
-async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none') {
-  await loginUser(agent, 'admin')
-  const settingsResponse = await agent.get('/travelSettings')
-  const settings = settingsResponse.body.data
-  originalVehicleRegistrationSetting ??= settings.vehicleRegistrationWhenUsingOwnCar
-  await agent.post('/admin/travelSettings').send({ _id: settings._id, vehicleRegistrationWhenUsingOwnCar })
-}
-
-test.serial('GET /project', async (t) => {
-  const [res, categoryResponse] = await Promise.all([agent.get('/project'), agent.get('/category')])
-  travel.project = res.body.data[0]
-  category = categoryResponse.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
+  async function setVehicleRegistrationRequirement(vehicleRegistrationWhenUsingOwnCar: 'required' | 'optional' | 'none') {
+    await loginUser(agent, 'admin')
+    const settingsResponse = await agent.get('/travelSettings')
+    const settings = settingsResponse.body.data
+    originalVehicleRegistrationSetting ??= settings.vehicleRegistrationWhenUsingOwnCar
+    await agent.post('/admin/travelSettings').send({ _id: settings._id, vehicleRegistrationWhenUsingOwnCar })
   }
-})
 
-test.serial('POST /approve/travel/bulk creates approved travels from natural references', async (t) => {
-  const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
-  t.truthy(owner)
-  await loginUser(agent, 'travel')
-  const response = await agent
-    .post('/approve/travel/bulk')
-    .send([
+  await step(t, 'GET /project', async (t) => {
+    const [res, categoryResponse] = await Promise.all([agent.get('/project'), agent.get('/category')])
+    travel.project = res.body.data[0]
+    category = categoryResponse.body.data.find(({ for: value }: Category) => value === 'Travel' || value === 'both')
+    t.is(res.status, 200, JSON.stringify(res.body))
+  })
+
+  await step(t, 'POST /approve/travel/bulk creates approved travels from natural references', async (t) => {
+    const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
+    t.truthy(owner)
+    await loginUser(agent, 'travel')
+    const response = await agent
+      .post('/approve/travel/bulk')
+      .send([
+        {
+          owner: owner?.email,
+          project: travel.project.identifier,
+          name: 'CSV approved travel',
+          destinationPlace: { place: 'Ankara', country: 'TR' },
+          reason: 'CSV conference',
+          startDate: '2025-05-10',
+          endDate: '2025-05-12',
+          advances: [],
+          isCrossBorder: false
+        }
+      ])
+
+    t.is(response.status, 200)
+    t.is(response.body.result.length, 1)
+    t.is(response.body.result[0].state, TravelState.APPROVED)
+    t.is(response.body.result[0].owner._id, owner?._id.toString())
+    t.is(response.body.result[0].destinationPlace.country._id, 'TR')
+    await loginUser(agent, 'user')
+  })
+
+  await step(t, 'POST /approve/travel/bulk rejects all rows when one country is invalid', async (t) => {
+    const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
+    const names = ['CSV atomic valid travel', 'CSV atomic invalid travel']
+    await loginUser(agent, 'travel')
+    const response = await agent.post('/approve/travel/bulk').send([
       {
         owner: owner?.email,
         project: travel.project.identifier,
-        name: 'CSV approved travel',
-        destinationPlace: { place: 'Ankara', country: 'TR' },
-        reason: 'CSV conference',
+        name: names[0],
+        destinationPlace: { place: 'Berlin', country: 'DE' },
+        reason: 'Valid row',
         startDate: '2025-05-10',
-        endDate: '2025-05-12',
-        advances: [],
-        isCrossBorder: false
+        endDate: '2025-05-11',
+        advances: []
+      },
+      {
+        owner: owner?.email,
+        project: travel.project.identifier,
+        name: names[1],
+        destinationPlace: { place: 'Unknown', country: 'XX' },
+        reason: 'Invalid row',
+        startDate: '2025-05-10',
+        endDate: '2025-05-11',
+        advances: []
       }
     ])
 
-  t.is(response.status, 200)
-  t.is(response.body.result.length, 1)
-  t.is(response.body.result[0].state, TravelState.APPROVED)
-  t.is(response.body.result[0].owner._id, owner?._id.toString())
-  t.is(response.body.result[0].destinationPlace.country._id, 'TR')
-  await loginUser(agent, 'user')
-})
+    t.is(response.status, 422)
+    t.regex(response.body.message, /CSV row 4/)
+    t.is(await TravelModel.countDocuments({ name: { $in: names } }), 0)
+    await loginUser(agent, 'user')
+  })
 
-test.serial('POST /approve/travel/bulk rejects all rows when one country is invalid', async (t) => {
-  const owner = await UserModel.findOne({ 'fk.ldapauth': 'fry' }).lean()
-  const names = ['CSV atomic valid travel', 'CSV atomic invalid travel']
-  await loginUser(agent, 'travel')
-  const response = await agent.post('/approve/travel/bulk').send([
-    {
-      owner: owner?.email,
-      project: travel.project.identifier,
-      name: names[0],
-      destinationPlace: { place: 'Berlin', country: 'DE' },
-      reason: 'Valid row',
-      startDate: '2025-05-10',
-      endDate: '2025-05-11',
-      advances: []
-    },
-    {
-      owner: owner?.email,
-      project: travel.project.identifier,
-      name: names[1],
-      destinationPlace: { place: 'Unknown', country: 'XX' },
-      reason: 'Invalid row',
-      startDate: '2025-05-10',
-      endDate: '2025-05-11',
-      advances: []
-    }
-  ])
-
-  t.is(response.status, 422)
-  t.regex(response.body.message, /CSV row 4/)
-  t.is(await TravelModel.countDocuments({ name: { $in: names } }), 0)
-  await loginUser(agent, 'user')
-})
-
-test.serial('POST /travel/appliedFor', async (t) => {
-  t.plan(2)
-  const res = await agent.post('/travel/appliedFor').send(travel)
-  travel = res.body.result
-  if (res.status === 200) {
-    t.pass()
-    const user: User = (await agent.get('/user')).body.data
-    t.is((res.body.result as Travel).log[0]?.by._id, user._id)
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-})
-
-test.serial('GET /travel', async (t) => {
-  t.plan(2)
-  const res = await agent.get('/travel')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  for (const gotTravel of res.body.data as TravelSimple[]) {
-    if (travel._id === gotTravel._id) {
+  await step(t, 'POST /travel/appliedFor', async (t) => {
+    t.plan(2)
+    const res = await agent.post('/travel/appliedFor').send(travel)
+    travel = res.body.result
+    if (res.status === 200) {
       t.pass()
-      break
+      const user: User = (await agent.get('/user')).body.data
+      t.is((res.body.result as Travel).log[0]?.by._id, user._id)
+    } else {
+      console.log(res.body)
+      t.fail()
     }
-  }
-})
+  })
 
-// APPROVE
+  await step(t, 'GET /travel', async (t) => {
+    t.plan(2)
+    const res = await agent.get('/travel')
+    t.is(res.status, 200, JSON.stringify(res.body))
+    for (const gotTravel of res.body.data as TravelSimple[]) {
+      if (travel._id === gotTravel._id) {
+        t.pass()
+        break
+      }
+    }
+  })
 
-test.serial('GET /approve/travel', async (t) => {
-  await loginUser(agent, 'travel')
-  t.plan(2)
-  const res = await agent.get('/approve/travel')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  for (const gotTravel of res.body.data as TravelSimple[]) {
-    if (travel._id === gotTravel._id) {
+  // APPROVE
+
+  await step(t, 'GET /approve/travel', async (t) => {
+    await loginUser(agent, 'travel')
+    t.plan(2)
+    const res = await agent.get('/approve/travel')
+    t.is(res.status, 200, JSON.stringify(res.body))
+    for (const gotTravel of res.body.data as TravelSimple[]) {
+      if (travel._id === gotTravel._id) {
+        t.pass()
+        break
+      }
+    }
+  })
+
+  await step(t, 'POST /approve/travel/approved', async (t) => {
+    t.plan(5)
+    const comment = 'A Comment'
+    const res = await agent.post('/approve/travel/approved').send({ _id: travel._id, comment })
+    if (res.status === 200) {
       t.pass()
-      break
+      const user: User = (await agent.get('/user')).body.data
+      t.is((res.body.result as Travel).log[10]?.by._id, user._id)
+    } else {
+      console.log(res.body)
+      t.fail()
     }
-  }
-})
+    t.is((res.body.result as Travel).state, TravelState.APPROVED)
+    t.is((res.body.result as Travel).history.length, 1)
+    t.like((res.body.result as Travel).comments[0], { text: comment, toState: TravelState.APPROVED })
+  })
 
-test.serial('POST /approve/travel/approved', async (t) => {
-  t.plan(5)
-  const comment = 'A Comment'
-  const res = await agent.post('/approve/travel/approved').send({ _id: travel._id, comment })
-  if (res.status === 200) {
-    t.pass()
-    const user: User = (await agent.get('/user')).body.data
-    t.is((res.body.result as Travel).log[10]?.by._id, user._id)
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).state, TravelState.APPROVED)
-  t.is((res.body.result as Travel).history.length, 1)
-  t.like((res.body.result as Travel).comments[0], { text: comment, toState: TravelState.APPROVED })
-})
+  // FILL OUT
 
-// FILL OUT
+  const stages: Stage[] = [
+    {
+      departure: new Date('2023-08-24T14:05:00.000Z'),
+      arrival: new Date('2023-08-24T19:30:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Frankfurt'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'TR' },
+        place: 'Ankara'
+      },
+      midnightCountries: [],
+      transport: { type: 'airplane' },
+      cost: {
+        amount: 652, //@ts-ignore
+        currency: { _id: 'USD' }, //@ts-ignore
+        receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
+        date: new Date('2023-08-04T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    },
+    {
+      departure: new Date('2023-08-29T11:30:00.000Z'),
+      arrival: new Date('2023-08-29T14:05:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'TR' },
+        place: 'Ankara'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'BG' },
+        place: 'Sofia'
+      },
+      midnightCountries: [],
+      transport: { type: 'airplane' }, //@ts-ignore
+      cost: {
+        amount: null, //@ts-ignore
+        currency: { _id: 'EUR' }
+      },
+      purpose: 'professional'
+    },
+    {
+      departure: new Date('2023-09-01T14:05:00.000Z'),
+      arrival: new Date('2023-09-01T18:34:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'BG' },
+        place: 'Sofia'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Frankfurt'
+      },
+      midnightCountries: [],
+      transport: { type: 'airplane' }, //@ts-ignore
+      cost: {
+        amount: 0, //@ts-ignore
+        currency: { _id: 'EUR' }
+      },
+      purpose: 'professional'
+    }
+  ]
 
-const stages: Stage[] = [
-  {
-    departure: new Date('2023-08-24T14:05:00.000Z'),
-    arrival: new Date('2023-08-24T19:30:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Frankfurt'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'TR' },
-      place: 'Ankara'
-    },
-    midnightCountries: [],
-    transport: { type: 'airplane' },
-    cost: {
-      amount: 652, //@ts-ignore
-      currency: { _id: 'USD' }, //@ts-ignore
-      receipts: [{ name: 'Online Invoice.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }],
-      date: new Date('2023-08-04T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  },
-  {
-    departure: new Date('2023-08-29T11:30:00.000Z'),
-    arrival: new Date('2023-08-29T14:05:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'TR' },
-      place: 'Ankara'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'BG' },
-      place: 'Sofia'
-    },
-    midnightCountries: [],
-    transport: { type: 'airplane' }, //@ts-ignore
-    cost: {
-      amount: null, //@ts-ignore
-      currency: { _id: 'EUR' }
-    },
-    purpose: 'professional'
-  },
-  {
-    departure: new Date('2023-09-01T14:05:00.000Z'),
-    arrival: new Date('2023-09-01T18:34:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'BG' },
-      place: 'Sofia'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Frankfurt'
-    },
-    midnightCountries: [],
-    transport: { type: 'airplane' }, //@ts-ignore
-    cost: {
-      amount: 0, //@ts-ignore
-      currency: { _id: 'EUR' }
-    },
-    purpose: 'professional'
-  }
-]
+  await step(t, 'POST /travel/stage', async (t) => {
+    await loginUser(agent, 'user')
+    t.plan(stages.length + 0)
+    for (const stage of stages) {
+      const stageBody = withCostPositions(stage, stage.transport.type)
+      let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
+      for (const entry of objectToFormFields(stageBody)) {
+        if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+          req = req.attach(entry.field, entry.val)
+        } else {
+          req = req.field(entry.field, entry.val)
+        }
+      }
+      const res = await req
+      if (res.status === 200) {
+        travel = res.body.result
+        t.pass()
+      } else {
+        console.log(res.body)
+        t.fail()
+      }
+    }
+  })
 
-test.serial('POST /travel/stage', async (t) => {
-  await loginUser(agent, 'user')
-  t.plan(stages.length + 0)
-  for (const stage of stages) {
-    const stageBody = withCostPositions(stage, stage.transport.type)
+  const expenses: TravelExpense[] = [
+    {
+      description: 'Konferenzkosten',
+      cost: {
+        amount: 82, //@ts-ignore
+        currency: { _id: 'TRY' }, //@ts-ignore
+        receipts: [{ name: 'Photo.png', type: 'image/png', data: 'tests/files/dummy.png' }],
+        date: new Date('2023-08-07T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    }
+  ]
+
+  let stageImportTarget: Travel
+
+  await step(t, 'POST /travel/expense', async (t) => {
+    t.plan(expenses.length + 0)
+    for (const expense of expenses) {
+      const expenseBody = withCostPositions(expense, expense.description)
+      let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
+      for (const entry of objectToFormFields(expenseBody)) {
+        if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+          req = req.attach(entry.field, entry.val)
+        } else {
+          req = req.field(entry.field, entry.val)
+        }
+      }
+      const res = await req
+      if (res.status === 200) {
+        travel = res.body.result
+        t.pass()
+      } else {
+        console.log(res.body)
+        t.fail()
+      }
+    }
+  })
+
+  await step(t, 'POST /travel/stage/import copies shifted stages without expenses, receipts, or manual costs', async (t) => {
+    const targetApplication = {
+      name: 'Ankara Aug 2024',
+      reason: 'Fortbildung',
+      destinationPlace: travel.destinationPlace,
+      startDate: new Date('2024-08-24T00:00:00.000Z'),
+      endDate: new Date('2024-08-25T00:00:00.000Z'),
+      project: travel.project
+    }
+    const createResponse = await agent.post('/travel/appliedFor').send(targetApplication)
+    t.is(createResponse.status, 200)
+
+    await loginUser(agent, 'travel')
+    const approveResponse = await agent.post('/approve/travel/approved').send({ _id: createResponse.body.result._id })
+    t.is(approveResponse.status, 200)
+    stageImportTarget = approveResponse.body.result
+
+    await loginUser(agent, 'user')
+    const sourcesResponse = await agent.get('/travel/stage/import').query({ targetTravelId: stageImportTarget._id.toString() })
+    t.is(sourcesResponse.status, 200)
+    t.true((sourcesResponse.body.data as TravelSimple[]).some(({ _id }) => _id.toString() === travel._id.toString()))
+    t.false((sourcesResponse.body.data as TravelSimple[]).some(({ _id }) => _id.toString() === stageImportTarget._id.toString()))
+
+    const emptySourceResponse = await agent
+      .post('/travel/stage/import')
+      .send({ sourceTravelId: stageImportTarget._id, targetTravelId: travel._id })
+    t.is(emptySourceResponse.status, 409)
+
+    const sameTravelResponse = await agent.post('/travel/stage/import').send({ sourceTravelId: travel._id, targetTravelId: travel._id })
+    t.is(sameTravelResponse.status, 409)
+
+    const importResponse = await agent
+      .post('/travel/stage/import')
+      .send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
+    t.is(importResponse.status, 200)
+    stageImportTarget = importResponse.body.result
+
+    const sourceTravel = travel as Travel
+    const offset = new Date(stageImportTarget.startDate).valueOf() - new Date(sourceTravel.startDate).valueOf()
+    t.is(stageImportTarget.stages.length, sourceTravel.stages.length)
+    t.is(stageImportTarget.expenses.length, 0)
+    for (const [index, importedStage] of stageImportTarget.stages.entries()) {
+      const sourceStage = sourceTravel.stages[index]
+      t.not(importedStage._id.toString(), sourceStage._id.toString())
+      t.is(new Date(importedStage.departure).valueOf() - new Date(sourceStage.departure).valueOf(), offset)
+      t.is(new Date(importedStage.arrival).valueOf() - new Date(sourceStage.arrival).valueOf(), offset)
+      t.is(importedStage.cost.positions.length, 0)
+      t.is(importedStage.cost.receipts.length, 0)
+      t.falsy(importedStage.cost.date)
+      for (const [countryIndex, midnightCountry] of (importedStage.midnightCountries ?? []).entries()) {
+        const sourceMidnightCountry = sourceStage.midnightCountries?.[countryIndex]
+        t.truthy(sourceMidnightCountry)
+        t.is(new Date(midnightCountry.date).valueOf() - new Date(sourceMidnightCountry?.date ?? 0).valueOf(), offset)
+      }
+    }
+
+    const repeatedImportResponse = await agent
+      .post('/travel/stage/import')
+      .send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
+    t.is(repeatedImportResponse.status, 409)
+  })
+
+  await step(t, 'POST /travel/stage/import rejects travels owned by another user', async (t) => {
+    await loginUser(agent, 'travel')
+    const response = await agent.post('/travel/stage/import').send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
+    t.is(response.status, 403)
+    await loginUser(agent, 'user')
+  })
+
+  await step(t, 'POST /travel/underExamination', async (t) => {
+    t.plan(5)
+    const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
+    const res = await agent.post('/travel/underExamination').send({ _id: travel._id, comment })
+    if (res.status === 200) {
+      t.pass()
+      const user: User = (await agent.get('/user')).body.data
+      t.is((res.body.result as Travel).log[20]?.by._id, user._id)
+    } else {
+      console.log(res.body)
+      t.fail()
+    }
+    t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
+    t.is((res.body.result as Travel).history.length, 2)
+    t.like((res.body.result as Travel).comments[1], { text: comment, toState: TravelState.IN_REVIEW })
+  })
+
+  await step(t, 'POST /travel/approved AGAIN', async (t) => {
+    t.plan(3)
+    const res = await agent.post('/travel/approved').send({ _id: travel._id })
+    if (res.status === 200) {
+      travel = res.body.result
+      t.pass()
+    } else {
+      console.log(res.body)
+      t.fail()
+    }
+    t.is((res.body.result as Travel).state, TravelState.APPROVED)
+    t.is((res.body.result as Travel).history.length, 3)
+  })
+
+  await step(t, 'POST /travel/stage keeps invalid travel saveable in approved state', async (t) => {
+    t.plan(4)
+    const overlappingStage: Stage = {
+      ...(travel as Travel).stages[1],
+      departure: new Date('2023-08-24T18:00:00.000Z'),
+      arrival: new Date('2023-08-24T22:00:00.000Z')
+    }
+
     let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(stageBody)) {
+    for (const entry of objectToFormFields(overlappingStage)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -295,30 +460,26 @@ test.serial('POST /travel/stage', async (t) => {
       console.log(res.body)
       t.fail()
     }
-  }
-})
+    t.is((res.body.result as Travel).addUp[0].lumpSums.amount, 0)
+    t.false(Number.isNaN((res.body.result as Travel).addUp[0].total.amount))
+    t.is((res.body.result as Travel).state, TravelState.APPROVED)
+  })
 
-const expenses: TravelExpense[] = [
-  {
-    description: 'Konferenzkosten',
-    cost: {
-      amount: 82, //@ts-ignore
-      currency: { _id: 'TRY' }, //@ts-ignore
-      receipts: [{ name: 'Photo.png', type: 'image/png', data: 'tests/files/dummy.png' }],
-      date: new Date('2023-08-07T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  }
-]
+  await step(t, 'POST /travel/underExamination rejects invalid travel', async (t) => {
+    const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
+    t.is(res.status, 422)
+  })
 
-let stageImportTarget: Travel
+  await step(t, 'POST /travel/stage fixes invalid travel again', async (t) => {
+    t.plan(2)
+    const fixedStage: Stage = {
+      ...(travel as Travel).stages[1],
+      departure: new Date('2023-08-29T11:30:00.000Z'),
+      arrival: new Date('2023-08-29T14:05:00.000Z')
+    }
 
-test.serial('POST /travel/expense', async (t) => {
-  t.plan(expenses.length + 0)
-  for (const expense of expenses) {
-    const expenseBody = withCostPositions(expense, expense.description)
-    let req = agent.post('/travel/expense').query({ parentId: travel._id.toString() })
-    for (const entry of objectToFormFields(expenseBody)) {
+    let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
+    for (const entry of objectToFormFields(fixedStage)) {
       if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
         req = req.attach(entry.field, entry.val)
       } else {
@@ -333,557 +494,419 @@ test.serial('POST /travel/expense', async (t) => {
       console.log(res.body)
       t.fail()
     }
-  }
-})
+    t.false(Number.isNaN((res.body.result as Travel).addUp[0].lumpSums.amount))
+  })
 
-test.serial('POST /travel/stage/import copies shifted stages without expenses, receipts, or manual costs', async (t) => {
-  const targetApplication = {
-    name: 'Ankara Aug 2024',
-    reason: 'Fortbildung',
-    destinationPlace: travel.destinationPlace,
-    startDate: new Date('2024-08-24T00:00:00.000Z'),
-    endDate: new Date('2024-08-25T00:00:00.000Z'),
-    project: travel.project
-  }
-  const createResponse = await agent.post('/travel/appliedFor').send(targetApplication)
-  t.is(createResponse.status, 200)
-
-  await loginUser(agent, 'travel')
-  const approveResponse = await agent.post('/approve/travel/approved').send({ _id: createResponse.body.result._id })
-  t.is(approveResponse.status, 200)
-  stageImportTarget = approveResponse.body.result
-
-  await loginUser(agent, 'user')
-  const sourcesResponse = await agent.get('/travel/stage/import').query({ targetTravelId: stageImportTarget._id.toString() })
-  t.is(sourcesResponse.status, 200)
-  t.true((sourcesResponse.body.data as TravelSimple[]).some(({ _id }) => _id.toString() === travel._id.toString()))
-  t.false((sourcesResponse.body.data as TravelSimple[]).some(({ _id }) => _id.toString() === stageImportTarget._id.toString()))
-
-  const emptySourceResponse = await agent
-    .post('/travel/stage/import')
-    .send({ sourceTravelId: stageImportTarget._id, targetTravelId: travel._id })
-  t.is(emptySourceResponse.status, 409)
-
-  const sameTravelResponse = await agent.post('/travel/stage/import').send({ sourceTravelId: travel._id, targetTravelId: travel._id })
-  t.is(sameTravelResponse.status, 409)
-
-  const importResponse = await agent
-    .post('/travel/stage/import')
-    .send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
-  t.is(importResponse.status, 200)
-  stageImportTarget = importResponse.body.result
-
-  const sourceTravel = travel as Travel
-  const offset = new Date(stageImportTarget.startDate).valueOf() - new Date(sourceTravel.startDate).valueOf()
-  t.is(stageImportTarget.stages.length, sourceTravel.stages.length)
-  t.is(stageImportTarget.expenses.length, 0)
-  for (const [index, importedStage] of stageImportTarget.stages.entries()) {
-    const sourceStage = sourceTravel.stages[index]
-    t.not(importedStage._id.toString(), sourceStage._id.toString())
-    t.is(new Date(importedStage.departure).valueOf() - new Date(sourceStage.departure).valueOf(), offset)
-    t.is(new Date(importedStage.arrival).valueOf() - new Date(sourceStage.arrival).valueOf(), offset)
-    t.is(importedStage.cost.positions.length, 0)
-    t.is(importedStage.cost.receipts.length, 0)
-    t.falsy(importedStage.cost.date)
-    for (const [countryIndex, midnightCountry] of (importedStage.midnightCountries ?? []).entries()) {
-      const sourceMidnightCountry = sourceStage.midnightCountries?.[countryIndex]
-      t.truthy(sourceMidnightCountry)
-      t.is(new Date(midnightCountry.date).valueOf() - new Date(sourceMidnightCountry?.date ?? 0).valueOf(), offset)
-    }
-  }
-
-  const repeatedImportResponse = await agent
-    .post('/travel/stage/import')
-    .send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
-  t.is(repeatedImportResponse.status, 409)
-})
-
-test.serial('POST /travel/stage/import rejects travels owned by another user', async (t) => {
-  await loginUser(agent, 'travel')
-  const response = await agent.post('/travel/stage/import').send({ sourceTravelId: travel._id, targetTravelId: stageImportTarget._id })
-  t.is(response.status, 403)
-  await loginUser(agent, 'user')
-})
-
-test.serial('POST /travel/underExamination', async (t) => {
-  t.plan(5)
-  const comment = "A quite long comment but this doesn't matter because mongoose has no limit."
-  const res = await agent.post('/travel/underExamination').send({ _id: travel._id, comment })
-  if (res.status === 200) {
-    t.pass()
-    const user: User = (await agent.get('/user')).body.data
-    t.is((res.body.result as Travel).log[20]?.by._id, user._id)
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
-  t.is((res.body.result as Travel).history.length, 2)
-  t.like((res.body.result as Travel).comments[1], { text: comment, toState: TravelState.IN_REVIEW })
-})
-
-test.serial('POST /travel/approved AGAIN', async (t) => {
-  t.plan(3)
-  const res = await agent.post('/travel/approved').send({ _id: travel._id })
-  if (res.status === 200) {
-    travel = res.body.result
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).state, TravelState.APPROVED)
-  t.is((res.body.result as Travel).history.length, 3)
-})
-
-test.serial('POST /travel/stage keeps invalid travel saveable in approved state', async (t) => {
-  t.plan(4)
-  const overlappingStage: Stage = {
-    ...(travel as Travel).stages[1],
-    departure: new Date('2023-08-24T18:00:00.000Z'),
-    arrival: new Date('2023-08-24T22:00:00.000Z')
-  }
-
-  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-  for (const entry of objectToFormFields(overlappingStage)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      req = req.attach(entry.field, entry.val)
+  await step(t, 'POST /travel/underExamination AGAIN', async (t) => {
+    t.plan(3)
+    const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
+    if (res.status === 200) {
+      travel = res.body.result
+      t.pass()
     } else {
-      req = req.field(entry.field, entry.val)
+      console.log(res.body)
+      t.fail()
     }
-  }
-  const res = await req
-  if (res.status === 200) {
-    travel = res.body.result
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).addUp[0].lumpSums.amount, 0)
-  t.false(Number.isNaN((res.body.result as Travel).addUp[0].total.amount))
-  t.is((res.body.result as Travel).state, TravelState.APPROVED)
-})
+    t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
+    t.is((res.body.result as Travel).history.length, 4)
+  })
 
-test.serial('POST /travel/underExamination rejects invalid travel', async (t) => {
-  const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
-  t.is(res.status, 422)
-})
+  await step(t, 'POST /travel/underExamination rejects ownCar without owner vehicle registration when required', async (t) => {
+    await setVehicleRegistrationRequirement('required')
+    await loginUser(agent, 'user')
+    await agent.post('/user/vehicleRegistration').field('noop', '1')
 
-test.serial('POST /travel/stage fixes invalid travel again', async (t) => {
-  t.plan(2)
-  const fixedStage: Stage = {
-    ...(travel as Travel).stages[1],
-    departure: new Date('2023-08-29T11:30:00.000Z'),
-    arrival: new Date('2023-08-29T14:05:00.000Z')
-  }
-
-  let req = agent.post('/travel/stage').query({ parentId: travel._id.toString() })
-  for (const entry of objectToFormFields(fixedStage)) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      req = req.attach(entry.field, entry.val)
-    } else {
-      req = req.field(entry.field, entry.val)
+    const ownCarTravel: TravelSimple = {
+      name: 'Own Car May 2024',
+      reason: 'Project meeting',
+      destinationPlace: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      startDate: new Date('2024-05-14T00:00:00.000Z'),
+      endDate: new Date('2024-05-14T00:00:00.000Z'),
+      project: travel.project
     }
-  }
-  const res = await req
-  if (res.status === 200) {
-    travel = res.body.result
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.false(Number.isNaN((res.body.result as Travel).addUp[0].lumpSums.amount))
-})
 
-test.serial('POST /travel/underExamination AGAIN', async (t) => {
-  t.plan(3)
-  const res = await agent.post('/travel/underExamination').send({ _id: travel._id })
-  if (res.status === 200) {
-    travel = res.body.result
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).state, TravelState.IN_REVIEW)
-  t.is((res.body.result as Travel).history.length, 4)
-})
+    const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
+    t.is(createdResponse.status, 200)
+    const createdTravel = createdResponse.body.result as Travel
 
-test.serial('POST /travel/underExamination rejects ownCar without owner vehicle registration when required', async (t) => {
-  await setVehicleRegistrationRequirement('required')
-  await loginUser(agent, 'user')
-  await agent.post('/user/vehicleRegistration').field('noop', '1')
+    await loginUser(agent, 'travel')
+    const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(approvedResponse.status, 200)
 
-  const ownCarTravel: TravelSimple = {
-    name: 'Own Car May 2024',
-    reason: 'Project meeting',
-    destinationPlace: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    startDate: new Date('2024-05-14T00:00:00.000Z'),
-    endDate: new Date('2024-05-14T00:00:00.000Z'),
-    project: travel.project
-  }
+    await loginUser(agent, 'user')
+    const ownCarStage: Stage = {
+      departure: new Date('2024-05-14T08:00:00.000Z'),
+      arrival: new Date('2024-05-14T18:00:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Hamburg'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      midnightCountries: [],
+      transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
+      cost: {
+        amount: 0, //@ts-ignore
+        currency: { _id: 'EUR' }, //@ts-ignore
+        receipts: [],
+        date: new Date('2024-05-14T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    }
 
-  const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
-  t.is(createdResponse.status, 200)
-  const createdTravel = createdResponse.body.result as Travel
+    let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
+    for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
+      stageRequest = stageRequest.field(entry.field, entry.val)
+    }
+    const stageResponse = await stageRequest
+    t.is(stageResponse.status, 200)
 
-  await loginUser(agent, 'travel')
-  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(approvedResponse.status, 200)
+    const importTargetResponse = await agent
+      .post('/travel/appliedFor')
+      .send({
+        ...ownCarTravel,
+        name: 'Own Car May 2025',
+        startDate: new Date('2025-05-14T00:00:00.000Z'),
+        endDate: new Date('2025-05-14T00:00:00.000Z')
+      })
+    t.is(importTargetResponse.status, 200)
+    await loginUser(agent, 'travel')
+    const approvedImportTargetResponse = await agent.post('/approve/travel/approved').send({ _id: importTargetResponse.body.result._id })
+    t.is(approvedImportTargetResponse.status, 200)
+    await loginUser(agent, 'user')
+    const importResponse = await agent
+      .post('/travel/stage/import')
+      .send({ sourceTravelId: createdTravel._id, targetTravelId: approvedImportTargetResponse.body.result._id })
+    t.is(importResponse.status, 200)
+    const importedOwnCarStage = (importResponse.body.result as Travel).stages[0]
+    const sourceOwnCarStage = (stageResponse.body.result as Travel).stages[0]
+    t.is(importedOwnCarStage.transport.type, 'ownCar')
+    t.is(importedOwnCarStage.cost.positions.length, 1)
+    t.is(importedOwnCarStage.cost.positions[0].kind, 'ownCar')
+    t.is(importedOwnCarStage.cost.positions[0].grossAmount, sourceOwnCarStage.cost.positions[0].grossAmount)
+    t.is(importedOwnCarStage.cost.positions[0].project._id.toString(), travel.project._id.toString())
+    t.is(importedOwnCarStage.cost.receipts.length, 0)
+    t.falsy(importedOwnCarStage.cost.date)
 
-  await loginUser(agent, 'user')
-  const ownCarStage: Stage = {
-    departure: new Date('2024-05-14T08:00:00.000Z'),
-    arrival: new Date('2024-05-14T18:00:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Hamburg'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    midnightCountries: [],
-    transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
-    cost: {
-      amount: 0, //@ts-ignore
-      currency: { _id: 'EUR' }, //@ts-ignore
-      receipts: [],
-      date: new Date('2024-05-14T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  }
-
-  let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
-    stageRequest = stageRequest.field(entry.field, entry.val)
-  }
-  const stageResponse = await stageRequest
-  t.is(stageResponse.status, 200)
-
-  const importTargetResponse = await agent
-    .post('/travel/appliedFor')
-    .send({
-      ...ownCarTravel,
-      name: 'Own Car May 2025',
-      startDate: new Date('2025-05-14T00:00:00.000Z'),
-      endDate: new Date('2025-05-14T00:00:00.000Z')
-    })
-  t.is(importTargetResponse.status, 200)
-  await loginUser(agent, 'travel')
-  const approvedImportTargetResponse = await agent.post('/approve/travel/approved').send({ _id: importTargetResponse.body.result._id })
-  t.is(approvedImportTargetResponse.status, 200)
-  await loginUser(agent, 'user')
-  const importResponse = await agent
-    .post('/travel/stage/import')
-    .send({ sourceTravelId: createdTravel._id, targetTravelId: approvedImportTargetResponse.body.result._id })
-  t.is(importResponse.status, 200)
-  const importedOwnCarStage = (importResponse.body.result as Travel).stages[0]
-  const sourceOwnCarStage = (stageResponse.body.result as Travel).stages[0]
-  t.is(importedOwnCarStage.transport.type, 'ownCar')
-  t.is(importedOwnCarStage.cost.positions.length, 1)
-  t.is(importedOwnCarStage.cost.positions[0].kind, 'ownCar')
-  t.is(importedOwnCarStage.cost.positions[0].grossAmount, sourceOwnCarStage.cost.positions[0].grossAmount)
-  t.is(importedOwnCarStage.cost.positions[0].project._id.toString(), travel.project._id.toString())
-  t.is(importedOwnCarStage.cost.receipts.length, 0)
-  t.falsy(importedOwnCarStage.cost.date)
-
-  const blockedResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
-  t.is(blockedResponse.status, 422)
-  t.true(
-    blockedResponse.body.errors.some(
-      (error: { path?: string; message: string }) => error.path === 'stages.0.cost.receipts' && error.message === 'requiredForReview'
+    const blockedResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
+    t.is(blockedResponse.status, 422)
+    t.true(
+      blockedResponse.body.errors.some(
+        (error: { path?: string; message: string }) => error.path === 'stages.0.cost.receipts' && error.message === 'requiredForReview'
+      )
     )
-  )
-})
+  })
 
-test.serial('POST /travel/underExamination allows ownCar with owner vehicle registration when required', async (t) => {
-  await loginUser(agent, 'user')
+  await step(t, 'POST /travel/underExamination allows ownCar with owner vehicle registration when required', async (t) => {
+    await loginUser(agent, 'user')
 
-  let vehicleRegistrationRequest = agent.post('/user/vehicleRegistration')
-  for (const entry of objectToFormFields({
-    vehicleRegistration: [{ name: 'vehicle-registration.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
-  })) {
-    if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
-      vehicleRegistrationRequest = vehicleRegistrationRequest.attach(entry.field, entry.val)
-    } else {
-      vehicleRegistrationRequest = vehicleRegistrationRequest.field(entry.field, entry.val)
-    }
-  }
-  const uploadResponse = await vehicleRegistrationRequest
-  t.is(uploadResponse.status, 200)
-
-  const ownCarTravel: TravelSimple = {
-    name: 'Own Car June 2024',
-    reason: 'Workshop',
-    destinationPlace: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    startDate: new Date('2024-06-12T00:00:00.000Z'),
-    endDate: new Date('2024-06-12T00:00:00.000Z'),
-    project: travel.project
-  }
-
-  const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
-  t.is(createdResponse.status, 200)
-  const createdTravel = createdResponse.body.result as Travel
-
-  await loginUser(agent, 'travel')
-  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(approvedResponse.status, 200)
-
-  await loginUser(agent, 'user')
-  const ownCarStage: Stage = {
-    departure: new Date('2024-06-12T08:00:00.000Z'),
-    arrival: new Date('2024-06-12T18:00:00.000Z'),
-    startLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Hamburg'
-    },
-    endLocation: {
-      //@ts-expect-error
-      country: { _id: 'DE' },
-      place: 'Berlin'
-    },
-    midnightCountries: [],
-    transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
-    cost: {
-      amount: 0, //@ts-ignore
-      currency: { _id: 'EUR' }, //@ts-ignore
-      receipts: [],
-      date: new Date('2024-06-12T00:00:00.000Z')
-    },
-    purpose: 'professional'
-  }
-
-  let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
-  for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
-    stageRequest = stageRequest.field(entry.field, entry.val)
-  }
-  const stageResponse = await stageRequest
-  t.is(stageResponse.status, 200)
-
-  const reviewResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
-  t.is(reviewResponse.status, 200)
-  t.is((reviewResponse.body.result as Travel).state, TravelState.IN_REVIEW)
-
-  if (originalVehicleRegistrationSetting) {
-    await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
-  }
-})
-
-// EXAMINE
-
-test.serial('travel saves drafts during provider outages but cannot complete review', async (t) => {
-  await loginUser(agent, 'travel')
-  const before = await TravelModel.findById(travel._id).lean()
-  t.truthy(before)
-  const restore = simulateExchangeRateOutage(t)
-  try {
-    const completion = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id })
-    t.is(completion.status, 422)
-    t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
-    const unchanged = await TravelModel.findById(travel._id).lean()
-    t.is(unchanged?.state, before?.state)
-    t.deepEqual(unchanged?.bookings, before?.bookings)
-    t.deepEqual(unchanged?.advances, before?.advances)
-    const draft = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
-    t.is(draft.status, 200)
-    t.is(draft.body.result.expenses[0].cost.exchangeRate, null)
-  } finally {
-    restore()
-    const after = await TravelModel.findById(travel._id).lean()
-    const previousHistory = new Set(before?.history.map(String))
-    const createdHistory = after?.history.filter((id) => !previousHistory.has(id.toString())) ?? []
-    await TravelModel.updateOne({ _id: travel._id }, { $set: { history: before?.history } })
-    await TravelModel.deleteMany({ _id: { $in: createdHistory } })
-  }
-  const recovered = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
-  t.is(recovered.status, 200)
-  t.truthy(recovered.body.result.expenses[0].cost.exchangeRate)
-})
-
-test.serial('POST /examine/travel/reviewCompleted', async (t) => {
-  await loginUser(agent, 'travel')
-  t.plan(5)
-  const comment = '' // empty string should not create comment
-  const res = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id, comment })
-  if (res.status === 200) {
-    t.pass()
-    const user: User = (await agent.get('/user')).body.data
-    t.is((res.body.result as Travel).log[30]?.by._id, user._id)
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is((res.body.result as Travel).state, TravelState.REVIEW_COMPLETED)
-  t.is((res.body.result as Travel).history.length, 5)
-  t.is((res.body.result as Travel).comments.length, 2)
-})
-
-test.serial('POST /approve/travel/withdrawApproval rejects review-completed travel', async (t) => {
-  await loginUser(agent, 'travel')
-  const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
-  t.not(res.status, 200)
-})
-
-// REPORT
-
-test.serial('GET /travel/report', async (t) => {
-  await loginUser(agent, 'user')
-  const res = await agent.get('/travel/report').query({ _id: travel._id })
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-})
-
-// BOOK
-
-test.serial('POST /book/travel/bookingExportPackage cumulatively allocates mixed cent amounts and VAT overrides', async (t) => {
-  const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())
-  await TravelModel.collection.updateOne(
-    { _id: new Types.ObjectId(idDocumentToId(travel._id).toString()) },
-    {
-      $set: {
-        professionalShare: 0.5,
-        stages: [],
-        days: [],
-        addUp: [{ project: projectId, advance: { amount: 0 } }],
-        expenses: [
-          {
-            _id: new Types.ObjectId(),
-            description: 'Mixed cent expenses',
-            purpose: 'mixed',
-            cost: {
-              positions: [1, 2].map((position) => ({
-                _id: new Types.ObjectId(),
-                kind: 'manual',
-                description: `Mixed cent expense ${position}`,
-                grossAmount: 0.01,
-                vatRate: 19,
-                vatAmountOverride: 0.01,
-                project: projectId,
-                category: new Types.ObjectId(idDocumentToId(category._id).toString())
-              })),
-              currency: 'EUR',
-              exchangeRate: null,
-              receipts: [],
-              date: new Date('2026-07-01T00:00:00.000Z')
-            }
-          }
-        ]
+    let vehicleRegistrationRequest = agent.post('/user/vehicleRegistration')
+    for (const entry of objectToFormFields({
+      vehicleRegistration: [{ name: 'vehicle-registration.pdf', type: 'application/pdf', data: 'tests/files/dummy.pdf' }]
+    })) {
+      if (entry.field.length > 6 && entry.field.slice(-6) === '[data]') {
+        vehicleRegistrationRequest = vehicleRegistrationRequest.attach(entry.field, entry.val)
+      } else {
+        vehicleRegistrationRequest = vehicleRegistrationRequest.field(entry.field, entry.val)
       }
     }
-  )
+    const uploadResponse = await vehicleRegistrationRequest
+    t.is(uploadResponse.status, 200)
 
-  await loginUser(agent, 'travel')
-  const preview = await agent.post('/book/travel/bookingExportPreview').send([travel._id])
-  t.is(preview.status, 200)
-  t.is(preview.body.result.organisations[0].amount, 0.01)
-  const res = await requestBookingExport(agent, '/book/travel', [travel._id])
-  t.is(res.status, 200)
-  const bookings = res.body.result.bookings as BookingExportRow[]
-  assertBookingsBalanced(t, bookings, 'Travel')
-  t.deepEqual(
-    bookings.map(({ side, amount }) => ({ side, amount })),
-    [
-      { side: 'debit', amount: 0.01 },
-      { side: 'credit', amount: 0.01 }
-    ]
-  )
-  t.is(res.body.result.sepaFiles.length, 1)
-})
+    const ownCarTravel: TravelSimple = {
+      name: 'Own Car June 2024',
+      reason: 'Workshop',
+      destinationPlace: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      startDate: new Date('2024-06-12T00:00:00.000Z'),
+      endDate: new Date('2024-06-12T00:00:00.000Z'),
+      project: travel.project
+    }
 
-test.serial('POST /book/travel/booked', async (t) => {
-  await loginUser(agent, 'travel')
-  t.plan(2)
-  const res = await agent.post('/book/travel/booked').send([travel._id])
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-    t.fail()
-  }
-  t.is(res.body.result[0].status, 'fulfilled')
-})
+    const createdResponse = await agent.post('/travel/appliedFor').send(ownCarTravel)
+    t.is(createdResponse.status, 200)
+    const createdTravel = createdResponse.body.result as Travel
 
-test.serial('POST /approve/travel/withdrawApproval rejects booked travel', async (t) => {
-  const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
-  t.not(res.status, 200)
-})
+    await loginUser(agent, 'travel')
+    const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(approvedResponse.status, 200)
 
-test.serial('POST /approve/travel/withdrawApproval rejects approval and allows fresh reapproval', async (t) => {
-  await loginUser(agent, 'user')
-  const application = {
-    name: 'Withdrawable travel',
-    reason: 'Plans may change',
-    project: travel.project,
-    destinationPlace: { country: { _id: 'DE' }, place: 'Berlin' },
-    startDate: new Date('2030-05-01T00:00:00.000Z'),
-    endDate: new Date('2030-05-02T00:00:00.000Z'),
-    advances: []
-  }
-  const createdResponse = await agent.post('/travel/appliedFor').send(application)
-  t.is(createdResponse.status, 200)
-  const createdTravel = createdResponse.body.result as Travel
+    await loginUser(agent, 'user')
+    const ownCarStage: Stage = {
+      departure: new Date('2024-06-12T08:00:00.000Z'),
+      arrival: new Date('2024-06-12T18:00:00.000Z'),
+      startLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Hamburg'
+      },
+      endLocation: {
+        //@ts-expect-error
+        country: { _id: 'DE' },
+        place: 'Berlin'
+      },
+      midnightCountries: [],
+      transport: { type: 'ownCar', distance: 100, distanceRefundType: 'car' },
+      cost: {
+        amount: 0, //@ts-ignore
+        currency: { _id: 'EUR' }, //@ts-ignore
+        receipts: [],
+        date: new Date('2024-06-12T00:00:00.000Z')
+      },
+      purpose: 'professional'
+    }
 
-  await loginUser(agent, 'travel')
-  const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(approvedResponse.status, 200)
+    let stageRequest = agent.post('/travel/stage').query({ parentId: createdTravel._id.toString() })
+    for (const entry of objectToFormFields(withCostPositions(ownCarStage, 'Own car', 'ownCar'))) {
+      stageRequest = stageRequest.field(entry.field, entry.val)
+    }
+    const stageResponse = await stageRequest
+    t.is(stageResponse.status, 200)
 
-  const comment = 'The authorization was revoked'
-  const withdrawResponse = await agent.post('/approve/travel/withdrawApproval').send({ _id: createdTravel._id, comment })
-  t.is(withdrawResponse.status, 200)
-  const withdrawnTravel = withdrawResponse.body.result as Travel
-  t.is(withdrawnTravel.state, TravelState.REJECTED)
-  t.falsy(withdrawnTravel.log[TravelState.APPROVED])
-  t.truthy(withdrawnTravel.log[TravelState.REJECTED])
-  t.like(withdrawnTravel.comments.at(-1), { text: comment, toState: TravelState.REJECTED })
-  t.is(withdrawnTravel.history.length, 2)
+    const reviewResponse = await agent.post('/travel/underExamination').send({ _id: createdTravel._id })
+    t.is(reviewResponse.status, 200)
+    t.is((reviewResponse.body.result as Travel).state, TravelState.IN_REVIEW)
 
-  const approvedTravelsResponse = await agent.get('/approvedTravel')
-  t.is(approvedTravelsResponse.status, 200)
-  t.false(approvedTravelsResponse.body.data.some((approvedTravel: { reportId: string }) => approvedTravel.reportId === createdTravel._id))
+    if (originalVehicleRegistrationSetting) {
+      await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
+    }
+  })
 
-  await loginUser(agent, 'user')
-  const resubmitResponse = await agent.post('/travel/appliedFor').send({ ...application, _id: createdTravel._id })
-  t.is(resubmitResponse.status, 200)
+  // EXAMINE
 
-  await loginUser(agent, 'travel')
-  const reapproveResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
-  t.is(reapproveResponse.status, 200)
-  t.truthy(reapproveResponse.body.result.log[TravelState.APPROVED])
-  t.is(reapproveResponse.body.result.history.length, 3)
-})
+  await step(t, 'travel saves drafts during provider outages but cannot complete review', async (t) => {
+    await loginUser(agent, 'travel')
+    const before = await TravelModel.findById(travel._id).lean()
+    t.truthy(before)
+    const restore = simulateExchangeRateOutage(t)
+    try {
+      const completion = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id })
+      t.is(completion.status, 422)
+      t.regex(JSON.stringify(completion.body.errors), /exchangeRateUnavailable/)
+      const unchanged = await TravelModel.findById(travel._id).lean()
+      t.is(unchanged?.state, before?.state)
+      t.deepEqual(unchanged?.bookings, before?.bookings)
+      t.deepEqual(unchanged?.advances, before?.advances)
+      const draft = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
+      t.is(draft.status, 200)
+      t.is(draft.body.result.expenses[0].cost.exchangeRate, null)
+    } finally {
+      restore()
+      const after = await TravelModel.findById(travel._id).lean()
+      const previousHistory = new Set(before?.history.map(String))
+      const createdHistory = after?.history.filter((id) => !previousHistory.has(id.toString())) ?? []
+      await TravelModel.updateOne({ _id: travel._id }, { $set: { history: before?.history } })
+      await TravelModel.deleteMany({ _id: { $in: createdHistory } })
+    }
+    const recovered = await agent.post('/examine/travel').send({ _id: travel._id, name: travel.name })
+    t.is(recovered.status, 200)
+    t.truthy(recovered.body.result.expenses[0].cost.exchangeRate)
+  })
 
-// test.after.always('DELETE /travel', async (t) => {
-//   await loginUser(agent, 'user')
-//   const res = await agent.delete('/travel').query({ _id: travel._id })
-//   if (res.status === 200) {
-//     t.pass()
-//   } else {
-//     console.log(res.body)
-//     t.fail()
-//   }
-// })
+  await step(t, 'POST /examine/travel/reviewCompleted', async (t) => {
+    await loginUser(agent, 'travel')
+    t.plan(5)
+    const comment = '' // empty string should not create comment
+    const res = await agent.post('/examine/travel/reviewCompleted').send({ _id: travel._id, comment })
+    if (res.status === 200) {
+      t.pass()
+      const user: User = (await agent.get('/user')).body.data
+      t.is((res.body.result as Travel).log[30]?.by._id, user._id)
+    } else {
+      console.log(res.body)
+      t.fail()
+    }
+    t.is((res.body.result as Travel).state, TravelState.REVIEW_COMPLETED)
+    t.is((res.body.result as Travel).history.length, 5)
+    t.is((res.body.result as Travel).comments.length, 2)
+  })
 
-test.serial.after.always('Restore travel settings and drop DB connection', async () => {
-  if (originalVehicleRegistrationSetting) {
-    await setVehicleRegistrationRequirement(originalVehicleRegistrationSetting)
-  }
-  await shutdown()
+  await step(t, 'POST /approve/travel/withdrawApproval rejects review-completed travel', async (t) => {
+    await loginUser(agent, 'travel')
+    const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
+    t.not(res.status, 200)
+  })
+
+  // REPORT
+
+  await step(t, 'GET /travel/report', async (t) => {
+    await loginUser(agent, 'user')
+    const res = await agent.get('/travel/report').query({ _id: travel._id })
+    t.is(res.status, 200, JSON.stringify(res.body))
+  })
+
+  // BOOK
+
+  await step(t, 'travel bookings apply numeric professional shares to mixed expenses and stages', async (t) => {
+    const storedReport = await TravelModel.collection.findOne<Travel<Types.ObjectId, mongo.Binary>>({
+      _id: new Types.ObjectId(travel._id.toString())
+    })
+    if (!storedReport) throw new Error('Missing test travel')
+    const expense = storedReport.expenses[0]
+    const position = expense.cost.positions[0]
+    const cost = {
+      currency: baseCurrency,
+      receipts: [],
+      positions: [{ kind: 'manual' as const, grossAmount: 100, vatRate: 0, project: position.project, category: position.category }]
+    }
+    const actual = []
+    const expected = []
+    for (const source of ['expense', 'stage'] as const) {
+      for (const scenario of [
+        { purpose: 'mixed' as const, professionalShare: 0, amount: 0 },
+        { purpose: 'mixed' as const, professionalShare: 0.5, amount: 50 },
+        { purpose: 'mixed' as const, professionalShare: null, amount: 100 },
+        { purpose: 'professional' as const, professionalShare: 0, amount: 100 }
+      ]) {
+        const { purpose, professionalShare, amount } = scenario
+        const report = {
+          ...storedReport,
+          professionalShare,
+          days: [],
+          advances: [],
+          addUp: [],
+          expenses: source === 'expense' ? [{ ...expense, purpose, cost }] : [],
+          stages: source === 'stage' ? [{ ...storedReport.stages[0], purpose, cost }] : []
+        }
+        const bookings = await calculateBookings(report, 'Travel')
+        actual.push({ source, purpose, professionalShare, bookings: bookings.map(({ side, amount }) => ({ side, amount })) })
+        expected.push({
+          source,
+          purpose,
+          professionalShare,
+          bookings:
+            amount === 0
+              ? []
+              : [
+                  { side: 'debit', amount },
+                  { side: 'credit', amount }
+                ]
+        })
+      }
+    }
+    t.deepEqual(actual, expected)
+  })
+
+  await step(t, 'POST /book/travel/bookingExportPackage cumulatively allocates mixed cent amounts and VAT overrides', async (t) => {
+    const projectId = new Types.ObjectId(idDocumentToId(travel.project).toString())
+    await TravelModel.collection.updateOne(
+      { _id: new Types.ObjectId(idDocumentToId(travel._id).toString()) },
+      {
+        $set: {
+          professionalShare: 0.5,
+          stages: [],
+          days: [],
+          addUp: [{ project: projectId, advance: { amount: 0 } }],
+          expenses: [
+            {
+              _id: new Types.ObjectId(),
+              description: 'Mixed cent expenses',
+              purpose: 'mixed',
+              cost: {
+                positions: [1, 2].map((position) => ({
+                  _id: new Types.ObjectId(),
+                  kind: 'manual',
+                  description: `Mixed cent expense ${position}`,
+                  grossAmount: 0.01,
+                  vatRate: 19,
+                  vatAmountOverride: 0.01,
+                  project: projectId,
+                  category: new Types.ObjectId(idDocumentToId(category._id).toString())
+                })),
+                currency: 'EUR',
+                exchangeRate: null,
+                receipts: [],
+                date: new Date('2026-07-01T00:00:00.000Z')
+              }
+            }
+          ]
+        }
+      }
+    )
+
+    await loginUser(agent, 'travel')
+    const preview = await agent.post('/book/travel/bookingExportPreview').send([travel._id])
+    t.is(preview.status, 200)
+    t.is(preview.body.result.organisations[0].amount, 0.01)
+    const res = await requestBookingExport(agent, '/book/travel', [travel._id])
+    t.is(res.status, 200)
+    const bookings = res.body.result.bookings as BookingExportRow[]
+    assertBookingsBalanced(t, bookings, 'Travel')
+    t.deepEqual(
+      bookings.map(({ side, amount }) => ({ side, amount })),
+      [
+        { side: 'debit', amount: 0.01 },
+        { side: 'credit', amount: 0.01 }
+      ]
+    )
+    t.is(res.body.result.sepaFiles.length, 1)
+  })
+
+  await step(t, 'POST /book/travel/booked', async (t) => {
+    await loginUser(agent, 'travel')
+    t.plan(2)
+    const res = await agent.post('/book/travel/booked').send([travel._id])
+    t.is(res.status, 200, JSON.stringify(res.body))
+    t.is(res.body.result[0].status, 'fulfilled')
+  })
+
+  await step(t, 'POST /approve/travel/withdrawApproval rejects booked travel', async (t) => {
+    const res = await agent.post('/approve/travel/withdrawApproval').send({ _id: travel._id })
+    t.not(res.status, 200)
+  })
+
+  await step(t, 'POST /approve/travel/withdrawApproval rejects approval and allows fresh reapproval', async (t) => {
+    await loginUser(agent, 'user')
+    const application = {
+      name: 'Withdrawable travel',
+      reason: 'Plans may change',
+      project: travel.project,
+      destinationPlace: { country: { _id: 'DE' }, place: 'Berlin' },
+      startDate: new Date('2030-05-01T00:00:00.000Z'),
+      endDate: new Date('2030-05-02T00:00:00.000Z'),
+      advances: []
+    }
+    const createdResponse = await agent.post('/travel/appliedFor').send(application)
+    t.is(createdResponse.status, 200)
+    const createdTravel = createdResponse.body.result as Travel
+
+    await loginUser(agent, 'travel')
+    const approvedResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(approvedResponse.status, 200)
+
+    const comment = 'The authorization was revoked'
+    const withdrawResponse = await agent.post('/approve/travel/withdrawApproval').send({ _id: createdTravel._id, comment })
+    t.is(withdrawResponse.status, 200)
+    const withdrawnTravel = withdrawResponse.body.result as Travel
+    t.is(withdrawnTravel.state, TravelState.REJECTED)
+    t.falsy(withdrawnTravel.log[TravelState.APPROVED])
+    t.truthy(withdrawnTravel.log[TravelState.REJECTED])
+    t.like(withdrawnTravel.comments.at(-1), { text: comment, toState: TravelState.REJECTED })
+    t.is(withdrawnTravel.history.length, 2)
+
+    const approvedTravelsResponse = await agent.get('/approvedTravel')
+    t.is(approvedTravelsResponse.status, 200)
+    t.false(approvedTravelsResponse.body.data.some((approvedTravel: { reportId: string }) => approvedTravel.reportId === createdTravel._id))
+
+    await loginUser(agent, 'user')
+    const resubmitResponse = await agent.post('/travel/appliedFor').send({ ...application, _id: createdTravel._id })
+    t.is(resubmitResponse.status, 200)
+
+    await loginUser(agent, 'travel')
+    const reapproveResponse = await agent.post('/approve/travel/approved').send({ _id: createdTravel._id })
+    t.is(reapproveResponse.status, 200)
+    t.truthy(reapproveResponse.body.result.log[TravelState.APPROVED])
+    t.is(reapproveResponse.body.result.history.length, 3)
+  })
 })

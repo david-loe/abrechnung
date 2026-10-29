@@ -1,41 +1,37 @@
-import axios from 'axios'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-vi.mock('axios', () => ({ default: { get: vi.fn(), isAxiosError: vi.fn(() => true), isCancel: vi.fn(() => false) } }))
-vi.mock('@/i18n.js', () => ({ default: { global: { t: (value: string) => value } } }))
-vi.mock('@/session.js', () => ({ purgeSession: vi.fn(), sessionState: { isOnline: { value: true } } }))
-
+import { CanceledError } from 'axios'
+import { beforeEach, describe, expect, it } from 'vitest'
 import API from '@/api.js'
-import { purgeSession } from '@/session.js'
+import { readAuthContext, storeAuthContext } from '@/indexedDB.js'
+import { initializeSession, purgeSession, sessionState } from '@/session.js'
+import { serve } from './http.js'
 
-const unauthorized = { response: { status: 401, data: { message: 'Unauthorized' } } }
-
-beforeEach(() => {
-  vi.clearAllMocks()
-  vi.mocked(axios.isCancel).mockReturnValue(false)
-  vi.mocked(axios.get).mockRejectedValue(unauthorized)
+const context = { userId: 'owner', cacheScope: 'scope', expiresAt: '2099-01-01T00:00:00Z', permissions: {} }
+beforeEach(async () => {
+  await purgeSession()
+  await storeAuthContext(context)
+  await initializeSession()
+  API.alerts.splice(0)
+  serve(() => ({ status: 401, data: { message: 'Unauthorized' } }))
 })
 
 describe('API authentication errors', () => {
-  it('keeps the session for an expected authorization failure', async () => {
+  it('given an expected authorization failure, the current session remains available', async () => {
     await API.getter('users', {}, {}, { showAlert: false, handleAuthenticationError: false })
-
-    expect(purgeSession).not.toHaveBeenCalled()
+    expect(sessionState.authContext.value).toEqual(context)
+    expect(await readAuthContext()).toEqual(context)
   })
-
-  it('purges the session for normal authenticated requests', async () => {
+  it('given an expired authenticated request, both memory and persisted authentication are cleared', async () => {
     await API.getter('user')
-
-    expect(purgeSession).toHaveBeenCalledOnce()
+    expect(sessionState.authContext.value).toBeNull()
+    expect(await readAuthContext()).toBeUndefined()
   })
-})
-
-it('ignores canceled requests without alerts, logging, or authentication changes', async () => {
-  const error = new Error('canceled')
-  vi.mocked(axios.isCancel).mockReturnValue(true)
-  vi.mocked(axios.get).mockRejectedValue(error)
-  const alerts = API.alerts.length
-  expect(await API.getter('travel')).toEqual({ error })
-  expect(purgeSession).not.toHaveBeenCalled()
-  expect(API.alerts).toHaveLength(alerts)
+  it('given a canceled request, no alert or authentication change occurs', async () => {
+    const error = new CanceledError('canceled')
+    serve(() => {
+      throw error
+    })
+    expect(await API.getter('travel')).toEqual({ error })
+    expect(sessionState.authContext.value).toEqual(context)
+    expect(API.alerts).toEqual([])
+  })
 })

@@ -1,10 +1,10 @@
 import test from 'ava'
-import { baseCurrency, Country, CountryCode, DocumentFile, Stage, TravelState } from '../types.js'
+import { baseCurrency, Country, CountryCode, DocumentFile, Stage, TravelSettings, TravelState } from '../types.js'
 import { TravelCalculator } from './calculator.js'
 import travelSettings from './travelSettings.js'
-import { combineTravelValidationResults } from './validator.js'
+import { combineTravelValidationResults, TravelValidator } from './validator.js'
 
-function createSetup() {
+function createSetup(overrides: Partial<TravelSettings<string>> = {}) {
   const project = { _id: 'p1', name: 'P', identifier: '1', organisation: 'o1', balance: { amount: 0 } }
   const category = {
     _id: 'c1',
@@ -41,7 +41,9 @@ function createSetup() {
   const countries: Record<CountryCode, Country> = { DE: countryDE, FR: countryFR }
   const getCountryById = async (id: CountryCode) => countries[id]
 
-  const tc = new TravelCalculator(getCountryById, { ...travelSettings, _id: 'settings' })
+  const settings = { ...travelSettings, ...overrides, _id: 'settings' }
+  const tc = new TravelCalculator(getCountryById, settings)
+  const validator = new TravelValidator(settings)
 
   const stages: Stage<string>[] = [
     {
@@ -112,7 +114,7 @@ function createSetup() {
     reference: 1
   }
 
-  return { tc, stages, days, travel }
+  return { tc, validator, stages, days, travel }
 }
 
 test('getProgress returns 100 when stages cover approved period', (t) => {
@@ -160,8 +162,7 @@ test('calc computes refunds and costs', async (t) => {
 })
 
 test('calc rounds overnight refunds with decimal multiplication', async (t) => {
-  const { tc, travel } = createSetup()
-  tc.travelSettings.factorOvernightLumpSum = 0.5
+  const { tc, travel } = createSetup({ factorOvernightLumpSum: 0.5 })
   travel.destinationPlace.country.lumpSums[0].overnight = 2.01
 
   const { result, conflicts } = await tc.calc(travel)
@@ -171,8 +172,7 @@ test('calc rounds overnight refunds with decimal multiplication', async (t) => {
 })
 
 test('calc rounds catering refunds after decimal subtraction before factor application', async (t) => {
-  const { tc, travel } = createSetup()
-  tc.travelSettings.factorCateringLumpSum = 0.5
+  const { tc, travel } = createSetup({ factorCateringLumpSum: 0.5 })
   travel.days[0].cateringRefund = { breakfast: false, lunch: true, dinner: true }
   travel.destinationPlace.country.lumpSums[0].catering8 = 2.01
   travel.destinationPlace.country.lumpSums[0].catering24 = 5
@@ -199,14 +199,14 @@ test('calc reports conflicts for overlapping stages', async (t) => {
 })
 
 test('validator returns warnings independently from validation errors', (t) => {
-  const { tc, travel } = createSetup()
-  const results = tc.validator.getValidationResults({ ...travel, endDate: new Date('2022-12-20') })
+  const { validator, travel } = createSetup()
+  const results = validator.getValidationResults({ ...travel, endDate: new Date('2022-12-20') })
   t.true(results.some((result) => result.code === 'stageOutOfBounds' && result.severity === 'warning'))
 })
 
 test('validator requires receipts for non-own-car travel stages with a cost amount', (t) => {
-  const { tc, stages, travel } = createSetup()
-  const results = tc.validator.getValidationResults({
+  const { validator, stages, travel } = createSetup()
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       {
@@ -230,10 +230,10 @@ test('validator requires receipts for non-own-car travel stages with a cost amou
 })
 
 test('validator requires own car proof when vehicle registration is required and missing', (t) => {
-  const { tc, stages, travel } = createSetup()
-  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
+  const { validator, stages, travel } = createSetup()
+  validator.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
 
-  const results = tc.validator.getValidationResults({
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
@@ -245,13 +245,13 @@ test('validator requires own car proof when vehicle registration is required and
 })
 
 test('validator accepts vehicle registration context for own car when required', (t) => {
-  const { tc, stages, travel } = createSetup()
-  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
+  const { validator, stages, travel } = createSetup()
+  validator.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'required' })
   const vehicleRegistration: DocumentFile<string>[] = [
     { _id: 'vr1', owner: 'u1', name: 'registration.pdf', type: 'application/pdf', data: new Blob([]) }
   ]
 
-  const results = tc.validator.getValidationResults(
+  const results = validator.getValidationResults(
     {
       ...travel,
       stages: [
@@ -266,10 +266,10 @@ test('validator accepts vehicle registration context for own car when required',
 })
 
 test('validator does not require own car receipts when vehicle registration is optional', (t) => {
-  const { tc, stages, travel } = createSetup()
-  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'optional' })
+  const { validator, stages, travel } = createSetup()
+  validator.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'optional' })
 
-  const results = tc.validator.getValidationResults({
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
@@ -281,10 +281,10 @@ test('validator does not require own car receipts when vehicle registration is o
 })
 
 test('validator does not require own car receipts when vehicle registration is disabled', (t) => {
-  const { tc, stages, travel } = createSetup()
-  tc.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'none' })
+  const { validator, stages, travel } = createSetup()
+  validator.updateSettings({ ...travelSettings, _id: 'settings', vehicleRegistrationWhenUsingOwnCar: 'none' })
 
-  const results = tc.validator.getValidationResults({
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       { ...stages[0], cost: { ...stages[0].cost, positions: [{ ...stages[0].cost.positions[0], grossAmount: 10 }], receipts: [] } },
@@ -296,8 +296,8 @@ test('validator does not require own car receipts when vehicle registration is d
 })
 
 test('combineTravelValidationResults combines overlapping stage paths into one conflict', (t) => {
-  const { tc, stages, travel } = createSetup()
-  const results = tc.validator.getValidationResults({
+  const { validator, stages, travel } = createSetup()
+  const results = validator.getValidationResults({
     ...travel,
     stages: [stages[0], { ...stages[0], _id: 's3', departure: new Date('2023-01-01T10:00:00Z'), arrival: new Date('2023-01-01T19:00:00Z') }]
   })
@@ -310,8 +310,8 @@ test('combineTravelValidationResults combines overlapping stage paths into one c
 })
 
 test('combineTravelValidationResults keeps distinct overlap pairs when one stage overlaps multiple others', (t) => {
-  const { tc, stages, travel } = createSetup()
-  const results = tc.validator.getValidationResults({
+  const { validator, stages, travel } = createSetup()
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       { ...stages[0], arrival: new Date('2023-01-01T20:00:00Z') },
@@ -334,8 +334,8 @@ test('combineTravelValidationResults keeps distinct overlap pairs when one stage
 })
 
 test('combineTravelValidationResults does not collapse multi-overlap markers into same-stage conflicts', (t) => {
-  const { tc, stages, travel } = createSetup()
-  const results = tc.validator.getValidationResults({
+  const { validator, stages, travel } = createSetup()
+  const results = validator.getValidationResults({
     ...travel,
     stages: [
       { ...stages[0], arrival: new Date('2023-01-01T18:00:00Z') },
@@ -360,8 +360,8 @@ test('combineTravelValidationResults does not collapse multi-overlap markers int
 })
 
 test('combineTravelValidationResults combines country-change paths into one conflict', (t) => {
-  const { tc, stages, travel } = createSetup()
-  const results = tc.validator.getValidationResults({
+  const { validator, stages, travel } = createSetup()
+  const results = validator.getValidationResults({
     ...travel,
     stages: [stages[0], { ...stages[1], startLocation: { place: 'Berlin', country: stages[0].startLocation.country } }]
   })

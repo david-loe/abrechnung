@@ -52,7 +52,7 @@ test.serial('category scope cannot become incompatible with active report positi
 
     t.is(response.status, 422)
     t.true(response.body.errors.some((error: { path?: string; message: string }) => error.path === 'for' && error.message === 'referenced'))
-    t.is((await Category.findById(category._id).orFail()).for, 'both')
+    t.is((await agent.get('/category').query({ _id: category._id.toString() }).expect(200)).body.data.for, 'both')
   }
 })
 
@@ -60,7 +60,7 @@ test.serial('category scope can be widened or changed when only historic reports
   const categoryToWiden = await createCategory('Travel')
   const widenedResponse = await agent.post('/admin/category').send({ _id: categoryToWiden._id.toString(), for: 'both' })
   t.is(widenedResponse.status, 200)
-  t.is((await Category.findById(categoryToWiden._id).orFail()).for, 'both')
+  t.is((await agent.get('/category').query({ _id: categoryToWiden._id.toString() }).expect(200)).body.data.for, 'both')
 
   const historicallyReferencedCategory = await createCategory('both')
   await insertReportReference('travels', historicallyReferencedCategory._id, 'stages', true)
@@ -68,7 +68,10 @@ test.serial('category scope can be widened or changed when only historic reports
     .post('/admin/category')
     .send({ _id: historicallyReferencedCategory._id.toString(), for: 'ExpenseReport' })
   t.is(restrictedResponse.status, 200)
-  t.is((await Category.findById(historicallyReferencedCategory._id).orFail()).for, 'ExpenseReport')
+  t.is(
+    (await agent.get('/category').query({ _id: historicallyReferencedCategory._id.toString() }).expect(200)).body.data.for,
+    'ExpenseReport'
+  )
 })
 
 test.serial.after.always('Clean up category scope tests and drop DB connection', async () => {

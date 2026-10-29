@@ -6,11 +6,9 @@ await loginUser(agent, 'user')
 
 test('GET /settings', async (t) => {
   const res = await agent.get('/settings')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-  }
+  t.is(res.status, 200, JSON.stringify(res.body))
+  t.regex(res.body.data.version, /^\d+\.\d+\.\d+/)
+  t.is(typeof res.body.data.isReadOnly, 'boolean')
 })
 
 test.serial.after.always('Drop DB Connection', async () => {

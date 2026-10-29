@@ -12,12 +12,11 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-it('does not open the database on import and shares one connection between concurrent requests', async () => {
-  const open = vi.spyOn(indexedDB, 'open')
+it('importing leaves storage untouched and concurrent reads expose the same empty store', async () => {
   const { readAuthContext, hasLogoutTombstone } = await import('../src/indexedDB.js')
-  expect(open).not.toHaveBeenCalled()
+  expect(await indexedDB.databases()).toEqual([])
   expect(await Promise.all([readAuthContext(), hasLogoutTombstone()])).toEqual([undefined, false])
-  expect(open).toHaveBeenCalledExactlyOnceWith('abrechnung-db', 3)
+  expect(await indexedDB.databases()).toEqual([{ name: 'abrechnung-db', version: 3 }])
 })
 
 it('defers the v2 migration until use, purges private responses and preserves UI preferences', async () => {

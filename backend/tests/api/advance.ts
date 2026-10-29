@@ -75,7 +75,7 @@ async function confirmAdvanceReceipt(_id: string, receivedOn = new Date('2024-05
   return await agent.post('/advance/received').send({ _id, receivedOn })
 }
 
-test.serial('load shared fixtures', async (t) => {
+test.before(async (t) => {
   await loginUser(agent, 'user')
   const [projectResponse, categoryResponse, insuranceResponse] = await Promise.all([
     agent.get('/project'),

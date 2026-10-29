@@ -1,28 +1,27 @@
-import { mock } from 'node:test'
 import test from 'ava'
 import mongoose from 'mongoose'
 import ExchangeRate from '../../models/exchangeRate.js'
+import Organisation from '../../models/organisation.js'
 import User from '../../models/user.js'
 import createAgent, { loginUser, shutdown } from '../_agent.js'
+import { connectTestDatabase } from '../_database.js'
 import { seedExchangeRates } from '../_exchangeRates.js'
-import { snapshotSharedFixtures } from '../_fixtures.js'
+import { createFixtureTracker, snapshotSharedFixtures } from '../_fixtures.js'
 
-const synchronize = mock.method(mongoose, 'syncIndexes', async () => {
-  throw new Error('Test application must not synchronize indexes')
-})
+await connectTestDatabase()
+const existingIndexes = await User.collection.indexes()
 const started = performance.now()
 const agent = await createAgent()
 console.log(`Prepared createAgent: ${Math.round(performance.now() - started)} ms`)
 
 test.serial('prepared applications do not repeat database setup or share sessions', async (t) => {
-  t.is(synchronize.mock.callCount(), 0)
-  t.is(mongoose.connection.config.autoIndex, false)
+  t.deepEqual(await User.collection.indexes(), existingIndexes)
   t.is((await agent.get('/auth/authenticated')).status, 401)
   await loginUser(agent, 'user')
   t.is((await agent.get('/auth/authenticated')).status, 200)
   const other = await createAgent()
   t.is((await other.get('/auth/authenticated')).status, 401)
-  t.is(synchronize.mock.callCount(), 0)
+  t.deepEqual(await User.collection.indexes(), existingIndexes)
 })
 
 test.serial('shared fixture restoration preserves existing users, settings and activity', async (t) => {
@@ -63,7 +62,59 @@ test.serial('exchange-rate fixtures normalize dates and restore existing and new
   }
 })
 
+test.serial('fixture cleanup removes only recorded new IDs and preserves existing and unrelated new users', async (t) => {
+  const prefix = `cleanup-${new mongoose.Types.ObjectId()}`
+  const existing = await User.create({
+    email: `${prefix}-existing@example.invalid`,
+    name: { givenName: 'Existing', familyName: 'Fixture' },
+    fk: {}
+  })
+  const tracker = await createFixtureTracker()
+  const own = await User.create({ email: `${prefix}-own@example.invalid`, name: { givenName: 'Owned', familyName: 'Fixture' }, fk: {} })
+  const unrelated = await User.create({
+    email: `${prefix}-unrelated@example.invalid`,
+    name: { givenName: 'Unrelated', familyName: 'Fixture' },
+    fk: {}
+  })
+  try {
+    tracker.recordResponse('/admin/user', { _id: existing._id })
+    tracker.recordResponse('/create/user', { _id: own._id })
+    await tracker.cleanup()
+    t.truthy(await User.exists({ _id: existing._id }))
+    t.truthy(await User.exists({ _id: unrelated._id }))
+    t.is(await User.findById(own._id), null)
+    await tracker.cleanup()
+    t.truthy(await User.exists({ _id: unrelated._id }))
+  } finally {
+    await User.deleteMany({ _id: { $in: [existing._id, own._id, unrelated._id] } })
+  }
+})
+
+test.serial('fixture cleanup removes recorded new organisations and preserves existing and unrelated organisations', async (t) => {
+  const source = await Organisation.collection.findOne()
+  if (!source) throw new Error('Missing organisation fixture')
+  const [existing, own, unrelated] = Array.from({ length: 3 }, () => new mongoose.Types.ObjectId())
+  try {
+    await Organisation.collection.insertOne({ ...source, _id: existing, name: `Existing cleanup ${existing}` })
+    const tracker = await createFixtureTracker()
+    await Organisation.collection.insertMany([
+      { ...source, _id: own, name: `Owned cleanup ${own}` },
+      { ...source, _id: unrelated, name: `Unrelated cleanup ${unrelated}` }
+    ])
+    tracker.recordResponse('/admin/organisation', { _id: existing })
+    tracker.recordResponse('/admin/organisation', { _id: own })
+    await tracker.cleanup()
+    t.truthy(await Organisation.exists({ _id: existing }))
+    t.truthy(await Organisation.exists({ _id: unrelated }))
+    t.is(await Organisation.findById(own), null)
+    await tracker.cleanup()
+    t.truthy(await Organisation.exists({ _id: existing }))
+    t.truthy(await Organisation.exists({ _id: unrelated }))
+  } finally {
+    await Organisation.collection.deleteMany({ _id: { $in: [existing, own, unrelated] } })
+  }
+})
+
 test.after.always(async () => {
-  mock.restoreAll()
   await shutdown()
 })

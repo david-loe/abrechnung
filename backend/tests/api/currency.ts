@@ -6,11 +6,8 @@ await loginUser(agent, 'user')
 
 test('GET /currency', async (t) => {
   const res = await agent.get('/currency')
-  if (res.status === 200) {
-    t.pass()
-  } else {
-    console.log(res.body)
-  }
+  t.is(res.status, 200, JSON.stringify(res.body))
+  t.true(res.body.data.some(({ _id }: { _id: string }) => _id === 'EUR'))
 })
 
 test.serial.after.always('Drop DB Connection', async () => {
