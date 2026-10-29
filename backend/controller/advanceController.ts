@@ -353,7 +353,8 @@ export class AdvanceApproveController extends Controller {
       },
       'offsetEntry',
       null,
-      requestBody.subject
+      requestBody.subject,
+      idDocumentToId(advance.owner)
     )
     const result = await Advance.findOne({ _id: idDocumentToId(requestBody.advanceId), historic: false })
       .select({ historic: 0, history: 0 })

@@ -27,6 +27,7 @@ interface Methods {
     reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
     reportId: Types.ObjectId | null,
     subject: string,
+    reportOwnerId: Types.ObjectId,
     session?: mongoose.ClientSession | null
   ): Promise<MoneyNotNull>
 }
@@ -140,13 +141,16 @@ schema.methods.offset = async function (
   reportModelName: ReportModelNameWithoutAdvance | 'offsetEntry',
   reportId: Types.ObjectId | null,
   subject: string,
+  reportOwnerId: Types.ObjectId,
   session: mongoose.ClientSession | null = null
 ) {
-  if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal.amount <= 0) {
-    return reportTotal
-  }
   const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
-  if (!doc) {
+  if (!doc || doc.historic || !idDocumentToId(doc.owner).equals(reportOwnerId)) {
+    const error = new mongoose.Error.ValidationError()
+    error.addError('advances', new mongoose.Error.ValidatorError({ path: 'advances', message: 'invalidAdvanceOwner' }))
+    throw error
+  }
+  if (doc.state < AdvanceState.APPROVED || doc.settledOn || reportTotal.amount <= 0) {
     return reportTotal
   }
   if (reportId && doc.offsetAgainst.some((o) => o.reportId?.equals(reportId))) {

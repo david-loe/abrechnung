@@ -156,6 +156,19 @@ schema.pre('validate', async function () {
 })
 
 schema.pre('validate', async function () {
+  const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
+  const advances =
+    advanceIds.length > 0
+      ? await model<AdvanceBase<Types.ObjectId>>('Advance')
+          .find({ _id: { $in: advanceIds }, ...(!this.historic ? { owner: idDocumentToId(this.owner), historic: false } : {}) })
+          .select({ 'budget.currency': 1 })
+          .lean()
+      : []
+  if (advances.length !== advanceIds.length) {
+    this.invalidate('advances', 'invalidAdvanceOwner')
+    return
+  }
+
   if (!this.currency) {
     this.exchangeRateDate = undefined
     this.exchangeRate = undefined
@@ -166,18 +179,8 @@ schema.pre('validate', async function () {
         this.invalidate(`expenses.${index}.cost.currency`, 'reportCurrencyMismatch')
       }
     }
-    const advanceIds = this.advances.map((advance) => idDocumentToId(advance))
-    if (advanceIds.length > 0) {
-      const advances = await model<AdvanceBase<Types.ObjectId>>('Advance')
-        .find({ _id: { $in: advanceIds } })
-        .select({ 'budget.currency': 1, 'balance.currency': 1 })
-        .lean()
-      if (
-        advances.length !== advanceIds.length ||
-        advances.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)
-      ) {
-        this.invalidate('advances', 'reportCurrencyMismatch')
-      }
+    if (advances.some((advance) => idDocumentToId(advance.budget.currency).toString() !== currency)) {
+      this.invalidate('advances', 'reportCurrencyMismatch')
     }
   }
 
