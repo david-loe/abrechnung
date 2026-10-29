@@ -18,7 +18,12 @@ export async function readPdf(bytes: Uint8Array) {
         content: text.map(({ str }) => str).join(' '),
         width: viewport.width,
         height: viewport.height,
-        annotations: await page.getAnnotations(),
+        annotations: await Promise.all(
+          (await page.getAnnotations()).map(async (annotation) => ({
+            ...annotation,
+            destinationPageIndex: Array.isArray(annotation.dest) ? await document.getPageIndex(annotation.dest[0]) : undefined
+          }))
+        ),
         operators,
         images: imageRectangles(operators)
       })

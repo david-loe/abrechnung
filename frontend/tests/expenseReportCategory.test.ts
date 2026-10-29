@@ -26,20 +26,24 @@ function fixture() {
 }
 
 // This server boundary models persistence and failures, not the client's replacement rule.
-function server(report: ExpenseReport<string>, failure?: string) {
+function server(report: ExpenseReport<string>, failure?: string, prefix = '') {
   const saved = structuredClone(report)
   serve((request) => {
     const body = requestBody(request)
-    if (request.url?.endsWith('/expense')) {
+    if (request.method !== 'post') return { status: 405, data: { message: 'Method not allowed' } }
+    if (request.url === `http://backend.test/${prefix}expenseReport/expense`) {
+      if (request.params?.parentId !== report._id) return { status: 422, data: { message: 'Invalid parent ID' } }
       const id = body instanceof Object ? body._id : undefined
       if (failure === id) return { status: 422, data: { message: 'Expense rejected' } }
       const index = saved.expenses.findIndex((expense) => expense._id === id)
       if (index < 0) return { status: 404, data: { message: 'Unknown expense' } }
       // Receipts use the multipart wire format, decoded just as a server would.
       saved.expenses[index] = body
-    } else {
+    } else if (request.url === `http://backend.test/${prefix}expenseReport${prefix === 'examine/' ? '' : '/inWork'}`) {
       if (failure === 'details') return { status: 422, data: { message: 'Details rejected' } }
       Object.assign(saved, body)
+    } else {
+      return { status: 404, data: { message: 'Unknown endpoint' } }
     }
     return { data: { message: 'alerts.successSaving', result: saved } }
   })
@@ -55,7 +59,7 @@ describe('saving report category changes through the HTTP boundary', () => {
   it.each(['', 'examine/'])('given affected and overridden positions, saving %j preserves receipts and unrelated data', async (prefix) => {
     const report = fixture()
     const original = structuredClone(report)
-    const saved = server(report)
+    const saved = server(report, undefined, prefix)
     const result = await saveExpenseReportDetails(report, { _id: report._id, category: next }, prefix)
     expect(result.error).toBeUndefined()
     expect(saved.category).toEqual(next)

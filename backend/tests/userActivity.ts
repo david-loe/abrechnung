@@ -26,6 +26,24 @@ for (const initial of ['missing', 'null'] as const) {
   })
 }
 
+for (const { description, permission, endpoint } of [
+  { description: 'an inactive user', permission: 'user', endpoint: '/user' },
+  { description: 'a user without admin permission', permission: 'admin', endpoint: '/admin/user' }
+] as const) {
+  test.serial(`given ${description}, a rejected HTTP request leaves persisted activity unchanged`, async (t) => {
+    const previous = new Date(now.valueOf() - 600_000)
+    const user = await User.findById(userId).orFail()
+    const originalPermission = user.access[permission]
+    try {
+      await User.updateOne({ _id: userId }, { $set: { lastActiveAt: previous, [`access.${permission}`]: false } })
+      await agent.get(endpoint).expect(401)
+      t.deepEqual((await User.findById(userId).orFail()).lastActiveAt, previous)
+    } finally {
+      await User.updateOne({ _id: userId }, { $set: { [`access.${permission}`]: originalPermission } })
+    }
+  })
+}
+
 test.serial('given recent activity, requests retain the timestamp until the exact five-minute boundary', async (t) => {
   const previous = new Date(now.valueOf() - 299_999)
   await User.updateOne({ _id: userId }, { $set: { lastActiveAt: previous } })

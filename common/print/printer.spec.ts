@@ -71,8 +71,10 @@ test('given two receipts, table links in the saved PDF lead to their separate at
   const pages = await readPdf(await drawer.finish())
   t.is(pages.length, 3)
   t.is(pages[0].annotations.length, 2)
-  const destinations = pages[0].annotations.map(({ dest }) => JSON.stringify(dest))
-  t.is(new Set(destinations).size, 2)
+  t.deepEqual(
+    pages[0].annotations.map(({ destinationPageIndex }) => destinationPageIndex),
+    [1, 2]
+  )
   const receiptText = pages[0].text.find(({ str }) => str.includes('1, 2'))
   t.truthy(receiptText)
   if (!receiptText) throw new Error('Missing receipt text in the PDF')
