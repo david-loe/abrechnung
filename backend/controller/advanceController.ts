@@ -23,7 +23,7 @@ import ReportUsage from '../models/reportUsage.js'
 import Travel from '../models/travel.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
 import { Controller, checkOwner, GetterQuery } from './controller.js'
-import { AuthorizationError, NotFoundError } from './error.js'
+import { AuthorizationError, NotAllowedError, NotFoundError } from './error.js'
 import { bulkSaveImport, resolveImportReferences, validateImportValues } from './reportImport.js'
 import { AdvanceBulkImportPost, AuthenticatedExpressRequest, MoneyPost } from './types.js'
 
@@ -262,6 +262,10 @@ export class AdvanceApproveController extends Controller {
       | { _id: string; comment?: string; bookingRemark?: string | null; exchangeRateDate?: Date | string | null },
     @Request() request: AuthenticatedExpressRequest
   ) {
+    const project = 'project' in requestBody ? requestBody.project : undefined
+    if (project && !checkIfUserIsProjectSupervisor(request.user, idDocumentToId(project))) {
+      throw new NotAllowedError('Not allowed to approve an advance for this project')
+    }
     const extendedBody = Object.assign(requestBody, { state: AdvanceState.APPROVED, editor: request.user._id })
     if (!extendedBody._id) {
       if (!(extendedBody as AdvanceApplication).name) {
