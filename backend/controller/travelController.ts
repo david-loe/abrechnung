@@ -126,8 +126,8 @@ export class TravelController extends Controller {
   @Post('stage/import')
   public async importStagesToOwn(@Body() requestBody: TravelStageImportRequest<string>, @Request() request: AuthenticatedExpressRequest) {
     const [sourceTravel, targetTravel] = await Promise.all([
-      Travel.findOne({ _id: requestBody.sourceTravelId }),
-      Travel.findOne({ _id: requestBody.targetTravelId })
+      Travel.findOne({ _id: requestBody.sourceTravelId, historic: false }),
+      Travel.findOne({ _id: requestBody.targetTravelId, historic: false })
     ])
     if (!sourceTravel) {
       throw new NotFoundError(`No Travel for _id: '${requestBody.sourceTravelId}' found.`)
@@ -339,6 +339,7 @@ export class TravelController extends Controller {
       cb,
       async checkOldObject(oldObject: TravelDoc) {
         if (
+          !oldObject.historic &&
           oldObject.owner._id.equals(request.user._id) &&
           (oldObject.state === TravelState.APPROVED || oldObject.state === TravelState.IN_REVIEW) &&
           oldObject.editor._id.equals(request.user._id)
@@ -364,7 +365,7 @@ export class TravelController extends Controller {
       cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: t }),
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
+        if (!oldObject.historic && oldObject.owner._id.equals(request.user._id) && oldObject.state === TravelState.APPROVED) {
           await assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -526,7 +527,11 @@ export class TravelApproveController extends Controller {
       cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'travel.approved', report: t }),
       allowNew: true,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === TravelState.APPLIED_FOR &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           const changes = requestBody as TravelApplication & { owner?: IdDocument }
           await assertAdvanceOwnership(changes.owner ?? oldObject.owner, changes.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
@@ -545,7 +550,11 @@ export class TravelApproveController extends Controller {
       requestBody: extendedBody,
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state !== TravelState.APPROVED || !checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          oldObject.historic ||
+          oldObject.state !== TravelState.APPROVED ||
+          !checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           return false
         }
         await oldObject.saveToHistory()
@@ -570,7 +579,9 @@ export class TravelApproveController extends Controller {
       cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.rejected', report: t }),
       allowNew: false,
       checkOldObject: async (oldObject: TravelDoc) =>
-        oldObject.state === TravelState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        !oldObject.historic &&
+        oldObject.state === TravelState.APPLIED_FOR &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
 }
@@ -625,7 +636,7 @@ export class TravelExamineController extends Controller {
     return await this.deleter(Travel, {
       _id: _id,
       async checkOldObject(oldObject: TravelDoc) {
-        return checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        return !oldObject.historic && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
       }
     })
   }
@@ -769,7 +780,11 @@ export class TravelExamineController extends Controller {
       allowNew: false,
       cb: (e: ITravel) => emitIntegrationEvent({ type: 'travel.back_to_approved', report: e }),
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === TravelState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === TravelState.IN_REVIEW &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await oldObject.saveToHistory()
           return true
         }
@@ -790,7 +805,11 @@ export class TravelExamineController extends Controller {
       cb: async (t: ITravel<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: t }),
       allowNew: false,
       async checkOldObject(oldObject: TravelDoc) {
-        if (oldObject.state === TravelState.APPROVED && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === TravelState.APPROVED &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertTravelCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -882,7 +901,11 @@ export class TravelBookableController extends Controller {
           requestBody: doc,
           allowNew: false,
           async checkOldObject(oldObject: TravelDoc) {
-            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+            if (
+              !oldObject.historic &&
+              oldObject.state === State.BOOKABLE &&
+              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+            ) {
               await oldObject.saveToHistory()
               return true
             }

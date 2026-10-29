@@ -448,7 +448,7 @@ export async function addReferenceOnNewDocs(doc: HydratedDocument<ReferenceDoc>,
 type HistoryDoc = { reference?: number; historic?: boolean; updatedAt: Date | string; history: Types.ObjectId[] }
 export async function addHistoryEntry(doc: HydratedDocument<HistoryDoc>, modelName: string, session: mongoose.ClientSession | null = null) {
   const m = mongoose.model<HistoryDoc>(modelName)
-  const dbDoc = await m.findOne({ _id: doc._id }, { history: 0 }).session(session).lean()
+  const dbDoc = await m.findOne({ _id: doc._id, historic: false }, { history: 0 }).session(session).lean()
   if (!dbDoc) {
     throw new Error(`${modelName} (${doc._id}) not found while saving to history`)
   }

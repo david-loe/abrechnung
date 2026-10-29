@@ -145,7 +145,7 @@ schema.methods.offset = async function (
   if (this.state < AdvanceState.APPROVED || this.settledOn || reportTotal.amount <= 0) {
     return reportTotal
   }
-  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance').findOne({ _id: this._id }).session(session)
+  const doc = await model<Advance<Types.ObjectId>, AdvanceModel>('Advance').findOne({ _id: this._id, historic: false }).session(session)
   if (!doc) {
     return reportTotal
   }
@@ -240,7 +240,7 @@ schema.pre('save', async function () {
 })
 
 schema.post('save', async function () {
-  if (this.$locals.SKIP_POST_SAFE_HOOK) {
+  if (this.historic || this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }
   if (this.state === AdvanceState.APPROVED) {

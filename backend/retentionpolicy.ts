@@ -84,7 +84,7 @@ async function triggerDeletion(retentionPolicy: { [key in RetentionType]: number
 async function deleteAny(reports: Array<ITravel | IExpenseReport | IHealthCareCost>, schema: ReportModelNameWithoutAdvance) {
   const { formatter } = createOperationServices()
   for (let i = 0; i < reports.length; i++) {
-    const result = await model(schema).deleteOne({ _id: reports[i]._id })
+    const result = await model(schema).deleteOne({ _id: reports[i]._id, historic: false })
     if (result && result.deletedCount === 1) {
       logger.info(`Deleted ${schema} from owner ${formatter.name(reports[i].owner.name)} with name ${reports[i].name}.`)
     }
@@ -96,10 +96,7 @@ async function notificationMailForDeletions(retentionPolicy: { [key in Retention
   if (retentionPolicy.mailXDaysBeforeDeletion > 0) {
     for (let i = 0; i < notifications.length; i++) {
       if (notifications[i].deletionPeriod !== 0) {
-        const daysUntilDeletionTemp =
-          retentionPolicy.mailXDaysBeforeDeletion < notifications[i].deletionPeriod
-            ? retentionPolicy.mailXDaysBeforeDeletion
-            : notifications[i].deletionPeriod
+        const daysUntilDeletionTemp = Math.min(retentionPolicy.mailXDaysBeforeDeletion, notifications[i].deletionPeriod)
         const date = await getDateThreshold(notifications[i].deletionPeriod - daysUntilDeletionTemp)
         const startDate = new Date(date)
         startDate.setDate(startDate.getDate() - 1)
