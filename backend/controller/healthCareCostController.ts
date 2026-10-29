@@ -23,13 +23,14 @@ import HealthCareCost, { HealthCareCostDoc } from '../models/healthCareCost.js'
 import Organisation from '../models/organisation.js'
 import User from '../models/user.js'
 import { createBookingExportPackage, getBookingExportPreview } from './bookingExport.js'
-import { Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
+import { assertAdvanceOwnership, Controller, checkOwner, GetterQuery, SetterBody } from './controller.js'
 import { AuthorizationError, NotFoundError, ValidationClientError } from './error.js'
 import { AuthenticatedExpressRequest } from './types.js'
 
 const healthCareCostValidator = new Validator({ requireReceipts: true })
 
-function assertHealthCareCostCanEnterReview(report: Pick<IHealthCareCost, 'expenses'>, language: string) {
+async function assertHealthCareCostCanEnterReview(report: Pick<IHealthCareCost, 'owner' | 'advances' | 'expenses'>, language: string) {
+  await assertAdvanceOwnership(report.owner, report.advances)
   const reviewSummary = healthCareCostValidator.getValidationSummary(report)
   if (!reviewSummary.canEnterReview) {
     throw new ValidationClientError(
@@ -129,6 +130,7 @@ export class HealthCareCostController extends Controller {
         throw new AuthorizationError()
       }
       Object.assign(extendedBody, { owner: request.user._id })
+      await assertAdvanceOwnership(request.user._id, requestBody.advances)
       if (!extendedBody.name) {
         const date = new Date()
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
@@ -140,9 +142,11 @@ export class HealthCareCostController extends Controller {
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === HealthCareCostState.IN_WORK && request.user.access['inWork:healthCareCost']) {
+            await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             return true
           }
           if (oldObject.state === HealthCareCostState.IN_REVIEW && oldObject.editor._id.equals(request.user._id)) {
+            await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             await oldObject.saveToHistory()
             return true
           }
@@ -166,7 +170,7 @@ export class HealthCareCostController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
-          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
+          await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -303,10 +307,17 @@ export class HealthCareCostExamineController extends Controller {
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
       allowNew: false,
-      checkOldObject: async (oldObject: HealthCareCostDoc) =>
-        !oldObject.historic &&
-        (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
-        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+      checkOldObject: async (oldObject: HealthCareCostDoc) => {
+        if (
+          !oldObject.historic &&
+          (oldObject.state === State.EDITABLE_BY_OWNER || oldObject.state === State.IN_REVIEW) &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
+          await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
+          return true
+        }
+        return false
+      }
     })
   }
 
@@ -332,6 +343,9 @@ export class HealthCareCostExamineController extends Controller {
         extendedBody.name = `${requestBody.patientName} ${i18n.t(`monthsShort.${date.getUTCMonth()}`, { lng: request.user.settings.language })} ${date.getUTCFullYear()}`
       }
     }
+    if (!extendedBody._id) {
+      await assertAdvanceOwnership(requestBody.owner, requestBody.advances)
+    }
     return await this.setter(HealthCareCost, {
       requestBody: extendedBody,
       cb: async (h: IHealthCareCost<Types.ObjectId>) =>
@@ -339,6 +353,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+          await assertAdvanceOwnership(requestBody.owner ?? oldObject.owner, requestBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
         }
@@ -362,7 +377,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
+          await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }
@@ -384,7 +399,7 @@ export class HealthCareCostExamineController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
         if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
-          assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
+          await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
         }

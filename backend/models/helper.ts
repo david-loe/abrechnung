@@ -371,7 +371,6 @@ export async function offsetAdvance(
     exchangeRate?: number | null
     _id: Types.ObjectId
     name: string
-    owner: IdDocument<Types.ObjectId>
   },
   modelName: ReportModelNameWithoutAdvance
 ) {
@@ -403,7 +402,7 @@ export async function offsetAdvance(
         })
       for (const advance of matchingAdvances) {
         if (advance.project._id.equals(idDocumentToId(addUp.project))) {
-          total = await (advance as AdvanceDoc).offset(total, modelName, report._id, report.name, idDocumentToId(report.owner), session)
+          total = await (advance as AdvanceDoc).offset(total, modelName, report._id, report.name, session)
         }
       }
     }
