@@ -91,7 +91,7 @@ async function postExpensesBulk(
     throw new ValidationClientError(i18n.t('alerts.noData.expense', { lng: language }))
   }
 
-  const parentObject = await ExpenseReport.findOne({ _id: parentId })
+  const parentObject = await ExpenseReport.findOne({ _id: parentId, historic: false })
   if (!parentObject) {
     throw new NotFoundError(`No ExpenseReport for _id: '${parentId}' found.`)
   }
@@ -215,7 +215,7 @@ export class ExpenseReportController extends Controller {
       requestBody: extendedBody,
       cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.draft_saved', report: e }),
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.owner._id.equals(request.user._id)) {
+        if (!oldObject.historic && oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === ExpenseReportState.IN_WORK && request.user.access['inWork:expenseReport']) {
             await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             return true
@@ -244,7 +244,7 @@ export class ExpenseReportController extends Controller {
       cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: e }),
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
+        if (!oldObject.historic && oldObject.owner._id.equals(request.user._id) && oldObject.state === ExpenseReportState.IN_WORK) {
           await assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -349,7 +349,7 @@ export class ExpenseReportExamineController extends Controller {
     return await this.deleter(ExpenseReport, {
       _id: _id,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        return checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        return !oldObject.historic && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
       }
     })
   }
@@ -474,7 +474,11 @@ export class ExpenseReportExamineController extends Controller {
         emitIntegrationEvent({ type: extendedBody._id ? 'report.back_to_in_work' : 'report.review_requested', report: e }),
       allowNew: true,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === ExpenseReportState.IN_REVIEW &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertAdvanceOwnership(requestBody.owner ?? oldObject.owner, requestBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
@@ -498,7 +502,11 @@ export class ExpenseReportExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === ExpenseReportState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === ExpenseReportState.IN_REVIEW &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertExpenseReportCanCompleteReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -520,7 +528,11 @@ export class ExpenseReportExamineController extends Controller {
       cb: async (e: IExpenseReport<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: e }),
       allowNew: false,
       async checkOldObject(oldObject: ExpenseReportDoc) {
-        if (oldObject.state === ExpenseReportState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === ExpenseReportState.IN_WORK &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertExpenseReportCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -612,7 +624,11 @@ export class ExpenseReportBookableController extends Controller {
           requestBody: doc,
           allowNew: false,
           async checkOldObject(oldObject: ExpenseReportDoc) {
-            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+            if (
+              !oldObject.historic &&
+              oldObject.state === State.BOOKABLE &&
+              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+            ) {
               await oldObject.saveToHistory()
               return true
             }

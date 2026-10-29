@@ -210,7 +210,7 @@ schema.pre('save', async function () {
 })
 
 schema.post('save', async function () {
-  if (this.$locals.SKIP_POST_SAFE_HOOK) {
+  if (this.historic || this.$locals.SKIP_POST_SAFE_HOOK) {
     return
   }
   if (this.state === ExpenseReportState.REVIEW_COMPLETED) {

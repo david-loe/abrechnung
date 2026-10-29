@@ -13,7 +13,7 @@ export class AdminToolController extends Controller {
   public async getByRef(@Query() ref: number, @Query() type: ReportModelName) {
     const report = await mongoose
       .model<{ name: string; owner: UserSimple; project: ProjectSimple; reference: number }>(type)
-      .findOne({ reference: ref })
+      .findOne({ reference: ref, historic: false })
       .select({ _id: 1, project: 1, name: 1, owner: 1 })
       .lean()
     if (!report) {
@@ -31,7 +31,9 @@ export class AdminToolController extends Controller {
     }
   ) {
     const model = mongoose.model<{ name: string; owner: UserSimple; project: ProjectSimple; reference: number }>(requestBody.type)
-    const report = await model.findOneAndUpdate({ reference: requestBody.ref }, requestBody.data, { returnDocument: 'after' }).lean()
+    const report = await model
+      .findOneAndUpdate({ reference: requestBody.ref, historic: false }, requestBody.data, { returnDocument: 'after' })
+      .lean()
     if (!report) {
       throw new NotFoundError(`No ${requestBody.type} with ref: '${requestBody.ref}' found`)
     }
@@ -41,7 +43,7 @@ export class AdminToolController extends Controller {
   @Delete('report')
   public async deleteReport(@Query() ref: number, @Query() type: ReportModelName) {
     const model = mongoose.model<{ name: string; owner: UserSimple; project: ProjectSimple; reference: number }>(type)
-    const result = await model.deleteOne({ reference: ref })
+    const result = await model.deleteOne({ reference: ref, historic: false })
     if (result.deletedCount === 0) {
       throw new NotFoundError(`No ${type} with ref: '${ref}' found`)
     }

@@ -284,7 +284,11 @@ export class AdvanceApproveController extends Controller {
       cb,
       allowNew: true,
       async checkOldObject(oldObject: AdvanceDoc) {
-        if (oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === AdvanceState.APPLIED_FOR &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await oldObject.saveToHistory()
           return true
         }
@@ -302,6 +306,7 @@ export class AdvanceApproveController extends Controller {
       allowNew: false,
       async checkOldObject(oldObject: AdvanceDoc) {
         if (
+          oldObject.historic ||
           oldObject.state !== AdvanceState.APPROVED ||
           oldObject.receivedOn ||
           oldObject.offsetAgainst.length > 0 ||
@@ -332,7 +337,9 @@ export class AdvanceApproveController extends Controller {
       cb: async (a: IAdvance<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.rejected', report: a }),
       allowNew: false,
       checkOldObject: async (oldObject: AdvanceDoc) =>
-        oldObject.state === AdvanceState.APPLIED_FOR && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        !oldObject.historic &&
+        oldObject.state === AdvanceState.APPLIED_FOR &&
+        checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
     })
   }
 
@@ -451,7 +458,11 @@ export class AdvanceBookableController extends Controller {
           requestBody: doc,
           allowNew: false,
           async checkOldObject(oldObject: AdvanceDoc) {
-            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+            if (
+              !oldObject.historic &&
+              oldObject.state === State.BOOKABLE &&
+              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+            ) {
               await oldObject.saveToHistory()
               return true
             }

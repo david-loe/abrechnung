@@ -140,7 +140,7 @@ export class HealthCareCostController extends Controller {
       requestBody: extendedBody,
       cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.draft_saved', report: h }),
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.owner._id.equals(request.user._id)) {
+        if (!oldObject.historic && oldObject.owner._id.equals(request.user._id)) {
           if (oldObject.state === HealthCareCostState.IN_WORK && request.user.access['inWork:healthCareCost']) {
             await assertAdvanceOwnership(oldObject.owner, requestBody.advances ?? oldObject.advances)
             return true
@@ -169,7 +169,7 @@ export class HealthCareCostController extends Controller {
       cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: h }),
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
+        if (!oldObject.historic && oldObject.owner._id.equals(request.user._id) && oldObject.state === HealthCareCostState.IN_WORK) {
           await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -235,7 +235,7 @@ export class HealthCareCostExamineController extends Controller {
     return await this.deleter(HealthCareCost, {
       _id: _id,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        return checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        return !oldObject.historic && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
       }
     })
   }
@@ -358,7 +358,11 @@ export class HealthCareCostExamineController extends Controller {
         emitIntegrationEvent({ type: extendedBody._id ? 'report.back_to_in_work' : 'report.review_requested', report: h }),
       allowNew: true,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === HealthCareCostState.IN_REVIEW &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertAdvanceOwnership(requestBody.owner ?? oldObject.owner, requestBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
           return true
@@ -382,7 +386,11 @@ export class HealthCareCostExamineController extends Controller {
       cb,
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === HealthCareCostState.IN_REVIEW && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === HealthCareCostState.IN_REVIEW &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -404,7 +412,11 @@ export class HealthCareCostExamineController extends Controller {
       cb: async (h: IHealthCareCost<Types.ObjectId>) => emitIntegrationEvent({ type: 'report.review_requested', report: h }),
       allowNew: false,
       async checkOldObject(oldObject: HealthCareCostDoc) {
-        if (oldObject.state === HealthCareCostState.IN_WORK && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+        if (
+          !oldObject.historic &&
+          oldObject.state === HealthCareCostState.IN_WORK &&
+          checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+        ) {
           await assertHealthCareCostCanEnterReview(oldObject, request.user.settings.language)
           await oldObject.saveToHistory()
           return true
@@ -503,7 +515,11 @@ export class HealthCareCostBookableController extends Controller {
           requestBody: doc,
           allowNew: false,
           async checkOldObject(oldObject: HealthCareCostDoc) {
-            if (oldObject.state === State.BOOKABLE && checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)) {
+            if (
+              !oldObject.historic &&
+              oldObject.state === State.BOOKABLE &&
+              checkIfUserIsProjectSupervisor(request.user, oldObject.project._id)
+            ) {
               await oldObject.saveToHistory()
               return true
             }
