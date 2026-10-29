@@ -66,6 +66,33 @@ test.serial('given stale activity, parallel authorized requests converge on the 
   t.is((await agent.get('/user').expect(200)).body.data.lastActiveAt, now.toISOString())
 })
 
+test.serial('given a stale request user, saving settings preserves newer persisted activity', async (t) => {
+  const user = await User.findById(userId).orFail()
+  const language = user.settings.language === 'fr' ? 'en' : 'fr'
+  const newer = new Date(now.valueOf() + 1000)
+  await User.updateOne({ _id: userId }, { $set: { lastActiveAt: new Date(now.valueOf() - 600_000) } })
+
+  const updateOne = User.updateOne.bind(User)
+  let modifiedCount: number | undefined
+  // Persist competing activity after authentication has loaded the request user.
+  const concurrentUpdate = mock.method(User, 'updateOne', async (...args: Parameters<typeof User.updateOne>) => {
+    await updateOne({ _id: userId }, { $set: { lastActiveAt: newer } })
+    const result = await updateOne(...args)
+    modifiedCount = result.modifiedCount
+    return result
+  })
+  try {
+    await agent.post('/user/settings').send({ language }).expect(200)
+  } finally {
+    concurrentUpdate.mock.restore()
+  }
+
+  const saved = await User.findById(userId).orFail()
+  t.is(modifiedCount, 0)
+  t.is(saved.settings.language, language)
+  t.deepEqual(saved.lastActiveAt, newer)
+})
+
 test.serial('given an activity-store outage, an authorized request and login still succeed', async (t) => {
   const previous = new Date(now.valueOf() - 600_000)
   await User.updateOne({ _id: userId }, { $set: { lastActiveAt: previous } })
