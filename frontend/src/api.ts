@@ -1,6 +1,7 @@
 import { GETResponse, SETResponse } from 'abrechnung-common/types.js'
 import axios, { AxiosRequestConfig } from 'axios'
 import { Reactive, reactive } from 'vue'
+import { cookieWriteConfig } from './csrf.js'
 import ENV from './env.js'
 import { eventBus } from './eventBus.js'
 import i18n from './i18n.js'
@@ -63,7 +64,8 @@ class API {
   ): Promise<{ ok?: T; error?: unknown }> {
     if (!sessionState.isOnline.value) return { error: new Error('Offline mode is read-only') }
     try {
-      const res = await axios.post(`${ENV.VITE_BACKEND_URL}/${endpoint}`, data, Object.assign({ withCredentials: true }, config))
+      const url = `${ENV.VITE_BACKEND_URL}/${endpoint}`
+      const res = await axios.post(url, data, await cookieWriteConfig(url, config))
       if (showAlert) this.addAlert({ title: i18n.global.t(res.data.message), type: 'success' })
       eventBus.dispatchEvent(new CustomEvent('api-mutation-succeeded', { detail: { endpoint, method: 'POST' } }))
       return { ok: (res.data as SETResponse<T>).result }
@@ -84,7 +86,8 @@ class API {
       }
     }
     try {
-      const res = await axios.delete(`${ENV.VITE_BACKEND_URL}/${endpoint}`, { params: params, withCredentials: true })
+      const url = `${ENV.VITE_BACKEND_URL}/${endpoint}`
+      const res = await axios.delete(url, await cookieWriteConfig(url, { params }))
       if (showAlert.success) this.addAlert({ message: '', title: i18n.global.t('alerts.successDeleting'), type: 'success' })
       eventBus.dispatchEvent(new CustomEvent('api-mutation-succeeded', { detail: { endpoint, method: 'DELETE' } }))
       if (res.data.result) {

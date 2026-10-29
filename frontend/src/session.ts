@@ -1,6 +1,7 @@
 import type { AuthContext } from 'abrechnung-common/types.js'
 import axios from 'axios'
 import { readonly, ref } from 'vue'
+import { clearCsrfToken, cookieWriteConfig } from './csrf.js'
 import ENV from './env.js'
 import {
   clearLogoutTombstone,
@@ -17,6 +18,7 @@ const channel = typeof BroadcastChannel === 'undefined' ? undefined : new Broadc
 const purgeHandlers = new Set<() => void | Promise<void>>()
 
 async function purge(notify = true) {
+  clearCsrfToken()
   authContext.value = null
   await Promise.all([...purgeHandlers].map((handler) => handler()))
   await purgePrivateData()
@@ -48,6 +50,7 @@ export async function refreshAuthContext() {
   if (!navigator.onLine) return getValidOfflineContext()
   await prepareLogin()
   const response = await axios.get<AuthContext>(`${ENV.VITE_BACKEND_URL}/auth/authenticated`, { withCredentials: true })
+  clearCsrfToken()
   const previousScope = authContext.value?.cacheScope ?? (await readAuthContext())?.cacheScope
   if (previousScope && previousScope !== response.data.cacheScope) await purge()
   authContext.value = response.data
@@ -58,11 +61,15 @@ export async function refreshAuthContext() {
 export async function prepareLogin() {
   if (!navigator.onLine) return false
   if (!(await hasLogoutTombstone())) return true
-  try {
-    await axios.delete(`${ENV.VITE_BACKEND_URL}/auth/logout`, { withCredentials: true })
-  } catch (error) {
-    if (!axios.isAxiosError(error) || error.response?.status !== 401) throw error
-  }
+  const url = `${ENV.VITE_BACKEND_URL}/auth/logout`
+  // Only a 401 from token acquisition proves the cookie session is gone.
+  // A rejected DELETE can instead mean the Origin or token was refused.
+  const config = await cookieWriteConfig(url).catch((error: unknown) => {
+    if (axios.isAxiosError(error) && error.response?.status === 401) return null
+    throw error
+  })
+  if (config) await axios.delete(url, config)
+  clearCsrfToken()
   await clearLogoutTombstone()
   return true
 }

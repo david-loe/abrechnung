@@ -3,6 +3,7 @@ import mongoose from 'mongoose'
 import request from 'supertest'
 import { createApp, shutdown } from '../../app.js'
 import { sessionStore } from '../../db.js'
+import ENV from '../../env.js'
 import { initializeBackendRuntime } from '../../runtime.js'
 import { connectTestDatabase } from '../_database.js'
 import { snapshotSharedFixtures } from '../_fixtures.js'
@@ -105,8 +106,27 @@ test.serial('existing sessions without touch metadata remain usable', async (t) 
   t.true((await sessions.findOne({ _id: id }))?.lastModified instanceof Date)
 })
 
+test.serial('retrieving a stable CSRF token for an existing session adds no session writes', async (t) => {
+  const agent = request.agent(app).set('Origin', new URL(ENV.VITE_FRONTEND_URL).origin)
+  await agent.post('/auth/ldapauth').send({ username: 'fry', password: 'fry' }).expect(204)
+  const session = await agent.get('/__test/session').expect(200)
+  const before = await sessions.findOne({ _id: session.body.id })
+  const initialSets = sets
+  const initialTouches = touches
+  const token = await agent.get('/auth/csrf').expect(200)
+  for (let i = 0; i < 3; i++) {
+    const response = await agent.get('/auth/csrf').expect(200)
+    t.is(response.body.csrfToken, token.body.csrfToken)
+    t.false('set-cookie' in response.headers)
+  }
+  t.is(sets, initialSets)
+  t.is(touches, initialTouches)
+  t.deepEqual(await sessions.findOne({ _id: session.body.id }), before)
+  await agent.delete('/auth/logout').set('X-CSRF-Token', token.body.csrfToken).expect(204)
+})
+
 test.serial('expired sessions cannot retain authentication and logout destroys live sessions', async (t) => {
-  const agent = request.agent(app)
+  const agent = request.agent(app).set('Origin', new URL(ENV.VITE_FRONTEND_URL).origin)
   await agent.post('/auth/ldapauth').send({ username: 'fry', password: 'fry' }).expect(204)
   const response = await agent.get('/__test/session').expect(200)
   const id = response.body.id as string
@@ -118,7 +138,8 @@ test.serial('expired sessions cannot retain authentication and logout destroys l
 
   await agent.post('/auth/ldapauth').send({ username: 'fry', password: 'fry' }).expect(204)
   const fresh = await agent.get('/__test/session').expect(200)
-  await agent.delete('/auth/logout').expect(204)
+  const csrf = await agent.get('/auth/csrf').expect(200)
+  await agent.delete('/auth/logout').set('X-CSRF-Token', csrf.body.csrfToken).expect(204)
   t.is(await sessions.findOne({ _id: fresh.body.id }), null)
   t.is((await agent.get('/auth/authenticated')).status, 401)
 })

@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosHeaders, type InternalAxiosRequestConfig } from 'axios'
 import qs from 'qs'
 import { afterEach } from 'vitest'
+import { clearCsrfToken } from '@/csrf.js'
 
 interface Reply {
   data: unknown
@@ -10,12 +11,17 @@ const originalAdapter = axios.defaults.adapter
 
 afterEach(() => {
   axios.defaults.adapter = originalAdapter
+  clearCsrfToken()
 })
 
+export const fixtureCsrfToken = 'a'.repeat(43)
+
 /** A server boundary for Node tests: Axios serialization, API and session code stay real. */
-export function serve(handler: (request: InternalAxiosRequestConfig) => Reply | Promise<Reply>) {
+export function serve(handler: (request: InternalAxiosRequestConfig) => Reply | Promise<Reply>, options = { csrf: true }) {
   axios.defaults.adapter = async (config) => {
-    const reply = await handler(config)
+    if (!config.url) throw new Error('HTTP fixture requires a request URL')
+    const reply =
+      options.csrf && new URL(config.url).pathname === '/auth/csrf' ? { data: { csrfToken: fixtureCsrfToken } } : await handler(config)
     const response = { config, data: reply.data, status: reply.status ?? 200, statusText: '', headers: new AxiosHeaders() }
     if (response.status >= 400) throw new AxiosError(`HTTP ${response.status}`, 'ERR_BAD_RESPONSE', config, undefined, response)
     return response

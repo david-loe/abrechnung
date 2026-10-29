@@ -3,14 +3,18 @@ import { Request } from 'express'
 import passport, { AuthenticateCallback } from 'passport'
 import httpBearerStrategy from '../authStrategies/http-bearer.js'
 import usageTokenStrategy from '../authStrategies/usage-token.js'
+import { validateCookieRequest } from '../csrf.js'
 import { recordUserActivity } from '../userActivity.js'
 import { AuthorizationError } from './error.js'
 
 export async function expressAuthentication(req: Request, securityName: string, scopes?: string[]): Promise<Express.User> {
   if (securityName === 'cookieAuth') {
-    if (req.isAuthenticated() && (await isUserAllowedToAccess(req.user, scopes as Access[] | undefined))) {
-      await recordUserActivity(req.user)
-      return req.user
+    if (req.isAuthenticated()) {
+      validateCookieRequest(req)
+      if (await isUserAllowedToAccess(req.user, scopes as Access[] | undefined)) {
+        await recordUserActivity(req.user)
+        return req.user
+      }
     }
   } else if (securityName === 'httpBearer') {
     return bearerAuthentication(req, httpBearerStrategy, scopes)
