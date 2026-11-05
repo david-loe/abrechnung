@@ -21,6 +21,7 @@ import { enqueueMail } from '../integrations/notifications/email.js'
 import Advance from '../models/advance.js'
 import ExpenseReport from '../models/expenseReport.js'
 import HealthCareCost from '../models/healthCareCost.js'
+import Passkey from '../models/passkey.js'
 import Token from '../models/token.js'
 import Travel from '../models/travel.js'
 import User, { userSchema } from '../models/user.js'
@@ -206,7 +207,7 @@ export class UserAdminController extends Controller {
 
   @Delete()
   public async delete(@Query() _id: string) {
-    return await this.deleter(User, {
+    const result = await this.deleter(User, {
       _id,
       referenceChecks: [
         {
@@ -231,6 +232,8 @@ export class UserAdminController extends Controller {
         }
       ]
     })
+    if (result.deletedCount) await Passkey.deleteMany({ user: _id })
+    return result
   }
 
   @Post('merge')
@@ -248,6 +251,7 @@ export class UserAdminController extends Controller {
     let deleteResult: DeleteResult | null = null
     if (delOverwritten) {
       deleteResult = await User.deleteOne({ _id: userIdToOverwrite })
+      if (deleteResult.deletedCount) await Passkey.deleteMany({ user: userIdToOverwrite })
     }
 
     const unmergedUser = user.toObject()

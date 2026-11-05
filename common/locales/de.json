@@ -886,6 +886,23 @@
     "10": "Nov",
     "11": "Dez"
   },
+  "passkeys": {
+    "add": "Passkey hinzufügen",
+    "createdAt": "Erstellt: {date}",
+    "description": "Melde dich mit deinem Gerät oder einem Sicherheitsschlüssel an. Du kannst mehrere Passkeys hinterlegen.",
+    "disabled": "Passkey-Anmeldung und das Hinzufügen sind durch die Administration deaktiviert.",
+    "empty": "Noch keine Passkeys hinterlegt.",
+    "failed": "Der Passkey-Vorgang ist fehlgeschlagen. Bitte versuche es erneut.",
+    "lastUsedAt": "Zuletzt verwendet: {date}",
+    "loadFailed": "Passkeys konnten nicht geladen werden. Bitte lade die Seite erneut.",
+    "loading": "Passkeys werden geladen …",
+    "name": "Passkey-Name",
+    "neverUsed": "Noch nicht verwendet",
+    "offline": "Passkeys können nur online verwendet und verwaltet werden.",
+    "signIn": "Mit Passkey anmelden",
+    "title": "Passkeys",
+    "unsupported": "Passkeys benötigen einen unterstützten Browser und eine sichere Verbindung (HTTPS oder localhost)."
+  },
   "settings": {},
   "settingsSearch": {
     "adminTools": ["wartung", "reparatur", "werkzeuge", "referenz"],

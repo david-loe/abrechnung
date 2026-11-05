@@ -54,7 +54,8 @@ export const displaySettingsSchema = () => {
           magiclogin: { type: Boolean, required: true, label: 'Magiclogin' },
           microsoft: { type: Boolean, required: true, label: 'Microsoft' },
           ldapauth: { type: Boolean, required: true, label: 'LDAP' },
-          oidc: { type: Boolean, required: true, label: 'OIDC' }
+          oidc: { type: Boolean, required: true, label: 'OIDC' },
+          passkey: { type: Boolean, required: true, label: 'Passkeys' }
         },
         required: true
       },

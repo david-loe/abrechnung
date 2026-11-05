@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@simplewebauthn/browser": "^14.0.0",
     "@vueform/vueform": "^1.13.13",
     "abrechnung-common": "file:../common",
     "axios": "^1.21.0",

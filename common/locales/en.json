@@ -886,6 +886,23 @@
     "10": "Nov",
     "11": "Dec"
   },
+  "passkeys": {
+    "add": "Add passkey",
+    "createdAt": "Created: {date}",
+    "description": "Sign in using your device or a security key. You can add multiple passkeys.",
+    "disabled": "Passkey sign-in and registration are disabled by the administrator.",
+    "empty": "No passkeys added yet.",
+    "failed": "The passkey operation failed. Please try again.",
+    "lastUsedAt": "Last used: {date}",
+    "loadFailed": "Passkeys could not be loaded. Please reload the page.",
+    "loading": "Loading passkeys …",
+    "name": "Passkey name",
+    "neverUsed": "Not used yet",
+    "offline": "Passkeys can only be used and managed online.",
+    "signIn": "Sign in with a passkey",
+    "title": "Passkeys",
+    "unsupported": "Passkeys require a supported browser and a secure connection (HTTPS or localhost)."
+  },
   "settings": {},
   "settingsSearch": {
     "adminTools": ["maintenance", "repair", "utilities", "reference"],

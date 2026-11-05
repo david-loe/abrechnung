@@ -1,5 +1,5 @@
 export default {
-  auth: { magiclogin: true, microsoft: true, ldapauth: true, oidc: true },
+  auth: { magiclogin: true, microsoft: true, ldapauth: true, oidc: true, passkey: true },
   oidc: { label: 'OIDC', icon: 'key' },
   locale: { default: 'de', fallback: 'de', overwrite: { de: {}, en: {}, fr: {}, ru: {}, es: {}, kk: {} } },
   nameDisplayFormat: 'givenNameFirst',

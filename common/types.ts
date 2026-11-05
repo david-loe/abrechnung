@@ -205,7 +205,7 @@ export interface LumpSumIntegrationSettings<idType extends _id = _id> extends In
 }
 
 export interface DisplaySettings<idType extends _id = _id> {
-  auth: { magiclogin: boolean; microsoft: boolean; ldapauth: boolean; oidc: boolean }
+  auth: { magiclogin: boolean; microsoft: boolean; ldapauth: boolean; oidc: boolean; passkey: boolean }
   oidc: { label: string; icon: string }
   locale: { default: Locale; fallback: Locale; overwrite: { [key in Locale]: { [key: string]: string } } }
   nameDisplayFormat: NameDisplayFormat
