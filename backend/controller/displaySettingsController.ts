@@ -15,6 +15,7 @@ export class DisplaySettingsController extends Controller {
     const connectionSettings = (await ConnectionSettings.findOne({}, { __v: 0 }).lean()) as IConnectionSettings | null
     if (displaySettings && connectionSettings) {
       displaySettings.auth = {
+        passkey: displaySettings.auth.passkey,
         microsoft: displaySettings.auth.microsoft && Boolean(connectionSettings.auth.microsoft),
         magiclogin: displaySettings.auth.magiclogin && Boolean(connectionSettings.smtp),
         ldapauth: displaySettings.auth.ldapauth && Boolean(connectionSettings.auth.ldapauth),

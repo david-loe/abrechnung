@@ -55,6 +55,14 @@
       </form>
     </div>
 
+    <div v-if="LOGIN_APP_DATA.displaySettings.auth.passkey" class="mt-4">
+      <button type="button" class="btn btn-lg btn-primary" :disabled="passkeyBusy || !passkeySupported" @click="loginWithPasskey">
+        <i class="bi bi-key-fill me-1" aria-hidden="true"></i>
+        {{ t('passkeys.signIn') }}
+      </button>
+      <p v-if="!passkeySupported" class="text-body-secondary mt-2">{{ t('passkeys.unsupported') }}</p>
+    </div>
+
     <div v-if="LOGIN_APP_DATA.displaySettings.auth.ldapauth" class="mt-4">
       <button type="button" class="btn btn-lg btn-primary" @click="strategy = 'ldapauth'">
         <i class="bi bi-people-fill me-1"></i>
@@ -93,6 +101,7 @@ import { useRoute, useRouter } from 'vue-router'
 import API from '@/api.js'
 import APP_LOADER from '@/dataLoader.js'
 import ENV from '@/env.js'
+import { authenticatePasskey, passkeyCancelled, supportsPasskeys } from '@/passkeys.js'
 import { prepareLogin, refreshAuthContext } from '@/session.js'
 
 const router = useRouter()
@@ -107,6 +116,8 @@ const usernameLDAP = ref('')
 const magicLoginMail = ref('')
 const magicLoginSend = ref(false)
 const loginReady = ref(false)
+const passkeyBusy = ref(false)
+const passkeySupported = supportsPasskeys()
 let loginGeneration = 0
 
 async function enableLogin() {
@@ -144,6 +155,21 @@ async function login() {
     API.addAlert({ message: t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
   }
 }
+async function loginWithPasskey() {
+  if (passkeyBusy.value) return
+  passkeyBusy.value = true
+  try {
+    await authenticatePasskey()
+    await refreshAuthContext()
+    await APP_LOADER.loadData(true)
+    await router.push(route.query.redirect ? (route.query.redirect as string) : '/')
+  } catch (error) {
+    if (!passkeyCancelled(error)) API.addAlert({ message: t('alerts.loginFailed'), title: 'ERROR', type: 'danger' })
+  } finally {
+    passkeyBusy.value = false
+  }
+}
+
 async function requestMagicLogin() {
   try {
     const res = await axios.post(`${ENV.VITE_BACKEND_URL}/auth/magiclogin`, {

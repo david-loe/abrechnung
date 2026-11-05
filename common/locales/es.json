@@ -886,6 +886,23 @@
     "10": "Nov",
     "11": "Dic"
   },
+  "passkeys": {
+    "add": "Añadir clave de acceso",
+    "createdAt": "Creada: {date}",
+    "description": "Inicia sesión con tu dispositivo o una llave de seguridad. Puedes añadir varias claves de acceso.",
+    "disabled": "La administración ha desactivado el inicio de sesión y el registro con claves de acceso.",
+    "empty": "Todavía no hay claves de acceso.",
+    "failed": "La operación ha fallado. Inténtalo de nuevo.",
+    "lastUsedAt": "Último uso: {date}",
+    "loadFailed": "No se pudieron cargar las claves de acceso. Recarga la página.",
+    "loading": "Cargando claves de acceso…",
+    "name": "Nombre de la clave de acceso",
+    "neverUsed": "Sin usar",
+    "offline": "Las claves de acceso solo se pueden usar y gestionar con conexión.",
+    "signIn": "Iniciar sesión con una clave de acceso",
+    "title": "Claves de acceso",
+    "unsupported": "Las claves de acceso requieren un navegador compatible y una conexión segura (HTTPS o localhost)."
+  },
   "settings": {},
   "settingsSearch": {
     "adminTools": ["mantenimiento", "reparación", "herramientas", "referencia"],

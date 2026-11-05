@@ -52,6 +52,8 @@
       </div>
     </section>
 
+    <PasskeySettings :enabled="APP_DATA.displaySettings.auth.passkey" />
+
     <section class="card">
       <div class="card-body">
         <h3 class="h5 card-title mb-3">API Key</h3>
@@ -71,6 +73,7 @@ import BankAccountForm from '@/components/elements/BankAccountForm.vue'
 import FileUpload from '@/components/elements/FileUpload.vue'
 import HealthInsuranceSelector from '@/components/elements/HealthInsuranceSelector.vue'
 import OrganisationSelector from '@/components/elements/OrganisationSelector.vue'
+import PasskeySettings from '@/components/elements/PasskeySettings.vue'
 import APP_LOADER from '@/dataLoader.js'
 
 const { t, locale } = useI18n()

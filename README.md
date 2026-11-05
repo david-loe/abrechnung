@@ -56,3 +56,11 @@ Auswahl zwischen
 ## Contributing
 
 Erstelle gerne <a href="https://github.com/david-loe/abrechnung/issues">Issues</a> oder <a href="https://github.com/david-loe/abrechnung/pulls">PR's</a> ([Contributing Guidelines](./CONTRIBUTING.md))!
+
+### Passkeys
+
+Passkeys ermöglichen die Anmeldung ohne Benutzername über ein Gerät oder einen FIDO2-Sicherheitsschlüssel. Nutzer können in ihren persönlichen Einstellungen mehrere Passkeys anlegen, benennen und entfernen. Die erste Einrichtung erfolgt nach Anmeldung über ein bestehendes Verfahren; diese Verfahren bleiben auch bei Verlust eines Passkeys nutzbar.
+
+Der Schalter unter Administration → Anzeigeeinstellungen → Authentifizierung aktiviert Anmeldung und Neuanlage. Bei Neuinstallationen sind Passkeys eingeschaltet, bei bestehenden Installationen nach dem Update zunächst ausgeschaltet. Auch bei ausgeschaltetem Schalter können Nutzer vorhandene Passkeys anzeigen, umbenennen und löschen. Das Löschen in der App widerruft den Zugang; ein Eintrag im Passwortmanager muss dort gegebenenfalls separat entfernt werden.
+
+Das Frontend benötigt HTTPS; für lokale Entwicklung ist auch `localhost` möglich. Die RP-ID entspricht dem Hostnamen von `VITE_FRONTEND_URL`, der erlaubte WebAuthn-Origin dessen Origin einschließlich Port. Änderungen des Hostnamens erfordern eine erneute Einrichtung der Passkeys. Backend und Frontend verwenden die bestehende Cookie-Sitzung und müssen entsprechend der vorhandenen Proxy-/Cookie-Konfiguration erreichbar sein.

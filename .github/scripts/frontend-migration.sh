@@ -31,6 +31,7 @@ import { createServer, request } from 'node:http'
 import { chromium, firefox } from 'playwright'
 import { testUserManagement } from './userManagement.mjs'
 import { testInteractions } from './interactions.mjs'
+import { testPasskeys } from './passkeys.mjs'
 import { testWorkerLifecycle } from './workerLifecycle.mjs'
 
 const origin = 'http://127.0.0.1:18767'
@@ -140,6 +141,8 @@ try {
       console.log(`${browserType.name()}: production ${process.env.PREVIOUS_VERSION} -> current worker and frontend; all tabs reloaded with query and fragment intact`)
       await testUserManagement(browser, origin)
       await testInteractions(browser, origin)
+      // WebAuthn RP IDs require a hostname rather than a loopback IP address.
+      await testPasskeys(browser, origin.replace('127.0.0.1', 'localhost'))
       await testWorkerLifecycle(browser, origin, currentEntry)
     } catch (error) {
       console.error(`${browserType.name()}: production frontend test failed`, error)
