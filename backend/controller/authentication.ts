@@ -34,7 +34,7 @@ function bearerAuthentication(req: Request, strategy: passport.Strategy, scopes?
         resolve(user)
       }
     }
-    passport.authenticate(strategy, { session: false }, authenticateCallback)(req)
+    passport.authenticate(Object.create(strategy), { session: false }, authenticateCallback)(req)
   })
 }
 
