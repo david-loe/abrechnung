@@ -886,6 +886,23 @@
     "10": "Nov",
     "11": "Déc"
   },
+  "passkeys": {
+    "add": "Ajouter une clé d’accès",
+    "createdAt": "Créée le : {date}",
+    "description": "Connectez-vous avec votre appareil ou une clé de sécurité. Vous pouvez ajouter plusieurs clés d’accès.",
+    "disabled": "La connexion et l’ajout de clés d’accès sont désactivés par l’administration.",
+    "empty": "Aucune clé d’accès enregistrée.",
+    "failed": "L’opération a échoué. Veuillez réessayer.",
+    "lastUsedAt": "Dernière utilisation : {date}",
+    "loadFailed": "Impossible de charger les clés d’accès. Rechargez la page.",
+    "loading": "Chargement des clés d’accès…",
+    "name": "Nom de la clé d’accès",
+    "neverUsed": "Jamais utilisée",
+    "offline": "Les clés d’accès ne peuvent être utilisées et gérées qu’en ligne.",
+    "signIn": "Se connecter avec une clé d’accès",
+    "title": "Clés d’accès",
+    "unsupported": "Les clés d’accès nécessitent un navigateur compatible et une connexion sécurisée (HTTPS ou localhost)."
+  },
   "settings": {},
   "settingsSearch": {
     "adminTools": ["maintenance", "réparation", "outils", "référence"],

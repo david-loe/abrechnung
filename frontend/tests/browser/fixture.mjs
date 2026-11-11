@@ -48,7 +48,10 @@ export async function browserFixture(browser) {
     const url = new URL(request.url())
     const path = url.pathname.replace('/api/', '')
     state.requests.push({ path, method: request.method(), query: url.search })
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(request.method()) && !['auth/ldapauth', 'auth/magiclogin'].includes(path)) {
+    if (
+      !['GET', 'HEAD', 'OPTIONS'].includes(request.method()) &&
+      !['auth/ldapauth', 'auth/magiclogin', 'auth/passkey/options', 'auth/passkey/verify'].includes(path)
+    ) {
       assert.equal(request.headers()['x-csrf-token'], 'a'.repeat(43), 'Cookie writes include the session CSRF token')
     }
     const handler = state.handlers[`${request.method()} ${path}`]
@@ -110,10 +113,12 @@ export async function browserFixture(browser) {
       'admin/ledgerAccount': [],
       specialLumpSums: {},
       'user/actionCounts': {},
+      'user/passkeys': [],
       settings: { version: '3.1.0', isReadOnly: false, disableReportType: {} },
       travelSettings: { fallbackLumpSumCountry: 'DE' },
       printerSettings: {},
       displaySettings: {
+        auth: { passkey: false, ldapauth: true, microsoft: false, oidc: false, magiclogin: false },
         nameDisplayFormat: 'givenNameFirst',
         locale: { default: 'en', fallback: 'en', overwrite: {} },
         accessIcons: {},

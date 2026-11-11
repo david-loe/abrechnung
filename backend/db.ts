@@ -76,6 +76,14 @@ export function sessionStore() {
   return sessionStorePromise
 }
 
+export async function initializeDisplaySettings(collection = mongoose.connection.collection('displaysettings')) {
+  // Existing installations opt in; only newly created settings enable passkeys by default.
+  await collection.updateMany({ 'auth.passkey': { $exists: false } }, { $set: { 'auth.passkey': false } })
+  if ((await collection.countDocuments()) === 0) {
+    await collection.insertOne(displaySettings satisfies Omit<IDisplaySettings, '_id'>)
+  }
+}
+
 export async function initDB() {
   const DBsettings = (await mongoose.connection.collection('settings').findOne()) as ISettings | null
   if (DBsettings) {
@@ -105,9 +113,7 @@ export async function initDB() {
     await mongoose.connection.collection('printersettings').insertOne(printerSettings satisfies Omit<IPrinterSettings, '_id'>)
   }
 
-  if ((await mongoose.connection.collection('displaysettings').countDocuments()) === 0) {
-    await mongoose.connection.collection('displaysettings').insertOne(displaySettings satisfies Omit<IDisplaySettings, '_id'>)
-  }
+  await initializeDisplaySettings()
 
   if ((await mongoose.connection.collection('connectionsettings').countDocuments()) === 0) {
     if (ENV.NODE_ENV === 'production') {

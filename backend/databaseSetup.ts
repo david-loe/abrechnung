@@ -1,6 +1,8 @@
 import mongoose from 'mongoose'
 import { connectDB } from './db.js'
 import { checkForMigrations } from './migrations.js'
+import './models/passkey.js'
+import './models/passkeyChallenge.js'
 
 export async function prepareDatabase() {
   await connectDB(true, { autoIndex: false, autoCreate: false })
