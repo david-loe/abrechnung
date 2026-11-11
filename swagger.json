@@ -8850,6 +8850,353 @@
 			"SetterBody_IPrinterSettings_mongoose.Types.ObjectId__": {
 				"$ref": "#/components/schemas/SetterPartial_IPrinterSettings_mongoose.Types.ObjectId_.NoPost_"
 			},
+			"PasskeyAuthenticationOptions": {
+				"properties": {
+					"challengeId": {
+						"type": "string"
+					},
+					"optionsJSON": {
+						"properties": {
+							"allowCredentials": {
+								"items": {
+									"properties": {
+										"transports": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"type": {
+											"type": "string"
+										},
+										"id": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"type",
+										"id"
+									],
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"userVerification": {
+								"type": "string",
+								"enum": [
+									"required",
+									"preferred",
+									"discouraged"
+								]
+							},
+							"timeout": {
+								"type": "number",
+								"format": "double"
+							},
+							"rpId": {
+								"type": "string"
+							},
+							"challenge": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"challenge"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"challengeId",
+					"optionsJSON"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PasskeyAuthenticationResponse": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"rawId": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"public-key"
+						],
+						"nullable": false
+					},
+					"clientExtensionResults": {
+						"properties": {
+							"credProps": {
+								"properties": {
+									"rk": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"response": {
+						"properties": {
+							"userHandle": {
+								"type": "string"
+							},
+							"signature": {
+								"type": "string"
+							},
+							"authenticatorData": {
+								"type": "string"
+							},
+							"clientDataJSON": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"signature",
+							"authenticatorData",
+							"clientDataJSON"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"id",
+					"rawId",
+					"type",
+					"clientExtensionResults",
+					"response"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PasskeyRegistrationOptions": {
+				"properties": {
+					"challengeId": {
+						"type": "string"
+					},
+					"optionsJSON": {
+						"properties": {
+							"excludeCredentials": {
+								"items": {
+									"properties": {
+										"transports": {
+											"items": {
+												"type": "string"
+											},
+											"type": "array"
+										},
+										"type": {
+											"type": "string"
+										},
+										"id": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"type",
+										"id"
+									],
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"authenticatorSelection": {
+								"properties": {
+									"authenticatorAttachment": {
+										"type": "string",
+										"enum": [
+											"platform",
+											"cross-platform"
+										]
+									},
+									"userVerification": {
+										"type": "string",
+										"enum": [
+											"required",
+											"preferred",
+											"discouraged"
+										]
+									},
+									"requireResidentKey": {
+										"type": "boolean"
+									},
+									"residentKey": {
+										"type": "string",
+										"enum": [
+											"required",
+											"preferred",
+											"discouraged"
+										]
+									}
+								},
+								"type": "object"
+							},
+							"attestation": {
+								"type": "string",
+								"enum": [
+									"none",
+									"indirect",
+									"direct",
+									"enterprise"
+								]
+							},
+							"timeout": {
+								"type": "number",
+								"format": "double"
+							},
+							"pubKeyCredParams": {
+								"items": {
+									"properties": {
+										"alg": {
+											"type": "number",
+											"format": "double"
+										},
+										"type": {
+											"type": "string",
+											"enum": [
+												"public-key"
+											],
+											"nullable": false
+										}
+									},
+									"required": [
+										"alg",
+										"type"
+									],
+									"type": "object"
+								},
+								"type": "array"
+							},
+							"user": {
+								"properties": {
+									"displayName": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									},
+									"id": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"displayName",
+									"name",
+									"id"
+								],
+								"type": "object"
+							},
+							"rp": {
+								"properties": {
+									"id": {
+										"type": "string"
+									},
+									"name": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"name"
+								],
+								"type": "object"
+							},
+							"challenge": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"pubKeyCredParams",
+							"user",
+							"rp",
+							"challenge"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"challengeId",
+					"optionsJSON"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PasskeyTransport": {
+				"type": "string",
+				"enum": [
+					"ble",
+					"cable",
+					"hybrid",
+					"internal",
+					"nfc",
+					"smart-card",
+					"usb"
+				]
+			},
+			"PasskeyRegistrationResponse": {
+				"properties": {
+					"id": {
+						"type": "string"
+					},
+					"rawId": {
+						"type": "string"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"public-key"
+						],
+						"nullable": false
+					},
+					"clientExtensionResults": {
+						"properties": {
+							"credProps": {
+								"properties": {
+									"rk": {
+										"type": "boolean"
+									}
+								},
+								"type": "object"
+							}
+						},
+						"type": "object"
+					},
+					"response": {
+						"properties": {
+							"transports": {
+								"items": {
+									"$ref": "#/components/schemas/PasskeyTransport"
+								},
+								"type": "array"
+							},
+							"attestationObject": {
+								"type": "string"
+							},
+							"clientDataJSON": {
+								"type": "string"
+							}
+						},
+						"required": [
+							"attestationObject",
+							"clientDataJSON"
+						],
+						"type": "object"
+					}
+				},
+				"required": [
+					"id",
+					"rawId",
+					"type",
+					"clientExtensionResults",
+					"response"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"VatRate__id_": {
 				"properties": {
 					"rate": {
@@ -12029,6 +12376,9 @@
 				"properties": {
 					"auth": {
 						"properties": {
+							"passkey": {
+								"type": "boolean"
+							},
 							"oidc": {
 								"type": "boolean"
 							},
@@ -12043,6 +12393,7 @@
 							}
 						},
 						"required": [
+							"passkey",
 							"oidc",
 							"ldapauth",
 							"microsoft",
@@ -12395,6 +12746,9 @@
 				"properties": {
 					"auth": {
 						"properties": {
+							"passkey": {
+								"type": "boolean"
+							},
 							"oidc": {
 								"type": "boolean"
 							},
@@ -12409,6 +12763,7 @@
 							}
 						},
 						"required": [
+							"passkey",
 							"oidc",
 							"ldapauth",
 							"microsoft",
@@ -13075,6 +13430,9 @@
 					},
 					"auth": {
 						"properties": {
+							"passkey": {
+								"type": "boolean"
+							},
 							"oidc": {
 								"type": "boolean"
 							},
@@ -21269,6 +21627,363 @@
 					}
 				],
 				"parameters": []
+			}
+		},
+		"/auth/passkey/options": {
+			"post": {
+				"operationId": "Options",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PasskeyAuthenticationOptions"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/auth/passkey/verify": {
+			"post": {
+				"operationId": "Verify",
+				"responses": {
+					"204": {
+						"description": "No content"
+					}
+				},
+				"tags": [
+					"Auth"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"response": {
+										"$ref": "#/components/schemas/PasskeyAuthenticationResponse"
+									},
+									"challengeId": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"response",
+									"challengeId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/passkeys": {
+			"get": {
+				"operationId": "List",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"data": {
+											"items": {
+												"properties": {
+													"createdAt": {
+														"type": "string"
+													},
+													"name": {
+														"type": "string"
+													},
+													"_id": {
+														"type": "string"
+													},
+													"lastUsedAt": {
+														"type": "string"
+													}
+												},
+												"required": [
+													"createdAt",
+													"name",
+													"_id"
+												],
+												"type": "object"
+											},
+											"type": "array"
+										}
+									},
+									"required": [
+										"data"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/passkeys/options": {
+			"post": {
+				"operationId": "Options",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"$ref": "#/components/schemas/PasskeyRegistrationOptions"
+										}
+									},
+									"required": [
+										"result"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": []
+			}
+		},
+		"/user/passkeys/verify": {
+			"post": {
+				"operationId": "Register",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"createdAt": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"type": "string"
+												},
+												"lastUsedAt": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"createdAt",
+												"name",
+												"_id"
+											],
+											"type": "object"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"name": {
+										"type": "string"
+									},
+									"response": {
+										"$ref": "#/components/schemas/PasskeyRegistrationResponse"
+									},
+									"challengeId": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"name",
+									"response",
+									"challengeId"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/user/passkeys/{id}": {
+			"post": {
+				"operationId": "Rename",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"result": {
+											"properties": {
+												"createdAt": {
+													"type": "string"
+												},
+												"name": {
+													"type": "string"
+												},
+												"_id": {
+													"type": "string"
+												},
+												"lastUsedAt": {
+													"type": "string"
+												}
+											},
+											"required": [
+												"createdAt",
+												"name",
+												"_id"
+											],
+											"type": "object"
+										},
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"result",
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								},
+								"required": [
+									"name"
+								],
+								"type": "object"
+							}
+						}
+					}
+				}
+			},
+			"delete": {
+				"operationId": "Remove",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"properties": {
+										"message": {
+											"type": "string"
+										}
+									},
+									"required": [
+										"message"
+									],
+									"type": "object"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"User"
+				],
+				"security": [
+					{
+						"cookieAuth": []
+					}
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/organisation": {
