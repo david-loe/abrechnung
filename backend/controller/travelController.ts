@@ -342,7 +342,9 @@ export class TravelController extends Controller {
           !oldObject.historic &&
           oldObject.owner._id.equals(request.user._id) &&
           (oldObject.state === TravelState.APPROVED || oldObject.state === TravelState.IN_REVIEW) &&
-          oldObject.editor._id.equals(request.user._id)
+          // Owners allowed to approve their own travels may edit them no matter who approved (supervisor, API user).
+          // Everyone else may only touch what they edited last themselves (e.g. withdrawing from review).
+          (request.user.access['approved:travel'] || oldObject.editor._id.equals(request.user._id))
         ) {
           await assertAdvanceOwnership(oldObject.owner, extendedBody.advances ?? oldObject.advances)
           await oldObject.saveToHistory()
